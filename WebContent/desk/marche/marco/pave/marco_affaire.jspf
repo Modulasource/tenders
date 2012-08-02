@@ -1,0 +1,59 @@
+<TABLE class="pave">
+  <TR>
+	<TD class="pave_titre_gauche" colspan="2">Affaire Code origine : <%= aff.sCodeOrigine %> Numéro de l'affaire : <%= aff.sNumeroAffaire %> 
+	</TD>
+  </TR>
+  <tr>
+  	<td colspan="2">&nbsp;</td>
+  </tr>
+  <TR>
+    <TD class="pave_cellule_gauche">Code utilsateur Marco :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sCodeUtilisateurMarco %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Code personne morale :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sCodePersonneMorale %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Libellé du Marché :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sLibelle %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Lieu de l'exécution du marché :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sLieuExecutionAffaire %></TD>
+  </TR>
+<%
+	//:BUG MARCO
+%>
+  <TR>
+    <TD class="pave_cellule_gauche">Type d'opération :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sIdTypeOperation %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Type d'opération d"tail :</TD>
+ 	<TD class="pave_cellule_droite"><%= aff.sIdTypeOperationDetail %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Adresse administrative :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sAdresseAdministrative %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Correspondant administratif :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sCorrespondantAdministratif %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Adresse technique :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sAdresseTechnique %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Correspondant technique :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sCorrespondantTechnique %></TD>
+  </TR>
+  <TR>
+    <TD class="pave_cellule_gauche">Code utilisateur Marco PRM :</TD>
+    <TD class="pave_cellule_droite"><%= aff.sCodeUtilisateurMarcoPRM %></TD>
+  </TR>
+  <tr>
+  	<td colspan="2">&nbsp;</td>
+  </tr>
+</TABLE>

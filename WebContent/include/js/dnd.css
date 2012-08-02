@@ -1,0 +1,22 @@
+html, body, #tomove, #tomove2; #tomove3{
+	margin: 0px;
+	padding: 0px;
+}
+
+body{
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 75%;
+}
+
+/*
+#tomove, #tomove2, #tomove3{
+	width: 150px;
+	height: 150px;
+	background: #eee none;
+	border: 1px solid #ddd;
+	font-size: 0.9em;
+	cursor: move;
+
+	position: absolute;
+}
+*/

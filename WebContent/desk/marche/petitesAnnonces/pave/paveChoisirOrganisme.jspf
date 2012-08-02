@@ -1,0 +1,28 @@
+<%
+	String sOrganisationPassantMarche = "Indéfinie";
+	String sCommissionPassantMarche = "Indéfinie";
+	try {
+		sOrganisationPassantMarche = Organisation.getOrganisation(marche.getIdOrganisationFromMarche()).getRaisonSociale();
+		sCommissionPassantMarche = Commission.getCommission(marche.getIdCommission()).getNom();
+	} catch (Exception e) {}
+%>
+
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="modula.commission.Commission"%><table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2" >Renseignements sur l'organisme et la commission</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">Acheteur public :</td>
+		<td class="pave_cellule_droite"><%= sOrganisationPassantMarche != ""? sOrganisationPassantMarche:"A définir"%>
+	   	 </td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Commission :</td>
+		<td class="pave_cellule_droite"><%= sCommissionPassantMarche != ""? sCommissionPassantMarche:"A définir"%>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

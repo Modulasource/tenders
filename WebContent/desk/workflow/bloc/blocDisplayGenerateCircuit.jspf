@@ -1,0 +1,128 @@
+<%
+if (lIdOrganigramNodeStart != -1
+    && lIdOrganigramNodeEnd != -1)
+{
+    
+	OrganigramCircuit oc = new OrganigramCircuit(
+    		   lIdOrganisation,
+    		   lIdOrganisationServiceStart,
+               lIdOrganisationServiceEnd,
+               lIdOrganigramNodeStart,
+               lIdOrganigramNodeEnd,
+               bAddNodeHead);
+
+    oc.prepare(conn);
+    oc.generateCircuit(conn);
+
+%>    
+<%@page import="org.coin.bean.organigram.*"%>
+<%@page import="org.coin.fr.bean.*"%>
+<%@page import="java.util.Vector"%>
+
+<%@page import="org.coin.fr.bean.util.OrganigramCircuit"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<div class="sectionTitle">Circuit </div>
+    <div class="sectionFrame">
+        <table class="formLayout" cellspacing="3">
+        <tr>
+            <td class="label" ></td>
+            <td class="frame"><b>Circuit dans service de départ : <%= oc.osStart.getName() %></b>
+            </td>
+        </tr>
+
+    <%
+
+    for(int k=0; k < oc.vPathStart.size(); k++)
+    {
+        OrganigramNode nod = (OrganigramNode)oc.vPathStart.get(k);
+        %>
+        <tr>
+            <td class="label" ><%= "" + (k+1) %></td>
+            <td class="frame"><%= nod.getName() %>
+            </td>
+        </tr>
+        <%
+    }
+    %>
+    <tr>
+        <td class="label" ></td>
+        <td class="frame"><b>Circuit inter-service</b>
+        </td>
+    </tr>
+    <%
+
+    for(int k=0; k < oc.vPathInterServiceStart.size(); k++)
+    {
+        OrganigramNode on = (OrganigramNode)oc.vPathInterServiceStart.get(k);
+        
+        /**
+         * ici c'est des ID de service
+         */
+        Organigram organigram = null;
+        Vector<OrganigramNode> vNode = null;
+        Vector<OrganigramNode> vNodeHead =  new Vector<OrganigramNode>();
+        Vector vOrganigram = Organigram.getAllFromObject(ObjectType.ORGANISATION_SERVICE, on.getIdReferenceObject());
+        if(vOrganigram.size() ==1)
+        {
+            organigram = (Organigram ) vOrganigram.get(0);
+            vNode =  OrganigramNode.getAllFromIdOrganigram(organigram .getId());
+
+        }
+        else{
+            vNode = new Vector();
+        }
+        
+        OrganigramNode.computeName(vNode, oc.vPersonne, oc.vPoste);
+        
+        String sHead =  " : <br/>\n";
+        /**
+         * on récupère tous les noeuds de tete
+         */
+        for(OrganigramNode node : vNode)
+        {
+        	if(node.getIdOrganigramNodeParent() == node.getId() )
+        	{
+                vNodeHead.add(node);
+                sHead += " - " + node.getName() +  ",<br/>\n";
+            }
+        }
+        
+        %>
+        <tr>
+            <td class="label" ><%= "" + (k+1) %></td>
+            <td class="frame"><%= on.getName() + sHead %>
+            </td>
+        </tr>
+        <%
+    }
+    %>
+
+
+
+    <tr>
+        <td class="label" ></td>
+        <td class="frame"><b>Circuit dans service d'arrivée : <%= oc.osEnd.getName() %></b>
+        </td>
+    </tr>
+    <%
+
+
+    for(int k=0; k < oc.vPathEnd.size(); k++)
+    {
+        OrganigramNode nod = (OrganigramNode)oc.vPathEnd.get(oc.vPathEnd.size() - (k+1));
+        %>
+        <tr>
+            <td class="label" ><%= "" + (k+1) %></td>
+            <td class="frame"><%= nod.getName() %>
+            </td>
+        </tr>
+        <%
+    }
+    %>
+        </table>
+    </div>
+    <%
+}
+
+%>

@@ -1,0 +1,37 @@
+<%
+	int j;
+	for (int i = 0; i < vGroups.size(); i++)	
+	{
+		EditorialAssistanceGroup group = (EditorialAssistanceGroup) vGroups.get(i);
+		PersonnePhysique auteur = PersonnePhysique.getPersonnePhysique(group.getIdPersonnePhysiqueAuteur());
+		String sVisibilite = "Public";
+		Vector<EditorialAssistanceGroupLibrary> vLibSysteme = EditorialAssistanceGroupLibrary.getAllEditorialAssistanceGroupLibraryFromGroupAndTypeObjet((int)group.getId(),ObjectType.SYSTEME);
+		if(vLibSysteme == null || vLibSysteme.size()==0)
+			sVisibilite = "Privé";
+		
+		j = i % 2;
+		String sRedirectPage = rootPath + "desk/editorial/afficherEditorialAssistanceGroup.jsp?iIdEditorialAssistanceGroup=" + group.getId();
+%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.editorial.EditorialAssistanceGroupLibrary"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.bean.editorial.EditorialAssistanceGroup"%>
+<%@page import="modula.graphic.Icone"%>
+<tr class="liste<%=j%>" 
+				 onmouseover="className='liste_over'" 
+				 onmouseout="className='liste<%=j%>'" 
+				 onclick="Redirect('<%= response.encodeRedirectURL(sRedirectPage) %>')"> 
+			<td><%= group.getName() %></td>
+			<td><%= auteur.getName() %></td>
+			<td><%= CalendarUtil.getDateCourte(group.getDateCreation()) %></td>
+			<td><%= sVisibilite %></td>
+			<td style="text-align:right;width:5%">
+				<a href="<%=response.encodeURL(sRedirectPage) %>">
+				<img src="<%=rootPath+ Icone.ICONE_FICHIER_DEFAULT %>" style="width:21" height="21"  alt="Afficher" title="Afficher"/>
+				</a>
+			</td>
+		</tr>
+<%
+	}
+%>

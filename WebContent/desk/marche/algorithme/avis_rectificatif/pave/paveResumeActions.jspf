@@ -1,0 +1,41 @@
+<%
+	boolean isAvisValide = avis.isAvisValide(false);
+
+	boolean isOngletsValides = avis.isOngletsValides(false);
+	
+	boolean isMailCandidatEnvoye = avis.isMailCandidatEnvoye(false);
+	
+	boolean isMailPublicationEnvoye = avis.isMailPublicationEnvoye(false);
+
+	String sImageStatusValide = "<img width='16' src='"+ rootPath + modula.graphic.Icone.ICONE_SUCCES + "' />";
+	String sImageStatusNonValide = "<img width='16' src='"+ rootPath + modula.graphic.Icone.ICONE_WARNING + "' />";	
+	
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Actions effectuées</td>
+		<td class="pave_titre_droite">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche"><%= isAvisValide?sImageStatusValide:sImageStatusNonValide %></td>
+		<td class="pave_cellule_droite">Validation de l'avis</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche"><%= isOngletsValides?sImageStatusValide:sImageStatusNonValide %></td>
+		<td class="pave_cellule_droite">Validation des onglets</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche"><%= isMailPublicationEnvoye?sImageStatusValide:sImageStatusNonValide %></td>
+		<td class="pave_cellule_droite">Prévenir les publications </td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche"><%= isMailCandidatEnvoye?sImageStatusValide:sImageStatusNonValide %></td>
+		<td class="pave_cellule_droite">Prévenir les candidats </td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+</table>

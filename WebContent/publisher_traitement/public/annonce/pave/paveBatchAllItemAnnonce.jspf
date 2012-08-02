@@ -1,0 +1,128 @@
+
+<%@page import="org.coin.fr.bean.Adresse"%><%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+<%@page import="org.coin.fr.bean.MultimediaType"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.fr.bean.Multimedia"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="modula.commission.Commission"%>
+<%@page import="modula.marche.AncienAvis"%>
+<%@page import="modula.marche.MarchePieceJointe"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.Validite"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<%
+
+	CoinDatabaseWhereClause wcAllIdOrganisation = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+	CoinDatabaseWhereClause wcAllIdAddresse = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+	CoinDatabaseWhereClause wcAllIdAvisRectificatif = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+
+	AvisRectificatif avisRectificatifTotal = new AvisRectificatif();
+	Vector<AvisRectificatif> vAvisRectificatifTotal 
+	    = avisRectificatifTotal.getAllWithWhereAndOrderByClause(
+	           " WHERE " + wcAllIdMarche.generateWhereClause("id_marche"),
+	            "",
+	            connSearchEngineTotal);
+	
+	String sWhereClauseValiditeAvisRectificatif = "";
+	for (int i = 0; i < vAvisRectificatifTotal.size(); i++)  
+	{
+	    AvisRectificatif tempAvisRectificatif = (AvisRectificatif)vAvisRectificatifTotal.get(i);
+	    wcAllIdAvisRectificatif.add(tempAvisRectificatif.getId());
+	    sWhereClauseValiditeAvisRectificatif 
+	      = "OR (id_type_objet_modula=" + TypeObjetModula.AVIS_RECTIFICATIF
+	          + " AND " + wcAllIdAvisRectificatif.generateWhereClause("id_reference_objet") 
+	          + ")";
+	}
+	
+	
+	Validite validiteTotal = new Validite();
+	Vector<Validite> vValiditeTotal 
+	 = validiteTotal.getAllWithWhereAndOrderByClause(
+	          // " WHERE (id_type_objet_modula in (1,5,7)"
+	          // Comme cela on est sûr de ne rien oublier
+	           " WHERE (" + wcAllIdMarche.generateWhereClause("id_reference_objet")
+	          + " ) " + sWhereClauseValiditeAvisRectificatif,
+	         "",
+	         connSearchEngineTotal);
+	
+	MarchePieceJointe marchePieceJointeTotal = new MarchePieceJointe();
+	Vector<MarchePieceJointe> vMarchePieceJointeTotal 
+	 = marchePieceJointeTotal.getAllWithWhereAndOrderByClause(
+	       " WHERE " + wcAllIdMarche.generateWhereClause("id_marche"),
+	        "",
+	        connSearchEngineTotal);
+	
+	
+	
+	AncienAvis ancienAvisTotal = new AncienAvis();
+	Vector<AncienAvis> vAncienAvisTotal = null;
+	if(wcAllIdAvisRectificatif.listItems.size() > 0)
+	{
+	    vAncienAvisTotal 
+	      = ancienAvisTotal.getAllWithWhereAndOrderByClause(
+	            " WHERE " + wcAllIdAvisRectificatif.generateWhereClause("id_avis_rectificatif"),
+	            "",
+	            connSearchEngineTotal);
+	}
+	
+	
+	Commission commissionTotal = new Commission();
+	Vector<Commission> vCommissionTotal 
+	= commissionTotal.getAllWithWhereAndOrderByClause(
+	       " WHERE " + wcAllIdCommission.generateWhereClause("id_commission"),
+	       "",
+	       connSearchEngineTotal);
+	
+	PersonnePhysique personnePhysiqueTotal = new PersonnePhysique();
+	Vector<PersonnePhysique> vPersonnePhysiqueTotal 
+	= personnePhysiqueTotal.getAllWithWhereAndOrderByClause(
+	      " WHERE " + wcAllIdPersonnePhysique.generateWhereClause("id_personne_physique"),
+	      "",
+	      connSearchEngineTotal);
+	
+	
+	for (int i = 0; i < vCommissionTotal.size(); i++)  
+	{
+	    Commission tempCommission = (Commission)vCommissionTotal.get(i);
+	    wcAllIdOrganisation.add(tempCommission.getIdOrganisation());
+	}
+	
+	for (int i = 0; i < vPersonnePhysiqueTotal.size(); i++)  
+	{
+	    PersonnePhysique tempPersonnePhysique = (PersonnePhysique)vPersonnePhysiqueTotal.get(i);
+	    wcAllIdOrganisation.add(tempPersonnePhysique.getIdOrganisation());
+	}
+	
+	
+	Organisation organisationTotal = new Organisation();
+	Vector<Organisation> vOrganisationTotal 
+	    = organisationTotal.getAllWithWhereAndOrderByClause(
+	       " WHERE " + wcAllIdOrganisation.generateWhereClause("id_organisation"),
+	       "",
+	       connSearchEngineTotal);
+	
+	for (int i = 0; i < vOrganisationTotal.size(); i++)  
+	{
+		Organisation tempOrganisation = (Organisation)vOrganisationTotal.get(i);
+	    wcAllIdAddresse.add(tempOrganisation.getIdAdresse());
+	}
+	Adresse adresseTotal = new Adresse();
+	Vector<Adresse> vAdresseTotal 
+	    = adresseTotal.getAllWithWhereAndOrderByClause(
+	       " WHERE " + wcAllIdAddresse.generateWhereClause("id_adresse"),
+	       "",
+	       connSearchEngineTotal);
+	
+	
+	Multimedia multimediaTotal = new Multimedia();
+	Vector<Multimedia> vMultimediaTotal 
+	  = multimediaTotal.getAllWithWhereAndOrderByClause(
+	          " WHERE"
+	          + " id_coin_multimedia_type = " + MultimediaType.TYPE_LOGO
+	          + " AND id_type_objet = " + ObjectType.ORGANISATION
+	          + " AND " + wcAllIdOrganisation.generateWhereClause("id_reference_objet"),
+	          "",
+	          connSearchEngineTotal);
+%>

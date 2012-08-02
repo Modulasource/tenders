@@ -1,0 +1,103 @@
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="modula.algorithme.PhaseEtapes"%>
+<%@page import="modula.marche.Marche"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="java.util.Vector"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="org.coin.security.Password"%>
+<%@page import="modula.Validite"%>
+<%@page import="modula.algorithme.Etape"%>
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="org.coin.db.ConnectionManager"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+
+<%@page import="org.coin.security.SecureString"%>
+<%@page import="mt.modula.affaire.AffaireValiditeArray"%><table class="liste" style="width:100%" >
+	<tr>
+		<th>Référence</th>
+		<th>Désignation</th>
+		<th>Date de clôture</th>
+		<th>Statut</th>
+		<th>&nbsp;</th>
+	</tr>
+<%
+    System.out.println("\n\n\n\n\n\nStart Pave liste candidature !!\n");
+
+    Connection connListeCandidatureTotal = ConnectionManager.getConnection();
+	CoinDatabaseWhereClause wcAllIdMarche = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+    for (int i = 0; i < candidatures.size(); i++)
+    {
+        Candidature candidature = candidatures.get(i);
+        wcAllIdMarche.add(candidature.getIdMarche());
+    }
+    
+   
+    AffaireValiditeArray ava = new AffaireValiditeArray(wcAllIdMarche);
+    ava.init(connListeCandidatureTotal);
+    
+    
+    for (int i = 0; i < candidatures.size(); i++)
+	{
+		int j = i%2;
+		Candidature candidature = candidatures.get(i);
+		PhaseEtapes oPhaseEtapes = null;
+		String sEtape = "";
+		try
+		{
+			oPhaseEtapes = PhaseEtapes.getPhaseEtapesMemory(candidature.getIdAlgoPhaseEtapes());
+			sEtape = Etape.getEtapeNameMemory(oPhaseEtapes.getIdAlgoEtape());
+		}
+		catch(Exception e){}
+		Marche marche = Marche.getMarche(candidature.getIdMarche(), ava.vMarcheTotal);
+		boolean bIsContainsCandidatureManagement = AffaireProcedure.isContainsCandidatureManagement(marche.getIdAlgoAffaireProcedure());
+		int iIdOngletRedirect = Onglet.ONGLET_CANDIDATURE;
+		if(!bIsContainsCandidatureManagement)
+			iIdOngletRedirect = Onglet.ONGLET_DCE;
+		
+		String sDateCloture = ava.getDateClotureMarche(marche);
+%>
+	<tr class="liste<%=j%>" onmouseover="className='liste_over'" onmouseout="className='liste<%=j%>'"
+			onclick="Redirect('<%= response.encodeURL(rootPath + sPublisherPath+"/private/candidat/consulterDossier.jsp?iIdOnglet="+iIdOngletRedirect+"&amp;cand=" 
+				+ SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session) ) %>')">
+	   <td style="font-weight:bold"><%= marche.getReference() %></td>
+		<td><%= marche.getObjet() %></td>
+		<td><%= sDateCloture %></td>
+		<%
+			boolean bIsDCERetire = candidature.isDCERetire(false);
+			boolean bIsCandidaturesCloses = marche.isCandidaturesCloses(false);
+			boolean bIsOffreCloses = marche.isOffresCloses(false);
+			boolean bAfficheLien = true;
+	    	
+			if(!bIsDCERetire)
+			{
+				sEtape = "Dossier en cours";
+			}
+			if(bIsOffreCloses || bIsCandidaturesCloses)
+			{
+				sEtape = "En attente de delibération";
+				bAfficheLien = false;
+			}
+			%>
+			<td>
+				<% if(bAfficheLien){ %><a href="<%= 
+					   response.encodeURL("consulterDossier.jsp?iIdOnglet=2&amp;cand=" 
+					   + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session) ) %>"><%}%>
+				<%= sEtape %>
+				</a>
+			</td>
+			<td>
+				<img src="<%=rootPath+ Icone.ICONE_FICHIER_DEFAULT %>" width="21" height="21"  alt="Afficher" title="Afficher"/>
+			</td>
+		</tr>
+<%
+	}
+    
+    
+%>
+</table>

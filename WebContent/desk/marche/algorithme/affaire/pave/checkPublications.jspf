@@ -1,0 +1,21 @@
+<script type="text/javascript" >
+function onAfterPageLoading()
+{
+<%
+	if(iIdOnglet == 0){
+		try{
+			if(!marche.isPubliePapier()){
+%>
+	cacher('liste_supports_pub');
+<%
+			}
+		}
+		catch(Exception e){
+%>
+	cacher('liste_supports_pub');
+<%
+		}
+	}
+%>
+}
+</script>

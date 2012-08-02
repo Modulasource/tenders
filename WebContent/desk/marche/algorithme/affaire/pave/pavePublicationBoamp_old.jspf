@@ -1,0 +1,61 @@
+<%
+	Vector<PublicationBoamp> vPublicationsAAPCBoamp 
+	= PublicationBoamp.getAllPublicationBoampFromAffaire(
+		PublicationType.TYPE_AAPC,
+		marche.getIdMarche());
+
+	if(vPublicationsAAPCBoamp.size() == 0)
+	{
+		Vector<Export> vExport = Export.getAllExportFromSourceAndDestination(
+				marche.getIdOrganisationFromMarche(),
+				TypeObjetModula.ORGANISATION,
+				PublicationBoamp.getIdOrganisationBoampOptional(),
+				TypeObjetModula.ORGANISATION);
+%>	
+				<tr>
+					<td class="pave_cellule_gauche">Publication de l'AAPC au BOAMP :</td>
+					<td class="pave_cellule_droite" style="vertical-align:middle">
+<%		
+		if(vExport.size() ==0)
+		{
+			%>Pas export défini vers le BOAMP.<%
+		}
+			
+		for (int i =0 ; i < vExport.size() ; i++)
+		{
+			Export export = vExport.get(i);
+			String sUrlCreate 
+				= rootPath + "desk/export/publication/modifierPublicationBoamp.jsp?"
+				+ "sAction=createIndentifiants"
+				+ "&amp;iIdTypeObjet=" + ObjectType.AFFAIRE
+				+ "&amp;iIdReferenceObjet=" + marche.getIdMarche()
+				+ "&amp;iIdExport=" + export.getIdExport()
+				+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+				+ "&amp;iIdPublicationEtat=" + PublicationEtat.ETAT_A_ENVOYER
+				+ "&amp;iIdExportMode=" + export.getIdExportMode()
+				+ "&amp;sUrlRedirect=" 
+				+ rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?"
+				+ "iIdAffaire="	+ marche.getIdMarche() 
+				+ "%26iIdOnglet=" + modula.graphic.Onglet.ONGLET_AFFAIRE_PLANNING;
+			
+			String sMode = ExportMode.getExportModeNameMemory(export.getIdExportMode());
+%>					<a href="<%= response.encodeURL( 
+								sUrlCreate 
+							)  %>" >
+							Ajouter une publication <%= sMode %>
+						</a><br /> 
+		
+<%		} %>						
+					</td>
+				</tr>
+<%
+	
+	}
+	else
+	{
+		// TODO : DK vu avec Leila et le BOAMP, il est possible 
+		// d'avoir 2 publications suivant les champs renseignés dans l'AAPC
+		PublicationBoamp publi = vPublicationsAAPCBoamp.get(0);
+%><%@ include file="../../../../export/publication/pave/pavePublicationBoampCellule.jspf" %><%	
+	}
+%>

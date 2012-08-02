@@ -1,0 +1,69 @@
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarcheType"%>
+
+<%
+	/* TODO : magouille de Florian pour récupérer les libellés
+	 * car ils sont cachés dans la table avec id_marche_code_type = 0  ....
+	*/
+	Vector vListeLibelle 
+		= MarcheType
+			.getAllMarcheTypePourIdMarcheTypeDetail(
+					0,
+					//"ORDER BY id_marche_code_type_detail",
+					false);
+%>
+function niveau2(index){
+	switch(parseInt(index)){
+<%
+	for (int i = 1; i <= vListeLibelle.size(); i++)
+	{
+		out.write("\t\t case " + i + ":\n");
+		out.write("\t\t\t return Array(\n");
+		Vector vListeLibelleDetail = MarcheType.getAllMarcheTypePourIdMarcheCodeType(i,false);
+		for (int j = 0; j < vListeLibelleDetail.size() ; j++)
+		{
+			MarcheType libelleDetail = (MarcheType) vListeLibelleDetail.get(j);
+			
+			if (!libelleDetail.getIdCodeTypeDetail().equals("0") )
+			{
+				out.write("\t\t\t\t Array(" + libelleDetail.getIdType() + ",\"" 
+						+ "[" + libelleDetail.getIdCodeTypeDetail() + "] " 
+						+ libelleDetail.getLibelleDetail() + "\")");
+				
+				if(j != (vListeLibelleDetail.size() - 1) )
+					out.write(",");
+				
+				out.write("\n");
+			}
+		}
+		out.write("\t\t\t );\n \t\t\t break;\n");
+	}
+%>
+	}
+}
+
+var tListe1 = Array(
+<%
+	for (int i = 0; i < vListeLibelle.size(); i++)
+	{
+		MarcheType libelle = (MarcheType) vListeLibelle.get(i);
+		
+		out.write("\t\t\t new Array(" + libelle.getIdCodeType() + ",\"" 
+				+ libelle.getLibelle() + "\")");
+			
+		if(i != (vListeLibelle.size() - 1) )
+			out.write(",");
+		
+		out.write("\n");
+	}
+%>
+			);
+
+function init1(){
+   // alert ("remplir " + remplir);
+   try{
+      remplir("<%= sFormPrefix %>iIdMarcheType", tListe1);
+   } catch (e) {}
+}
+
+

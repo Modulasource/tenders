@@ -1,0 +1,27 @@
+<%@page import="org.coin.bean.boamp.BoampFormulaireType"%>
+<%@page import="modula.marche.MarcheProcedure"%>
+<%
+	boolean bUseFormMAPA = false;
+	boolean bUseFormNS = false;
+	boolean bUseFormUE = false;
+	MarcheProcedure	oMarcheProcedure = null;
+	int iIdBoampFormulaireType = 0;
+	
+	try {
+		oMarcheProcedure = MarcheProcedure.getFromMarche(marche.getIdMarche());
+		iIdBoampFormulaireType = oMarcheProcedure.getIdBoampFormulaireType();
+		switch(iIdBoampFormulaireType){
+		case BoampFormulaireType.TYPE_MAPA:
+			bUseFormMAPA = true;
+			break;
+		case BoampFormulaireType.TYPE_NS:
+			bUseFormNS = true;
+			break;
+		case BoampFormulaireType.TYPE_UE:
+			/// imposible !!!!
+			bUseFormUE = true;
+			break;
+		}
+	} catch (Exception e) {}
+
+%>

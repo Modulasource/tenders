@@ -1,0 +1,49 @@
+<%
+	/*
+	 *	Objet nécessaire:
+	 *		String sPaveCompetenceTitre;
+	 *		Marche marche;
+	 */
+
+/* Récupération de toutes les compétences */
+{
+%>
+	<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<table class="pave" summary="none">
+		<tr onclick="montrer_cacher('paveGroupCompetence')">
+			<td class="pave_titre_gauche" colspan="2"><%= sPaveClassificationGroupProduitsTitre %></td>
+		</tr>
+		<tr>
+			<td>
+				<table id="paveGroupCompetence" summary="compétences">
+					<tr>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="pave_cellule_gauche">
+							<%= sPaveClassificationGroupProduitsTitre %> :
+						</td>
+						<td class="pave_cellule_droite" style="font-weight:normal">
+						<div id="cpfGroupSelectedItems"></div>
+						<script>
+						var jsonCpfSelectedItems = <%= cpfSwitcher.getGroupCPFSelectedList() %>;
+						jsonCpfSelectedItems.each(function(cpf){
+						  $("cpfGroupSelectedItems").innerHTML += cpf.value+"<br/>";
+						});
+						</script>
+						</td >
+					</tr>
+					<tr>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+<%
+}
+%>

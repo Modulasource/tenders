@@ -1,0 +1,25 @@
+<%
+	/* Nécéssite les javascripts suivants : 
+	 * checkInfosCandidats(form, sFormPrefix) 
+	 * form - nom du formulaire -->
+	 * sFormPrefix - préfixe du formulaire
+	 * 
+	 *
+	 */
+%>
+	<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" colspan="2"><%= sPaveRenseignementsTitre %></td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="vertical-align:top">
+			Délai d'urgence - justification (zone obligatoire en cas de délai d'urgence):<br/>
+            <i>Ne peut pas être renseigné pour le formulaire JOUE 2</i>
+			</td>
+			<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sJustificationUrgence" cols="100" rows="4"><%= marche.getJustificationUrgence() %></textarea>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>

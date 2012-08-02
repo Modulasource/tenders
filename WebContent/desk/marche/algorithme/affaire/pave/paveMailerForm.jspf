@@ -1,0 +1,207 @@
+<%
+	/*
+	 *	Nécessite les objets suivants :
+	 *		MailType mailType;
+	 *		String sTitrePave;
+	 *		String rootPath;
+	 *		String[] sBalisesActives;
+	 *		boolean bJoindreAAPC;
+	 *		boolean bJoindreAATR;
+	 * 		boolean bPieceJointe;
+	 *
+	 *	Nécessite les javascripts suivants :
+	 *		popup.js;
+	 *		
+	 */
+%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<script type="text/javascript">
+function afficherPieceJointe()
+{
+	if(document.formulaires.bPieceJointe.checked)
+	{
+		montrer("divPieceJointe");
+	}
+	else
+	{
+		cacher("divPieceJointe");
+	}
+}
+</script>
+
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sTitrePave %></td>
+	</tr>
+	<tr>
+		<td style="text-align:left;">
+			<table class="pave" summary="none">
+				<tr>
+					<td style="font-weight:bold">
+					Objet :&nbsp;
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<textarea cols="100" rows="2" name="objet"><%= mailType.getObjetType() %></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td style="font-weight:bold">
+					Contenu :&nbsp;
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<textarea cols="100" rows="20" name="contenuMail"><%= mailType.getContenuType() %></textarea>
+					</td>
+				</tr>
+<%
+String sEditionPDF = "";
+if (bJoindreAAPC)
+{
+	boolean bAAPCAutomatique = false;
+	try
+	{
+		bAAPCAutomatique = marche.isAAPCAutomatique();
+	}
+	catch(Exception e){}
+	
+	if(bAAPCAutomatique) sEditionPDF="Joindre l'AAPC de l'affaire au format automatique généré en PDF";
+	else 
+	{
+		sEditionPDF="Joindre l'AAPC de l'affaire au format Libre (";
+	
+		String sNomAAPCLibre = marche.getNomAAPC();
+		if (sNomAAPCLibre != null && !sNomAAPCLibre.equals("") )
+		{	
+			String sURLAAPC = "desk/DownloadFileDesk?"
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request, 
+							marche.getIdMarche(), 
+							TypeObjetModula.AAPC);
+					
+			sURLAAPC = response.encodeURL(rootPath+ sURLAAPC);
+			sEditionPDF += "<a href='"+ sURLAAPC +"'>"+sNomAAPCLibre+"</a>)";
+		}
+		else
+		{
+			sEditionPDF += "pas de document associé)";
+		}
+	}
+}
+else if (bJoindreAATR && avisAttribution != null)
+{
+	boolean	bAATRAutomatique = avisAttribution.isAATRAutomatique(true);
+	
+	if(bAATRAutomatique) sEditionPDF="Joindre l'AATR de l'affaire au format automatique généré en PDF";
+	else 
+	{
+		sEditionPDF="Joindre l'AATR de l'affaire au format Libre (";
+	
+		String sNomAATRLibre = avisAttribution.getNomAATR();
+		if (sNomAATRLibre != null && !sNomAATRLibre.equals("") )
+		{	
+			String sURLAATR = "desk/DownloadFileDesk?"
+						+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request, 
+							avisAttribution.getIdAvisAttribution(), 
+							TypeObjetModula.AATR);
+					
+			sURLAATR = response.encodeURL(rootPath+ sURLAATR);
+			sEditionPDF += "<a href='"+ sURLAATR +"'>"+sNomAATRLibre+"</a>)";
+		}
+		else
+		{
+			sEditionPDF += "pas de document associé)";
+		}
+	}
+}
+%>
+				<tr>
+					<td>
+						<table summary="none">
+							<tr>
+								<%
+								if(bJoindreAAPC)
+								{
+								%>
+								<td>
+									<input type="checkbox" name="bJoindreAAPC" value="true" checked='checked'/>&nbsp;<%= sEditionPDF %>
+								</td>
+								<%
+								}
+								else if(bJoindreAATR)
+								{
+								%>
+								<td>
+									<input type="checkbox" name="bJoindreAATR" value="true" checked='checked'/>&nbsp;<%= sEditionPDF %>
+								</td>
+								<%
+								}
+								%>
+								<%if(bPieceJointe){%>
+								<td>
+									<input type="checkbox" name="bPieceJointe" value="true" onclick="afficherPieceJointe();"/>&nbsp; Ajouter une pi&egrave;ce jointe
+								</td>
+							</tr>
+							<tr id="divPieceJointe">
+								<td>&nbsp;</td>
+								<td>
+									<input type="file" name="pieceJointePath" value="" />
+								</td>
+							</tr>		
+							<%}else{
+								if(!bJoindreAAPC && !bJoindreAATR){
+							%>
+							<td>&nbsp;</td>
+							<%
+								}
+							%>
+							</tr>
+							<%}%>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<input type="button" name="envoiTest" value="S'envoyer un email test" 
+					onclick="javascript:OuvrirPopup('<%=response.encodeURL(rootPath+"desk/marche/communication/envoiTest.jsp?id="+mailType.getIdMailType()) %>',400,250,'menubar=no,scrollbars=yes,statusbar=no')"/>
+					</td>
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+			</table>
+		</td>
+		<!-- Partie Balises actives -->
+		<td style="vertical-align:top">
+			<table class="pave" summary="none">
+				<tr>
+					<td class="pave_titre_gauche"> Balises actives </td>
+				</tr>
+				<tr>
+					<td>
+					<a href='javascript:OuvrirPopup("<%=response.encodeURL(rootPath+"include/avertissementUtilisateur.jsp?id="+InfosBullesConstant.BALISES)%>",400,250,"menubar=no,scrollbars=yes,statusbar=no")'>
+					<img src="<%=rootPath+modula.graphic.Icone.ICONE_AU%>" alt="Avertissement utilisateur" title="Avertissement utilisateur" width="21" height="21"  style="vertical-align:middle" />
+					</a>
+					</td>
+				</tr>
+<%
+		for (int cpt = 0; cpt < sBalisesActives.length; cpt++)
+		{
+%>
+				<tr>
+					<td>
+						<a onclick=" document.forms['formulaire'].elements['contenuMail'].value += '<%= sBalisesActives[cpt] %>'" >
+						<%= sBalisesActives[cpt] %>
+						</a>
+					</td>
+				</tr>
+<%
+		}
+%>
+			</table>
+		</td>
+	</tr>
+</table>
+<!-- /Contenu du mail -->

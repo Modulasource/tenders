@@ -1,0 +1,85 @@
+<%@page import="org.coin.bean.UseCase"%>
+<%@page import="org.coin.bean.Habilitation"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="java.util.Collections"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanComparator"%>
+<%{ %>
+	<div id="headCU_<%= iBlocID %>" class="blockPaveBorder" style="cursor:pointer" onclick="montrer_cacher('trCU_<%= iBlocID %>')">
+		<span style="float: left;"><%= locBloc.getValue(iBlocID,sBlocDefaultTitle) %></span>
+		<span style="float: right;"><%=bDisplayOnlyManageable?vUseCasesManageable.size():vUseCases.size() %>&nbsp;</span>
+		<div style="clear: both;"></div>
+	</div>
+	
+	<table class="paveUnrounded" >
+		<tr id="trCU_<%= iBlocID %>">
+		<%if(!vUseCases.isEmpty()){ %>
+			<%
+			Collections.sort( vUseCases , new CoinDatabaseAbstractBeanComparator(CoinDatabaseAbstractBeanComparator.ORDERBY_LEXICOGRAPHIC_ID_ASCENDING));
+			int iCU = 0;
+			int iModuloCU = (int)(vUseCases.size()/3)+1;
+			if(iModuloCU<=10) iModuloCU = 10;
+			%>
+			<td>
+			<table>
+	<%
+	for (int j=0; j < vUseCases.size(); j++)
+	{
+		if(j%iModuloCU==0){
+			if(j>0){
+			%>
+			</table>
+			</td>
+			<%} %>
+			<td style="vertical-align:top;">
+				<table>
+			<%
+		}
+		UseCase usecase = (UseCase) vUseCases.get(j);
+		usecase.setAbstractBeanLocalization(sessionLanguage);
+		
+		boolean bIsManageable = false;
+		boolean bIsEnabled = false;
+		
+		if(bUseManageableAdmin){
+			try{
+				UseCase cu = (UseCase)CoinDatabaseAbstractBean.getCoinDatabaseAbstractBeanFromIdString(usecase.getIdString(),sessionUserHabilitation.getUseCasesManageable());
+				bIsManageable = true;
+			}catch(Exception e){}
+			
+			if(sessionUserHabilitation.isSuperUser()) bIsManageable = true;
+			
+			try{
+				UseCase cu = (UseCase)CoinDatabaseAbstractBean.getCoinDatabaseAbstractBeanFromIdString(usecase.getIdString(),vUseCasesDifferential);
+				bIsEnabled = true;
+			}catch(Exception e){}
+		}
+		if((bDisplayOnlyManageable && bIsManageable) || !bDisplayOnlyManageable){
+		%>
+		<tr>
+		  <td class="pave_cellule_droite" style="vertical-align:top;"><b><%=usecase.getIdString() %></b>&nbsp;<%= usecase.getName() %></td>
+		  
+		  <td style="vertical-align:top;padding-top:5px;text-align:left;font-style:italic;width:200px;">
+		  	<% if(bIsManageable){ %>
+		  	<input type="hidden" 
+	                name="manageable_<%= usecase.getIdString() %>" 
+	                id="manageable_<%= usecase.getIdString() %>" 
+	                onclick="onSelectUseCase()"
+	                value="<%= bIsEnabled?1:0 %>"
+	                class="dataType-checkbox2"/>
+	        <%} %>
+		  </td>
+		</tr>
+	<%
+		}
+	}
+	%>
+  				</table>
+			</td>
+	</table>
+		</td>
+		<%} %>
+		</tr>
+		
+	</table>
+	
+<%} %>

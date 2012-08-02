@@ -1,0 +1,138 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+<%@page import="org.coin.bean.UserStatus"%>
+<%@page import="org.coin.bean.User"%>
+<%@page import="org.coin.localization.Language"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="modula.graphic.Theme"%>
+
+<%@page import="org.coin.bean.CoinUserAccessModuleType"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sBlocNameUserAccount %></td>
+	</tr>
+	<%
+	String sMessageAccountDoesNotExist = locMessage.getValue(29,"Le compte utilisateur n'existe pas. Pour en créer un cliquer sur 'modifier' et suivre les instructions.");
+	String sMessageNoUserLoginAssociated = locMessage.getValue(30,"Pas d'utilisateur associé") ;
+
+	if(userPersonne != null)
+	{
+		String sUserLogin = "";
+		try {
+			sUserLogin = userPersonne.getLogin();
+		}catch (Exception e)
+		{
+			sUserLogin = sMessageNoUserLoginAssociated;
+		}
+		
+		String sUserStatus = "";
+		try {
+			sUserStatus = UserStatus.getUserStatusName(userPersonne.getIdUserStatus(),(int)sessionLanguage.getId());
+		}catch (Exception e)
+		{
+			sUserStatus = "Undefined : " + userPersonne.getIdUserStatus();
+		}
+	
+	%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%= hbFormulaire.getHtmlTrInput(userPersonne.getIdUserStatusLabel() + " :","",sUserStatus,"") %>
+	<%= hbFormulaire.getHtmlTrInput(userPersonne.getLoginLabel() + " :","",sUserLogin,"") %>
+	<%= hbFormulaire.getHtmlTrInput(userPersonne.getPasswordLabel() + " :","","********","") %>
+<%
+		if(dih.bDisplayFullTabUserAccount)
+		{
+%>	
+
+	<%= hbFormulaire.getHtmlTrInput(userPersonne.getDateExpirationLabel() + " :","",
+			CalendarUtil.getDateWithFormat( 
+					userPersonne.getDateExpiration(),
+					"dd/MM/yyyy HH:mm"))%>
+	<%= hbFormulaire.getHtmlTrInput(userPersonne.getDateLastAccessLabel() + " :","",
+				CalendarUtil.getDateWithFormat( 
+						userPersonne.getDateLastAccess(),
+						"dd/MM/yyyy HH:mm")) %>
+<%
+		}
+	
+		if(sessionUserHabilitation.isSuperUser()
+		&& organisation.getIdOrganisationType() == OrganisationType.TYPE_CANDIDAT)
+		{ 
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:top">
+		Se connecter avec son compte
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+			<a target="_blank" href="<%= 
+				rootPath + response.encodeURL(
+						"publisher_portail/private/candidat/indexCandidat.jsp?"
+						+ "superAdminChangeProfile=" + userPersonne.getIdUser()) 
+						%>" >GO</a>
+		</td>
+	</tr>
+<%
+		}
+	
+		if(organisation.getIdOrganisationType() == OrganisationType.TYPE_ACHETEUR_PUBLIC
+		&& dih.bDisplayFullTabUserAccount
+		&& !Theme.getTheme().equals ("paraph"))
+		{
+	
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:top">
+		<input class="cbx" type="checkbox" name="alertMail" id="alertMail" value="1" disabled="disabled" <%=
+			personne.getAlerteMail()?"checked=\"checked\"":""%> />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+			Cette personne recevra des mails d'alerte lorsqu'un candidat : 
+			<ul>
+				<li>retirera le DCE par voie électronique</li>
+				<li>déposera ses plis par voie électronique</li>
+				<li>posera une question à la rubrique FQR</li>
+			</ul>
+		</td>
+	</tr>
+<% 
+		}
+	}
+	else
+	{
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" >
+			<span style='color:#F00;'>
+				<%= sMessageAccountDoesNotExist %>
+			</span>
+		</td>
+	</tr>
+<%
+	}
+	
+	if(dih.bDisplayFullTabUserAccount)
+	{
+	
+%>
+<%
+	if(dih.bDisplayAccessModule){
+	try{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" >
+			Access Module Type :
+		</td>
+		<td class="pave_cellule_droite" >
+			<%= accessType.getName() %>
+		</td>
+	</tr>
+	<%
+	}catch(Exception se){/** no user acces module in db */}
+	}%>
+<%
+	}
+%>
+
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

@@ -1,0 +1,80 @@
+<a name="formContact">&nbsp;</a>
+<%
+	String sMessage = "";
+try{
+	sMessage = request.getParameter("sMessage");
+}catch(Exception e){}
+%>
+
+<div class="rouge" style="text-align:center"><%= (sMessage!=null?sMessage:"") %></div>
+<form action="<%=response.encodeURL(rootPath + "publisher_traitement/public/pagesStatics/contact/contact.jsp")%>" name="formulaire" onsubmit="javascript:return checkForm()">
+	<table style="width:60%">
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td class="pave_cellule_gauche">Raison Sociale* :</td>
+			<td class="pave_cellule_droite">
+			<input type="text" name="raison_sociale" value=""/>
+			<input type="hidden" name="sContactRedirection" value="<%= sContactRedirection%>"/>
+			
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Qualité* :</td>
+			<td class="pave_cellule_droite">
+				<select name="civilite">
+					<option value="Mademoiselle">Mademoiselle</option>
+					<option value="Madame">Madame</option>
+					<option value="Monsieur">Monsieur</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Nom* :</td>
+			<td class="pave_cellule_droite">
+				<input type="text" name="nom" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Prénom* :</td>
+			<td class="pave_cellule_droite">
+				<input type="text" name="prenom" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Téléphone* :</td>
+			<td class="pave_cellule_droite">
+				<input type="text" name="tel" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Email* :</td>
+			<td class="pave_cellule_droite">
+				<input type="text" name="email" value="" />
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				<input type="checkbox" name="certificat" value="1" />&nbsp;
+			</td>
+			<td class="pave_cellule_droite">
+				Je souhaite en savoir plus sur les modalités d'obtention d'un certificat électronique.
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				<input type="checkbox" name="formation" value="1" />&nbsp;
+			</td>
+			<td class="pave_cellule_droite">
+				Je souhaite obtenir des informations sur vos programmes de formation et d'accompagnement aux entreprises.
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td colspan="2" style="text-align:center">
+				<button type="submit" >Envoyer</button>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>
+</form>

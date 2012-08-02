@@ -1,0 +1,94 @@
+<%
+{
+	CommissionMembre presidentCM = null;
+	PersonnePhysique president = null;
+	try
+	{
+		presidentCM = CommissionMembre.getPresident(iIdCommission);
+		president = PersonnePhysique.getPersonnePhysique(presidentCM.getIdPersonnePhysique());
+	}
+	catch(Exception e)
+	{
+		president = new PersonnePhysique();
+		president.setNom("A définir");
+	}	
+	
+	CommissionMembre secretaireCM = null;
+	PersonnePhysique secretaire = null;
+	try
+	{
+		secretaireCM = CommissionMembre.getSecretaire(iIdCommission);
+		secretaire = PersonnePhysique.getPersonnePhysique(secretaireCM.getIdPersonnePhysique());
+	}
+	catch(Exception e)
+	{
+		secretaire = new PersonnePhysique();
+		secretaire.setNom("A définir");
+	}	
+	
+%>
+	<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche">Présidence</td>
+		</tr>
+		<tr>
+			<td>
+				<table class="liste" summary="none">
+					<tr>
+						<th>Nom</th>
+						<th>Rôle</th>
+						<th>E-mail</th>
+						<th>&nbsp;</th>
+					</tr>
+<% if(presidentCM != null)
+	{
+%>
+					<tr class='liste' onmouseover="className='liste_over'" 
+						onmouseout="className='liste'" 
+						onclick="Redirect('<%=response.encodeRedirectURL("afficherCommissionMembre.jsp?iIdCommissionMembre="+presidentCM.getIdCommissionMembre()) %>')"> <!--  onclick="#" -->
+						<td style="width:40%"><%= president.getCivilitePrenomNomOptional()%></td>
+						<td style="width:20%">Président</td>
+						<td style="width:35%"><a href="mailto:<%= president.getEmail() %>" target="_blank"><%= president.getEmail() %></a></td>
+						<td style="text-align:right" width="5%">
+						<a href="<%=response.encodeURL("afficherCommissionMembre.jsp?iIdCommissionMembre="+presidentCM.getIdCommissionMembre()) %>">
+						<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT %>" width="21" height="21"  alt="Afficher" title="Afficher"/>
+						</a>&nbsp;</td>
+					</tr>
+<% } else {
+%>
+					<tr class='liste' onmouseover="className='liste_over'" 
+						onmouseout="className='liste'" > 
+						<td style="width:40%"><%= president.getCivilitePrenomNomOptional()%></td>
+						<td style="width:20%">Président</td>
+						<td style="width:35%">&nbsp;</td>
+						<td style="text-align:right" width="5%">&nbsp;</td>
+					</tr>
+<% } 
+%>											
+<% if(secretaireCM != null)
+	{
+%>
+					<tr class='liste' onmouseover="className='liste_over'" onmouseout="className='liste'" onclick="Redirect('<%=response.encodeRedirectURL("afficherCommissionMembre.jsp?iIdCommissionMembre="+secretaireCM.getIdCommissionMembre()) %>')"> 
+						<td style="width:40%"><%= secretaire.getCivilitePrenomNomOptional()%></td>
+						<td style="width:20%">Secrétaire</td>
+						<td style="width:35%"><a href="mailto:<%= secretaire.getEmail() %>" target="_blank"><%= secretaire.getEmail() %></a></td>
+						<td style="text-align:right" width="5%"><a href="<%=response.encodeURL("afficherCommissionMembre.jsp?iIdCommissionMembre="+secretaireCM.getIdCommissionMembre()) %>">
+						<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT %>" width="21" height="21"  alt="Afficher" title="Afficher"/>
+						</a>&nbsp;</td>
+					</tr>
+<% } else {
+%>
+					<tr class='liste' onmouseover="className='liste_over'" onmouseout="className='liste'" > 
+						<td style="width:40%"><%= secretaire.getCivilitePrenomNomOptional() %></td>
+						<td style="width:20%">Secrétaire</td>
+						<td style="width:35%">&nbsp;</td>
+						<td style="text-align:right" width="5%">&nbsp;</td>
+					</tr>
+<% } 
+%>											
+				</table>
+			</td>
+		</tr>
+	</table>
+	
+<% } %>

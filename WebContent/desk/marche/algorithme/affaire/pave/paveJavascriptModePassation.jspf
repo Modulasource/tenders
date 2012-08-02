@@ -1,0 +1,125 @@
+
+<%@page import="modula.algorithme.AffaireProcedureType"%>
+<%@page import="org.coin.bean.UserGroup"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.boamp.BoampFormulaireType"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%
+	Vector<UserGroup> vUserGroup = UserGroup.getAllHabilitateFromUser(sessionUser.getIdUser());
+	boolean bIsPackRedackUser = false;
+	for(UserGroup userGroup : vUserGroup) {
+		if(userGroup.getIdCoinGroup()==40) bIsPackRedackUser = true;
+	}
+%>
+
+var jTypeForm = <%= jTypeForm %>;
+var jPass = <%= jPass %>;
+var jNiveau = <%= jNiveau %>;
+var jLois = <%= jLois %>;
+var jProc = <%= jProc %>;
+var bIsPackRedackUser = <%= bIsPackRedackUser %>;
+
+
+
+function updateListPassation(bInit){
+try{
+    mt.html.enableSuperCombos();
+    var typeFormSelected = getCheckedValue(document.forms['formulaire'].elements['iIdBoampFormulaireType']);
+    $("iIdMarchePassation").removeAll();
+    $("iIdProcedure").removeAll();
+
+    var selIdArticlesLoisComplete = $("<%=afIdArticleSelection.getSelectComplete().getId()%>");
+    selIdArticlesLoisComplete.removeAll();
+    var selIdArticlesLoisSelected = $("<%=afIdArticleSelection.getSelectSelected().getId()%>");
+    selIdArticlesLoisSelected.removeAll();
+
+    jPass.each(function(pass){
+    if(pass.lId != <%= MarchePassation.INDEFINI%>){
+        var aatr = <%= marche.isAffaireAATR(false) %>;
+        var addPass = false;
+        jProc.each(function(proc){
+            if(proc.iIdMarchePassation == pass.lId
+            && proc.iIdBoampFormulaireType == typeFormSelected){
+                if(!aatr || (aatr && proc.iIdPhaseDemarrage==<%= Phase.PHASE_CREATION_AATR %>)){
+                    addPass = true;
+                }
+            }
+        });
+        if(addPass) $("iIdMarchePassation").addItem(pass);
+    }
+    });
+
+    $("iIdMarchePassation").onchange = function(){
+        var passSelected = this.value;
+        
+        $("iIdProcedure").removeAll();
+        jProc.each(function(proc){
+            if(proc.iIdMarchePassation == passSelected
+            && proc.iIdBoampFormulaireType == typeFormSelected){
+                var niveauToAdd = jNiveau.find(function(niveau){
+                    return (niveau.lId==proc.iIdType);
+                });
+                if(bIsPackRedackUser) {
+                    if(niveauToAdd.lId != <%= AffaireProcedureType.PROCEDURE_COMPLETE %>
+                    && niveauToAdd.lId != <%= AffaireProcedureType.UNE_ENV_NEGO %>
+                    && niveauToAdd.lId != <%= AffaireProcedureType.DEUX_ENV_NEGO %>)
+                    {
+	                    $("iIdProcedure").addItemValue(proc.lId,niveauToAdd.value);
+                    }
+                } else {                    
+                    $("iIdProcedure").addItemValue(proc.lId,niveauToAdd.value);
+                }
+            }
+        });
+        selIdArticlesLoisComplete.removeAll();
+        selIdArticlesLoisSelected.removeAll();
+        jLois.each(function(loi){
+            var bAdded = false;
+            if(loi.iIdMarchePassation == passSelected){
+                <%
+                for(int i =0 ;i<vArticleLoiMarche.size();i++){
+                    %>
+                    if(loi.lId==<%=vArticleLoiMarche.get(i).getId() %>){
+                        selIdArticlesLoisSelected.addItemValue(loi.lId,loi.sLibelle);
+                        bAdded = true;
+                    }
+                    <%
+                }
+                %>
+                    if(!bAdded)
+                        selIdArticlesLoisComplete.addItemValue(loi.lId,loi.sLibelle);
+                }
+        });
+        
+        
+	    if(passSelected == <%= MarchePassation.APPEL_OFFRES_OUVERT %>)
+	    {
+	        Element.show("trProcedureSimpleEnveloppe");
+	    } else {
+	        Element.hide("trProcedureSimpleEnveloppe");
+	    }
+    }
+    
+    var iIdMarchePassation = <%= affProc.getIdMarchePassation() %>;
+    
+    var iIdDefaultMarchePassation = <%= AffaireProcedure.getAffaireProcedure(AffaireProcedure.AFFAIRE_PROCEDURE_APPEL_OFFRES_OUVERT).getIdMarchePassation() %>;
+    if(typeFormSelected == <%= BoampFormulaireType.TYPE_MAPA %>) {
+        iIdDefaultMarchePassation = <%= AffaireProcedure.getAffaireProcedure(AffaireProcedure.AFFAIRE_PROCEDURE_MAPA_OUVERT).getIdMarchePassation() %>;
+    }
+    
+    if(iIdMarchePassation == 0) iIdMarchePassation = iIdDefaultMarchePassation;
+    
+    if(bInit){
+        $("iIdMarchePassation").setSelectedValue(iIdMarchePassation);
+        $("iIdMarchePassation").onchange();
+        $("iIdProcedure").setSelectedValue(<%= affProc.getId() %>);
+    }else{
+        $("iIdMarchePassation").setSelectedValue(iIdDefaultMarchePassation);        
+        $("iIdMarchePassation").onchange();
+    }
+
+
+}catch(e){alert(e);}
+}
+

@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%@page import="modula.graphic.CSS"%>
+<%@page import="modula.UserConstant"%>
+<%@page import="java.net.URL"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="org.coin.util.HTMLEntities"%>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+<%
+	/** 
+	 * fucking pb ..
+	 */
+	String sHeaderEncoding = "ISO-8859-1";
+
+	String sMetaDataKeywords = "modula, dématérialisation, logiciel, progiciel, marchés publics, appels d'offre, avis d'appel public à concurrence, AAPC, avis d'attribution, AATR, annonces légales, journal annonces légales, démat, acheteur public, infrastructure à clé publique, interfaçage marco agysoft, logiciels de gestion des marchés publics, portail de dématérialisation, plate-forme de dématérialisation, procédures formalisées, mapa, procédures adaptées, e-administration, publication marché";
+	sMetaDataKeywords = Configuration.getConfigurationDescriptionMemory("design.publisher.html.metadata.keywords",sMetaDataKeywords,false);
+	sMetaDataKeywords = new String ( sMetaDataKeywords.getBytes(), sHeaderEncoding );
+	
+	String sMetaDataDescription = "solution globale, logiciel de dématérialisation de marchés et des achats publics. Service de dématérialisation des marchés publics fourni aux acheteurs publics, collectivités teriitoriales et entreprises publiques, conformément à l'article 56 du code des marchés publics. Progiciel interfaçable avec les logiciels de gestion de marchés publics et fourni à la presse quotidienne régionale.";
+	sMetaDataDescription = Configuration.getConfigurationDescriptionMemory("design.publisher.html.metadata.description",sMetaDataDescription, false);
+	sMetaDataDescription = new String ( sMetaDataDescription.getBytes(), sHeaderEncoding );
+
+	String sMetaDataTitle = "D&eacute;mat&eacute;rialisation de march&eacute;s publics";
+	sMetaDataTitle = Configuration.getConfigurationDescriptionMemory("design.publisher.html.metadata.title",sMetaDataTitle, false);
+	sMetaDataTitle = new String ( sMetaDataTitle.getBytes(), sHeaderEncoding );
+%>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="<%= sMetaDataDescription %>" />
+<meta name="Keywords" content="<%= sMetaDataKeywords %>" />
+<meta name="Author" content="Studio Matamore" />
+<meta name="revisit-after" content="10 days" />
+<meta name="Copyright" content="Studio Matamore" />
+<meta name="Publisher" content="Studio Matamore" />
+<meta name="Generator" content="Eclipse" />
+<meta name="robots" content="index, follow" />
+
+<title><%= sMetaDataTitle + " - "
+	+ sTitle %></title> 
+<%
+	String rootPath = request.getContextPath()+"/";
+
+	/**
+	 * Pour forcer la mise à jour de l'organisation
+	 */
+	String sDesignUseOrganisationId = request.getParameter(CSS.DESIGN_USE_ORGANISATION_ID);
+	if(sDesignUseOrganisationId != null)
+	{
+		session.setAttribute(CSS.DESIGN_USE_ORGANISATION_ID  , sDesignUseOrganisationId);
+		session.setAttribute(CSS.DESIGN_CSS_CURRENT_URL ,"");
+	} else {
+		/**
+		 * On se réfere tjs à une id organisation pour définir le design
+		 */
+		
+		 try{
+			URL urlRequest = new URL( request.getRequestURL().toString());
+			sDesignUseOrganisationId =
+						Configuration.getConfigurationValueMemory(
+								CSS.PUBLISHER_MAIN_FRAME_ORGANISATION + urlRequest.getHost());
+			session.setAttribute(CSS.DESIGN_USE_ORGANISATION_ID  , sDesignUseOrganisationId);
+		 } catch (CoinDatabaseLoadException e) {
+			 
+		 }
+	}
+	
+	
+	// Valeur par défaut
+	int iIdApplicationName = UserConstant.USER_SESSION_APPLICATION_ID_PUBLISHER_GENERIQUE;
+	String sCurrentApplicationName = (String) session.getAttribute("sessionCurrentApplicationName");
+	
+	if(sCurrentApplicationName == null )
+	{
+		// le générique par défaut
+		// ici on est pas passé par un des filtres : 
+		// - PublisherPortailHabilitationFilter.java
+		// - PublisherHabilitationFilter.java
+		sCurrentApplicationName = UserConstant.USER_SESSION_APPLICATION_PUBLISHER_GENERIQUE;
+	}
+
+	if( sCurrentApplicationName.equals( UserConstant.USER_SESSION_APPLICATION_PUBLISHER_GENERIQUE) )
+		iIdApplicationName = UserConstant.USER_SESSION_APPLICATION_ID_PUBLISHER_GENERIQUE ;
+	if( sCurrentApplicationName.equals( modula.UserConstant.USER_SESSION_APPLICATION_PUBLISHER_PORTAIL) )
+		iIdApplicationName = UserConstant.USER_SESSION_APPLICATION_ID_PUBLISHER_PORTAIL;
+%>
+<link rel="stylesheet" type="text/css" href="<%= CSS.getUrlCss(session, request, iIdApplicationName ) 
+ %>" media="screen" />
+<link rel="SHORTCUT ICON" href="<%= rootPath %>include/modula.ico" />
+<script  type="text/javascript" >
+	var rootPath = "<%= request.getContextPath() %>/";
+	var isLogged = <%= sessionUser.isLogged %>;
+</script>

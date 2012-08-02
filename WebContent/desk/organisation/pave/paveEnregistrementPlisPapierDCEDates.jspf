@@ -1,0 +1,15 @@
+<table id="DCEDates">
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= sTitreRetraitDCE %>
+		</td>
+		<td class="pave_cellule_droite">
+			<%if(tsDateRetraitDCE != null){ %>
+			<strong>le</strong>&nbsp;
+			<%= CalendarUtil.getDateCourte(tsDateRetraitDCE) %>&nbsp;
+			<strong>&agrave;</strong>&nbsp;
+			<%= CalendarUtil.getHeureMinuteSecLitterale(tsDateRetraitDCE) %>&nbsp;
+			<%}else{ %>Pas encore retir&eacute;<%} %>
+		</td> 
+	</tr>
+</table>

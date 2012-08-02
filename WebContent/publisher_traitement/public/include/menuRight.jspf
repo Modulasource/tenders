@@ -1,0 +1,9 @@
+<%@page import="org.coin.util.HttpUtil"%>
+<%
+	/** paramètre utilisé uniquement pour eurosud  */
+	if (HttpUtil.parseStringBlank("sShowLogin", request).equals("false") ) bShowLogin = false;
+	if ((!sessionUser.isLogged)&&(bShowLogin)) {
+		%><%@ include file="menu_login.jspf" %>       
+<% 
+   }
+%>

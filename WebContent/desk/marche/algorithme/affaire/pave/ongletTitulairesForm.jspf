@@ -1,0 +1,338 @@
+<%
+
+{
+	if(bIsContainsCandidatureManagement)
+	{
+	sSelected = "";
+%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="modula.candidature.EnveloppeB"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.fr.bean.Adresse"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Statut <%= (iNbLots>1)?"des lots":"du marché" %></td>
+		<td class="pave_titre_droite"><%= (iNbLots>1)?iNbLots + " lots":"" %></td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<%
+	if(iNbLots>1)
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Lots infructueux :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= vLotsInfructueux.size() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Lots "Attribué définitivement" :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= vLotsAttribues.size() %>
+		</td>
+	</tr>
+	<%
+	}
+	else
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Statut du march&eacute; :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= (vLotsAttribues.size()==1)?"Attribué définitivement":(vLotsInfructueux.size()==1)?"infructueux":"" %>
+		</td>
+	<%
+	}
+	%>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />
+<%
+	}
+	/* Traitement de chaque lot */
+	for (int i = 0; i < vLotsAttribues.size(); i++)
+	{
+		MarcheLot lot = vLotsAttribues.get(i);
+
+		Vector vEnveloppesB = EnveloppeB.getAllEnveloppesBAttribueesDefinitifFromLot(lot.getIdMarcheLot());
+		if(vEnveloppesB.size() != 0)
+		{
+		EnveloppeB enveloppe = (EnveloppeB)vEnveloppesB.firstElement();
+		Candidature candidature = Candidature.getCandidature(enveloppe.getIdCandidature());
+		PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(candidature.getIdPersonnePhysique());
+		Organisation organisation = Organisation.getOrganisation(candidature.getIdOrganisation());
+		Adresse oAdresse = null;
+		try {
+			oAdresse = Adresse.getAdresse(personne.getIdAdresse());
+		} catch (CoinDatabaseLoadException e){
+			oAdresse = new Adresse();
+			oAdresse.setAdresseLigne1("Attention adresse non définie !!!! <br/>Il faut aller "
+					+ "sur la page du candidat pour lui associer une adresse");
+			oAdresse.setIdPays("");
+		}
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveLot<%= i %>')">
+		<td class="pave_titre_gauche" colspan="2">
+			Identification du titulaire du <%= (vLots.size() > 1)?"lot "+lot.getNumero():"marché" %>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+			<table id="paveLot<%= i %>" summary="Lot <%=i%>">
+				<tr>
+					<td class="pave_cellule_gauche">
+					Nom du titulaire/Organisme :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= organisation.getRaisonSociale() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					A l'attention de :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= personne.getCivilitePrenomNom() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Adresse :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= oAdresse.getAllAdresseString("\n") %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Téléphone :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= personne.getTel() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Télécopieur/Fax :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= organisation.getFax() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Courrier électronique :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= personne.getEmail() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Site Internet :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= organisation.getSiteWeb() %>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />
+<%
+	sFormPrefix = "paveMontant" + i;
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('<%= sFormPrefix %>')">
+		<td class="pave_titre_gauche" colspan="2">
+			Montant du <%= (vLots.size() > 1)?"lot "+lot.getNumero():"marché" %>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+			<table id="<%= sFormPrefix %>">
+				<tr>
+					<td class="pave_cellule_droite" colspan="2">
+					Champs obligatoires au-dessus des seuils européens. Le cas échéant, la mention "indéfini(e)" peut cependant
+					y être renseignée.
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+<%
+	sSelected = "";
+	if (!lot.getMontantLot().equalsIgnoreCase(""))
+		sSelected = "checked='checked'";
+%>
+					<input type="radio" name="<%= sFormPrefix %>iChoixMontant" value="1" <%= sSelected %> onClick="montrer('montant<%= i %>');cacher('offre<%= i %>')"/>&nbsp;
+					</td>
+					<td class="pave_cellule_droite">
+					<strong>Montant (en Euros HT) :</strong>
+					<input id="montant<%= i %>" type="text" name="<%= sFormPrefix %>sMontant" size="50" maxlength="50"
+					value="<%= lot.getMontantLot() %>"/>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche" style="vertical-align:top;">
+<%
+	sSelected = "";
+	if ( (!lot.getOffreBasse().equalsIgnoreCase("")) || (!lot.getOffreHaute().equalsIgnoreCase("")) )
+		sSelected = "checked";
+%>
+					<input type="radio" name="<%= sFormPrefix %>iChoixMontant" value="2" <%= sSelected %> onClick="montrer('offre<%= i %>');cacher('montant<%= i %>')"/>&nbsp;
+					</td>
+					<td class="pave_cellule_droite" style="vertical-align:top">
+						<strong>Offre :</strong>
+						<table id="offre<%= i %>">
+							<tr>
+								<td>
+								la plus basse : <input type="text" name="<%= sFormPrefix %>sOffreBasse" 
+								value="<%= lot.getOffreBasse() %>"/>
+								</td>
+							</tr>
+							<tr>
+								<td>
+								la plus haute : <input type="text" name="<%= sFormPrefix %>sOffreHaute"
+								value="<%= lot.getOffreHaute() %>"/>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />
+<%
+	sFormPrefix = "paveSousTraitance" + i;
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('<%= sFormPrefix %>')">
+		<td class="pave_titre_gauche" colspan="2">
+			Sous-traitance du <%= (vLots.size() > 1)?"lot "+lot.getNumero():"marché" %>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+			<table id="<%= sFormPrefix %>">
+				<tr>
+					<td class="pave_cellule_gauche">
+					Sous-traitance :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+	sSelected = "";
+	boolean bSousTraite = false;
+	try
+	{
+		bSousTraite = lot.isSousTraite();
+	}
+	catch(Exception e)
+	{
+		// TODO : mettre dans la log
+		System.out.println(e.getMessage());
+	}
+	if (bSousTraite)
+		sSelected = "checked='checked'";
+%>
+					<input type="radio" name="<%= sFormPrefix %>iSousTraitance" value="1" 
+						onclick="montrer('soustraitance<%= i %>');" <%= sSelected %>/> Oui
+					<br />
+<%
+	if (sSelected.equalsIgnoreCase(""))
+		sSelected = "checked='checked'";
+	else
+		sSelected = "";
+%>
+					<input type="radio" name="<%= sFormPrefix %>iSousTraitance" value="2" 
+						onclick="cacher('soustraitance<%= i %>');" <%= sSelected %>/> Non
+					</td>
+				</tr>
+				<tr id="soustraitance<%= i %>">
+					<td class="pave_cellule_gauche">
+					Indiquer la part de sous-traitance :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+	sSelected = "";
+	if (lot.getTypeSousTraitance() == MarcheLot.PART_VALEUR)
+		sSelected = "checked='checked'";
+%>
+					<input type="radio" name="<%= sFormPrefix %>iPartSousTraitance" value="<%= MarcheLot.PART_VALEUR %>" 
+					<%= sSelected %>/>&nbsp;
+					<input id="valeur<%= i %>" type="text" name="<%= sFormPrefix %>sValeur" 
+					value="<%= ( sSelected.equalsIgnoreCase("") ? "Valeur (HT)" : lot.getPartSousTraitance()) %>"/>&nbsp;
+					<br />
+<%
+	sSelected = "";
+	if (lot.getTypeSousTraitance() == MarcheLot.PART_POURCENTAGE)
+		sSelected = "checked";
+%>
+					<input type="radio" name="<%= sFormPrefix %>iPartSousTraitance" value="<%= MarcheLot.PART_POURCENTAGE %>" 
+					<%= sSelected %>/>&nbsp;
+					<input id="pourcentage<%= i %>" type="text" name="<%= sFormPrefix %>sPourcentage" 
+					value="<%= (sSelected.equalsIgnoreCase("") ? "En %" : lot.getPartSousTraitance()) %>"/>%
+					<br />
+<%
+	sSelected = "";
+	if (lot.getTypeSousTraitance() == MarcheLot.REPONSE_INCONNUE)
+		sSelected = "checked";
+%>
+					<input type="radio" name="<%= sFormPrefix %>iPartSousTraitance" value="<%= MarcheLot.REPONSE_INCONNUE %>" 
+					<%= sSelected %>/>&nbsp;
+					Réponse inconnue
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />
+<%
+}
+		/* /Traitement de chaque lot */
+	}
+}
+%>
+
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">
+		Montant total du marché
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Valeur totale estimée (HT) :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%= sFormPrefix %>sMontantTotal" size="50" maxlength="50"
+		value="<%= (avisAttribution.getMontantMarche().equalsIgnoreCase("") ? "" : avisAttribution.getMontantMarche()) %>"/> Euros
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>
+
+
+
+
+

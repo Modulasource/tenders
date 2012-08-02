@@ -1,0 +1,280 @@
+<%@page import="modula.marche.MarchePieceJointeType"%>
+<%@page import="modula.Validite"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.marche.MarchePieceJointe"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="modula.servlet.DownloadPieceMarche"%>
+<%@page import="mt.modula.servlet.DownloadZipAffaireDceServlet"%>
+<%@page import="modula.graphic.Icone"%>
+<br />
+<div class="titre_page">Liste des pièces du DCE</div>
+<%
+
+	/**
+	 * Attention ici il faut garder le try/catch car on doit savoir si le boolean est instancié ou non.
+	 */
+	boolean bIsDCEDisponibleInstancie = true;
+	boolean bIsDCEDisponible = false;
+	try{bIsDCEDisponible = marche.isDCEDisponible();}
+	catch(Exception e){bIsDCEDisponibleInstancie = false;}
+	
+	boolean bIsRetraitDCEAutoriseInstancie = true;
+	boolean bIsRetraitDCEAutorise = false;
+	try{bIsRetraitDCEAutorise = candidature.isRetraitDCEAutorise();}
+	catch (Exception e){bIsRetraitDCEAutoriseInstancie = false;}
+	
+	boolean bIsDCEPapier = candidature.isDCEPapier(false);
+	boolean bIsExistRC = marche.isExistRC(false);
+	
+	boolean bIsCandidatureAdmiseDialogue = false;
+	try{bIsCandidatureAdmiseDialogue = Candidature.isAdmiseForDialogue(candidature.getIdCandidature());}
+	catch (Exception e){}
+
+	
+	
+if(!bIsDCEPapier)
+{
+    MarchePieceJointe[] listePJTotal = MarchePieceJointe.getAllMarchePieceJointeFromMarche(marche.getIdMarche(), false);
+	if ((bIsRetraitDCEAutorise || !bIsContainsCandidatureManagement) && bIsDCEDisponible)
+	{
+		%>
+<div style="text-align:center">
+<span style="text-align:center;vertical-align:middle;">
+	TELECHARGER TOUTES LES PIECES DU DCE :
+</span>
+<%
+	if(listePJTotal == null || listePJTotal.length==0)
+	{
+%>aucune pièce disponible<%			
+	} else {
+%>
+	<img alt="TELECHARGER TOUTES LES PIECES DU DCE"
+		style="cursor: pointer; vertical-align:middle"
+		src="<%= 
+		rootPath %>images/icons/32x32/zip.png"
+		onclick="javascript:OuvrirPopup('<%= 
+		response.encodeURL(rootPath + "publisher_portail/DownloadZipAffaireDceServlet?"
+		+ DownloadZipAffaireDceServlet
+			.getSecureTransactionString(marche.getIdMarche(), request)) 
+			%>',400,200,'menubar=no,scrollbars=yes,statusbar=no');" />
+<%
+	}
+%>
+
+</div>
+<%
+		for(int j=-1;j<vLotsTotal.size();j++)
+		{
+			int nbPieces = 0;
+			MarchePieceJointe[] listePJ = null;
+			String sTitrePaveDCE = "Liste des pièces du DCE ";
+			
+			if(j < 0)
+			{
+				listePJ = MarchePieceJointe.getAllMarchePieceJointeFromMarcheAndLot(marche.getIdMarche(),0, listePJTotal);
+				sTitrePaveDCE += "communes à plusieurs lots";
+			}
+			else
+			{
+				MarcheLot lot = vLotsTotal.get(j);
+				listePJ = MarchePieceJointe.getAllMarchePieceJointeFromMarcheAndLot(marche.getIdMarche(),lot.getIdMarcheLot(), listePJTotal);
+				sTitrePaveDCE += "pour le lot n°"+lot.getNumero();
+			}
+	
+			if (listePJ != null && listePJ.length > 0)
+			{
+				nbPieces = listePJ.length;
+		%>
+		<br/>
+
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0"><tr>
+            <td>
+                <strong class="post-title-alt"><%= sTitrePaveDCE %></strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00"><%= nbPieces %> <%= (nbPieces > 1 ? "pièces" : "pièce")%></strong>
+            </td>
+        </tr></table>
+    </div>
+    
+    <div class="post-footer post-block" style="margin-top:0">
+       <table class="fullWidth">
+           <tr>
+               <th style="width:35%">Nom du document</th>
+               <th style="width:30%">Type</th>
+               <th style="width:25%">Commentaire</th> 
+           </tr>
+
+		<%
+				String url =  request.getContextPath();
+		
+				for (int i = 0; i < listePJ.length; i++)
+				{
+					int iIdPieceJointeType = listePJ[i].getIdMarchePieceJointeType();
+					MarchePieceJointe mpj = listePJ[i];
+					
+					String urlFile = url + "/publisher_portail/DownloadPieceMarchePublisher?"
+						    + DownloadPieceMarche.getSecureTransactionString(
+		                      marche.getIdMarche(), 
+		                      mpj.getIdMarchePieceJointe(),
+		                      request);
+							
+							
+					/* Test sur date de création de la pièce jointe (après la mise en ligne du DCE) */
+                    Vector<Validite> vValiditeOffres = Validite.getAllValiditeEnveloppeBFromAffaire(marche.getIdMarche());
+                    Validite oFirstValiditeOffre = null;
+                    Timestamp tsDateDebutOffre = null;
+                    if(vValiditeOffres != null)
+                    {
+                        if(vValiditeOffres.size() >= 1)
+                        {
+                            oFirstValiditeOffre = vValiditeOffres.firstElement();
+                            tsDateDebutOffre = oFirstValiditeOffre.getDateDebut();
+                        }
+                    }
+                    String sPhrase = "";
+        
+                    if(mpj.getDateModif() != null 
+                    && mpj.getDateCreation() != null 
+                    && tsDateDebutOffre != null){
+	                    if(mpj.getDateModif().after(tsDateDebutOffre) 
+	                    || mpj.getDateCreation().after(tsDateDebutOffre))
+	                    {
+	                        if (listePJ[i].isLienActif()) sPhrase = "Pièce ajoutée le " 
+	                        	+ CalendarUtil.getDateFormattee(mpj.getDateCreation());
+	                        else sPhrase = "Pièce supprimée le " + CalendarUtil.getDateFormattee(mpj.getDateModif());
+	                    }
+                    } else {
+                    	if(tsDateDebutOffre == null)
+                    	{
+                    		/**
+                    		 * si la date de debut offre n'est pas renseignée
+                    		 * on est sans doute dans un dialogue compétitif 
+                    		 * et on doit voir les pieces du DCE
+                    		 */
+	                        if (listePJ[i].isLienActif()) sPhrase = "Pièce ajoutée le " 
+	                        	+ CalendarUtil.getDateFormattee(mpj.getDateCreation());
+	                        else sPhrase = "Pièce supprimée le " + CalendarUtil.getDateFormattee(mpj.getDateModif());
+
+                    		
+                    	} else {
+	                    	sPhrase = "id=" + mpj.getId() 
+	                    		+ " getDateCreation " +  mpj.getDateCreation()
+								+ " getDateCreation " + mpj.getDateModif();
+                    	}
+                    }
+                    
+                    
+                    String sUrlDocument = 
+                         "<img src=\"" + rootPath + Icone.getIconeFromFileName(mpj.getNomPieceJointe()) + "\"" 
+                        + " style=\"vertical-align:middle\" />" 
+                        + "&nbsp;&nbsp;"
+                        + mpj.getNomPieceJointe() ;
+                        
+                    if(listePJ[i].isLienActif()){
+                    	sUrlDocument 
+                    	   = "<a href=\"" +  response.encodeURL(urlFile ) + "\">"
+                    	   + sUrlDocument
+                    	   + "</a>";
+                    }
+%>
+			<tr>
+				<td>
+		            <%= sUrlDocument %>
+				</td>
+				<td>
+					<%= MarchePieceJointeType.getMarchePieceJointeTypeNameMemory(iIdPieceJointeType) %>
+				</td>
+				<td>
+					<p style="color:red"><%=sPhrase%></p>
+				</td>
+			</tr>
+<%
+			   }
+%>
+		</table>
+    </div>
+<%
+			}
+%>
+</div>
+<%
+		}
+	}
+	else if(!bIsDCEDisponible)
+	{
+%>
+    <div class="post-header post-block center" style="margin-left:0;">
+		Le DCE n'est pas accessible pour le moment.
+		<%
+		if(bIsExistRC)
+		{
+			Vector<MarchePieceJointe> vReglement = MarchePieceJointe.getReglementConsultation(marche.getIdMarche());
+			if ( (vReglement != null) && (vReglement.size() >= 1) )
+			{
+				// Récupération de la première pièce correspondante au Règlement de Consultation
+				MarchePieceJointe pj = vReglement.firstElement();
+				String url = response.encodeURL( request.getContextPath()
+							+ "/publisher_portail/DownloadPieceMarchePublisher?"
+							+ "fileid=" + pj.getIdMarchePieceJointe()
+							+ "&amp;idMarche=" + marche.getIdMarche() );
+				%>
+				<br />
+				Cependant vous pouvez <a href="<%= url %>" style="color:#ff8c00">consulter le règlement de consultation</a>.
+				<%
+			}
+		}
+		
+		if(AffaireProcedure.isDialogueComplete(marche.getIdAlgoAffaireProcedure())
+		&& bIsCandidatureAdmiseDialogue)
+		{
+			Vector<MarchePieceJointe> vProg = MarchePieceJointe.getProgrammeFonctionnel(marche.getIdMarche());
+			if ( (vProg != null) && (vProg.size() >= 1) )
+			{
+				// Récupération de la première pièce correspondante au Règlement de Consultation
+				MarchePieceJointe pj = vProg.firstElement();
+				String url = response.encodeURL( request.getContextPath()
+							+ "/publisher_portail/DownloadPieceMarchePublisher?"
+							+ "fileid=" + pj.getIdMarchePieceJointe()
+							+ "&amp;idMarche=" + marche.getIdMarche() );
+				
+				%>
+				<br />
+				Vous Pouvez également  <a href="<%= url %>" style="color:#ff8c00">consulter le programme fonctionnel</a>.
+				<%
+			}
+		}
+		%>
+	</div>
+	<%
+	}
+	else if(bIsDCEDisponible && !bIsRetraitDCEAutoriseInstancie)
+	{
+	   %>
+	    <div class="post-header post-block center" style="margin-left:0;">
+			Votre demande de retrait du dossier de consultation des entreprises est en cours de traitement par la plateforme de gestion de marchés de l'acheteur public. Ce processus peut durer jusqu'à une minute. Veuillez alors réactualiser la page en cliquant sur le bouton "réactualiser la page" ci-dessous.
+			<br /><br /><a href="<%= response.encodeURL(rootPath + sPublisherPath + "/private/candidat/consulterDossier.jsp?iIdOnglet=1&cand=" + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session) ) %>">réactualiser la page</a>
+	    </div>
+		<%
+	}
+}
+else
+{
+%>
+    <div class="post-header post-block center" style="margin-left:0;">
+	   Le DCE à été retiré au format papier.</td>
+    </div>
+<%
+}
+%>
+</div>
+
+<br />

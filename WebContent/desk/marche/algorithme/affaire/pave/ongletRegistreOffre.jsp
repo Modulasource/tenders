@@ -1,0 +1,241 @@
+<%@page import="modula.candidature.*"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.EnveloppeBPieceJointe"%>
+<%@page import="org.coin.util.*"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="modula.*"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%
+	int iIdMarche = Integer.parseInt(request.getParameter("iIdMarche"));
+	Marche marche = Marche.getMarche(iIdMarche);
+	
+	String rootPath = request.getContextPath()+"/";
+	Vector<MarcheLot> vLots = MarcheLot.getAllLotsFromMarcheAndPA(marche);
+	
+	boolean bIsContainsEnveloppeCManagement = AffaireProcedure.isContainsEnveloppeCManagement(marche.getIdAlgoAffaireProcedure());
+	
+	boolean bDisplayPdf = false;
+    try {
+        bDisplayPdf = Boolean.parseBoolean(request.getParameter("bDisplayPdf"));
+    } catch (Exception e) {}
+    
+    String sIconeDownload = rootPath+Icone.ICONE_DOWNLOAD;
+    String sIconeFichierDefault = rootPath+Icone.ICONE_FICHIER_DEFAULT;
+    String sIconeHorsDelai = rootPath+"images/icones/hors_delai.gif";
+    if(bDisplayPdf) {
+        sIconeDownload = HttpUtil.getUrlWithProtocolAndPort(sIconeDownload, request).toExternalForm();
+        sIconeFichierDefault = HttpUtil.getUrlWithProtocolAndPort(sIconeFichierDefault, request).toExternalForm();
+        sIconeHorsDelai = HttpUtil.getUrlWithProtocolAndPort(sIconeHorsDelai, request).toExternalForm();
+    }	
+    
+    boolean bIsEnvBAnonyme = marche.isEnveloppesBAnonyme(false);
+    Vector<Long> vIdCandidatures = new Vector<Long>();
+
+    for (int i = 0; i < vLots.size() ;i ++) 
+    {
+        MarcheLot lot = vLots.get(i);
+        String sReference = "";
+        if(vLots.size() == 1) sReference = "marché ref." + marche.getReference();
+        else sReference = "lot ref." + lot.getReference();
+        
+        int iIdValidite = -1;
+        int k = 0;
+        Vector<EnveloppeB> vEnveloppeB = EnveloppeB.getAllEnveloppesBCacheteesFromLotOrderedByValiditeDate(lot.getIdMarcheLot());
+        boolean bAfficheEnveloppe = false;
+        
+        for (int j = 0; j < vEnveloppeB.size() ;j ++)
+        {
+            EnveloppeB oEnveloppeB = vEnveloppeB.get(j);
+            
+            Candidature candidature = Candidature.getCandidature(oEnveloppeB.getIdCandidature());
+            boolean bIsPapier = candidature.isCandidaturePapier(false);
+            
+            Vector<EnveloppeBPieceJointe> vEnvBPJ = EnveloppeBPieceJointe.getAllEnveloppeBPiecesJointesFromEnveloppe((int)oEnveloppeB.getId());
+            if( (vEnvBPJ != null && vEnvBPJ.size()>0) || bIsPapier)
+            {
+                bAfficheEnveloppe = true;
+                k = k%2;
+                if(iIdValidite != oEnveloppeB.getIdValidite())
+                {
+                    k = 0;
+                    /**
+                     * on dirait un test pour fermer une table précedement ouverte
+                     */
+                    
+                    if(iIdValidite != -1)
+                    {
+                        %>
+
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="modula.marche.Marche"%>                        
+<%@page import="modula.algorithme.AffaireProcedure"%>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td> 
+                </tr>
+            </table>
+            <br/>
+                <%
+                    }
+                    
+                    iIdValidite = oEnveloppeB.getIdValidite();
+                    int iRowVal = Validite.getValiditeRowFromAffaire(iIdValidite,lot.getIdMarche());
+                    String sTypeOffre = "";
+                    if(bIsContainsEnveloppeCManagement && iRowVal==0)
+                        sTypeOffre = " de prix ";
+                    String sNego = "";
+                    if(iRowVal > 0) sNego = " ("+Outils.sConverionEntierLiterralFeminin[iRowVal-1]+" négociation)"; 
+%>
+
+<table class="pave" >
+    <tr>
+        <td class="pave_titre_gauche" colspan="2">Registre des offres<%= sTypeOffre %> du <%= sReference + sNego %></td> 
+    </tr>
+    <tr>
+        <td colspan="2">
+            <table class="liste" >
+                <tr>
+                    <th>Raison sociale</th>
+                    <th>Format</th>
+                    <th>Date du cachetage</th>
+                    <th>Statut</th>
+                    <th>&nbsp;</th>
+                </tr>
+<%
+                }
+            String sDateCachetageOffre = "Offre non cachetée";
+    
+            if ( oEnveloppeB.isCachetee(false) )
+            {
+                sDateCachetageOffre = CalendarUtil.getDateFormattee(oEnveloppeB.getDateFermeture());
+            }
+                
+            String sFormat = "électronique";
+            if ( bIsPapier )
+            {
+                sFormat = "papier";
+            }
+        
+            boolean bHorsDelai = oEnveloppeB.isHorsDelais(false);
+            String sStatut = oEnveloppeB.getStatutLibelleValueCourant(lot.getIdValiditeEnveloppeBCourante());
+            if(!marche.isEnveloppesBDecachetees(false))
+                sStatut = "Indéfini";
+            
+            String sUrlTarget = rootPath+"desk/organisation/afficherCandidature.jsp?iIdPersonnePhysique=" + candidature.getIdPersonnePhysique()
+                    +"&amp;iIdMarche="+marche.getIdMarche();
+            
+                    
+            Organisation organisationCDT = null;
+            try{
+                organisationCDT = Organisation.getOrganisation(candidature.getIdOrganisation());
+            } catch (CoinDatabaseLoadException e) {
+                organisationCDT = new Organisation();
+                organisationCDT.setRaisonSociale(
+                        "Error id cand=" + candidature.getId()
+                        + " organisation=" + candidature.getIdOrganisation()
+                        + " is unkown");
+            }
+            String sNomCandidature = organisationCDT.getRaisonSociale();
+            if(bIsEnvBAnonyme)
+            {
+                sNomCandidature = "Candidature ORG"+organisationCDT.getId();
+                sUrlTarget += "&amp;bAnonyme=true";
+            }
+    
+            %>
+            <tr class="liste<%=k%>" onmouseover="className='liste_over'" 
+                onmouseout="className='liste<%=k%>'" 
+                onclick="Redirect('<%= response.encodeURL(sUrlTarget)  %>')"
+                 >
+                <td style="width:40%"><strong><%= sNomCandidature + " (" + candidature.getId() +  ")"%></strong></td>
+                <td style="width:15%"><strong><%= sFormat %></strong></td>
+                <td style="width:35%"><strong><%= sDateCachetageOffre %></strong></td>
+                <td style="width:10%"><strong><%= sStatut.equalsIgnoreCase("")?"Indéfini":sStatut %></strong></td>
+                <td style="width:10%;text-align:right">
+                <%=(bHorsDelai)?"<img src='"+sIconeHorsDelai+"' alt='Hors délai' title='Hors délai'/> ":"" %>
+                    <a href="<%= response.encodeURL(sUrlTarget) %>">
+                            <img src="<%=sIconeFichierDefault %>" alt="Afficher" title="Afficher"/>
+                    </a>                
+                </td>
+            </tr>
+            <%
+            
+            
+            
+            for(int iEnvBPJ=0;iEnvBPJ<vEnvBPJ.size();iEnvBPJ++)
+            {
+                EnveloppeBPieceJointe envBPJ = (EnveloppeBPieceJointe)vEnvBPJ.get(iEnvBPJ);
+                if(envBPJ.getChiffrage() == 0)
+                {
+                    /**
+                     * La pièces n'est plus chiffrée, elle peut etre affichée à l'AP. Et aussi téléchargeable.
+                     */
+                    String sURLBPJ = "desk/DownloadFileDesk?"
+                            + DownloadFile.getSecureTransactionStringFullJspPage(
+                                    request, 
+                                    envBPJ.getIdEnveloppePieceJointe(), 
+                                    TypeObjetModula.ENVELOPPE_B );
+                            
+                    sURLBPJ = response.encodeURL(rootPath+ sURLBPJ);
+                    %>
+                    <tr class="liste<%=j%2%>" onmouseover="className='liste_over'" 
+                        onmouseout="className='liste<%=j%2%>'" 
+                         >
+                        <td style="width:40%"></td>
+                        <td style="width:15%;text-align: right">Pièce jointe</td>
+                        <td style="width:35%"><%= envBPJ.getNomPieceJointe() %> (<%= envBPJ.getFileSizeInMegaBytes() %> et ID<%= envBPJ.getId() %>)</td>
+                        <td style="width:10%">Statut : <%= envBPJ.getFileStateName() %></td>
+                        <td style="width:10%;text-align:right">
+                            <a href="<%= response.encodeURL(sURLBPJ) %>">
+                            <img src="<%=sIconeDownload %>" 
+                                alt="Afficher" 
+                                title="Télécharger"/>
+                            </a>                            
+                        </td>
+                    </tr>                   
+                    <%
+                }
+            }
+            
+            
+        } // fin if( (vEnvBPJ != null && vEnvBPJ.size()>0) || bIsPapier)
+        k++;
+    }//fin for envB
+    if(vEnveloppeB.size()==0 || !bAfficheEnveloppe)
+    {
+%>
+    <table class="pave" summary="none">
+        <tr>
+            <td class="pave_titre_gauche" colspan="2">Registre des offres du <%= sReference %></td> 
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table class="liste" summary="none">
+                    <tr>
+                        <th>Raison sociale</th>
+                        <th>Format</th>
+                        <th>Date du cachetage</th>
+                        <th>Statut</th>
+                        <th>&nbsp;</th>
+                    </tr>
+<%
+}//fin if
+%>
+                
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">&nbsp;</td> 
+    </tr>
+</table>
+<br/>
+<%
+}
+//fin for lots
+%>

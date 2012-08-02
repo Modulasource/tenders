@@ -1,0 +1,65 @@
+<%	
+	AncienAvis ancienAvis = null;
+	String sUrlAncienAvis = null;
+	try
+	{
+		ancienAvis = AncienAvis.getAncienAvisFromAvisRectificatif(avis.getIdAvisRectificatif(), vAncienAvisTotal);
+		if(ancienAvis != null)
+		{
+			sUrlAncienAvis = response.encodeURL(
+					rootPath+"publisher_portail/DownloadFilePublisher?" 
+							+ DownloadFile.getSecureTransactionStringFullJspPage(
+									request, 
+									ancienAvis.getIdAncienAvis() , 
+									TypeObjetModula.ANCIEN_AVIS ));
+		}
+	}
+	catch(Exception e){}
+	
+	String sTypeAvis = "AAPC";
+	if(avis.getIdAvisRectificatifType() == AvisRectificatifType.TYPE_AATR)
+		sTypeAvis = "AATR";
+	
+%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%@page import="modula.marche.AncienAvis"%>
+<%@page import="org.coin.util.Outils"%>
+<table>
+<%  if (avis.getDescriptionType().equalsIgnoreCase("texte_libre")){
+%>
+	<tr>
+		<td class="annonce_cellule_gauche" style="width:15%">Description : </td>
+		<td class="annonce_cellule_droite" style="vertical-align:top"><%= Outils.replaceAll( avis.getDescription() , "\n" , "<br />") %></td>
+	</tr>
+<%
+	}
+	else{
+%>
+	<tr>
+		<td class="annonce_cellule_gauche" style="width:15%">Pièce jointe : </td>  
+		<td class="annonce_cellule_droite">
+			<a href="<%= response.encodeURL(
+					rootPath+ "publisher_portail/DownloadFilePublisher?" 
+							+ DownloadFile.getSecureTransactionStringFullJspPage(
+									request, 
+									avis.getIdAvisRectificatif()  , 
+									TypeObjetModula.AVIS_RECTIFICATIF ))
+					%>" ><%= avis.getPieceJointeNom() %>
+			<img src="<%=rootPath + modula.graphic.Icone.getIconeFromFileName(avis.getPieceJointeNom()) %>" style="vertical-align:middle"/>
+			</a>
+		</td>
+	</tr>
+<%
+	}
+	if(sUrlAncienAvis != null)
+	{ %>
+	<tr>
+		<td class="annonce_cellule_gauche" style="vertical-align:middle;width:15%">Voir l'ancien <%= sTypeAvis %> : </td>
+		<td class="annonce_cellule_droite"><a href="<%= sUrlAncienAvis %>" ><%= ancienAvis.getAncienAvisFilename() %></a>
+			<img src="<%=rootPath + modula.graphic.Icone.getIconeFromFileName(ancienAvis.getAncienAvisFilename()) %>" style="vertical-align:middle"/>
+		</td>
+	</tr>
+	<%} %>
+</table>

@@ -1,0 +1,7 @@
+<%@page import="org.coin.localization.LocalizationConstant"%>
+<%@page import="org.coin.localization.Localize"%>
+<%
+	Localize locMessage = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_LOGON_PAGE_MESSAGE);
+%>

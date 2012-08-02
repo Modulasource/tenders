@@ -1,0 +1,368 @@
+<%@ include file="/include/new_style/headerPublisher.jspf" %>
+
+<%@ page import="modula.graphic.*,modula.commission.*,java.sql.*,modula.algorithme.*,org.coin.fr.bean.*,modula.*,modula.marche.*, modula.candidature.*, java.util.*" %>
+<%@ include file="/publisher_traitement/public/include/beanCandidat.jspf" %> 
+<%@ page import="org.coin.db.*"%>
+<%@ page import="mt.modula.html.HtmlAnnonce"%>
+<%@page import="mt.modula.affaire.candidature.CandidatureEnveloppe"%>
+<%@page import="modula.fqr.*"%>
+<%
+	boolean bSearchEngineHabilitation = Configuration.isEnabledMemory("publisher.portail.annonce.searchengine.habilitation",false);	
+    Connection connGlobalTotal = ConnectionManager.getConnection();
+
+    String sAppletAllLotSelectionne = "";
+
+    
+    String sEtape="";
+	String sTitle = "Votre dossier de candidature";
+	String sCand = request.getParameter("cand");
+	Candidature candidature = Candidature.getCandidature(Integer.parseInt(
+			SecureString.getSessionPlainString(
+            sCand,session)),
+            connGlobalTotal);
+
+    try{
+        PhaseEtapes oPhaseEtapes = PhaseEtapes.getPhaseEtapesMemory(candidature.getIdAlgoPhaseEtapes(), false, connGlobalTotal);
+        sEtape = Etape.getEtapeNameMemory(oPhaseEtapes.getIdAlgoEtape(), false);
+    }catch(Exception e){}
+	
+	boolean bIsCandidaturePapier = candidature.isCandidaturePapier(false);
+	
+	Marche marche = Marche.getMarche(candidature.getIdMarche(),connGlobalTotal,false); 
+	boolean bIsContainsCandidatureManagement = AffaireProcedure.isContainsCandidatureManagement(marche.getIdAlgoAffaireProcedure());
+	boolean bIsContainsDCEManagement = AffaireProcedure.isContainsDCEManagement(marche.getIdAlgoAffaireProcedure());
+	boolean bIsContainsEnveloppeAManagement = AffaireProcedure.isContainsEnveloppeAManagement(marche.getIdAlgoAffaireProcedure());
+	boolean bIsContainsEnveloppeCManagement = AffaireProcedure.isContainsEnveloppeCManagement(marche.getIdAlgoAffaireProcedure());
+	boolean bIsForcedNegociationManagement = AffaireProcedure.isForcedNegociationManagement(marche.getIdAlgoAffaireProcedure());
+	
+	int iTypeProcedure = AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure(), connGlobalTotal);
+    Vector<MarcheLot> vLotsTotal = MarcheLot.getAllLotsFromMarche(marche.getIdMarche());
+	Vector<MarcheLot> vLots = MarcheLot.getAllLotsConstituablesFromMarche(marche, vLotsTotal, connGlobalTotal);
+
+
+	CoinDatabaseWhereClause wcAllIdMarche = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+    CoinDatabaseWhereClause wcAllIdCommission = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+    CoinDatabaseWhereClause wcAllIdPersonnePhysique = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+     
+    wcAllIdCommission.add(marche.getIdCommission());
+    wcAllIdMarche.add(marche.getId());
+    wcAllIdPersonnePhysique.add(marche.getIdCreateur());
+     
+    Connection connSearchEngineTotal = ConnectionManager.getConnection();
+     
+     %><%@include file="/publisher_traitement/public/annonce/pave/paveBatchAllItemAnnonce.jspf"%><%
+    ConnectionManager.closeConnection(connSearchEngineTotal);
+
+     
+     QuestionAnswer qaProcedureSimpleEnveloppe = null;
+     
+     try{
+    	 String sMarcheParametreProcedureSimpleEnveloppe = "";
+
+    	 MarcheParametre marcheParametreProcedureSimpleEnveloppe 
+            = MarcheParametre.getMarcheParametre(marche.getIdMarche(),"iIdProcedureSimpleEnveloppe");
+         sMarcheParametreProcedureSimpleEnveloppe 
+            = marcheParametreProcedureSimpleEnveloppe.getValue(); 
+	        
+    	 qaProcedureSimpleEnveloppe 
+             = QuestionAnswer.getQuestionAnswerMemory(
+                     Integer.parseInt(sMarcheParametreProcedureSimpleEnveloppe));
+    	 
+    	 
+     } catch (CoinDatabaseLoadException e ) {}
+	    
+	 
+	
+	Vector<EnveloppeA> vEnveloppesA = null;
+	Vector<EnveloppeB> vEnveloppesB = null;
+	Vector<EnveloppeC> vEnveloppesC = null;
+	if(bIsContainsCandidatureManagement)
+	{
+		CandidatureEnveloppe candidatureEnveloppe = new CandidatureEnveloppe();
+	    candidatureEnveloppe.createAllEnveloppeFromCandidature(
+	            candidature,
+	            marche,
+	            vLots,
+	            bIsCandidaturePapier,
+	            bIsContainsEnveloppeAManagement,
+	            bIsContainsEnveloppeCManagement,
+	            bIsForcedNegociationManagement,
+	            vValiditeTotal,
+	            connGlobalTotal);
+
+
+	    vEnveloppesA = candidatureEnveloppe.vEnveloppesA;
+	    vEnveloppesB = candidatureEnveloppe.vEnveloppesB;
+	    vEnveloppesC = candidatureEnveloppe.vEnveloppesC;
+
+	}
+	
+	/* Menu en onglets*/
+	int iIdOnglet = HttpUtil.parseInt("iIdOnglet", request, 0);
+	
+	Onglet.sNotCurrentTabStyle = " class='onglet_non_selectionne' ";
+	Onglet.sCurrentTabStyle =  " class='onglet_selectionne' ";
+	Onglet.sNotCurrentTabStyleInCreation = " class='onglet_non_selectionne' ";
+	Onglet.sCurrentTabStyleInCreation =  " class='onglet_selectionne' ";
+	Onglet.sEnddingTabStyle =  " class='onglet_vide_dernier' ";
+	
+    String sAddParam = "&cand=" + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()), session) ;
+	Vector<Onglet> vOnglets = new Vector<Onglet>();
+	vOnglets.add( new Onglet(0, false, "Petite annonce", response.encodeURL( "consulterDossier.jsp?iIdOnglet=0&amp;nonce="+System.currentTimeMillis() + sAddParam )) ); 
+	vOnglets.add( new Onglet(1, false, "DCE", response.encodeURL("consulterDossier.jsp?iIdOnglet=1&amp;nonce="+System.currentTimeMillis() + sAddParam)) ); 
+	vOnglets.add( new Onglet(2, false, "Candidature et Offre", response.encodeURL("consulterDossier.jsp?iIdOnglet=2&amp;nonce="+System.currentTimeMillis()  + sAddParam ))); 
+	vOnglets.add( new Onglet(3, false, "Questions des candidats", response.encodeURL("consulterDossier.jsp?iIdOnglet=3&amp;nonce="+System.currentTimeMillis() + sAddParam))); 
+	//vOnglets.add( new Onglet(4, false, "Vérification système", response.encodeURL("consulterDossier.jsp?iIdOnglet=4&amp;nonce="+System.currentTimeMillis() + sAddParam))); 
+
+	if(!bIsContainsCandidatureManagement && iIdOnglet == Onglet.ONGLET_CANDIDATURE)
+		iIdOnglet = Onglet.ONGLET_DCE;
+	
+	Onglet onglet = vOnglets.get(iIdOnglet);
+	onglet.bIsCurrent = true;
+	
+	if(!bIsContainsCandidatureManagement)
+	{
+		Onglet ongletCandidature = vOnglets.get(Onglet.ONGLET_CANDIDATURE);
+		ongletCandidature.bHidden = true;
+	}
+	if(!bIsContainsDCEManagement)
+	{
+		Onglet ongletDCE = vOnglets.get(Onglet.ONGLET_DCE);
+		ongletDCE.bHidden = true;
+	}
+	
+	
+	/* /Menu en onglets*/
+	
+	boolean bShowButtonAnnonceDetail = false;
+    boolean bShowButtonToDownloadFile = true;
+    boolean bShowAvisRectificatifDetail = true;
+    boolean bShowButtonStatut = false;
+    boolean bAppletMode = false;
+
+    
+    
+    if(HttpUtil.parseBoolean("bConstituerCandidature",  request  ,false)
+    || HttpUtil.parseBoolean("bConstituerOffre",  request  ,false))
+    {
+    	bAppletMode = true;
+    }
+%>
+<script type="text/javascript" src="<%= rootPath %>include/checkbox.js"></script>
+<%@include file="/publisher_traitement/private/candidat/pave/paveCacherDivisionsAnnonce.jspf" %>
+<script type="text/javascript">
+function createEnveloppeALot(env){
+	
+<%
+	if(vLotsTotal.size() > 1){
+		// marché allotit
+%>
+		var isChecked = remplirItemFromCheckboxesCheckedByName('selectionA','selectionLotsA');
+		if(!isChecked)
+		{
+			alert("Vous devez séléctionner au moins un lot auquel participer.");
+		}
+		else
+		{
+			var urlredirect = "<%= response.encodeURL("consulterDossier.jsp?iIdOnglet="
+				+ modula.graphic.Onglet.ONGLET_CANDIDATURE
+				+ "&bConstituerCandidature=true"
+				+ "&cand=" + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session)
+				+ "&iIdEnveloppe=") %>" + env + "&selectionLotsA="+document.getElementById('selectionLotsA').value;
+			
+			doUrl(urlredirect);
+		}
+<%
+	} else {
+		// marché unique
+%>
+			var urlredirect = "<%= response.encodeURL("consulterDossier.jsp?iIdOnglet="
+				+ modula.graphic.Onglet.ONGLET_CANDIDATURE
+				+ "&bConstituerCandidature=true"
+				+ "&cand=" + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session)
+				+ "&iIdEnveloppe=") %>" + env + "&selectionLotsA="+document.getElementById('selectionLotsA').value;;
+			doUrl(urlredirect);
+<%
+	}
+%>
+}
+</script>
+
+</head>
+<body onload="onAfterPageLoading()">
+<%@ include file="/publisher_traitement/public/include/header.jspf" %>
+
+
+<table class="fullWidth">
+    <tr>
+        <td style="size:50%;vertical-align:top;">
+
+	<div class="post">
+	    <div class="post-title">
+	        <table class="fullWidth" cellpadding="0" cellspacing="0">
+	        <tr>
+	            <td>
+	                <strong class="post-title-alt">Dates importantes</strong>
+	            </td>
+	            <td class="right">
+	                <strong style="color:#B00">&nbsp;</strong>
+	            </td>
+	        </tr>
+	        </table>
+	    </div>
+	    
+	  <div class="post-footer post-block" style="margin-top:0">
+	    <table class="fullWidth">
+	        <tr>
+	            <td class="pave_cellule_gauche" style="text-align:left">Date de retrait du DCE :</td>
+	            <td class="pave_cellule_droite" style="text-align:right">
+	            <%= CalendarUtil.getDateFormattee(candidature.getDateRetraitDCE()) %></td>
+	        </tr>
+<%
+if(bIsContainsCandidatureManagement)
+{
+    /* Récupération de l'enveloppe A */
+    for (int i = 0; i < vEnveloppesA.size(); i++)
+    {
+        EnveloppeA enveloppe = (EnveloppeA)vEnveloppesA.get(i);
+%>
+	        <tr>
+	            <td class="pave_cellule_gauche" style="text-align:left">Date de fermeture de la candidature :</td>
+	            <td class="pave_cellule_droite" style="text-align:right">
+	            <%= (enveloppe.getDateFermeture()!=null ?CalendarUtil.getDateFormattee(enveloppe.getDateFermeture()):"la candidature n'est pas fermée.") %></td>
+	        </tr>
+<%
+    }
+    
+    /* Récupération de l'enveloppe B */
+    for (int i = 0; i < vEnveloppesB.size(); i++)
+    {
+        EnveloppeB enveloppe = (EnveloppeB)vEnveloppesB.get(i);
+        String sTexteLot = "";
+        if (enveloppe.getIdLot() > 0 && vLots.size() > 1)
+        {
+            MarcheLot lot = MarcheLot.getMarcheLot(enveloppe.getIdLot());
+            sTexteLot = " du lot n°" + lot.getNumero();
+        }
+	%>
+	        <tr>
+	            <td class="pave_cellule_gauche" style="text-align:left">Date de fermeture de l'offre <%= sTexteLot %>:</td>
+	            <td class="pave_cellule_droite" style="text-align:right">
+	            <%= (enveloppe.getDateFermeture()!=null 
+	                    ?CalendarUtil.getDateFormattee(enveloppe.getDateFermeture())
+	                    :"l'offre n'est pas fermée.") %></td>
+	        </tr>
+<%
+    }
+}
+%>
+	     </table>    
+	   </div>
+	</div>
+
+        </td>
+        <td style="size:50%;vertical-align:top;">
+    <div class="post">
+        <div class="post-title">
+            <table class="fullWidth" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                    <strong class="post-title-alt">Information importante</strong>
+                </td>
+                <td class="right">
+                    <strong style="color:#B00">&nbsp;</strong>
+                </td>
+            </tr>
+            </table>
+        </div>
+        
+      <div class="post-footer post-block" style="margin-top:0">
+        <table class="fullWidth">
+            <tr>
+                <td class="pave_cellule_gauche" >
+                    <img src="<%= rootPath + Icone.ICONE_WARNING %>"  alt="Attention"/> 
+                </td>
+                <td class="pave_cellule_droite" >
+                    Vous voulez répondre électroniquement ? 
+                    <a href="<%= response.encodeURL(
+                    		rootPath + "publisher_portail/public/pagesStatics/checkComputerConformity.jsp")
+                    		%>">Tester votre poste</a>
+                </td>
+            </tr>
+        </table>
+       </div>
+    </div>
+
+        </td>
+    </tr>
+</table>
+
+<div class="titre_page">Affaire Référence : <%= marche.getReference() %></div>
+<div class="tabFrame">
+<%= Onglet.getAllTabsHtmlDesk(vOnglets)  %>
+<div class="tabContent">
+<%
+
+	boolean bImprimer = false;
+	boolean bConsultationAAPC = true;
+	boolean bConsultationAATR = true;
+	boolean bAfficheDates = true;
+	boolean bLirePetiteAnnonce = false;
+	
+	switch(iIdOnglet)
+	{
+		case Onglet.ONGLET_PETITE_ANNONCE :
+  
+		    Commission commission = Commission.getCommission(marche.getIdCommission(), vCommissionTotal);
+		    Organisation organisationAcheteuse = Organisation.getOrganisation(commission.getIdOrganisation() , vOrganisationTotal);
+		    String sAffaireAcheteurPublic = organisationAcheteuse.getRaisonSociale();   
+		    
+		    String sTypePetiteAnnonce = HtmlAnnonce.getTypePetiteAnnonce(marche);
+
+		    Vector<Multimedia> vMultimedias = 
+		        Multimedia.getAllMultimedia(
+		                MultimediaType.TYPE_LOGO, 
+		                organisationAcheteuse.getIdOrganisation(), 
+		                ObjectType.ORGANISATION,
+		                vMultimediaTotal);
+			
+			String sStatutDCE = "";			
+		  %><%@ include file="/publisher_traitement/private/candidat/pave/ongletPetiteAnnonce.jspf" %><%     
+			break;
+		  
+		case Onglet.ONGLET_DCE :
+		  %><%@ include file="/publisher_traitement/private/candidat/pave/ongletDCE.jspf" %><%
+			break;
+		  
+		  
+		case Onglet.ONGLET_CANDIDATURE : 
+			if(HttpUtil.parseBoolean("bConstituerCandidature",  request  ,false))
+			{
+			      %><%@ include file="/publisher_traitement/private/candidat/pave/paveConstituerCandidatureFormInline.jspf" %><% 
+			} else if(HttpUtil.parseBoolean("bConstituerOffre",  request  ,false))
+			{
+			      %><%@ include file="/publisher_traitement/private/candidat/pave/paveConstituerOffreFormInline.jspf" %><% 
+			} else {
+				if(bIsContainsCandidatureManagement)
+				{
+			      %><%@ include file="/publisher_traitement/private/candidat/pave/ongletDossierCandidature.jspf" %><% 
+				}
+			}
+			break;
+			
+		case Onglet.ONGLET_QUESTION : 
+		  %><%@ include file="/publisher_traitement/private/candidat/pave/ongletFQR.jspf" %><%     
+			break;
+		  
+		case Onglet.ONGLET_VERIFICATION_SYSTEME : 
+			break;
+	}
+%>
+</div>
+<%@ include file="/publisher_traitement/public/include/footer.jspf"%>
+</body>
+
+<%@page import="org.coin.bean.question.QuestionAnswer"%></html>
+<%
+	ConnectionManager.closeConnection(connGlobalTotal);
+%>

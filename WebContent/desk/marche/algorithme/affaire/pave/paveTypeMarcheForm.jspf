@@ -1,0 +1,158 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*	String sPaveTypeMarcheTitre;
+	*
+	*	Champs utilisés :
+	*	int iIdMarcheType;
+	*	int idTypeDetaille;
+	*/
+{ // pour les variables locales
+
+	MarcheType mtType = new MarcheType();
+	if ((marche.getIdMarcheType() > 0))
+		mtType = MarcheType.getMarcheType(marche.getIdMarcheType());
+%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="modula.graphic.CSS"%>
+<%@page import="modula.marche.MarcheType"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="modula.marche.MarcheParametre"%>
+<%@page import="mt.modula.affaire.type.MarcheTypeExtension"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.HashMap"%>
+
+<%@page import="modula.marche.MarchePassation"%><table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveTypeMarcheTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			Type de marché* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sIdCodeType = "";
+			String sCodeTypeLibelle = "";
+			sSelected = "";
+			if (mtType != null )
+			{
+				sIdCodeType = "";
+			}
+			if (sIdCodeType.equals(""))
+			{
+				sCodeTypeLibelle = "Choisissez le type de marché";
+			}
+			
+			sSelected = "selected='selected'";
+		%>
+		<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="<%=sFormPrefix %>iIdMarcheType" id="<%=sFormPrefix %>iIdMarcheType" style="width:300px">
+            <option <%= sSelected %> value="<%= sIdCodeType %>">
+            <%= sCodeTypeLibelle %>
+            </option>
+        </select>&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.TYPE_MARCHE) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			Type de prestations* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sIdCodeTypeDetaille = "";
+			String sCodeTypeDetailleLibelle = "";
+			sSelected = "";
+			if (mtType != null )
+			{
+				sIdCodeType = "";
+			}
+			if (sIdCodeType.equals(""))
+			{
+				sCodeTypeDetailleLibelle = "Choisissez le type de prestations";
+			}
+			
+			sSelected = "selected='selected'";
+			
+		%>
+		<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="<%=sFormPrefix %>idTypeDetaille" >
+            <option <%= sSelected %> value="<%= sIdCodeTypeDetaille %>">
+            <%=  sCodeTypeDetailleLibelle  %>
+            </option>
+        </select>&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.OPERATION_DETAILLEE) %>
+		</td>
+	</tr>
+	<%
+	ArrayList<HashMap<String, String>> arrExtension = new ArrayList<HashMap<String, String>>();
+	if(MarcheTypeExtension.isExtentionEnabled()){
+	%>
+	<tr id="trExtensions">
+        <td class="pave_cellule_gauche" style="vertical-align:middle">
+            Extensions :
+        </td>
+        <td class="pave_cellule_droite">
+        <% 
+        arrExtension = MarcheTypeExtension.getAllExtentionFromMarche(marche.getId());
+        for(HashMap<String, String> mapExtension : arrExtension){
+        %>
+        <span id="span_<%= mapExtension.get("id") %>">
+        <input type="checkbox" name="cb_<%= mapExtension.get("id") %>" id="cb_<%= mapExtension.get("id") %>" <%= Boolean.valueOf(mapExtension.get("value")) ?"checked=\"checked\"":"" %> /> <%= mapExtension.get("name") %>
+        </span>
+        <%
+        }
+        %>
+        </td>
+    </tr>
+    <%} %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<script>
+$("<%=sFormPrefix %>iIdMarcheType").onchange = function(){
+    verifier('iIdMarcheType', 'idTypeDetaille', 2);   
+    this.onAfterChange(); 
+}
+
+
+$("<%=sFormPrefix %>iIdMarcheType").onAfterChange = function(){
+
+
+    
+<% 
+	if(MarcheTypeExtension.isExtentionEnabled())
+	{
+%>
+    var showExt = false;
+<% 
+	    for(HashMap<String, String> mapExtension : arrExtension){
+	    	String sExtentionId = mapExtension.get("id");
+	    	String sExtensionValue = mapExtension.get("value");
+	    	String sExtentionName = mapExtension.get("name");
+	        int iDependType = Integer.parseInt(mapExtension.get("dependType"));
+	        int iDependTypeDetail = Integer.parseInt(mapExtension.get("dependTypeDetail"));
+%>
+	if(this.value == <%= iDependType %> || <%= iDependType %> == 0){
+	    Element.show("span_<%= sExtentionId %>");
+	    showExt = true;
+	}else{
+	    Element.hide("span_<%= sExtentionId %>");
+	    $("cb_<%= mapExtension.get("id") %>").checked = false;
+	}
+<%
+		}
+%>
+	if(!showExt){
+	    Element.hide("trExtensions");
+	}else{
+	    Element.show("trExtensions");
+	}
+<%
+	}
+%>
+}
+</script>
+<%
+}
+%>

@@ -1,0 +1,36 @@
+<%
+if(sAction.equals("store") )
+{ %>
+	<%
+	if(bShowForm )
+	{ 
+	%>
+					<input type="hidden" name="iIdAffaire" value="<%= marche.getIdMarche() %>" />
+					<input type="hidden" name="sAction" value="<%= sAction %>" />
+					<button type="submit" >Valider</button>
+	<% 	
+	}
+	else
+	{
+	%>
+					<button type="button" 
+						onclick='Redirect("<%= 
+							response.encodeURL("modifierPetiteAnnonce.jsp?sAction=storeNoForm"
+							+"&amp;iIdAffaire="+marche.getIdMarche()) %>")' >Retour</button>
+	<%
+	}
+}
+else 
+{
+	boolean bIsMarcheLectureSeule = marche.isLectureSeule(true);
+	if(!bIsMarcheLectureSeule)
+	{ %>
+						<button type="button" 
+							onclick="Redirect('<%= 
+								response.encodeURL("afficherPetiteAnnonce.jsp?iIdAffaire="
+								+marche.getIdMarche()+"&amp;sAction=store#ancreHP" ) 
+								%>') " >Modifier</button>
+	<% }
+		
+}
+%>

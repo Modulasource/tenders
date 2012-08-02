@@ -1,0 +1,55 @@
+<%
+if(!bIsClassementEnveloppesBFige)
+{
+%>
+<button type="button" 
+	name="classement" 
+	style="width:160px" 
+	onclick="$('sAction').value='enregistrer';document.formulaire.submit();" 
+	>Enregistrer le classement</button>&nbsp;&nbsp;
+	
+<%if(bAfficheBoutonFigerClassement){ 
+	%><button type="button" name="classement" 
+	onclick="return checkNonConformes();"
+	 >Figer les statuts</button>&nbsp;&nbsp;
+<% } %>
+
+<%if(bAfficheBoutonLancerNego){ 
+	%><button type="button" name="classement" 
+	onclick="return checkMailsNego();" 
+	>lancer une phase de négociation</button>&nbsp;&nbsp;
+<% } %>
+
+<%if(bAfficheBoutonFinaliserClassement){ 
+	%><button type="button" name="classement" value="" 
+	onclick="return checkFinalisation();" 
+	>Finaliser un classement</button>
+<% } %>
+<%
+}
+else if(bIsClassementEnveloppesBFige)
+{
+%>
+	<button type="button" 
+			onclick="if (checkInfructueux()) Redirect('<%=
+				response.encodeURL("declarerLotInfructueux.jsp?iIdLot=" + lot.getIdMarcheLot()
+					+ "&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes+"&amp;iIdAffaire="+iIdAffaire) %>');" >Déclarer le <%= sLibelleOnglet
+					%> infructueux</button>
+	&nbsp;&nbsp;
+	<button type="button" 
+			onclick="if (checkValidation()) Redirect('<%= 
+			response.encodeURL("attribuerLot.jsp?iIdLot="+lot.getIdMarcheLot() 
+				+"&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes+"&amp;iIdAffaire="+iIdAffaire) %>');" >Attribuer le <%= sLibelleOnglet
+				%> définitivement</button>
+<%
+}
+%>
+
+<%if(bAfficheListeAttribues){ %><input type="hidden" name="listeAttribuees_ids" id="listeAttribuees_ids" value="" /><%}%>
+<%if(bAfficheListeNonConformes){ %><input type="hidden" name="listeNonConformes_ids" id="listeNonConformes_ids" value="" /><%}%>
+<%if(bAfficheListeRetenues){ %><input type="hidden" name="listeNonAttribuees_ids" id="listeNonAttribuees_ids" value="" /><%}%>
+<%if(bAfficheListeNonRetenues){ %><input type="hidden" name="listeNonRetenues_ids" id="listeNonRetenues_ids" value="" /><%}%>
+<input type="hidden" name="iIdLot" value="<%= lot.getIdMarcheLot() %>" />
+<input type="hidden" name="iIdNextPhaseEtapes" value="<%= iIdNextPhaseEtapes %>" />
+<input type="hidden" name="nonce" value="<%= System.currentTimeMillis() %>" />
+<input type="hidden" name="sAction" id="sAction" value="" />

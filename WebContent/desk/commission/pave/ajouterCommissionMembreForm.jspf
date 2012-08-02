@@ -1,0 +1,31 @@
+<script type="text/javascript">
+	function checkIdPersonnePhysique(){
+		if (document.form1.iIdPersonnePhysique.length != 0) return true;
+		else alert("Pas de membre !");
+		return false;
+	}
+	function checkIdMembreRole()
+	{
+		switch(document.form1.iIdMembreRole.value)
+		{
+			case "<%= CommissionMembre.COMMISSION_MEMBRE_ID_ROLE_SECRETAIRE %>":
+			cacherToutesDiv();
+			montrer("divSecretaire");
+			break;
+			
+			case "<%= CommissionMembre.COMMISSION_MEMBRE_ID_ROLE_PRESIDENT %>":
+			cacherToutesDiv();
+			montrer("divPresident");
+			break;
+			
+			default :
+			cacherToutesDiv();
+			break;
+		}
+	}
+	function cacherToutesDiv()
+	{
+		cacher("divSecretaire");
+		cacher("divPresident");
+	}
+</script>

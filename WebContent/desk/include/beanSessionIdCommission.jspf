@@ -1,0 +1,28 @@
+<jsp:useBean id="sessionIdCommission" scope="session" class="java.lang.String" />
+<%
+	int iIdCommission = -1;
+	try {
+		iIdCommission = Integer.parseInt(request.getParameter("iIdCommission"));
+	}
+	catch (Exception e) {
+		iIdCommission = -1;
+	}
+
+	if (iIdCommission < 0)
+	{
+		try 
+		{
+			iIdCommission = Integer.parseInt(sessionIdCommission);
+		}
+		catch (Exception e) {iIdCommission = -1;}
+	}
+
+	Commission commission = null;
+	try
+	{
+		commission = Commission.getCommission(iIdCommission);
+	}
+	catch(Exception e){e.printStackTrace();}
+	session.setAttribute( "sessionIdCommission",  "" + iIdCommission ) ;
+	
+%>

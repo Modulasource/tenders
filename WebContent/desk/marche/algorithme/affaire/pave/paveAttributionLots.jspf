@@ -1,0 +1,48 @@
+<p style="text-align:center" class="mention">
+Pour pouvoir attribuer un lot &agrave; un candidat, vous devez ajouter les candidatures de ces derniers dans l'interface disponible dans le carnet d'adresse des candidats.
+</p>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Statut <%= (iNbLots>1)?"des lots":"du marché" %></td>
+		<td class="pave_titre_droite"><%= (iNbLots>1)?iNbLots + " lots":"" %></td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<%
+	for (int i = 0; i < vLots.size(); i++)
+	{
+		MarcheLot lot = vLots.get(i);
+		String sReferenceLot = "";
+		if(vLots.size()==1)
+			sReferenceLot = "marché";
+		else
+			sReferenceLot = "lot n°"+lot.getNumero()+" réf. "+lot.getReference();
+		
+		String sStatut = "";
+		try{if(lot.isInfructueux()) sStatut = "infructueux";}
+		catch(Exception e){}
+		try{if(lot.isAttribue()) sStatut = "attribué définitivement";}
+		catch(Exception e){}
+		
+		Vector<Candidature> vCand = Candidature.getAllCandidaturesAttribueesDefinitifFromLot(lot.getIdMarcheLot());
+		try
+		{
+			Candidature cand = vCand.firstElement();
+			Organisation org = Organisation.getOrganisation(cand.getIdOrganisation());
+			sStatut += " à "+org.getRaisonSociale();
+		}
+		catch(Exception e){}
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Statut du <%= sReferenceLot %> :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= sStatut %>
+		</td>
+	</tr>
+	<%
+	}
+	%>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />

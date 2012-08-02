@@ -1,0 +1,172 @@
+<%@page import="modula.marche.AvisRectificatifRubrique"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.marche.AvisRectificatifRubriqueSousType"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Rubriques modifiées</td>
+		<td class="pave_titre_droite">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+<%
+	Vector<AvisRectificatifRubrique> vRubriques = AvisRectificatifRubrique.getAllAvisRectificatifRubriqueForIdAvisRectificatif(avis.getIdAvisRectificatif());
+	String sRubriqueName = "Caractéristiques principales";
+	String sRubriqueAncienneValeur = "marché à tranche";
+	String sRubriqueNouvelleValeur = "marché à bon de commande";
+	
+	for(int i=0; i < vRubriques.size(); i++)
+	{
+		AvisRectificatifRubrique rubrique = vRubriques.get(i);
+	
+		if(rubrique.getIdAvisRectificatifRubriqueType() == AvisRectificatifRubrique.RUBRIQUE_TYPE_DATE)
+		{
+		 	String sReceptCandidaturesSelected = "";
+		 	String sReceptionOffresSelected  = "";
+		 	String sEnvoiInvitationSelected  = "";
+		 	String sRemiseCandidaturesSelected  = "";
+		 	if( rubrique.getRubrique().equals("ReceptCandidatures"))
+		 	{
+			 	sReceptCandidaturesSelected = " selected='selected' ";
+		 		sRubriqueName = "Réception des candidatures";
+			}
+		 	if( rubrique.getRubrique().equals("ReceptionOffres"))
+		 	{
+			 	sReceptionOffresSelected = " selected='selected'  ";
+		 		sRubriqueName = "Réception des offres";
+			}
+		 	if( rubrique.getRubrique().equals("EnvoiInvitation"))
+		 	{
+			 	sEnvoiInvitationSelected = " selected='selected' ";
+		 		sRubriqueName = "Envoi de l'invitation à présenter une offre";
+			}
+		 	if( rubrique.getRubrique().equals("RemiseCandidatures"))
+		 	{
+			 	sRemiseCandidaturesSelected = " selected='selected' ";
+		 		sRubriqueName = "Remise des candidatures";
+		 	}
+		 		
+		 	sRubriqueAncienneValeur = CalendarUtil.getDateFormattee( rubrique.getDateAncienneValeur());
+		 	sRubriqueNouvelleValeur = CalendarUtil.getDateFormattee( rubrique.getDateNouvelleValeur());
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<input type="hidden" name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_iIdAvisRectificatifRubriqueType" value="<%= rubrique.getIdAvisRectificatifRubriqueType() %>" />
+			<input type="hidden" name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_iIdAvisRectificatif" value="<%= rubrique.getIdAvisRectificatif() %>" />
+			<select style="width : 450 px" name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_sRubrique" >
+		 	 	<option value="" > Choisir la date à rectifier</option>
+		 	 	<option value="ReceptCandidatures" <%= sReceptCandidaturesSelected %> >Réception des candidatures</option>
+ 			 	<option value="ReceptionOffres" <%= sReceptionOffresSelected %> >Réception des offres</option>
+ 	 			<option value="EnvoiInvitation" <%= sEnvoiInvitationSelected %> >Envoi de l'invitation à présenter une offre</option>
+ 	 			<option value="RemiseCandidatures" <%= sRemiseCandidaturesSelected %> >Remise des candidatures</option>
+		 	</select>	
+		</td>
+		<td class="pave_cellule_droite">
+			Au lieu de 
+				<input 
+					type="text"
+					name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_tsDateAncienneValeurDate" 
+					value="<%= CalendarUtil.getDateCourte(rubrique.getDateAncienneValeur())%>" 
+					class="dataType-date"
+					size='12' 
+					maxlength="10" /> 
+			à <input 
+				type="text"
+				name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_tsDateAncienneValeurHeure" 
+				value="<%= CalendarUtil.getHeureMinuteSec(rubrique.getDateAncienneValeur())%>" 
+				size='5'  
+				maxlength="5" />,
+			lire <input 
+				type="text"
+				name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_tsDateNouvelleValeurDate" 
+				value="<%= CalendarUtil.getDateCourte(rubrique.getDateNouvelleValeur()) %>" 
+				class="dataType-date"
+				size='12'  
+				maxlength="10" /> 
+			à <input 
+				type="text"
+				name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_tsDateNouvelleValeurHeure" 
+				value="<%= CalendarUtil.getHeureMinuteSec(rubrique.getDateNouvelleValeur()) %>" 
+				size='5'  
+				maxlength="5" />
+		</td>
+	</tr>
+<%
+		} 
+	
+		if(rubrique.getIdAvisRectificatifRubriqueType() == AvisRectificatifRubrique.RUBRIQUE_TYPE_TEXTE)
+		{
+			String sRubriqueSousType = "";
+			String sRubriqueSousTypeSelectedAjouter = "";
+			String sRubriqueSousTypeSelectedSupprimer = "";
+			
+			if(rubrique.getIdAvisRectificatifRubriqueSousType() != AvisRectificatifRubriqueSousType.SOUS_TYPE_AJOUTER
+			&& rubrique.getIdAvisRectificatifRubriqueSousType() != AvisRectificatifRubriqueSousType.SOUS_TYPE_SUPPRIMER)
+			{
+				sRubriqueSousType = "Au lieu de";
+			} else {
+				sRubriqueSousType = "Après la mention";
+			}
+
+			if(rubrique.getIdAvisRectificatifRubriqueSousType() == AvisRectificatifRubriqueSousType.SOUS_TYPE_AJOUTER)
+			{
+				sRubriqueSousTypeSelectedAjouter = " selected='selected' ";
+			}
+			if(rubrique.getIdAvisRectificatifRubriqueSousType() == AvisRectificatifRubriqueSousType.SOUS_TYPE_SUPPRIMER)
+			{
+				sRubriqueSousTypeSelectedSupprimer = " selected='selected' ";
+			}
+			
+			%>
+				<tr>
+					<td class="pave_cellule_gauche">
+						<input type="hidden" name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_iIdAvisRectificatifRubriqueType" value="<%= rubrique.getIdAvisRectificatifRubriqueType() %>" />
+						<input type="hidden" name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_iIdAvisRectificatif" value="<%= rubrique.getIdAvisRectificatif() %>" />
+						Rubrique <input 
+							type="text"
+							name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_sRubrique"
+							value="<%= rubrique.getRubrique() %>" /> <%= sRubriqueSousType %>
+					</td>
+			<%
+			if(rubrique.getIdAvisRectificatifRubriqueSousType() != AvisRectificatifRubriqueSousType.SOUS_TYPE_AJOUTER
+			&& rubrique.getIdAvisRectificatifRubriqueSousType() != AvisRectificatifRubriqueSousType.SOUS_TYPE_SUPPRIMER)
+			{
+			 %>
+					<td class="pave_cellule_droite">
+							<textarea cols="60" rows="3" 
+								name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_sTexteAncienneValeur"
+								><%= rubrique.getTexteAncienneValeur() %></textarea>,<br/> 
+						lire <br/>
+							<textarea cols="60" rows="3" 
+								name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_sTexteNouvelleValeur"
+								><%= rubrique.getTexteNouvelleValeur() %></textarea>
+					</td>
+			<%
+			} else {
+				 %>
+					<td class="pave_cellule_droite">
+							<textarea cols="60" rows="3" 
+									name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_sTexteAncienneValeur"
+									><%= rubrique.getTexteAncienneValeur() %></textarea>,<br/> 
+							<select name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_iIdAvisRectificatifRubriqueSousType" style="width:90px;min-width:50px">
+								<option value="<%= AvisRectificatifRubriqueSousType.SOUS_TYPE_SUPPRIMER 
+									%>" <%= sRubriqueSousTypeSelectedSupprimer %> >supprimer</option>
+								<option value="<%= AvisRectificatifRubriqueSousType.SOUS_TYPE_AJOUTER 
+									%>" <%= sRubriqueSousTypeSelectedAjouter %> >ajouter</option>
+							</select><br/> 
+								<textarea cols="60" rows="3"  
+									name="id<%= rubrique.getIdAvisRectificatifRubrique() %>_sTexteNouvelleValeur"
+									><%= rubrique.getTexteNouvelleValeur() %></textarea>
+						</td>
+				<%
+			}
+			%>
+					</tr>
+			<% 
+		} 
+	} 
+%>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+</table>

@@ -1,0 +1,80 @@
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="mt.modula.bean.mail.MailMarcheFqr"%>
+<%@page import="mt.modula.affaire.fqr.MarcheFqrType"%>
+<form name="poserQuestion" method="post" action="<%= 
+	response.encodeURL(rootPath+"desk/FQR/modifierMarcheFqr.jsp")
+	%>" onsubmit="javascript:return checkFormFqrCreate()">
+
+    <input type="hidden" name="iIdAffaire" value="<%= marche.getId() %>" />
+    <input type="hidden" name="sAction" value="create" />
+<%
+	MarcheFqrType marcheFqrTypeCreation = new MarcheFqrType();
+
+
+%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Définir la question</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;<td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Type de question : </td>
+		<td class="pave_cellule_droite">
+            <%= marcheFqrTypeCreation.getAllInHtmlSelect("lIdMarcheFqrType") %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Titre de la question : </td>
+		<td class="pave_cellule_droite">
+			<input name="sTitre" type="text" size="50" value="" />
+		</td>
+	</tr>
+		<td class="pave_cellule_gauche">Question : </td>
+		<td class="pave_cellule_droite">
+			<textarea name="sQuestion" cols="80" rows="8"></textarea>
+		</td>
+	</tr>									
+	</tr>
+		<td class="pave_cellule_gauche">Réponse : </td>
+		<td class="pave_cellule_droite">
+			<textarea name="sReponse" cols="80" rows="8"></textarea>
+		</td>
+	</tr>
+    <tr>
+           <td class="pave_cellule_gauche">
+                 Destinataires : 
+           </td>
+           <td class="pave_cellule_droit">
+<%
+    Vector<Candidature> vCand = Candidature.getAllCandidatureFromMarche(marche.getIdMarche());
+    Vector<PersonnePhysique> vPersonnePhysique = MailMarcheFqr.getAllPersonnePhysiqueFromCandidature(vCand);
+    
+    for(Candidature cand : vCand){
+        PersonnePhysique personneDest 
+          = PersonnePhysique.getPersonnePhysique(cand.getIdPersonnePhysique(), vPersonnePhysique) ;
+        %><%= personneDest.getEmail() %> , <%
+    }
+%>
+         </td>
+    </tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+			&nbsp;
+		</td>
+	</tr>									
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<button type="submit" >Ajouter</button>
+		</td>
+	</tr>									
+	<tr>
+		<td colspan="2">&nbsp;<td>
+	</tr>
+</table>
+<br />
+</form>

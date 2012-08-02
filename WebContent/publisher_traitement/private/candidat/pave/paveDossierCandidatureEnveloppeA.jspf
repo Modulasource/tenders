@@ -1,0 +1,285 @@
+<%
+if(isConstitutionEnveloppeAAutoriseeInstancie)
+{
+	/**
+	 * bug#1878 for the procedure AOO with 1 enveloppe 
+	 */
+	if(qaProcedureSimpleEnveloppe != null
+	&& qaProcedureSimpleEnveloppe.getIdAnswer() == Answer.YES)
+	{
+	    for (int i = 0; i < vEnveloppesA.size(); i++)
+	    {
+	        EnveloppeA enveloppe = (EnveloppeA)vEnveloppesA.get(i);
+	        
+	        CandidatureUtil.updateEnvelopppeASelected(
+	                candidature,
+	                enveloppe,
+	                null,
+	                vLots,
+                true);
+	    }
+%>	
+
+	
+	
+
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="org.coin.bean.question.Answer"%>
+<%@page import="mt.modula.affaire.candidature.CandidatureUtil"%><div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0"><tr>
+            <td>
+                <strong class="post-title-alt">CMP2009 : AOO une enveloppe</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">Information</strong>
+            </td>
+        </tr></table>
+    </div>
+    <br/>
+    <div class="post-footer post-block" style="margin-top:0;color: #000000" >
+        Le code des marchés publics a changé et désormais l'appel d'offre ouvert demande le dépôt 
+        d'une enveloppe (ou pli) uniquement. <br/>
+        Celle-ci devra contenir les documents relatifs à la candidature et à l'offre. (Pour plus d'information vous pouvez appeler la hotline Modula).
+    </div>
+ </div>
+<%	
+	} else {
+		for (int i = 0; i < vEnveloppesA.size(); i++)
+		{
+			EnveloppeA enveloppe = (EnveloppeA)vEnveloppesA.get(i);
+			
+			Vector<EnveloppeALot> vEnveloppesALot = EnveloppeALot.getAllEnveloppeALotFromEnveloppeA((int)enveloppe.getId());
+			String sLot = "";
+			
+			if(vEnveloppesALot != null && vLotsTotal.size() > 1)
+			{
+				int iEnvALot = vEnveloppesALot.size();
+				if(iEnvALot > 1)
+					sLot += "pour les lots n°";
+				else
+					sLot += "pour le lot n°";
+				
+				for(int y=0;y<iEnvALot;y++)
+				{
+					EnveloppeALot envALot = vEnveloppesALot.get(y);
+					MarcheLot lot = MarcheLot.getMarcheLot(envALot.getIdLot(),vLotsTotal);
+					sLot += lot.getNumero();
+					
+					if(y != (iEnvALot-1))
+						sLot += ", ";
+				}
+			}
+			// attention en mode triche il est possible qu'aucune PJ s'affichent car elles seront considérées comme anti-datées.
+			Vector vPiecesJointes = EnveloppeAPieceJointe.getAllEnveloppeAPiecesJointesBeforeMarcheDateClotureFromEnveloppe(enveloppe.getIdEnveloppe());
+			Vector vPiecesJointesHorsDelai = EnveloppeAPieceJointe.getAllEnveloppeAPiecesJointesHorsDelaisFromEnveloppe(enveloppe.getIdEnveloppe());
+%>
+<%@page import="modula.candidature.EnveloppeA"%>
+<%@page import="modula.candidature.EnveloppeAPieceJointe"%>
+<%@page import="modula.candidature.EnveloppeALot"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.candidature.DemandeInfoComplementaire"%>
+<%@page import="java.util.Vector"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="java.math.BigDecimal"%>
+<%@page import="modula.candidature.EnveloppePieceJointe"%>
+<%@page import="org.coin.util.Outils"%>
+
+
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0"><tr>
+            <td>
+                <strong class="post-title-alt">Liste des pièces de la candidature <%= sLot %></strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00"><%= enveloppe.getStatutLibelleValue( EnveloppeA.ID_STATUS_CACHETEE )  %></strong>
+            </td>
+        </tr></table>
+    </div>
+    <br/>
+    <div class="post-footer post-block" style="margin-top:0">
+      <table class="fullWidth">
+		<tr>
+			<th>Nom de la pièce</th>
+			<th>Date de création</th>
+			<th>Poids</th>
+			<th>Etat</th>
+		</tr>
+<%
+			for (int j = 0; j < vPiecesJointes.size(); j++)
+			{
+				EnveloppeAPieceJointe pieceJointe = (EnveloppeAPieceJointe)vPiecesJointes.get(j);
+				candidature.setClosingCandidatureAllowedFromEnveloppeState(pieceJointe);
+%>
+				<tr>
+					<td style="width:60%"><%= pieceJointe.getNomPieceJointe() %></td>
+					<td><%= CalendarUtil.getDateCourte(pieceJointe.getDateCreation()) %></td>
+					<td><%= pieceJointe.getFileSizeInMegaBytes() %></td>
+					<td><%= pieceJointe.getFileStateName() %></td>
+				</tr>
+<%
+			}
+	
+			for (int j = 0; j < vPiecesJointesHorsDelai.size(); j++)
+			{
+				EnveloppeAPieceJointe pieceJointe = (EnveloppeAPieceJointe)vPiecesJointesHorsDelai.get(j);
+				candidature.setClosingCandidatureAllowedFromEnveloppeState(pieceJointe);
+%>
+		<tr>
+			<td style="width:60%" class="rouge"><%= pieceJointe.getNomPieceJointe() %>&nbsp;&nbsp;<img src="<%= rootPath %>images/icones/hors_delai.gif" width="25" height="24"/>(hors delais)</td>
+			<td><%= CalendarUtil.getDateCourte(pieceJointe.getDateCreation()) %></td>
+			<td><%= Outils.getSizeInMegaBytes(pieceJointe.getTailleFichier()) %></td>
+			<td><%= pieceJointe.getFileStateName() %></td>
+		</tr>
+<%
+		}
+%>
+		</table>	
+	</div>
+<%
+			Vector vDemandes = DemandeInfoComplementaire.getAllDemandeFromEnveloppeA(enveloppe.getIdEnveloppe());
+			for (int j = 0; j < vDemandes.size(); j++)
+			{
+				DemandeInfoComplementaire demande = (DemandeInfoComplementaire)vDemandes.get(j);
+%>
+    <br/>
+    <div class="post-footer post-block" style="margin-top:0">
+      <table class="fullWidth">
+		<tr>
+			<th colspan="4">
+			Demande d'informations complémentaires du <%= 
+				CalendarUtil.getDateCourte(demande.getDateDebutRemise()) %> 
+			au <%= CalendarUtil.getDateCourte(demande.getDateFinRemise()) %>
+			</th>
+		</tr>
+		<tr>
+			<td colspan="4">
+				<b>Informations complémentaires demandées :</b> <%= demande.getDemandeInfo() %>
+			</td>
+		</tr>
+<%
+				Vector vPiecesDemandes = EnveloppeAPieceJointe.getAllEnveloppeAPieceJointeFromDemandeInfo(demande.getIdDemandeInfoComp());
+				for (int l = 0; l < vPiecesDemandes.size(); l++)
+				{
+					EnveloppeAPieceJointe pieceJointe = (EnveloppeAPieceJointe)vPiecesDemandes.get(l);
+					candidature.setClosingCandidatureAllowedFromEnveloppeState(pieceJointe);
+%>
+				<tr>
+					<td style="width:60%"><%= pieceJointe.getNomPieceJointe() %></td>
+					<td><%= CalendarUtil.getDateCourte(pieceJointe.getDateCreation()) %></td>
+					<td><%= Outils.getSizeInMegaBytes(pieceJointe.getTailleFichier()) %></td>
+					<td><%= pieceJointe.getFileStateName() %></td>
+				</tr>
+<%
+				}
+	
+				Vector vPiecesDemandesHorsDelais = EnveloppeAPieceJointe.getAllEnveloppeAPieceJointeHorsDelaisFromDemandeInfo(demande.getIdDemandeInfoComp());
+				for (int l = 0; l < vPiecesDemandesHorsDelais.size(); l++)
+				{
+					EnveloppeAPieceJointe pieceJointe = (EnveloppeAPieceJointe)vPiecesDemandesHorsDelais.get(l);
+					candidature.setClosingCandidatureAllowedFromEnveloppeState(pieceJointe);
+%>
+		<tr>
+			<td style="width:60%; color: #FF0000"><%= pieceJointe.getNomPieceJointe()
+			%>&nbsp;&nbsp;<img src="<%= rootPath %>images/icones/hors_delai.gif" width="25" height="24"/>(hors delais)</td>
+			<td><%= CalendarUtil.getDateCourte(pieceJointe.getDateCreation()) %></td>
+			<td><%= Outils.getSizeInMegaBytes(pieceJointe.getTailleFichier()) %></td>
+			<td><%= pieceJointe.getFileStateName() %></td>
+		</tr>
+<%
+				}
+%>
+	</table>
+   
+        <div class="post-footer post-block" style="margin-top:0">
+<%
+				Timestamp tsDateJour = new Timestamp(System.currentTimeMillis());
+				Timestamp tsDateFinUrgence = new Timestamp(
+						demande.getDateFinRemise().getTime()
+						+(marche.getDelaiUrgence()*60*60*100));
+				
+				if ( (!demande.isFlagFermetureRemise()) 
+				&& (tsDateJour.before(tsDateFinUrgence)) )
+				{ /* Demande d'infos OUVERTE && date de fin remise non atteinte */
+%>
+				<button type="button" name="completer"
+				onclick="OuvrirPopup('<%= 
+					response.encodeURL("completerEnveloppeForm.jsp?iIdDemandeInfoComp="
+					+ demande.getIdDemandeInfoComp()
+					+ "&iIdMarche="  + candidature.getIdMarche() ) 
+					%>',700,600, 'menubar=no,scrollbars=yes,statusbar=no')" >Compléter ma candidature</button>
+<%
+			}
+	} // END for (int i = 0; i < vEnveloppesA.size(); i++)
+%>
+ 
+	<br/>
+    <div class="post-footer post-block" style="margin-top:0">
+      <table class="fullWidth">
+		<tr>
+			<td style="text-align:right" colspan="2">
+			&nbsp;
+<%
+			boolean bIsEnvADecachetees = marche.isEnveloppesADecachetees(false);	
+			boolean bIsEnvACachetee = enveloppe.isCachetee(false);
+			
+			if (isConstitutionEnveloppeAAutorisee && !bIsEnvACachetee && !bIsEnvADecachetees)
+			{
+				bConstitutionEnveloppeAPossible = true;
+				if(vPiecesJointes.size() + vPiecesJointesHorsDelai.size() > 0)
+					bExistEnveloppeAPJ = true;
+	
+				if(vLotsTotal.size() > 1)
+				{
+			%>
+			<button onclick="montrer_cacher('divisionA');" >Sélectionner les lots</button>
+			<table>
+				<tr><td>&nbsp;</td></tr>
+				<tr id="divisionA">
+					<td>
+						<%@ include file="paveSelectLotsA.jspf" %>
+					</td> 
+				</tr>
+			</table>
+	<%
+				}
+				else if(vLotsTotal.size() == 1)
+				{
+	%>
+		  <input type="hidden" name="selectionLotsA" id="selectionLotsA" value="<%= 
+			  vLotsTotal.firstElement().getIdMarcheLot() %>" />
+	<%
+			    }
+	%>
+		 <button type="button" name="constituerEnveloppeA" 
+			onclick="createEnveloppeALot('<%= enveloppe.getIdEnveloppe()
+			%>');" >Constituer ma candidature</button>
+<%
+			}
+			
+			boolean bIsEnvAClose = candidature.isEnveloppeAConstituee(false);
+			
+			if (isConstitutionEnveloppeAAutorisee && bIsEnvAClose && !bIsEnvADecachetees) 
+			{
+%>
+			<button type="button" value=""
+			onclick="if (confirm('Etes vous certain de réinitialiser votre candidature ? Cela détruira toutes vos pièces.')) Redirect('<%=
+				response.encodeURL(rootPath+"publisher_traitement/private/candidat/reinitialiserCandidature.jsp?cand=" 
+					+ SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session) 
+					+ "&action=candidature") %>')" >Réinitialiser ma candidature</button> &nbsp;
+<%
+			}
+%>
+			</td>
+		</tr>
+    </table>
+    </div>
+    </div>
+    
+<%
+		}
+	}
+}
+%>

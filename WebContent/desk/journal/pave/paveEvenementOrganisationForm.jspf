@@ -1,0 +1,76 @@
+<table class="pave" summary="none">		
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"> 
+			Evénement
+			<input type="hidden" name="iIdEvenement" value="<%= oEvenement.getIdEvenement() %>" />
+			<input type="hidden" name="sType" value="<%= sType %>" />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Date de création de l'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oEvenement.getDateCreationEvenement() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<input name="sTypeEvenement" value="<%= oEvenement.getTypeEvenement() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'objet :
+		</td>
+		<td class="pave_cellule_droite">
+			<input name="sTypeObjet" value="<%= oEvenement.getTypeObjet() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= oEvenement.getTypeObjet() %> :
+		</td>
+		<td class="pave_cellule_droite">
+			<a href="<%= response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherOrganisation.jsp?iIdAffaire="+ oOrganisation.getIdOrganisation() )%>"><%= oOrganisation.getRaisonSociale() %></a>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Commentaire libre :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea cols="80" rows="10"><%= oEvenement.getCommentaireLibre() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Identifiant de l'utilisateur :
+		</td>
+		<td class="pave_cellule_droite">
+			<a href="<%= response.encodeURL(rootPath + "desk/utilisateur/afficherUtilisateurGroupe.jsp?iIdUser="+oEvenement.getIdUser() ) %>" ><%= oEvenement.getUser() %></a>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Id jeton d'horodatage :
+		</td>
+		<td class="pave_cellule_droite">
+			<% 
+				if (oEvenement.getIdJetonHorodatage() < 1){
+					%><%
+				} else {%>
+			<%= oEvenement.getIdJetonHorodatage() %>
+				<%}%>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

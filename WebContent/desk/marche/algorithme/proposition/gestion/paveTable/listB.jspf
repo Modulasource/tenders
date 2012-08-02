@@ -1,0 +1,83 @@
+<!-- offres retenues (sous reserve) -->
+<%@page import="org.coin.fr.bean.mail.MailConstant"%>
+<%if(bAfficheListeAttribues){%>
+<div class="center" id="listeAttribueesDiv"></div>
+	<%	
+	if(bIsClassementEnveloppesBFige && vAttribuees.size() > 0){
+	String sURLDemandeJustificatif = response.encodeURL(rootPath 
+			+ "desk/marche/algorithme/proposition/gestion/envoyerMailForm.jsp?iMailType=" 
+				+ ((vLots.size() > 1)?MailConstant.MAIL_CDT_JUSTIFICATIF_SEPARE
+					:MailConstant.MAIL_CDT_JUSTIFICATIF_UNIQUE)
+			 + "&amp;iIdLot="+ lot.getIdMarcheLot() 
+			 + "&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes
+			 + "&amp;sRedirectURL="+sURL
+			 +"&amp;iIdAffaire="+iIdAffaire);
+	%>
+	<div class="center">
+	<button type="button" 
+		onclick="openModal('<%=sURLDemandeJustificatif%>', 'Notifier le titulaire sous réserve');"
+		 >Notifier le titulaire sous réserve</button> 
+	</div>
+	<%}%>
+<%}
+
+  if(bAfficheListeRetenues){
+  %>
+	<div class="center" id=listeNonAttribueesDiv></div>
+<%}
+  
+  if(bAfficheListeNonRetenues){
+  %>
+	<div class="center" id=listeNonRetenuesDiv></div>
+	<%
+	if(vNonRetenues.size()>0)
+	{
+		String sURLRejetOffre = response.encodeURL(rootPath 
+				+ "desk/marche/algorithme/proposition/gestion/envoyerMailForm.jsp?iMailType=" 
+						+ ((vLots.size() > 1)
+								?MailConstant.MAIL_CDT_REJET_OFFRE_SEPARE
+								:MailConstant.MAIL_CDT_REJET_OFFRE_UNIQUE)
+					+"&amp;iIdLot="+ lot.getIdMarcheLot() 
+					+ "&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes
+					+"&amp;sRedirectURL="+sURL
+					+"&amp;iIdAffaire="+iIdAffaire);
+	%>
+		<div class="center">
+		<button type="button" 
+			onclick="if(checkMailOffres(<%= (vLots.size() > 1)
+					?MailConstant.MAIL_CDT_REJET_OFFRE_SEPARE
+					:MailConstant.MAIL_CDT_REJET_OFFRE_UNIQUE 
+			%>)) openModal('<%=sURLRejetOffre
+			%>','Notifier les candidats \'non retenus\'');" >Notifier les candidats 'non retenus'</button>
+		</div>
+	<%
+	}
+}
+if(bAfficheListeNonConformes){%>
+	<div class="center" id=listeNonConformesDiv></div>
+	<%
+	if(vNonConformes.size()>0)
+	{
+		String sURLRejetOffreConformite 
+			= response.encodeURL(
+					rootPath + "desk/marche/algorithme/proposition/gestion/envoyerMailForm.jsp?iMailType=" 
+					+ ((vLots.size() > 1)
+							?MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_SEPARE
+							:MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_UNIQUE) 
+					+ "&amp;iIdLot="+ lot.getIdMarcheLot() 
+					+ "&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes
+					+ "&amp;sRedirectURL="+sURL
+					+"&amp;iIdAffaire="+iIdAffaire);
+	%>
+	<div class="center">
+	<button type="button" 
+		onclick="if(checkMailOffres(<%= (vLots.size() > 1)
+				?MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_SEPARE
+				:MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_UNIQUE 
+		%>)) openModal('<%=sURLRejetOffreConformite
+		%>','Notifier les candidats \'non conformes\'');" >Notifier les candidats 'non conformes'</button>
+	</div>
+	<%
+	}
+} 
+%>

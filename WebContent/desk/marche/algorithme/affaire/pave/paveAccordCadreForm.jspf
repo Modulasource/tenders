@@ -1,0 +1,256 @@
+<%
+	
+	MarcheAccordCadre marcheAccordCadre = null;
+	try {
+		marcheAccordCadre = MarcheAccordCadre.getMarcheAccordCadreFromMarche(marche.getId()); 
+	} catch (Exception e) {
+		marcheAccordCadre = new MarcheAccordCadre();
+	}
+	
+	boolean bEnableAccordCadre=false;
+	MarcheProcedure mp = MarcheProcedure.getFromMarche(marche.getId());
+	try {
+		if(QuestionAnswer.getKeywordAnswerMemory(mp.getIdQaAvisImplique()).equals("AccordCadre"))
+		{
+			bEnableAccordCadre=true;	
+		}
+	} catch (Exception e) {}
+	
+	String sAccordCadreNombreOperateurSelected_0 = "";
+	String sAccordCadreNombreOperateurSelected_1 = "";
+	String sAccordCadreNombreOperateurSelected_n = "";
+	String spanAccordCadreNombreOperateurStyle = "";
+	String spanAccordCadreStyle = "";
+	
+	if(bEnableAccordCadre){
+		switch ((int)marcheAccordCadre.getNombreOperateur()) {
+		case 0 : 
+			sAccordCadreNombreOperateurSelected_0 = " checked='checked' ";
+			spanAccordCadreNombreOperateurStyle = "style='display:none'";
+			spanAccordCadreStyle = "style='display:none'";
+			break;
+		case 1 : 
+			sAccordCadreNombreOperateurSelected_1 = " checked='checked' ";
+			spanAccordCadreNombreOperateurStyle = "style='display:none'";
+			break;
+		default: 
+			sAccordCadreNombreOperateurSelected_n = " checked='checked' ";
+			break;
+		}
+		
+	} else {
+		sAccordCadreNombreOperateurSelected_0 = " checked='checked' ";
+		spanAccordCadreNombreOperateurStyle = "style='display:none'";
+		spanAccordCadreStyle = "style='display:none'";
+	}
+	
+	String sAccordCadreNombreOperateur = "";
+	String sAccordCadreNombreOperateurMax = "";
+	
+	if(marcheAccordCadre.getNombreOperateur() != 0)
+		sAccordCadreNombreOperateur = "" + marcheAccordCadre.getNombreOperateur();
+	
+	if(marcheAccordCadre.getNombreOperateurMaximal() != 0)
+		sAccordCadreNombreOperateurMax = "" + marcheAccordCadre.getNombreOperateurMaximal();
+	
+	
+	Currency currency = null;
+	try {
+		currency = Currency.getCurrency(marcheAccordCadre.getIdCurrency());
+	} catch (Exception e) {
+		currency = new Currency ("EUR");
+	}
+	
+%>
+<%@page import="modula.marche.MarcheAccordCadre"%>
+<%@page import="org.coin.bean.accountancy.Currency"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.marche.MarcheProcedure"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="modula.marche.MarcheCaracteristique"%>
+<script type="text/javascript">
+<!--
+	
+	function onChangeRadioAccordCadreNbOperateur(item)
+	{
+		if(item.value == "n")
+		{
+			$("spanAccordCadreNombreOperateur").show();
+			$("lNombreOperateur").value = 2;
+		}
+		else
+		{
+			$("spanAccordCadreNombreOperateur").hide();
+			// on a soit 0 soit 1
+			$("lNombreOperateur").value = item.value; 
+			$("lNombreOperateurMaximal").value = ""; 
+		}
+
+		if(item.value == "0")
+		{
+			$$(".accord_cadre_data").each(function (item) { item.hide(); });
+		}
+		else
+		{
+			$$(".accord_cadre_data").each(function (item) { item.show(); });
+		}
+
+	}
+//-->
+</script>
+<table class="pave">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Accord cadre</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2"><i>Informations sur l'accord-cadre : (le cas échéant)</i></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Nombre d'opérateurs :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="radio" 
+				name="radioAccordCadreNbOperateur" 
+				onchange="onChangeRadioAccordCadreNbOperateur(this)"
+				value="0" <%= sAccordCadreNombreOperateurSelected_0 %>
+				/>pas d'accord cadre <br/>
+<%
+	if (bEnableAccordCadre) {
+%>
+			<input type="radio" 
+				name="radioAccordCadreNbOperateur" 
+				onchange="onChangeRadioAccordCadreNbOperateur(this)"
+				value="1" <%= sAccordCadreNombreOperateurSelected_1 %>
+				/>accord-cadre avec un seul opérateur <br/>
+			<input type="radio" 
+				name="radioAccordCadreNbOperateur" 
+				onchange="onChangeRadioAccordCadreNbOperateur(this)"
+				value="n" <%= sAccordCadreNombreOperateurSelected_n %>
+				/>accord-cadre avec plusieurs opérateurs <br/>
+			<span id="spanAccordCadreNombreOperateur" <%= spanAccordCadreNombreOperateurStyle %> >Nombre <input 
+				type="text" size="3" id="lNombreOperateur" name="lNombreOperateur"  
+				value="<%= sAccordCadreNombreOperateur %>" /> 
+			<br/>ou, le cas échéant, 
+			nombre maximal <input type="text" size="3" name="lNombreOperateurMaximal" 
+				id="lNombreOperateurMaximal" 
+				value="<%= sAccordCadreNombreOperateurMax %>" /> de participants à l'accord-cadre envisagé.
+			</span>
+<%
+	} 
+%>			
+		</td>
+	</tr>
+	<tr class="accord_cadre_data" <%= spanAccordCadreStyle %> > 
+		<td class="pave_cellule_gauche" >
+		Durée de l'accord-cadre : 
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" size="3" name="lDuree" value="<%= marcheAccordCadre.getDuree() %>" />
+		<%
+		String sDureeTypeMoisSelected = "";
+		String sDureeTypeAnneeSelected = "";
+		if(!Outils.isNullOrBlank(marcheAccordCadre.getDureeType()) 
+		&& marcheAccordCadre.getDureeType().equals("mois"))
+		{
+			sDureeTypeMoisSelected = " selected='selected' ";
+			sDureeTypeAnneeSelected = " ";
+		} else{
+			sDureeTypeMoisSelected = " ";
+			sDureeTypeAnneeSelected = " selected='selected' ";
+		}
+		
+		%>
+		<select name="sDureeType" >
+			<option value="mois" <%= sDureeTypeMoisSelected %> >mois</option>
+			<option value="annee" <%= sDureeTypeAnneeSelected %> >année(s)</option>
+		</select>
+		</td>
+	</tr>
+	
+	<tr class="accord_cadre_data" <%= spanAccordCadreStyle %> >
+		<td class="pave_cellule_gauche">
+	 	Justification d'un accord-cadre dont la durée dépasse quatre ans :
+		</td>
+		<td class="pave_cellule_droite">
+		<textarea rows="3" cols="60" name="sJustification" ><%= marcheAccordCadre.getJustification() %></textarea>
+		</td>
+	</tr>
+	
+	<tr class="accord_cadre_data" <%= spanAccordCadreStyle %> >
+		<td class="pave_cellule_gauche accord_cadre_data">
+			Estimation de la valeur totale des acquisitions pour l'ensemble de la durée de 
+			l'accord-cadre : (le cas échéant, en chiffres uniquement)
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+		
+		String sCheckedValeurEstimeeNeant = "";
+		String sCheckedValeurEstimeeUnique = "";
+		String sCheckedValeurEstimeeFourchette = "";
+
+		
+		switch (marcheAccordCadre.getIdValeurEstimeeType())
+		{
+		case MarcheAccordCadre.VALEUR_TYPE_NEANT:
+			sCheckedValeurEstimeeNeant = "checked='checked'";
+			break;
+		case MarcheAccordCadre.VALEUR_TYPE_UNIQUE:
+			sCheckedValeurEstimeeUnique= "checked='checked'";
+			break;
+		case MarcheAccordCadre.VALEUR_TYPE_FOURCHETTE:
+			sCheckedValeurEstimeeFourchette= "checked='checked'";
+			break;
+		}
+
+		%>
+			<table cellpadding="0" cellspacing="0">
+				<tr>
+					<td>
+						<input type="radio" name="radioValeurEstimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_NEANT %>" <%= sCheckedValeurEstimeeNeant %> /> Néant<br/>
+
+						<input type="radio" name="radioValeurEstimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_UNIQUE %>" <%= sCheckedValeurEstimeeUnique %> />
+						Valeur estimée (H.T.) : <input 
+							type="text" 
+							class="datatype-float"
+							name="dValeurEstimee"
+							value="<%= Outils.getFormatedValueNeant(marcheAccordCadre.getValeurEstimee()) %>"
+							size="10"  /><br/>
+
+						<input type="radio" name="radioValeurEstimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_FOURCHETTE %>" <%= sCheckedValeurEstimeeFourchette %> />
+						Fouchette : entre <input 
+							class="datatype-float"
+							type="text" 
+							name="dValeurEstimeeBasse" 
+							value="<%= Outils.getFormatedValueNeant(marcheAccordCadre.getValeurEstimeeBasse()) %>"
+							size="10"/> 
+						et <input 
+							type="text" 
+							class="datatype-float"
+							name="dValeurEstimeeHaute"
+							value="<%= Outils.getFormatedValueNeant(marcheAccordCadre.getValeurEstimeeHaute()) %>"
+							size="10"/> <br/>
+					</td>
+					<td>
+						Monnaie : <strong><%= currency.getAllInHtmlSelect("sIdCurrency") %></strong>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	
+	<tr class="accord_cadre_data" <%= spanAccordCadreStyle %> >
+		<td class="pave_cellule_gauche ">
+	 	Fréquence et valeur des marchés à attribuer (si elles sont connues) 
+	 	</td>
+		<td class="pave_cellule_droite">
+		<textarea rows="3" cols="60" name="sFrequenceValeur" ><%= marcheAccordCadre.getFrequenceValeur() %></textarea>
+		</td>
+	</tr>
+	
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

@@ -1,0 +1,12 @@
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "DTD/xhtml1-strict.dtd"> 
+<%@page import="modula.graphic.Theme"%>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+<%	String rootDesk = request.getContextPath()+"/"; %>
+<title><%= sTitle %></title> 
+<link rel="stylesheet" type="text/css" href="<%= rootDesk %>include/css/<%= Theme.getDeskCSS() %>.css" media="screen" />
+<link rel="SHORTCUT ICON" href="<%= rootDesk %>include/modula.ico" /> 
+<script type="text/javascript" src="<%=rootPath%>include/popup.js"></script>
+<script type="text/javascript" src="<%=rootPath%>include/redirection.js"></script>

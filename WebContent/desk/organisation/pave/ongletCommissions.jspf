@@ -1,0 +1,62 @@
+<%
+
+	Vector<Commission> vCommission = Commission.getAllcommissionWithIdOrganisation(organisation.getIdOrganisation());
+	if ((organisation.getIdOrganisationType() == OrganisationType.TYPE_ACHETEUR_PUBLIC)
+	 || (organisation.getIdOrganisationType() == OrganisationType.TYPE_CONSULTANT))
+	{
+%>
+
+
+<%@page import="java.util.Vector"%>
+<%@page import="modula.commission.Commission"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%><div>
+<div class="searchTitle">
+	<div id="infosSearchLeft" style="float:left">Commissions associées</div>
+	<div id="infosSearchRight" style="float:right;text-align:right;">
+<%
+		if(vCommission.size()>1){
+%><%= vCommission .size() %> commissions
+<%
+		}else{
+			if(vCommission.size()==1){
+%>1 commission
+<%
+			}
+			else{
+%>Pas de commission
+<%
+			}
+		}
+%>
+	</div>
+	<div style="clear:both"></div>
+</div>
+
+<div>
+<table class="dataGrid" cellspacing="1">
+	<tbody>
+		<tr class="header">
+			<td class="cell">Rôle</td>
+			<td class="cell">Commission</td>
+			<td class="cell">&nbsp;</td>
+		</tr>
+<%
+		for (int i = 0; i < vCommission .size(); i++)
+		{
+			Commission commission = vCommission .get(i);
+			int j = i % 2;
+			if (commission.getIdCommission() != 0)
+			{
+%>
+<%@ include file="paveListItemCommissionInOrganisation.jspf" %>
+<%
+			}
+		}
+%>
+		</tbody>
+</table>
+</div>
+<div>
+<%
+	}
+%>

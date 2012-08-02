@@ -1,0 +1,48 @@
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.export.ExportModeEmailDestinataire"%>
+<%@page import="org.coin.fr.bean.export.ExportModeEmailDestinatairePieceJointe"%>
+<%@page import="org.coin.fr.bean.export.ExportModeEmailPieceJointeType"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Transfert Mode Email </td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+<%
+	Vector<ExportModeEmailPieceJointeType> vPieceJointeType =ExportModeEmailPieceJointeType.getAllExportModeEmailPieceJointeType();
+	for(int i=0;i<vDestinataires.size();i++){
+		ExportModeEmailDestinataire destinataire = (ExportModeEmailDestinataire)vDestinataires.get(i); 
+		Vector<ExportModeEmailDestinatairePieceJointe> vPieceJointesDestinataire 
+			= ExportModeEmailDestinatairePieceJointe
+				.getAllDestinatairesPieceJointeFromDestinataire(destinataire.getIdExportModeEmailDestinataire()) ;
+%>
+	<tr>
+		<td class="pave_cellule_gauche">Email du destinataire :</td>
+		<td class="pave_cellule_droite">
+		<input type="hidden" name="iDestinataireSize" value="<%= vDestinataires.size() %>" />
+		<input type="hidden" name="iIdDestinataire<%=i%>" value="<%= destinataire.getIdExportModeEmailDestinataire() %>" />
+		<input type="text" name="sEmailDestinataire<%=i%>" value="<%= destinataire.getEmailDestinataire() %>" />
+		<strong>Type : </strong>
+		<input type="text" name="sTypeDestinataire<%=i%>" value="<%= destinataire.getTypeDestinataire() %>" />
+		<strong>Pièces Jointes : </strong>
+<%
+		for(int j=0;j<vPieceJointeType.size();j++){
+			ExportModeEmailPieceJointeType pieceJointe = vPieceJointeType.get(j);
+			String sChecked = "";
+			for(int k=0;k<vPieceJointesDestinataire.size();k++){
+				ExportModeEmailDestinatairePieceJointe pieceJointeDestinataire = vPieceJointesDestinataire.get(k);
+				if(pieceJointe.getId() == pieceJointeDestinataire.getIdExportModeEmailPieceJointeType())
+					sChecked="checked=\"checked\"";
+			}
+%>
+				<input type="checkbox" value="<%=pieceJointe.getId() %>" name="pieceJointe<%=i%>" <%=sChecked %> />&nbsp;<%=pieceJointe.getName() %>
+<%			
+		}
+%>		 
+		</td>
+	</tr>
+<%
+	}
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

@@ -1,0 +1,23 @@
+<tr class="liste<%=j%>" onmouseover="className='liste_over'" 
+	onmouseout="className='liste<%=j%>'" 
+	onclick="Redirect('<%=response.endcodeURL("../commission/afficherMembre.jsp?iIdCommissionMembre=" + membre.getIdCommissionMembre()) %>')"> <!--  onclick="#" -->
+	<td style="vertical-align:middle">
+		<table summary="none">
+			<tr> 
+				<td style="vertical-align:middle;width:40%;font-weight:bold">
+				<%= membre.getRole() %>
+				</td>
+				<td style="vertical-align:middle;width:45%;font-weight:bold">
+				<%= commission.getNom() %>
+				</td>
+				<td style="vertical-align:middle;width:15%;text-align:right">
+					<a href="<%=response.endcodeURL("../commission/afficherMembre.jsp?iIdCommissionMembre="+membre.getIdCommissionMembre()) %>">
+						<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT %>" width="21" height="21"  alt="Afficher" title="Afficher"/>
+					</a>
+					&nbsp;
+				</td>
+			</tr>
+		</table>
+	</td>
+</tr>
+		

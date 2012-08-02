@@ -1,0 +1,36 @@
+<%@page import="modula.marche.AvisRectificatif"%>
+<%@page import="modula.Validite"%>
+
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<div><strong style="color:#B00">historique des avis rectificatifs</strong></div>
+<div style="margin:3px">
+<% 
+	for (int iAvisRectificatif=vAvisRectificatif.size()-1; iAvisRectificatif >= 0; iAvisRectificatif--)
+	{
+		AvisRectificatif avis = vAvisRectificatif.get(iAvisRectificatif);
+		int	j = iAvisRectificatif % 2;
+		Validite validite 
+			= Validite.getValidite(
+					TypeObjetModula.AVIS_RECTIFICATIF, 
+					avis.getIdAvisRectificatif(),
+					vValiditeTotal);
+		
+		%>
+	<div class="liste<%=j%>" style="padding:2px 2px 2px 4px"
+		<% if(bShowAvisRectificatifDetail) { %>
+        onclick="javascript:montrer_cacher('avis_rectificatif<%=numAnnonce%>-<%=avis.getIdAvisRectificatif()%>')" 
+        <% }%>
+        >
+		<div>Mis en ligne <%= CalendarUtil.getDateFormattee( validite.getDateDebut() ) %></div>
+	</div>
+        <% if(bShowAvisRectificatifDetail) { %>
+	<tr >
+		<td colspan="2">
+			<%@include file="paveAvisRectificatif.jspf" %>
+		</td>
+	</tr>
+<%      }
+	} 
+%>
+</div>

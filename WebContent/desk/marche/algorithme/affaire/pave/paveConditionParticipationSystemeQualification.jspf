@@ -1,0 +1,41 @@
+<%
+	MarcheSystemeQualification marcheSystemeQualification = null;
+	try {
+		marcheSystemeQualification =
+			MarcheSystemeQualification.getMarcheSystemeQualificationFromMarche(marche.getId());
+	} catch (Exception e) {
+		marcheSystemeQualification = new MarcheSystemeQualification();
+	} 
+	
+%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.marche.MarcheSystemeQualification"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Conditions de participation à un système de qualification</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Conditions que doivent remplir les opérateurs économiques en vue de leur qualification :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= Outils.getTextToHtml(marcheSystemeQualification.getConditions()) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Méthodes par lesquelles chacune de ces conditions sera vérifiée :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= Outils.getTextToHtml(marcheSystemeQualification.getMethodeVerification()) %>
+		</td>
+	</tr>
+	<tr><td colspan="2" style="text-align: left">
+		Si cette information est volumineuse et repose sur des documents auxquels les opérateurs économiques 
+		intéressés ont accès, un résumé des principales conditions et méthodes ainsi qu'une référence à ces 
+		documents suffisent.	
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

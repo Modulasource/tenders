@@ -1,0 +1,109 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.marche.joue.MarcheJoueFormulaire"%>
+<%@page import="java.util.Vector"%>
+<%
+	boolean bExistInitialJouePub = false;
+	boolean bIsJoueFormSelected = false;
+	try {
+	    Vector<MarcheJoueFormulaire> vMjfSelected = MarcheJoueFormulaire.getAllFromIdMarche(marche.getIdMarche());
+	    if(vMjfSelected.firstElement().getIdJoueFormulaire() == 2) {
+	        bExistInitialJouePub = true;
+	        if(bCreationArec) bIsJoueFormSelected = true;
+	    } else if(vMjfSelected.firstElement().getIdJoueFormulaire() == 14) {
+	        bExistInitialJouePub = true;
+	        bIsJoueFormSelected = true;
+	    }
+	} catch(Exception e) {}
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Avis rectificatif</td>
+		<td class="pave_titre_droite">
+		<%= sTypeAvis %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Date de publication de l'avis *: </td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="tsDateValiditeDebut" 
+				value="<%= CalendarUtil.getDateCourte(validite.getDateDebut()) %>"
+				size="15" maxlength="10" 
+				class="dataType-date"
+				 /> à
+			<input type="text" name="tsHeureValiditeDebut" size="5" maxlength="5" value="<%= 
+				CalendarUtil.getHeureMinuteSecDefaultOfficial(validite.getDateDebut()) %>" />
+		</td>
+	</tr>
+<%
+	if(!sActionRectificatif.equals("create"))
+	{
+		String sChecked = " checked='checked'";
+%>
+	<tr>
+		<td class="pave_cellule_gauche">Avis rectificatif *: </td>
+		<td class="pave_cellule_droite">
+			<input type="radio" name="sTypeDescription"  value="texte_libre" 
+			<%
+				if (avis.getDescriptionType().equalsIgnoreCase("texte_libre")){
+					out.write(sChecked);
+				}
+			%>
+				 onclick="montrer('texte_libre');cacher('piece_jointe')" />Texte libre &nbsp;&nbsp;&nbsp;
+			<input type="radio" name="sTypeDescription"  value="piece_jointe" 
+			<%
+				if (avis.getDescriptionType().equalsIgnoreCase("piece_jointe")){
+					out.write(sChecked);
+				}
+			%>
+				  onclick="montrer('piece_jointe');cacher('texte_libre')" />Pièce jointe
+		</td>
+	</tr>
+<%
+	}
+	else{
+%>
+		<input type="hidden" name="sTypeDescription"  value="texte_libre" />
+<%	
+	}
+%>
+	<tr id="texte_libre" <% if(!avis.getDescriptionType().equalsIgnoreCase("texte_libre")) {out.write("style='display:none'");} %>>
+		<td class="pave_cellule_gauche" style="vertical-align : top">&nbsp;</td>
+		<td class="pave_cellule_droite">
+			<textarea cols="100" rows="20" name="sDescription"><%= avis.getDescription() %></textarea>
+		</td>
+	</tr>
+	<tr id="piece_jointe" <% if(!avis.getDescriptionType().equalsIgnoreCase("piece_jointe")) {out.write("style='display:none'");} %> >
+		<td class="pave_cellule_gauche">&nbsp;
+		</td>
+		<td class="pave_cellule_droite">
+		&nbsp;<%= avis.getPieceJointeNom() %>&nbsp;<button type="button" 
+			onclick="javascript:document.formulaire.submit();openModal('<%= 
+				response.encodeURL(
+				rootPath + "desk/marche/algorithme/avis_rectificatif/uploadAvisRectificatifPieceJointeForm.jsp?iIdAvisRectificatif=" 
+				+ avis.getIdAvisRectificatif())
+				%>','Modifier Pièce jointe', '750px','250px');">Modifier Pièce jointe</button>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+<%
+if(bExistInitialJouePub) {
+%>
+	<tr>
+        <td class="pave_cellule_gauche">
+		   L'avis initial a été sujet à une publication JOUE (formulaire 2).<br/> 
+		   L'avis rectificatif sera donc également soumis à un envoi JOUE (formulaire 14).
+        </td>
+        <td class="pave_cellule_droite">
+            <input type="checkbox" name="bSendArecToJoue" value="bSendArecToJoue" <%= (bIsJoueFormSelected)?"checked":"" %> >&nbsp;<i>Vous pouvez décocher la case si vous ne souhaitez pas envoyer l'avis rectificatif au JOUE.</i></input>
+        </td>
+	</tr>
+<%
+}
+%>
+</table>
+<input type="hidden" name="iIdAvisRectificatifType" value="<%= avis.getIdAvisRectificatifType() %>" />

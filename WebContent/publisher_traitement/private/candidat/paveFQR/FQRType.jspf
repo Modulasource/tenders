@@ -1,0 +1,25 @@
+<%@page import="modula.fqr.FQR"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.fqr.FQRTypeQuestion"%>
+<%
+	FQR oType = new FQR(); 
+	Vector vListeType = oType.getListeTypeQuestion() ;
+	
+	FQRTypeQuestion oListeType ;
+	for(int i = 0; i < vListeType.size();i++)
+	{
+		oListeType = (FQRTypeQuestion)vListeType.elementAt(i);
+		int iIdTypeQuestion = oListeType.getIdTypeQuestion() ;
+		String sTypeQuestion = oListeType.getTypeQuestion() ;
+		out.write("<OPTION VALUE='"
+				+ iIdTypeQuestion +"'");
+				if(iIdTypeQuestion==0){
+				out.write(" SELECTED ");
+				} else {
+				out.write("");
+				}
+		out.write(">"
+				+ sTypeQuestion
+				+ "</OPTION>" );
+	}
+%>

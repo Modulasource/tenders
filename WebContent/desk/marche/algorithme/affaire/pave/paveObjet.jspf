@@ -1,0 +1,40 @@
+<%@page import="org.coin.util.Outils"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveObjet')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveObjetMarcheTitre %></td>
+	</tr>  
+	<tr>
+		<td>
+			<table id="paveObjet" summary="Objet">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Numéro de référence de l'affaire* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant( marche.getReference())%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Objet du march&eacute;* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.replaceNltoBr(Outils.getStringNotNullNeant( marche.getObjet()))%>
+					</td>
+				</tr>
+			    <tr >
+			         <td class='pave_cellule_gauche' >Volume du marché (montant estimatif) * : </td>
+			         <td class='pave_cellule_droite' >
+			             <%= marcheVolumeType.getName() %>
+			         </td>
+			    </tr>
+    			<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,75 @@
+	<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" >Cas d'utilisation : </td>
+			<td class="pave_titre_droite" ><%= sUseCase  %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2" style="text-align : left" >Habilitations attribuées</td>
+		</tr>
+		<tr>
+			<td colspan="2" class="pave_cellule_droite">
+				<select name="<%= sUseCasePrefix  %>iIdUseCaseSelection" size="10" style="width:600px" multiple="multiple" >
+<%
+	for (int i=0; i < vUseCasesRole.size(); i++)
+	{
+		UseCase usecase = (UseCase) vUseCasesRole.get(i);
+		for (int j=0; j < vUseCasesAll.size(); j++)
+		{
+			UseCase usecaseTemp = (UseCase) vUseCasesAll.get(j);
+			
+			if(usecaseTemp.getIdString().equals(usecase.getIdString() ) 
+					&& usecase.getIdString().startsWith(sUseCase) )
+				out.write("<option value='"+ usecase.getIdString() + "'>" 
+						+ "[" + usecase.getIdString() + "] "+ usecase.getName() + "</option>\n");
+		}
+	}
+		  %>
+                </select>
+				<input type="hidden" name="<%= sUseCasePrefix  %>iIdUseCaseSelectionListe" />
+		  </td>
+		</tr>
+		<tr>
+			<td colspan="2" class="pave_cellule_droite" style="text-align : left" >
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="javascript:DeplacerTous(document.formulaire.<%= sUseCasePrefix  %>iIdUseCaseSelection,document.formulaire.<%= sUseCasePrefix  %>iIdUseCase)" >
+					<img src="<%= rootPath +modula.graphic.Icone.ICONE_BAS%>"  
+					alt="Enlever" /></a>
+				<a href="javascript:DeplacerTous(document.formulaire.<%= sUseCasePrefix  %>iIdUseCase,document.formulaire.<%= sUseCasePrefix  %>iIdUseCaseSelection)" >
+					<img src="<%= rootPath + modula.graphic.Icone.ICONE_HAUT%>"  
+					alt="Ajouter" /></a> 
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2" style="text-align : left" >Habilitations disponibles</td>
+		</tr>
+		<tr>
+			<td colspan="2" class="pave_cellule_droite" style="text-align : left" >
+				<select name="<%= sUseCasePrefix  %>iIdUseCase" size="10" style="width:600px" multiple="multiple" >
+<%
+
+	for (int i=0; i < vUseCasesAll.size(); i++)
+	{
+		UseCase usecase = (UseCase) vUseCasesAll.get(i);
+		boolean bDisplayUseCase = true; 
+		for (int j=0; j < vUseCasesRole.size(); j++)
+		{
+			UseCase usecaseTmp = (UseCase) vUseCasesRole .get(j);
+		
+			if(usecase.getIdString().equals(usecaseTmp.getIdString() ) )
+			{
+				bDisplayUseCase = false;
+			}
+		}
+		if(bDisplayUseCase )
+		{
+			out.write("<option value='"+ usecase.getIdString() + "'>" 
+					+ "[" + usecase.getIdString() + "] " + usecase.getName() + "</option>\n");
+		}
+	}
+		  %>
+                </select>
+			</td >
+		</tr>
+	</table>

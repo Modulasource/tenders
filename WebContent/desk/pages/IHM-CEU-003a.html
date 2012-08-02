@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<head>
+<META HTTP-EQUIV="Expires" CONTENT="-1"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<TITLE>IHM-CEU-002c</TITLE>
+<script src="/modula/desk/include/verification.js" type="text/javascript"></script>
+<script type="text/javascript">
+function ChangeUrl(formulaire, champFormulaire, message, redirection)
+{
+	var champ = formulaire.elements[champFormulaire];
+		
+	if (champ.selectedIndex != 0)
+	{
+	
+		var url =  redirection + champ.options[champ.selectedIndex].value;
+		
+		window.top.main.location.href = url ;
+ 	}
+	else 
+	{
+		if (message != null)
+			alert(message);
+	}
+}
+</SCRIPT>
+<style type="text/css">
+<!--
+@import url("../include/css/desk.css");
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="20" topmargin="20" marginwidth="20" marginheight="20">
+<form name="validerPDT" method="post" action="validerMarche.jsp" enctype="multipart/form-data" >
+<div id="entete">CUE-003a : Le secrétaire modifie le contenu d'un marché en cours.</div>
+<div style="text-align:center; width : 99%;">
+	<div class="titre">MODIFICATION DU MARCHE EN COURS : ETAPE 1</div>
+<br />
+<IMG SRC="../img/capture1.gif" WIDTH="625" HEIGHT="1452"  ALT="" />
+	<br />
+<div class="moteur">
+		<div class="contenu">
+			Cette étape n'est possible que pour certaines informations concernant le marché qui n'auront pas d'incidence directement sur les modes et phases de passation.<br />Il s'agit de ne pas modifier l'algorythme qui définit le dialogue entre le Desk et le site Internet initialement prévu pour la création de ce marché.<br />
+			<span id="entete">Cette étape n'est possible que lorsque la limite de réception des offres n'est pas arrivée à échéance.</span>
+		</div>
+	</div>
+	<br />
+	<div>
+	<br />
+	<div>
+	<table summary="none">
+		<tr>
+			<td style="width:50" style="text-align:left"><a href="IHM-CEU-002c.html">&lt;&lt;</a></td>
+			<td width="50" style="text-align:right"><a href="IHM-CEU-003b.html">&gt;&gt;</a></td>
+		<tr>
+	<table summary="none">
+	</div>
+	<br />
+</div>
+</form>
+</body>
+
+</html>

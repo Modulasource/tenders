@@ -1,0 +1,34 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+
+//verification du formulaire
+function checkForm()
+{
+    var form = document.formulaire;
+    var sError = "";
+    var bResult = true;
+
+    if(isNull(document.getElementById("sSiret1").value.trim())
+        || isNull(document.getElementById("sSiret2").value.trim())
+        || isNull(document.getElementById("sSiret3").value.trim())
+        || isNull(document.getElementById("sSiret4").value.trim())
+    ) {
+        sError += "Vous devez saisir un numéro de siret.<br />";
+        bResult = false;
+    }
+    
+    if ((document.getElementById("iIdOrganisationClasseProfit").value) == 0)
+    {
+        sError += "Vous devez saisir une classe profit.<br />";
+        bResult = false;
+    }
+
+    document.getElementById("divError").innerHTML = sError+"<br/>" ;
+    if(!bResult)
+    {
+        document.location.href = "#ancreError";
+    }
+    
+    return bResult;
+}

@@ -1,0 +1,37 @@
+<%@page import="java.sql.Timestamp"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Fichier de suivi du marché au B.O.A.M.P</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">Etat de la connexion :</td>
+		<td class="pave_cellule_droite"><%= sIsConnected %></td>
+	</tr>
+<%
+	if(bIsConnected){
+		Timestamp tsDateCreation = CalendarUtil.getConversionTimestamp(liste.getDateCreation(),"yyyy-MM-dd");
+%>	
+	<tr>
+		<td class="pave_cellule_gauche">Version du schéma :</td>
+		<td class="pave_cellule_droite"><%= liste.getVersion()  %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Date de création :</td>
+		<td class="pave_cellule_droite"><%= CalendarUtil.getDateFormattee(tsDateCreation)%></td>
+	</tr>
+<%
+		if(vAnnoncesAffichees.size()==0) {
+%>
+	<tr>
+		<td class="rouge" colspan="2">Le B.O.A.M.P n'a pas encore publié de suivi pour votre marché.</td>
+	</tr>
+<%		
+		}
+	}
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />	
+	

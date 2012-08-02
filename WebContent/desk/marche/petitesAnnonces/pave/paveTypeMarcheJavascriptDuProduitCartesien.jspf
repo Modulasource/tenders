@@ -1,0 +1,103 @@
+<script type="text/javascript"> 
+<%
+	/* TODO : magouille de Florian pour récupérer les libellés
+	 * car ils sont cachés dans la table avec id_marche_code_type = 0  ....
+	*/
+	Vector vListeLibelle = MarcheType.getAllMarcheTypePourIdMarcheTypeDetail(0,false);
+%>
+function MarcheType_niveau2(index){
+	switch(parseInt(index)){
+<%
+	for (int i = 1; i <= vListeLibelle.size(); i++)
+	{
+		out.write("\t\t case " + i + ":\n");
+		out.write("\t\t\t return Array(\n");
+		Vector vListeLibelleDetail = MarcheType.getAllMarcheTypePourIdMarcheCodeType(i,false);
+		for (int j = 0; j < vListeLibelleDetail.size() ; j++)
+		{
+			MarcheType libelleDetail = (MarcheType) vListeLibelleDetail.get(j);
+			
+			if (!libelleDetail.getIdCodeTypeDetail().equals("0") )
+			{
+				out.write("\t\t\t\t Array(" + libelleDetail.getIdType() + ",\"" 
+				+ libelleDetail.getLibelleDetail() + "\")");
+				
+				if(j != (vListeLibelleDetail.size() - 1) )
+					out.write(",");
+				
+				out.write("\n");
+			}
+		}
+		out.write("\t\t\t );\n \t\t\t break;\n");
+	}
+%>
+	}
+}
+
+var MarcheType_tListe1 = Array(
+<%
+	for (int i = 0; i < vListeLibelle.size(); i++)
+	{
+		MarcheType libelle = (MarcheType) vListeLibelle.get(i);
+	
+		out.write("\t\t\t Array(" + libelle.getIdCodeType() + ",\"" 
+			+ libelle.getLibelle() + "\")");
+			
+		if(i != (vListeLibelle.size() - 1) )
+			out.write(",");
+		
+		out.write("\n");
+	}
+%>
+			);
+
+function MarcheType_init1(){
+	remplir("<%=sFormPrefix %>iIdMarcheType", MarcheType_tListe1);
+}
+
+
+
+function MarcheType_verifier(liste, listeSuivante, niveau){
+	var l1 = eval("document.formulaire." + liste);
+	var l2 = eval("document.formulaire." + listeSuivante);
+	vider(l2);
+	if (niveau == "2"){
+		if (l1.options[l1.options.selectedIndex].value==""){
+			return;
+		}
+		remplir(listeSuivante, MarcheType_niveau2(l1.options[l1.options.selectedIndex].value));
+	}
+	if (niveau == "3"){
+		if (l1.options[l1.options.selectedIndex].value==""){
+			return;
+		}
+		remplir(listeSuivante, MarcheType_niveau2(l1.options[l1.options.selectedIndex].value));
+	}
+}
+
+
+function MarcheType_selectionnerOption2Niveaux(liste, listeValeurSelectionnee, listeSuivante, listeValeurSuivanteSelectionnee)
+{
+	var l1 = eval("document.formulaire." + liste);
+	var l2 = eval("document.formulaire." + listeSuivante);
+
+	
+	selectOptionByName(liste, listeValeurSelectionnee);
+	
+	remplir(listeSuivante,MarcheType_niveau2(l1.options[l1.options.selectedIndex].value));
+	
+	selectOptionByName(listeSuivante, listeValeurSuivanteSelectionnee);	
+}
+function MarcheType_selectionnerOption2NiveauxId(liste, listeValeurSelectionnee, listeSuivante, listeValeurSuivanteSelectionnee)
+{
+	var l1 = eval("document.formulaire." + liste);
+	var l2 = eval("document.formulaire." + listeSuivante);
+
+	
+	selectOptionById(liste, listeValeurSelectionnee);
+	
+	remplir(listeSuivante,MarcheType_niveau2(l1.options[l1.options.selectedIndex].value));
+	
+	selectOptionById(listeSuivante, listeValeurSuivanteSelectionnee);	
+}
+</script>

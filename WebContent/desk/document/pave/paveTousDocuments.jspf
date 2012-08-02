@@ -1,0 +1,42 @@
+<%@page import="org.coin.bean.document.Document"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.document.DocumentLibrary"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.bean.document.DocumentType"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%
+	int j;
+	for (int i = 0; i < vDocuments.size(); i++)	
+	{
+		Document doc = (Document) vDocuments.get(i);
+		
+		String sVisibilite = "Public";
+		Vector<DocumentLibrary> vLibSysteme 
+			= DocumentLibrary.getAllDocumentLibraryFromDocumentAndTypeObjet(
+					(int)doc.getId(),
+					ObjectType.SYSTEME);
+		
+		if(vLibSysteme == null || vLibSysteme.size()==0)
+			sVisibilite = "Privé";
+		
+		j = i % 2;
+		String sRedirectPage = rootPath + "desk/document/afficherDocument.jsp?iIdDocument=" + doc.getId();
+%>
+		
+<tr class="liste<%=j%>" 
+				 onmouseover="className='liste_over'" 
+				 onmouseout="className='liste<%=j%>'" 
+				 onclick="Redirect('<%= response.encodeRedirectURL(sRedirectPage) %>')"> 
+			<td><%= doc.getName() %></td>
+			<td><%= DocumentType.getDocumentTypeName(doc.getIdDocumentType()) %></td>
+			<td><%= CalendarUtil.getDateCourte(doc.getDateCreation()) %></td>
+			<td><%= sVisibilite %></td>
+			<td style="text-align:right;width:5%">
+				<a href="<%=response.encodeURL(sRedirectPage) %>">
+				<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT %>" style="width:21" height="21"  alt="Afficher" title="Afficher"/>
+				</a>
+			</td>
+		</tr>
+<%
+	}
+%>

@@ -1,0 +1,51 @@
+<%
+	Node nodeAvisInitial = BasicDom.getChildNodeByNodeName(nodeAnn, "avisInitial");
+
+ %>
+ <table class="pave" summary="none">
+	<tr onmouseover="cacherTousPaves();montrer('paveBlocAvisInitial');" onclick="montrer_cacher('paveBlocAvisInitial')" >
+		<td class="pave_titre_gauche">Bloc Avis initial</td>
+		<td class="pave_body_opener">Voir</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBlocAvisInitial" >
+<%
+	Node nodeAvisInit = BasicDom.getFirstChildElementNode(nodeAvisInitial );
+	while(nodeAvisInit != null)
+	{
+		nodeAvisInit = BasicDom.getFirstChildElementNode(nodeAvisInitial );
+ %>			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Type de journal : </td>
+				<td class="pave_cellule_droite"><%= nodeAvisInit.getNodeName() %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Parution : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeAvisInit, "parution")  %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Numéro de l'annonce parue : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeAvisInit, "num_ann_par") %>
+				</td>
+			</tr>
+<%
+java.util.Calendar calDatePublication = java.util.Calendar.getInstance();
+calDatePublication.setTimeInMillis(
+		org.coin.util.CalendarUtil.getConversionTimestamp(
+				BasicDom.getChildNodeValueByNodeName(nodeAvisInit, "datePub"),"yyyy-MM-dd").getTime() );
+%>			<tr>
+				<td class="pave_cellule_gauche">Date publication : </td>
+				<td class="pave_cellule_droite"><%= org.coin.util.CalendarUtil.getDateLitteraleFormattee(calDatePublication) %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+<%
+		nodeAvisInit = BasicDom.getNextSiblingElementNode(nodeAvisInit);
+ } %>
+		</table>
+		</td>
+	</tr>
+</table>

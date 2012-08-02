@@ -1,0 +1,23 @@
+<%
+	String sIdCoupleQR = request.getParameter("idQR") ;
+	int iIdCoupleQR = Integer.parseInt(sIdCoupleQR) ;
+	FQR FQR = new FQR() ;
+	Vector QR = new Vector() ;
+	QR = FQR.getCoupleQR(sIdCoupleQR) ;  
+	FQRCoupleQR oCouple ;
+	String sType = "" ;
+	String sStatut = "" ;
+	String sTitre = "" ;
+	String sQuestion = "" ;
+	String sReponse = "" ;
+	
+	for (int i=0 ; i<QR.size() ; i++){
+			oCouple = (FQRCoupleQR)QR.elementAt(0) ;
+			iIdCoupleQR = oCouple.getIdCoupleQR() ;
+			sType = oCouple.getTypeQuestion() ;
+			sStatut = oCouple.getStatutQuestion() ;
+			sTitre = oCouple.getTitreQuestion() ;
+			sQuestion = oCouple.getQuestion() ;
+			sReponse = oCouple.getReponseQuestion() ;
+	}
+%>

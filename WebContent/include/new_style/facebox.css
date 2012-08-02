@@ -1,0 +1,44 @@
+.facebox .b {
+  background:url(../../images/facebox/b.png);
+}
+
+.facebox .tl {
+  background:url(../../images/facebox/tl.png);
+}
+
+.facebox .tr {
+  background:url(../../images/facebox/tr.png);
+}
+
+.facebox .bl {
+  background:url(../../images/facebox/bl.png);
+}
+
+.facebox .br {
+  background:url(../../images/facebox/br.png);  
+}
+
+.facebox .tl, .facebox .tr, .facebox .bl, .facebox .br {
+  height: 10px;
+  width: 10px;
+  overflow: hidden;
+  padding: 0;
+}
+
+table.facebox .content {
+	border:1px solid #555;
+}
+
+table.facebox  {
+	width:100%;
+	border-collapse: collapse;
+}
+
+table.facebox td {
+  border-bottom: 0;
+  padding: 0;
+}
+
+table.facebox .body {
+  background: #fff;
+}

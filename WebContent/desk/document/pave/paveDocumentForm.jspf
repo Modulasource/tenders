@@ -1,0 +1,35 @@
+<%@page import="org.coin.bean.document.DocumentType"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Propriétés du Document</td>
+	</tr>
+	<% hbFormulaire.bIsForm = false; %>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<% hbFormulaire.bIsForm = true; %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :","sNom",doc.getName(),"size='50'") %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Type de document :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= org.coin.db.CoinDatabaseAbstractBeanHtmlUtil.getHtmlSelect(
+					sFormPrefix+"iIdDocumentType",
+					1,
+					DocumentType.getAllDocumentTypeForm(),
+					doc.getIdDocumentType()) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Description :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sDescription" cols="100" rows="4"><%= doc.getDescription() %></textarea>
+		</td>
+	</tr>
+	<% hbFormulaire.bIsForm = false; %>
+	<%= hbFormulaire.getHtmlTrInput("Date de création :","",CalendarUtil.getDateCourte(doc.getDateCreation()),"") %>
+	<% hbFormulaire.bIsForm = true; %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

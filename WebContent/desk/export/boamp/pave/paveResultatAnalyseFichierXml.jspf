@@ -1,0 +1,21 @@
+<table class="pave" summary="résultat de l'analyse">
+	<tr><td colspan="2" class="pave_titre_gauche">Résultat de l'analyse</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<img src="<%=rootPath %><%=bIsAvisValide?Icone.ICONE_SUCCES:Icone.ICONE_ERROR %>" />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+			<%= bIsAvisValide?"Données conformes":"Données non conformes"%> pour publication au B.O.A.M.P
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<img src="<%=rootPath %><%=bXsdValidtion?Icone.ICONE_SUCCES:Icone.ICONE_ERROR %>" />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+			<%= bXsdValidtion?"Fichier XML conforme à la XSD du BOAMP":"Fichier XML non conforme à la XSD du BOAMP"%>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

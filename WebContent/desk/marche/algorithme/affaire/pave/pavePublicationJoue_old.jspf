@@ -1,0 +1,59 @@
+<%
+	Vector<PublicationJoue> vPublicationsAAPCJoue 
+	= PublicationJoue.getAllPublicationJoueFromAffaire(
+		PublicationType.TYPE_AAPC,
+		marche.getIdMarche());
+
+	if(vPublicationsAAPCJoue.size() == 0)
+	{
+		Vector<Export> vExport = Export.getAllExportFromSourceAndDestination(
+				marche.getIdOrganisationFromMarche(),
+				ObjectType.ORGANISATION,
+				PublicationJoue.getIdOrganisationJoueOptional(),
+				ObjectType.ORGANISATION);
+%>	
+				<tr>
+					<td class="pave_cellule_gauche">Publication de l'AAPC au JOUE :</td>
+					<td class="pave_cellule_droite">
+<%		
+		if(vExport.size() ==0)
+		{
+			%>Pas export défini vers le JOUE.<%
+		}
+			
+		for (int i =0 ; i < vExport.size() ; i++)
+		{
+			Export export = vExport.get(i);
+			String sUrlCreate 
+				= rootPath + "desk/export/publication/modifierPublicationJoue.jsp?"
+				+ "sAction=createIndentifiants"
+				+ "&amp;iIdTypeObjet=" + ObjectType.AFFAIRE
+				+ "&amp;iIdReferenceObjet=" + marche.getIdMarche()
+				+ "&amp;iIdExport=" + export.getIdExport()
+				+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+				+ "&amp;iIdPublicationEtat=" + PublicationEtat.ETAT_A_ENVOYER
+				+ "&amp;iIdExportMode=" + export.getIdExportMode()
+				+ "&amp;sUrlRedirect=" 
+				+ rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?"
+				+ "iIdAffaire="	+ marche.getIdMarche() 
+				+ "%26iIdOnglet=" + modula.graphic.Onglet.ONGLET_AFFAIRE_PLANNING;
+			
+			String sMode = ExportMode.getExportModeNameMemory(export.getIdExportMode());
+%>					<a href="<%= response.encodeURL( 
+								sUrlCreate 
+							)  %>" >
+							Ajouter une publication <%= sMode %>
+						</a><br /> 
+		
+<%		} %>						
+					</td>
+				</tr>
+<%
+	
+	}
+	else
+	{
+		PublicationJoue publi = vPublicationsAAPCJoue.get(0);
+%><%@ include file="../../../../export/publication/pave/pavePublicationJoueCellule.jspf" %><%	
+	}
+%>

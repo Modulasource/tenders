@@ -1,0 +1,215 @@
+		<%
+		int iIdOrganisationSpqr = PublicationSpqr.getIdOrganisationSpqrOptional();
+		
+		if(iIdOrganisationSpqr == organisation.getIdOrganisation())
+		{
+
+			Vector<PublicationSpqr> vPublications 
+				= PublicationSpqr.getAllPublicationSpqrFromObjetDestinationAndExport( 
+					ObjectType.AFFAIRE,
+					marche.getIdMarche(), 
+					export.getIdExport());
+
+		%>
+		<table class="pave" summary="none">
+			<tr><td class="pave_titre_gauche">Sélectionner le type d'action</td></tr>
+			<tr><td>&nbsp;</td></tr>
+			<tr>
+				<td style="text-align:center">
+					<table summary="Les actions" align="center" style="width:auto">
+						<tr>
+							<td style="width:200px;vertical-align:top" >
+								<a href="<%= response.encodeURL( 
+										rootPath + "desk/export/spqr/afficherXmlGenereSpqrPourAAPC.jsp?" 
+										+ "iIdAffaire=" + marche.getIdMarche() 
+										+ "&amp;iIdOnglet=" + iIdOnglet
+										+ "&amp;iIdExport=" + export.getIdExport()) %>" >
+										<img height="30" src="<%= rootPath + "images/icones/AAPC_export.gif" %>"  title="Export AAPC" alt="Export AAPC" 
+										 onmouseover="this.src='<%= rootPath + "images/icones/AAPC_export_over.gif" %>'" 
+										 onmouseout="this.src='<%= rootPath + "images/icones/AAPC_export.gif" %>'" />
+								</a><br />
+								Envoi de l'AAPC au SPQR.
+							</td>
+	<%
+		Vector<AvisRectificatif> vAvisAAPC 
+			= AvisRectificatif
+				.getAllAvisRectificatifWithType(
+					marche.getIdMarche(),
+					modula.marche.AvisRectificatifType.TYPE_AAPC);
+		for(int k=0; k < vAvisAAPC.size(); k++)
+		{
+			AvisRectificatif avis = vAvisAAPC.get(k);
+	 %>
+							<td style="width:200px;vertical-align:top">
+								<a href="<%= response.encodeURL( 
+										rootPath + "desk/export/spqr/afficherXmlGenereSpqrPourAvisRecificatifDeAAPC.jsp?" 
+										+ "iIdAvisRectificatif=" + avis.getIdAvisRectificatif() 
+										+ "&amp;iIdOnglet=" + iIdOnglet 
+										+ "&amp;iIdExport=" + export.getIdExport()) %>" >
+										<img height="30" src="<%= rootPath + "images/icones/AREC_export.gif" %>"  title="Export AREC" alt="Export AREC" 
+										 onmouseover="this.src='<%= rootPath + "images/icones/AREC_export_over.gif" %>'" 
+										 onmouseout="this.src='<%= rootPath + "images/icones/AREC_export.gif" %>'" />
+								</a><br />
+								Envoi de l'avis rectificatif n°<%= (k+1) %> de l'AAPC au SPQR.
+							</td>
+	<%		
+		}
+		
+		try {
+		
+			modula.marche.AvisAttribution aatr = modula.marche.AvisAttribution.getAvisAttributionFromMarche(marche.getIdMarche()) ;
+	%>
+
+							<td style="width:200px;vertical-align:top">
+								<a href="<%= response.encodeURL( 
+									rootPath + "desk/export/spqr/afficherXmlGenereSpqrPourAATR.jsp?" 
+										+ "iIdAffaire=" + marche.getIdMarche() 
+										+ "&amp;iIdOnglet=" + iIdOnglet 
+										+ "&amp;iIdExport=" + export.getIdExport()) %>" >
+										<img height="30" src="<%= rootPath + "images/icones/AATR_export.gif" %>"  title="Export AATR" alt="Export AATR" 
+										 onmouseover="this.src='<%= rootPath + "images/icones/AATR_export_over.gif" %>'" 
+										 onmouseout="this.src='<%= rootPath + "images/icones/AATR_export.gif" %>'" />
+										</a><br />
+										Envoi de l'AATR au SPQR.
+							</td>
+
+	<%
+		} catch (Exception e) {}
+		
+		Vector<AvisRectificatif> vAvisAATR 
+			= AvisRectificatif
+				.getAllAvisRectificatifWithType(
+					marche.getIdMarche(),
+					modula.marche.AvisRectificatifType.TYPE_AATR);
+					
+		for(int k=0; k < vAvisAATR.size(); k++)
+		{
+			AvisRectificatif avis = vAvisAATR.get(k);
+	 %>
+							<td style="width:200px;vertical-align:top">
+								<a href="<%= response.encodeURL( 
+										rootPath + "desk/export/spqr/afficherXmlGenereSpqrPourAvisRecificatifDeAATR.jsp?" 
+										+ "iIdAvisRectificatif=" + avis.getIdAvisRectificatif() 
+										+ "&amp;iIdOnglet=" + iIdOnglet 
+										+ "&amp;iIdExport=" + export.getIdExport()) %>" >
+										<img height="30" src="<%= rootPath + "images/icones/AREC_export.gif" %>"  title="Export AREC" alt="Export AREC" 
+										 onmouseover="this.src='<%= rootPath + "images/icones/AREC_export_over.gif" %>'" 
+										 onmouseout="this.src='<%= rootPath + "images/icones/AREC_export.gif" %>'" />
+										</a><br />
+										Envoi de l'avis rectificatif n°<%= (k+1) %> de l'AATR au SPQR.
+							</td>
+	<%		
+		} 
+	%>
+
+
+							<td style="width:200px;vertical-align:top">
+								<a href="<%= response.encodeURL( 
+										rootPath + "desk/export/spqr/afficherXmlGenereSpqrPourAvisAnnulation.jsp?" 
+										+ "iIdAffaire=" + marche.getIdMarche() 
+										+ "&amp;iIdOnglet=" + iIdOnglet 
+										+ "&amp;iIdExport=" + export.getIdExport()) %>" >
+										<img height="30" src="<%= rootPath + "images/icones/ANUL_export.gif" %>"  title="Export ANUL" alt="Export ANUL" 
+										 onmouseover="this.src='<%= rootPath + "images/icones/ANUL_export_over.gif" %>'" 
+										 onmouseout="this.src='<%= rootPath + "images/icones/ANUL_export.gif" %>'" />
+										 </a><br />
+										Envoi de l'avis d'annulation au SPQR.
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr><td>&nbsp;</td></tr>
+		</table>
+		
+		<br />
+
+		<table class="pave" summary="none">
+			<tr>
+				<td>
+		<table class="liste" summary="Boîte d'envoi">
+			<tr>
+				<th>Fichier</th>
+				<th>Date d'envoi effective</th>
+				<th>Etat</th>
+				<th>Type d'avis</th>
+				<th style="width:15%">&nbsp;</th>
+			</tr>
+		<%
+
+			for(int i= 0; i < vPublications.size() ; i++)
+			{
+				PublicationSpqr publi = (PublicationSpqr)vPublications.get(i);
+				String sUrlAfficherPublicationSpqr = rootPath 
+			 		+ "desk/export/publication/afficherPublicationSpqr.jsp?iIdPublicationSpqr=" 
+			 		+ publi.getIdPublicationSpqr()
+					+ "&amp;iIdOnglet=" + iIdOnglet; 
+		
+				// TODO : faire la modif pour choisir le bon format : AAPC, AATR, AREC ou Avis annulation
+				String sUrlXmlGenereSqpr = rootPath 
+			 		+ "?iIdPublicationSpqr=" 
+			 		+ publi.getIdPublicationSpqr() 
+					+ "&amp;iIdOnglet=" + iIdOnglet; 
+			 	
+				String sPublicationType = "non trouvé !";
+				String sPublicationEtat = "non trouvé !";
+				try{
+					sPublicationType 
+						= org.coin.fr.bean.export.PublicationType.getPublicationTypeName(publi.getIdPublicationType());
+				}catch(Exception e) {}
+			
+				try{
+					sPublicationEtat 
+						= org.coin.fr.bean.export.PublicationEtat.getPublicationEtatName(publi.getIdPublicationEtat());
+				}catch(Exception e)	{}
+			
+			 	int j = i % 2;
+			 	
+		%>
+		
+			<tr class="liste<%=j%>"
+				 onmouseover="className='liste_over'" 
+				 onmouseout="className='liste<%=j%>'"
+				 onclick="Redirect('<%= 
+				 	response.encodeURL( sUrlAfficherPublicationSpqr) %>')" >
+				<td><%= publi.getNomFichier() %> </td>
+				<td>
+				<%= org.coin.util.CalendarUtil.getDateFormattee(publi.getDateEnvoiEffective())%>
+				</td>
+				<td>
+				<%= sPublicationEtat %>
+				</td>
+				<td style="width:15%">
+				<%= sPublicationType %>
+				</td>
+						
+				<td style="text-align:right">
+					<a href="<%= response.encodeURL( sUrlAfficherPublicationSpqr) 
+					  %>" >
+					  <img src="<%=rootPath + modula.graphic.Icone.ICONE_FICHIER_DEFAULT %>" title="Voir" alt="Voir" />
+					</a>&nbsp;
+					<a href="<%= response.encodeURL( sUrlXmlGenereSqpr) 
+					  %>" >
+					  <img src="<%=rootPath + modula.graphic.Icone.ICONE_FICHIER_PDF %>"  />
+					</a>&nbsp;
+					<a href="<%= response.encodeURL( 
+						rootPath + "desk/export/publication/modifierPublicationSpqr.jsp?"
+						+"sAction=remove&amp;iIdPublicationSpqr=" + publi.getIdPublicationSpqr()
+						+"&amp;sUrlRedirect=" 
+						+ rootPath + "desk/marche/algorithme/affaire/afficherToutesPublications.jsp?"
+						+ "iIdAffaire="	+ marche.getIdMarche() 
+						+ "&amp;iIdOnglet=" + iIdOnglet)  %>" >
+					  <img src="<%=rootPath + modula.graphic.Icone.ICONE_SUPPRIMER %>" title="Supprimer" alt="Supprimer"/> 
+					</a>
+				</td>
+			</tr>	
+		
+		<%	} %>
+		</table>
+			</td>
+			</tr>
+		</table>		
+		<br />
+		<%
+		}
+%>

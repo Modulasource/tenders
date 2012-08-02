@@ -1,0 +1,652 @@
+<%@page	import="org.coin.autoform.component.AutoFormCptDoubleMultiSelect"%>
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="modula.marche.MarcheCritere"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="org.coin.fr.bean.Adresse"%>
+<%@page import="org.coin.util.Outils"%>
+
+<%@page import="mt.modula.JavascriptVersionModula"%>
+
+<%@page import="mt.modula.html.HtmlTabCorrespondantItem"%><script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveObjet.js" %>"></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveTypeMarche.js" %>"></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveConditions.js?v=" + JavascriptVersionModula.MARCHE_PAVE_CONDITION %>"></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveCriteresAttribution.js" %>"></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveAdresses.js" %>"></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/organisation/paveAdresse.js" %>"></script>
+<script type="text/javascript" src="<%= rootPath %>include/date.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/fonctions.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/verification.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/bascule.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/calendar.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/cryptage.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/calendrier.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/overlib_mini.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/produitCartesien.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/changeUrl.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/AjaxAideRedac.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/DataGrid.js"></script>
+<script type="text/javascript">
+<%
+	AutoFormCptDoubleMultiSelect mot_cle = new AutoFormCptDoubleMultiSelect(
+			"Liste des mots Clefs", "lIdBoampMotCle", true, rootPath);
+	mot_cle.setEnabledSearch(true);
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_OBJET) 
+{
+%><%@ include file="paveTypeMarcheJavascriptDuProduitCartesien.jspf" %><%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_CRITERES)
+{
+%><%@ include file="paveProcedureJavascriptDuProduitCartesien.jspf" %><%
+}
+%>
+<%
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_PLANNING)
+{
+	
+%>
+	var i_num_pub=1;
+	function addPublicationJOUE()
+	{
+		var sPrefix = "newPublicationJOUE_"+i_num_pub+"_";
+		var div = document.createElement("div");
+		div.innerHTML = "Annonce n° :&nbsp;<input type='text' name='"+sPrefix+"sNumero' size='50' maxlength='50' value='' /> du <input type='text' name='"+sPrefix+"tsDatePublication' id='"+sPrefix+"tsDatePublication' size='15' maxlength='10' class=\"dataType-date\" value='' />";
+		$("AutresPublicationsJOUE").appendChild(div);
+		
+		enableDateField($(sPrefix+"tsDatePublication"));
+		i_num_pub++;
+	}
+<%
+}
+%>
+</script>
+<script type="text/javascript">
+var g_numdiv = 0;
+function checkDelaiJourMois(form, sItemName)
+{
+	var sFormPrefix = "";
+
+	var item = form.elements[sFormPrefix + sItemName];
+	if (!isNull(item.value))
+	{
+		try	{
+			var sarrDelaiExecution = item.value.split(" ");
+        	
+        	if(!isNum(sarrDelaiExecution[0]))
+        	{
+	        	alert("Le contenu doit être de la forme :\n xxxx jours ou xxx mois");
+        		return false;
+        	}
+        	
+        	if( (sarrDelaiExecution[1] == "jour" )
+        	|| (sarrDelaiExecution[1] == "jours") )
+        	{
+        		return true;
+        	}
+        	else
+        	{
+	        	if( sarrDelaiExecution[1] == "mois" )
+	        	{
+	        		return true;
+	        	}
+	        	else
+	        	{
+	        		alert("Le contenu doit être de la forme :\n xxxx jours ou xxx mois");
+		    		item.focus();
+	    			return false;
+	        	}
+        	}
+        } catch (e)
+        {
+        	alert(e);
+			item.focus();
+			return false;
+        }
+		
+		alert("Le contenu doit être de la forme :\n xxxx jours ou xxx mois");
+		item.focus();
+		return false;
+	}
+	
+	return true;	
+}
+
+<%
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_RECTIFICATIF)
+{
+%>
+
+	function checkAvisRectificatif()
+	
+	{
+		var item = document.forms['formulaire'].elements['sTypeDescription'];
+		if ((!item[0].checked)&&(!item[1].checked)) {
+			alert("Vous devez donner une description de l'avis rectificatif");
+			return false;
+		}
+		else return true;
+	
+	}
+<%
+}
+%>
+
+function checkItemFormJoue(sItem) {
+	var bFormCompleted = false;
+    var item = document.forms['formulaire'].elements[sItem];
+    for(var i=0; i<item.length; i++) {
+        if(item[i].checked) bFormCompleted = true;
+    }
+    if(!bFormCompleted) {
+        return false;
+    } else return true;
+}
+
+function checkForRubriqueTexteOrDate() {
+	var bLookForRubrique = false;
+    var item = document.forms['formulaire'].elements['sModifLocalisation'];
+    for(var i=0; i<item.length; i++) {
+    	if(item[i].checked) {
+    	    if(item[i].value == "dansAvisOriginal" || item[i].value == "avisOriginalEtDossierAppelOffre") {
+    	    	bLookForRubrique = true;
+    	    }
+    	}
+    }
+    if(bLookForRubrique) {
+        var div = null;
+        for(var i=1; i<51; i++) {
+            div = document.getElementById('rubrique_'+i);
+            if(div != null) return true;     
+        }
+    	return false;
+    } else return true;
+}
+
+function checkForm()
+{
+	var form = document.formulaire;
+	
+<%
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_OBJET)
+{
+%>
+	// pour envoyer la liste des compétences
+	Visualise(form.iIdCompetenceSelection,form.iIdCompetenceSelectionListe);
+	if(form.iIdGroupCompetenceSelection)
+		Visualise(form.iIdGroupCompetenceSelection,form.iIdGroupCompetenceSelectionListe);
+	
+<%
+	if(bUseFormMAPA)
+	{
+%><%= mot_cle.getJavascriptControlCode() %><%
+	}
+%>
+	
+	if (!checkObjet(form, ""))
+		return false;
+	
+	if (!checkTypeMarche(form, ""))
+		return false;
+
+	
+	if (!checkAdresseIfNecessary(form, "lieu_execution_"))
+		return false;
+<%
+if(bUseBoamp17 && !bUseFormNS){
+%>
+	if (!checkAdresseIfNecessary(form, "lieu_livraison_"))
+		return false;
+<%
+}
+%>
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_CARACTERISTIQUES ){
+%>
+	var item = document.forms['formulaire'].elements['sCaracPrincipales'];
+	if(!isNull(item.value))
+		if(item.value.length<5){
+			alert("Le champ Caractéristiques principales doit faire au moins 5 caractères");
+			item.focus();
+			return false;	
+		}
+		
+	item = document.forms['formulaire'].elements['sQuantite'];
+	if(!isNull(item.value))
+		if(item.value.length<5){
+			alert("Le champ Quantites doit faire au moins 5 caractères");
+			item.focus();
+			return false;	
+		}
+		
+	item = document.forms['formulaire'].elements['sOptions'];
+	if(!isNull(item.value))
+		if(item.value.length<5){
+			alert("Le champ Options doit faire au moins 5 caractères");
+			item.focus();
+			return false;	
+		}
+		
+	item = document.forms['formulaire'].elements['sCalendrierUlterieur'];
+	if(!isNull(item.value))
+		if(item.value.length<5){
+			alert("Le champ Calendrier des marchés ultérieurs doit faire au moins 5 caractères");
+			item.focus();
+			return false;	
+		}
+
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_CONDITIONS)
+{
+%>
+	//pour la liste des langues
+	Visualise(form.languesFinales, form.languesHidden);
+	if(!checkConditions(form))
+		return false;
+<%	
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_CRITERES)
+{
+	if(!bIsRectification){
+%>
+	var listePassation = document.forms['formulaire'].elements['<%= sFormPrefix %>iIdMarchePassation'];
+	if(listePassation.options[listePassation.options.selectedIndex].value == 20
+	|| listePassation.options[listePassation.options.selectedIndex].value == "")
+	{
+		alert("Vous devez séléctionner un mode de passation.");
+		return false;
+	}
+	
+	var bResult = true;
+	<%=afBlockTypeAvis.getJavascriptControlCode() %>
+
+	<%=afBlockProcedure.getJavascriptControlCode() %>
+	
+	if(!bResult)
+		return bResult;
+	<%}%>
+	
+	Visualise(document.forms['formulaire'].elements['listePonderes'], 
+						document.forms['formulaire'].elements['listePonderesHidden']);
+	
+	Visualise(document.forms['formulaire'].elements['listeClasses'], 
+						document.forms['formulaire'].elements['listeClassesHidden']);
+						
+	var item = document.forms['formulaire'].elements['iIdMarchePassation'];
+	
+	if (!checkCriteresAttribution(form, ""))
+	{
+		return false;
+	}
+	
+	
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_AUTRES)
+{
+%>
+	Visualise(document.forms['formulaire'].elements['piecesFinales'], 
+		document.forms['formulaire'].elements['sListePiecesEnveloppeA']);
+		
+	Visualise(document.forms['formulaire'].elements['pieces2Finales'], 
+		document.forms['formulaire'].elements['sListePiecesEnveloppeB']);
+		
+	var item = document.forms['formulaire'].elements['sJustificationUrgence'];
+	if(!isNull(item.value))
+		if(item.value.length<5){
+			alert("Le délai d'urgence doit faire au moins 5 caractères");
+			return false;	
+		}
+	item = document.forms['formulaire'].elements['sAutresInfos'];
+	if(!isNull(item.value))
+		if(item.value.length<5){
+			alert("Le champ \"Autres informations\" doit faire au moins 5 caractères");
+			return false;	
+		}
+		
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_LOTS)
+{
+	if(vLots.size() > 1)
+	{
+		int iNbEmptyDesignations = 0;
+		String sReferencesLots = "";
+		for(int i=0;i<vLots.size();i++)
+		{ 
+			MarcheLot lot = vLots.get(i);
+			if(lot.getDesignationReduite().equalsIgnoreCase(""))
+			{
+				if(iNbEmptyDesignations != 0)
+					sReferencesLots += " et ";
+				sReferencesLots += "réf."+lot.getReference();
+				iNbEmptyDesignations++;
+			}
+		}
+		if(iNbEmptyDesignations > 0)
+		{
+			String sMessage = "Veuillez remplir la description succincte du lot ";
+			if(iNbEmptyDesignations > 1)
+				sMessage = "Veuillez remplir les descriptions succinctes des lots ";
+			%>
+			alert("<%= sMessage + sReferencesLots %>");
+			return false;
+			<%
+		}
+	}
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_PLANNING)
+{
+	if(bIsContainsEnveloppeAManagement)
+	{
+%>
+<%@ include file="checkContainsEnveloppeManagement.jspf" %>
+<%
+	}
+	String sDepAP = "";
+	try{
+		Adresse adresseAP = Adresse.getAdresse(organisation.getIdAdresse());
+		sDepAP = adresseAP.getCodePostal().substring(0,2);
+%>
+
+
+	var item2 = form.elements['sDepPublicationBOAMP'];
+	if(!isNull(item2.value))
+		if(item2.value!=<%=sDepAP%>){
+		  mt.utils.displayFormFieldMsg(item2, "Le département choisi pour la publication diffère "
+				  + "de celui de votre organisme. Ne tenez pas compte de cette alerte si vous "
+				  + "n'avez pas fait d'erreur.");
+		  item2.focus();
+		}
+<%
+	}catch(Exception e){}
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_ORGANISME)
+{
+	Vector<HtmlTabCorrespondantItem> vCorrespondantItemMand = tabCorrespondant.getMandatory();
+	for(HtmlTabCorrespondantItem item : vCorrespondantItemMand){
+	%>
+	var item = form.elements['<%=item.sVarName%>'];
+	if (item.value==0)
+	{
+		alert("Veuillez sélectionner le <%=item.sTitrePersonne%>.");
+		item.focus();
+	    return false;
+	}
+	<%}%>
+	<%
+	Vector<HtmlTabCorrespondantItem> vCorrespondantItemSimple = tabCorrespondant.getSimple();
+	for(HtmlTabCorrespondantItem item : vCorrespondantItemSimple){
+	%>
+	Visualise(document.forms['formulaire'].elements['<%=item.sVarName%>Finaux'], 
+			document.forms['formulaire'].elements['<%=item.sVarName%>Hidden']);
+	<%}%>
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_RECTIFICATIF) {
+	if(bFormJOUE) {		
+%>
+        if(!checkItemFormJoue('sAvisImplique')
+ 		  || !checkItemFormJoue('sModification')
+          || !checkItemFormJoue('sModifLocalisation')
+          || !checkForRubriqueTexteOrDate()) {
+            alert("Renseignements relatifs au formulaire 14 non renseignés");
+        }
+<%
+	}
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_JOUE) {
+%>
+	var item = document.forms['formulaire'].elements;
+	
+	var iItemCheck = 0;
+	for(var i=0; i<item.length; i++) {
+        if(item[i].checked) {
+            if(++iItemCheck > 1) {
+                alert("Vous ne pouvez sélectionner qu'un seul formulaire à la fois");
+                return false;
+            }
+            if(<%= bIsRectification %>) {
+	            var prefix = item[i].name.substring(0,31);
+	            if(prefix == "cbMarcheJoueFormulaireSelected_") {
+	                var iId = item[i].name.substring(31,33);
+	                if(iId != 14) {
+	                    alert("En phase rectificative, seul le formulaire 14 peut être sélectionné");
+	                    return false;
+	                }
+	            }
+            }
+        }
+	}
+<%
+}
+%>
+	return true;
+}
+
+function ajouterDiv(prefix,iNumDivDefault)
+{
+	if(iNumDivDefault && g_numdiv==0) g_numdiv = iNumDivDefault-1;
+	g_numdiv++;
+	var division = prefix + 'objetSupp' + g_numdiv;
+	if( g_numdiv == 3 ) cacher(prefix+'ajouterCPV');
+	if( g_numdiv < 4 ) montrer(division);
+}
+
+function onAfterPageLoading()
+{
+	if (!window.XMLHttpRequest && !window.ActiveXObject)
+	{
+		alert("Attention, votre navigateur n'est pas compatible avec la technologie \"Ajax\".\nVeuillez installer un navigateur récent : www.GetFirefox.com");
+	}
+	
+	<%if(sAction.equals("store")){%>
+	if($("formulaire")){
+	    $("formulaire").onValidSubmit = function(){
+	        return checkForm();
+	    }
+    }
+    <%}%>
+<%
+if (iIdOnglet == Onglet.ONGLET_AFFAIRE_OBJET )
+{
+%>
+	
+	try { init1();	} catch (e) {}
+	try { montrer('ajouterCPV');	} catch (e) {}
+	//try { cacher('objetSupp1');	} catch (e) {}
+	//try { cacher('objetSupp2');	} catch (e) {}
+	//try { cacher('objetSupp3');	} catch (e) {}
+	try { prepareCPVButton();	} catch (e) {}
+
+	selectionnerOption2NiveauxId('iIdMarcheType', "<%=
+		    oMarcheType.getIdCodeType() %>", 'idTypeDetaille', "<%= 
+			oMarcheType.getIdType() %>");
+	$("<%=sFormPrefix %>iIdMarcheType").onAfterChange();
+<%
+}
+if (iIdOnglet == Onglet.ONGLET_AFFAIRE_CARACTERISTIQUES )
+{
+%>
+<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CARAC_PRINC_CALENDRIER,"iIdCalendrierUlterieur","sCalendrierUlterieur",rootPath,sessionUserHabilitation,session.getId()) %>	
+<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CARAC_PRINC_OPTIONS,"iIdOptions","sOptions",rootPath,sessionUserHabilitation,session.getId()) %>	
+<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CARAC_PRINC_QUANTITES,"iIdQuantite","sQuantite",rootPath,sessionUserHabilitation,session.getId()) %>	
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_CONDITIONS)
+{
+%>
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CONDITIONS_SITUATION_JURIDIQUE,"iIdReferenceJuridique","sReferenceJuridique",rootPath,sessionUserHabilitation,session.getId()) %>	
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CONDITIONS_REFERENCES,"iIdReferenceTech","sReferenceTech",rootPath,sessionUserHabilitation,session.getId()) %>	
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CONDITIONS_FINANCEMENT,"iIdFinancement","sFinancement",rootPath,sessionUserHabilitation,session.getId()) %>	
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CONDITIONS_FORME_JURIDIQUE,"iIdFormeGroupement","sFormeGroupement",rootPath,sessionUserHabilitation,session.getId()) %>	
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CONDITIONS_CRITERE_CAND,"iIdCriteresCandidature","sCriteresCandidature",rootPath,sessionUserHabilitation,session.getId()) %>	
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CONDITIONS_CAUTIONNEMENT,"iIdCautionnement","sCautionnement",rootPath,sessionUserHabilitation,session.getId()) %>	
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.CONDITIONS_ECO,"iIdReferenceEco","sReferenceEco",rootPath,sessionUserHabilitation,session.getId()) %>	
+	
+	var l1 = eval("document.formulaire." + 'languesFinales');
+	var l2 = eval("document.formulaire." + 'languesInitiales');
+	equilibrerBalance(l1, l2);
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_CRITERES)
+{
+	//if(sessionUserHabilitation.isSuperUser())
+	if(true)
+	{
+		if(bUseBoamp17)
+		{
+			if(!bIsRectification){
+%>
+		displayFields(<%= marProc.getIdBoampFormulaireType()%>,true);
+<%
+			}
+		}else{
+%>
+		updateListPassation(true);
+<%
+		}
+	}
+
+	Vector<MarcheCritere> vCriteresTemp = MarcheCritere.getAllMarcheCritereFromMarche(marche.getIdMarche());
+	MarcheCritere critere ;
+
+	if (vCriteresTemp.size() > 0)
+	{
+		critere = vCriteresTemp.firstElement();
+
+		switch ( critere.getIdCritereType() )
+		{
+			case 1:
+			case 4:
+			%>
+	cacher('critereClasses');
+	cacher('criterePonderes');
+			<%
+				break;
+			case 2: // critères pondérés
+			%>
+	cacher('critereClasses');
+			<%
+				break;
+			case 3: // critères classés
+			%>
+	cacher('criterePonderes');
+			<%
+				break;
+		}
+	}
+	else
+	{			
+	%>				
+	cacher('critereClasses');
+	cacher('criterePonderes');
+	<%
+	}
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_AUTRES)
+{
+%>
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.AUTRES_AUTRES_INFO,"iIdAutresInfos","sAutresInfos",rootPath,sessionUserHabilitation,session.getId()) %>
+	<%=EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.AUTRES_AUTRES_INFO_DCE, "iIdAutresInfosDce", "sAutresInfosDce", rootPath, sessionUserHabilitation, session.getId())%>
+	var l1 = eval("document.formulaire." + 'piecesFinales');
+	var l2 = eval("document.formulaire." + 'piecesInitiales');
+
+	equilibrerBalance(l1, l2);
+
+	var l1 = eval("document.formulaire." + 'pieces2Finales');
+	var l2 = eval("document.formulaire." + 'pieces2Initiales');
+	equilibrerBalance(l1, l2);
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_PLANNING)
+{
+%>
+
+
+	<%= EditorialAssistance.getAideRedactionnelleAJAX(EditorialAssistance.AAPC_COMPLEMENT,"iIdPetiteAnnonceTexteLibre","sPetiteAnnonceTexteLibre",rootPath,sessionUserHabilitation,session.getId()) %>
+	
+	cacher('divCal1');
+	cacher('coin1');
+	cacher('periodeOffresSupp');
+	cacher('PA_libre');
+	
+<%= Outils.isNullOrBlank( marche.getPetiteAnnonceTexteLibre())?"":"montrer('complement_annonce');" %>	
+<%
+	if (bAAPCAutomatique){
+%>
+	cacher('uploadAAPCLibre');
+<%
+	}
+	else{
+%>
+	montrer('uploadAAPCLibre');
+<%
+	}
+}
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_LOTS)
+{
+	if( vLots.size() < 2)
+	{
+	%>
+	cacher('trGestionLots');
+	<%	
+	}
+}
+
+if(iIdOnglet == Onglet.ONGLET_AFFAIRE_ORGANISME)
+{
+%>
+	<%
+	Vector<HtmlTabCorrespondantItem> vCorrespondantItemSimple = tabCorrespondant.getSimple();
+	for(HtmlTabCorrespondantItem item : vCorrespondantItemSimple){
+	%>
+	var l1 = eval("document.formulaire." + '<%=item.sVarName%>Finaux');
+	var l2 = eval("document.formulaire." + '<%=item.sVarName%>Initiaux');
+	equilibrerBalance(l1, l2);
+	<%}%>
+
+	<%
+	Vector<HtmlTabCorrespondantItem> vCorrespondantItemAll = tabCorrespondant.vCorrespondantItem;
+	for(HtmlTabCorrespondantItem item : vCorrespondantItemAll){
+		if (item.iVarValue == -1 && !item.bMandatory) { %>cacher('<%=item.sIdPave%>');<%}
+	}
+}
+if((iIdOnglet == Onglet.ONGLET_AFFAIRE_RECTIFICATIF)){
+	int iAvisRectificatif = -1;
+	try{
+		iAvisRectificatif = Integer.parseInt(request.getParameter("iIdAvisRectificatif"));
+	}catch(Exception e){}
+	if (iAvisRectificatif != -1){
+		AvisRectificatif avis = AvisRectificatif.getAvisRectificatif(iAvisRectificatif);
+		if (avis.getDescriptionType().equalsIgnoreCase("texte_libre")){
+%>
+			cacher('piece_jointe');
+<%
+		}
+		else if (avis.getDescriptionType().equalsIgnoreCase("piece_jointe")){
+%>
+			cacher('texte_libre');
+<%
+		}
+		else{
+%>
+			cacher('piece_jointe');
+			cacher('texte_libre');
+<%
+		}
+	}
+	else{
+%>
+		cacher('piece_jointe');
+		cacher('texte_libre');
+<%
+	}
+}
+%>
+// fin de la méthode javascript onAfterPageLoading()
+}
+</script>

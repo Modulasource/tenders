@@ -1,0 +1,36 @@
+	<%
+		sUseCasePrefix = org.coin.util.Outils.replaceAll(sUseCaseParamHabilitation, "-", "_");
+		sUseCase = sUseCaseParamHabilitation ;
+		vUseCasesAll = UseCase.getAllUseCaseWithPrefixMemory(sUseCase);
+	
+		if(sAction.equals("store") )
+ 		{
+ 		%>
+			<%@ include file="paveBalanceUseCase.jspf" %>
+			<br />
+		<%
+		} else {
+		%>
+			<%@ include file="pavePrefixUseCase.jspf" %>
+			<br />
+		<%
+		}
+		
+		sUseCasePrefix = org.coin.util.Outils.replaceAll(sUseCaseParamTreeview, "-", "_");
+		sUseCase = sUseCaseParamTreeview ;
+		vUseCasesAll = UseCase.getAllUseCaseWithPrefixMemory(sUseCase);
+	
+		if(sAction.equals("store") )
+ 		{
+ 		%>
+			<%@ include file="paveBalanceUseCase.jspf" %>
+			<br />
+		<%
+		} else {
+		%>
+			<%@ include file="pavePrefixUseCase.jspf" %>
+			<br />
+		<%
+		}
+		
+	%>

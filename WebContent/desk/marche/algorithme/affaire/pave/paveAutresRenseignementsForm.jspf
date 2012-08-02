@@ -1,0 +1,71 @@
+<%
+	String sDefaultRenseignement = "";
+    String sAutresInfoDCE = "";
+    if(marche.getsAutresInfosDce() != null) sAutresInfoDCE = marche.getsAutresInfosDce();
+%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<table class="pave" summary="none"> 
+		<tr>
+			<td class="pave_titre_gauche" colspan="2"><%= sPaveAutresRenseignements %></td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				Renseignements complémentaires : (le cas échéant)<br/>
+				
+			<%=  InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.AUTRES_INFOS) %>
+			<br>
+			<a href="#">
+	<img id="infos_supp_over2" src="<%=rootPath %>images/icones/infos_supp_over2.gif" /></a>
+
+			</td>
+			<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td><textarea name="<%=sFormPrefix %>sAutresInfos" id="<%=sFormPrefix %>sAutresInfos" cols="100" rows="8"><%= marche.getAutresInfos() %></textarea></td>
+	
+	          <%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdAutresInfos",rootPath,sessionUserHabilitation) %>
+					
+						
+				</tr>
+			</table>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>	
+	<tr>
+		<td class="pave_cellule_gauche">
+				Modalités d'accès au DCE :<br />
+			
+			</td>
+			<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td><textarea name="<%=sFormPrefix %>sAutresInfosDce" id="<%=sFormPrefix %>sAutresInfosDce" cols="100" rows="6"><%= sAutresInfoDCE %></textarea></td>
+					 <%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdAutresInfosDce",rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+			</td>
+		</tr>
+	
+	
+				
+	</table>
+<script>
+	
+	
+		var tooltip = new Control.ToolTip($('infos_supp_over2'),
+				"Les mentions figurant habituellement dans le règlement de consultation peuvent, notamment,"
+				+"être insérées dans l'avis d'appel public à la concurrence (art. 42 du code des marchés publics)."
+				+"En outre, pour les marchés publics qui exigent une publication au Bulletin officiel des annonces"
+				+" des marchés publics et au JOUE, lorsque des renseignements qui sont indiqués dans les avis d'appel"
+				+" public à la concurrence de marchés publics envoyés au JOUE ne trouvent pas de rubrique correspondante"
+				+" pour permettre également leur indication dans le présent modèle d'avis, les pouvoirs adjudicateurs ou"
+				+" les entités adjudicatrices doivent soit regrouper et mentionner ces renseignements à la présente"
+				+" rubrique, soit y mentionner les références de l'avis d'appel public à la concurrence au JOUE.",
+				{  
+		    		className: 'barbutton_tooltip'  
+				});
+	
+</script>

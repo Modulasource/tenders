@@ -1,0 +1,23 @@
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Coordonnées de l'organisme</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+	 	<%= hbFormulaire.getHtmlTrInput("Email :","",organisation.getMailOrganisation(),"") %>
+		<%= hbFormulaire.getHtmlTrInput("Téléphone :","",organisation.getTelephone(),"") %>
+		<%= hbFormulaire.getHtmlTrInput("Fax :","",organisation.getFax(),"") %>
+		<%= hbFormulaire.getHtmlTrInput("Adresse Internet :","",organisation.getSiteWeb(),"") %>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,385 @@
+<%@ page import="java.net.*,org.coin.util.*" %>
+<%@page import="modula.applet.*"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="org.coin.security.SecureString"%>
+<%@page import="modula.applet.util.AppletConstant"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="org.coin.applet.JavaLibInstallationApplet"%>
+<%@page import="mt.modula.Version"%>
+<%
+	String sUrlModulaClientInstaller = Version.URL_INSTALLATION_SOFTWARE;
+	String sUrlRemoteDownloadSite = "http://prod.modula-demat.com/install/jar/";
+    String sUrlRemoteDownloadModulaExe = Version.URL_INSTALLATION_SOFTWARE;
+	String[] sarrCheckExtFileChecked = HttpUtil.parseStringBlank("sarrCheckExtFile",request).split(";");
+	String sOS = HttpUtil.parseStringBlank("jlia_os",request);
+	String sJRE = HttpUtil.parseStringBlank("jlia_jre_version",request);
+	boolean bJliaCheck = HttpUtil.parseBoolean("jlia_check",request, false);
+	boolean bInstallMissingFiles = HttpUtil.parseBoolean("bInstallMissingFiles",request, false);
+	boolean bGetListAllInstalledLib = true;
+	bInstallMissingFiles = false;
+	
+	String sarrLibToCheck = "";// dont use it no more : SignatureApplet.LIST_MANDATORY_LIBRARY_SYSTEM_INSTALLED;
+		
+	String sListAllInstalledLib = HttpUtil.parseStringBlank("sListAllInstalledLib",request);
+	
+		 
+	if(!bJliaCheck ) session.setAttribute("systemeCandidatTested", null); 
+	
+	if(session.getAttribute("systemeCandidatTested") != null 
+	&& ((String)session.getAttribute("systemeCandidatTested")).equalsIgnoreCase("true")
+	&& session.getAttribute("systemeCandidatValid") != null 
+	&& ((String)session.getAttribute("systemeCandidatValid")).equalsIgnoreCase("true"))
+	{
+		bJliaCheck = true;
+		sOS = (String)session.getAttribute("os");
+		sJRE = (String)session.getAttribute("jre");
+	}
+	
+	
+	URL oURLPage = HttpUtil.getUrlWithProtocolAndPort(
+			request.getRequestURI() + ";jsessionid=" + session.getId() + "?",
+			request) ; 
+	
+	String sURL[] = Outils.parserChaineVersString(response.encodeURL(oURLPage.toString()),";");
+
+	
+	if(!bJliaCheck)
+	{
+		String sAppletMessage = "Test du système en cours ... veuillez patienter";
+		if(bInstallMissingFiles) {
+			sAppletMessage = "Installation des librairies additionnelles ... veuillez patienter";
+		}
+		
+	%>
+<applet code="org.coin.applet.JavaLibInstallationApplet.class" width="1" height="1" 
+	  archive="<%=  rootPath + "include/jar/SJavaLibInstallationApplet.jar?version=" 
+			  + JavaLibInstallationApplet.VERSION%> ">
+	  <param name="bRedirectUrl" value="true" />
+	  <param name="sRedirectUrl" value="<%= oURLPage.toString() %>" />
+	  <param name="sUrlRemoteDownloadSite" value="<%= sUrlRemoteDownloadSite%>" />
+	  <param name="bInstallMissingFiles" value="<%= bInstallMissingFiles %>" />
+      <param name="sarrCheckExtFile" value="<%= sarrLibToCheck %>" />
+      <param name="bGetListAllInstalledLib" value="<%= bGetListAllInstalledLib %>" />
+	</applet>
+
+	<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0"><tr>
+            <td>
+                <span class="post-title-alt">Votre Configuration</span>
+            </td>
+            <td class="right">
+             
+            </td>
+        </tr></table>
+    </div>
+	<br/>
+    <div class="post-footer post-block" style="margin-top:0">
+      <table class="fullWidth">
+         <tr>
+            <td class="pave_cellule_gauche" style="text-align:center;" >
+               <img src="<%= rootPath + Icone.ICONE_WARNING %>"  alt="Attention"/> 
+            </td>
+            <td class="pave_cellule_droite" >	
+			     <%= sAppletMessage %>
+            </td>
+		</tr> 
+		</table>
+    </div>
+	</div>
+
+<script type="text/javascript">
+//<!--
+
+// on attend 1 minute avant de proposer de télécharger le JRE sur le site de Sun
+var timeoutID = window.setTimeout("displayMessagePosteNonConforme()",60000);
+
+function displayMessagePosteNonConforme()
+{
+	Element.show("divPosteNonConforme");
+	window.clearTimeout(timeoutID);
+}
+
+
+// -->
+</script>
+
+    <div class="post" id="divPosteNonConforme" style="display: none;">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0"><tr>
+            <td>
+                <strong class="post-title-alt">Poste non conforme </strong>
+            </td>
+            <td class="right">
+                             
+            </td>
+        </tr></table>
+    </div>
+    <br/>
+    <div class="post-footer post-block" style="margin-top:0">
+      <table class="fullWidth">
+         <tr>
+            <td class="pave_cellule_gauche" style="text-align:center;" >
+               <img src="<%= rootPath + Icone.ICONE_ERROR %>"  alt="Error"/> 
+            </td>
+            <td class="pave_cellule_droite" >   
+            <p style="color:#F00"> Vous devez installer la JRE version 1.6 de Java<br/>
+            <a href="http://www.java.com" target="_blank">&gt;&gt; Aller sur le site de Java pour installer la JRE 1.6 </a>
+            </td>
+        </tr> 
+        </table>
+    </div>
+    </div>
+
+
+	<br>
+	<%
+	} else {
+	
+%>
+<br />
+
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0"><tr>
+            <td>
+                <span class="post-title-alt">Votre Configuration</span>
+            </td>
+            <td class="right">
+             
+            </td>
+        </tr></table>
+    </div>
+    <br/>
+    <div class="post-footer post-block" style="margin-top:0">
+      <table class="fullWidth">
+		<tr>
+			<th class="left">Type</th>
+			<th class="left">Nom</th>
+			<th class="left">Statut</th>
+		</tr>
+		<tr>
+			<td style="width:30%">Système d'exploitation</td>
+			<td style="width:60%">
+			<%= sOS %>
+			</td>
+			<td style="width:10%">
+			<img src="<%= rootPath +Icone.ICONE_SUCCES %>" style="height:15px" />
+			</td>
+		</tr>
+<%
+
+	String sIconUserAgent = Icone.ICONE_ERROR;
+	String sUserAgentControl = request.getHeader("User-Agent");
+    //sUserAgentControl = "MSIE";
+    //sUserAgentControl = "MSIE 7.0";
+    //sUserAgentControl = "Macintosh";
+	
+/**
+ * check browser
+ */
+
+
+%>
+		<tr>
+			<td>
+                Navigateur
+            </td>
+			<td>
+<%
+	if(sUserAgentControl.contains("Firefox"))
+	{
+	    sIconUserAgent = Icone.ICONE_SUCCES;
+	    %>Vous utilisez Firefox<%
+	} 
+	
+	
+	if(sUserAgentControl.contains("MSIE"))
+	{
+	    if( !sUserAgentControl.contains("MSIE 7.0"))
+	    {
+	        %>
+	        <a target="_blank" href="http://www.microsoft.com/france/windows/downloads/ie/getitnow.mspx" style="text-decoration:none">
+		    Vous utilisez une ancienne version d'Internet Explorer, si vous ne souhaitez pas passer à Firefox
+	         installez la version 7 d'Internet Explorer
+	        </a>
+	        <%
+	        sIconUserAgent = Icone.ICONE_ERROR;
+	    } else {   
+	    	if(sOS.toLowerCase().contains("vista"))
+	    	{
+		       %>Avec Vista et IE7 vous ne pouvez par répondre avec un certificat électronique MINEFE, 
+                vous devez utilisez Firefox<%
+		       sIconUserAgent = Icone.ICONE_WARNING;
+	    	} else {
+	               %>Vous utilisez IE7<%
+	               sIconUserAgent = Icone.ICONE_SUCCES;
+	    	}
+	    }
+	} 
+
+	if(sUserAgentControl.contains("Macintosh"))
+	{
+	    %>
+	    <br>
+	    <a target="_blank" href="http://www.apple.com/macosx/features/safari/" style="text-decoration:none">
+	    Vous utilisez un Mac, ce site fonctionne avec Safari 419.3 ou supérieur
+	    </a>
+	    <%
+	    sIconUserAgent = Icone.ICONE_ERROR;
+	} 
+%>
+            <br/>
+Info pratique : <a target="_blank" href="http://www.mozilla-europe.org/fr/products/firefox/" style="text-decoration:none">
+            Ce site est optimisé pour le navigateur open-source Firefox
+</a><br/>
+<span style="color:#AAA">
+Description complète : <i><%= request.getHeader("User-Agent") %></i></span>
+<br/>
+<br/>
+			</td>
+			<td>
+			<img src="<%= rootPath + sIconUserAgent %>" style="height:15px" />
+			</td>
+		</tr>
+
+
+
+		<tr>
+			<td>JRE Java</td>
+			<td>
+			
+		<% if(!sJRE.startsWith("1.6")) { %>
+			<p style="color:#F00"> Vous devez installer la JRE version 1.6 de Java<br/>
+			<a href="http://www.java.com" target="_blank">&gt;&gt; Aller sur le site de Java pour installer la JRE 1.6 </a>
+			</p>
+		<% } else {
+		    %>
+		    La version de Java JRE <%= sJRE %> est conforme, 
+             <a href="http://www.java.com" target="_blank">cliquer ici pour en savoir plus sur la technologie Java</a>
+
+		    <%			
+		}%>
+
+			</td>
+			<td>
+			<img src="<%= rootPath + 
+			(( sJRE.startsWith("1.6"))
+               ?Icone.ICONE_SUCCES
+			   :Icone.ICONE_ERROR) %>" style="height:15px" />
+			</td>
+		</tr>
+<%
+
+	boolean bAllLibInstalled = true;
+
+	String[] sarrCheckExtFile =  sarrLibToCheck.split(";");
+	for (int i = 0; i < sarrCheckExtFile.length; i++) {
+		String sFilenameLib = sarrCheckExtFile[i];
+		
+	
+		String sFilenameLibIcone = Icone.ICONE_ERROR;
+		/**
+		 * on recherche 
+		 */
+		for (int j = 0; j < sarrCheckExtFileChecked.length; j++) {
+			String sFilenameChecked = sarrCheckExtFileChecked[j];
+			String[] sarrFilenameChecked = sFilenameChecked.split(":");
+			if(sFilenameLib.equals( sarrFilenameChecked[0]))
+			{
+				if(sarrFilenameChecked[1].equals("true" ) )
+				{
+					sFilenameLibIcone = Icone.ICONE_SUCCES;
+				} else 
+				{
+					sFilenameLib = "<span style='color:#F00;'>" + sFilenameLib + "</span>";
+					bAllLibInstalled = false;
+				}
+			}
+		}
+%>
+		<tr>
+			<td>Librairies additionnelles</td>
+			<td><%= sFilenameLib %>
+			</td>
+			<td>
+			<img src="<%= rootPath + 
+				sFilenameLibIcone %>" style="height:15px" />
+			</td>
+		</tr>
+<%
+	}
+	
+	//bAllLibInstalled = false;
+%>
+		<tr>
+			<td>Controle des librairies additionnelles</td>
+			<td>
+<%
+			if(bAllLibInstalled)
+			{
+%>
+				Toutes les libraires sont installées 
+<%
+			} else {
+				String sUrlInstallLib = oURLPage.toString() + "bInstallMissingFiles=true";
+				/**
+				 * putted in comment to install by  modula.exe until we can install 
+				 * libs in user dir. 
+				 */
+				//if(!sOS.toLowerCase().contains("xp"))
+				{
+					sUrlInstallLib = sUrlRemoteDownloadModulaExe;
+				}
+%>
+				<p style="color:#F00"> Il vous manque des librairies <br/>
+				<a href="<%= sUrlInstallLib %>">&gt;&gt; Installer les 
+					librairies manquantes</a>
+				</p>
+				Attention une fois les librairies installées, vous devrez relancer votre navigateur pour prendre 
+				en compte les modifications.
+<%
+			}
+%>
+			</td>
+			<td>
+			<img src="<%= rootPath + 
+				(bAllLibInstalled?Icone.ICONE_SUCCES:Icone.ICONE_ERROR) %>" style="height:15px" />
+			</td>
+		</tr>
+        <tr>
+            <td>Librairies présentes sur votre système (info)</td>
+            <td>
+                <a href="#" onclick="Element.show('divListAllInstalledLib');" >Voir la liste</a>
+                <div id="divListAllInstalledLib" style="display: none;">
+<%
+   String[] sarrListAllInstalledLib = sListAllInstalledLib.split(";");
+	for (int j = 0; j < sarrListAllInstalledLib.length; j++) {
+	    String sLibInstalled = sarrListAllInstalledLib[j];
+	    String[] sarrLibInstalled = sLibInstalled.split(":");
+%>                  
+          <%= sarrLibInstalled[0] %> (<%= Long.parseLong( sarrLibInstalled[1] ) / 1024 %> Ko) <br/>
+<%
+    }
+%>
+               </div>
+                
+            </td>
+            <td>
+            
+            </td>
+        </tr>
+
+	</table>
+	
+    </div>
+</div>
+
+
+<% 
+	} // END if(!bJliaCheck)
+%>
+<br />
+<div style="text-align: center;font-style: italic;">JavaLibInstallationApplet V<%= JavaLibInstallationApplet.VERSION %></div>	

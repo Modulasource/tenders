@@ -1,0 +1,30 @@
+<div class="post-footer post-block" style="margin-top:0">
+	<table class="fullWidth">
+	<%if(cpf.isUseCPFGroup()){ %>
+	<tr>
+		<td class="right" width="40%" ><strong>Groupes de classification des produits :&nbsp;</strong></td>
+		<td style="left">
+			<div id="cpfGroupSelectedItems_<%= marche.getId() %>"></div>
+			<script>
+			var jsonCpfSelectedItems = <%= cpf.getGroupCPFSelectedList() %>;
+			jsonCpfSelectedItems.each(function(cpf){
+			  $("cpfGroupSelectedItems_<%= marche.getId() %>").innerHTML += cpf.value+"<br/>";
+			});
+			</script>
+		</td>
+	</tr>
+	<% } %>
+	<tr>
+		<td class="right" width="40%" ><strong>Classification des produits (CPF) :&nbsp;</strong></td>
+		<td style="left">
+			<div id="cpfSelectedItems_<%= marche.getId() %>"></div>
+			<script>
+			var jsonCpfSelectedItems = <%= cpf.getBoampCPFSelectedList() %>;
+			jsonCpfSelectedItems.each(function(cpf){
+			  $("cpfSelectedItems_<%= marche.getId() %>").innerHTML += cpf.value+"<br/>";
+			});
+			</script>
+		</td>
+	</tr>
+	</table>
+</div>

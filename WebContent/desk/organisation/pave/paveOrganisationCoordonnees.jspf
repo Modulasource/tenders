@@ -1,0 +1,67 @@
+<%
+  // Organisation organisation;
+%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+
+<%@page import="org.coin.fr.bean.PersonnePhysique"%><table class="pave" >
+	<tr><td class="pave_titre_gauche" colspan="2"><%= sBlocNameIdentity %></td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getMailOrganisationLabel() + " :","", Outils.getString(organisation.getMailOrganisation(), localizeButton.getValueUndefined())  ,"") %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getTelephoneLabel()+ " :","", Outils.getString(organisation.getTelephone(), localizeButton.getValueUndefined()) ) %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getFaxLabel() + " :","",  Outils.getString(organisation.getFax(), localizeButton.getValueUndefined())) %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getSiteWebLabel() + " :","", Outils.getString(organisation.getSiteWeb(), localizeButton.getValueUndefined()) ) %>
+    
+    <%= hbFormulaire.getHtmlTrInput( "Reference externe :","", Outils.getString(organisation.getReferenceExterne(), localizeButton.getValueUndefined()) ) %>
+    <%if(doh.bDisplayReferenceExterneAP){ %><%= hbFormulaire.getHtmlTrInput( "Reference externe AP :","", Outils.getString(organisation.getReferenceExterneAP(), localizeButton.getValueUndefined()) ) %><%} %>
+<%
+	if(doh.bDisplayOwner){ 
+		{
+			ObjectType ot = null;
+			String sObjectNameOwner = "";
+			try{
+				ot = ObjectType.getObjectTypeMemory(
+						organisation.getIdObjectTypeOwner() ) ;
+				
+				
+				sObjectNameOwner  = ObjectType.getIdObjetReferenceName(
+						organisation.getIdObjectTypeOwner(),
+						organisation.getIdObjectReferenceOwner() );
+				
+				
+			} catch (CoinDatabaseLoadException e) {
+				ot = new ObjectType();
+			}
+			
+			String sCreatorName = "";
+			try{
+				PersonnePhysique ppCreator = PersonnePhysique
+					.getPersonnePhysique(organisation.getIdCreateur());
+				 sCreatorName = ppCreator.getName();
+			} catch (Exception e ) {
+				 sCreatorName = "";
+			}
+		
+		
+%>
+	<tr>
+		<td class="pave_cellule_gauche" >Appartient à (owner) :</td>
+		<td class="pave_cellule_droite" >
+			<%= ot.getName() + " : " + sObjectNameOwner  %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Créateur</td>
+		<td class="pave_cellule_droite" >
+			<%= sCreatorName %>
+		</td>
+	</tr>
+
+<%		
+		}
+	}
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

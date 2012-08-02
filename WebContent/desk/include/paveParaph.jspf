@@ -1,0 +1,408 @@
+    
+<%@page import="mt.paraph.folder.ParaphFolder"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.OrganisationService"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.bean.organigram.OrganigramNodeType"%>
+<%@page import="mt.paraph.folder.ParaphFolderEntity"%>
+<%@page import="org.coin.bean.ged.GedDocumentEntityType"%>
+<%@page import="mt.paraph.folder.ParaphFolderType"%>
+<%@page import="mt.paraph.folder.ParaphFolderState"%>
+<%@page import="org.coin.bean.organigram.OrganigramNode"%>
+<%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="org.coin.db.ConnectionManager"%>
+
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.sql.Timestamp"%>
+<script type="text/javascript">
+function changeParaphFolderFlag(sIdImgFlag)
+{
+    var img = $(sIdImgFlag);
+    if(img.name == "off")
+    {
+        img.src = "<%= rootPath + "images/icons/flag-oxy-red.png"  %>";
+        img.name = "on";
+    } else {
+        img.src = "<%= rootPath + "images/icons/flag-oxy-white.png"  %>";
+        img.name = "off";
+    }
+        
+}
+
+function displayParaphFolder(sUrlDisplayItem, lId)
+{
+    var sUrl = "<%= 
+        response.encodeURL( 
+                rootPath + "desk/paraph/folder/xxx") %>" 
+                + "?lId=" + lId;
+
+         
+    sUrl = sUrl.replace("xxx", sUrlDisplayItem);
+
+    var idTab = "_tabParapFolder_" + lId;
+    var idTr = "_tr" + idTab ;
+
+    var colorBkg = "#B7F0F3"
+    $(idTr).style.backgroundColor = colorBkg;
+    addParentTabForced("Chargement...", sUrl, false, idTr, "tabParapFolder");
+
+
+    /**
+     * Its not the best way to do it ... Julien can you help me ?
+     */
+    var action = $(idTr + "_action");
+    action.onmousedown = function() {
+        $(idTr).style.backgroundColor = "#FFF";
+    }
+
+    /**
+     * DK : Some tests  ... Julien can you help me ?
+     */
+    var title = $(idTr + "_title");
+    title.onmousedown = function() {
+        var restColor = $(idTr).style.backgroundColor;
+    	new Effect.Highlight(idTr, 
+    		    {duration:1, fps:25, from:0.0, to:1.0, startcolor:'#FFD700', endcolor:colorBkg, restorecolor:restColor});
+    		        
+        //$(idTr).style.backgroundColor = "#AAA";
+    }
+    
+    //redirectParentTabActive(sUrl);
+}
+</script>
+
+<%
+    int iDatePositionCurrent = CalendarUtil.DATE_POSITION_TODAY;
+    String sDatePositionName = "Aujourd'hui";
+%>
+<td style="width: 350px;border: 1px solid;vertical-align:top;" id="trParaphSearchEngine" >
+       <div style="border: 1px solid #AAF;font-size: 18px">A Valider</div>
+       <div style="padding: 2px" >
+          <input type="text" size="50" value="Rechercher Brouillon" style="color: #999" />
+          <img alt="Arrow" src="<%= rootPath + "images/icons/down_arrow.png" %>" 
+            onclick="Element.toggle('divSearchEngineParaphFolder')"
+            style="cursor: pointer;"   />
+       </div>
+    <div id="divSearchEngineParaphFolder" style="display: none;padding: 2px" >
+        <table>
+            <tr>
+                <td>De : </td>
+                <td><input type="text" size="40" /></td>
+            </tr>
+            <tr>
+                <td>A : </td>
+                <td><input type="text" size="40" /></td>
+            </tr>
+            <tr>
+                <td>Objet : </td>
+                <td><input type="text" size="40" /></td>
+            </tr>
+            <tr>
+                <td>Corps : </td>
+                <td><input type="text" size="40" /></td>
+            </tr>
+        </table>
+    </div>
+       <div style="border: 1px solid #AAF;padding-left: 2px">Réorganiser par : 
+        <select>
+            <option>Date</option>
+            <option>A</option>
+            <option>De</option>
+            <option>Objet</option>
+            <option>Importance</option>
+        </select>
+        <select>
+            <option>Croissant</option>
+            <option>Décroissant</option>
+        </select>
+       </div>
+    <div style="overflow: auto;height: 650px" >
+
+       <div style="border: 1px solid #AAF;font-weight: bold;color: #55B;vertical-align: middle;">
+            <img src="<%= rootPath + "images/icons/bullet_toggle_minus.png"  %>" /><%= sDatePositionName %>
+       </div>
+       <div style="border: 1px solid #AAF;">
+            <table style="width: 100%;: 0px;" cellpadding="0px" cellspacing="0px" >
+<%
+
+{
+	Connection connParaph = ConnectionManager.getConnection();
+    Vector<ParaphFolder> vParaphFolder = ParaphFolder.getAllWithWhereAndOrderByClauseStatic(
+    		"WHERE (id_paraph_folder_state=" + ParaphFolderState.STATE_TO_BE_VALIDATED
+    			+ " )", 
+    		" ORDER BY date_modification DESC");
+
+	Vector<ParaphFolderEntity> vParaphFolderEntityAll =  ParaphFolderEntity.getAllStatic(connParaph);
+    PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual());
+    Vector<PersonnePhysique> vPersonnePhysique = PersonnePhysique.getAllFromIdOrganisation(
+            personne .getIdOrganisation());
+    
+    Vector<OrganisationService> vOrganisationService = OrganisationService.getAllFromIdOrganisation(personne .getIdOrganisation());
+    Vector<Organisation> vOrganisation = new Vector<Organisation>();
+    vOrganisation.add(Organisation.getOrganisation(personne .getIdOrganisation()));
+    
+    Vector vPoste = OrganigramNodeType.getAllStatic();
+    
+    CoinDatabaseWhereClause wc = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+    CoinDatabaseWhereClause wcEntity = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+    for (ParaphFolderEntity entity : vParaphFolderEntityAll) 
+    {
+        wcEntity.add(entity.getId());
+        if(entity.getIdTypeObject() == ObjectType.ORGANIGRAM_NODE)
+        {
+            wc.add(entity.getIdReferenceObject());
+        }   
+    }
+    OrganigramNode organigramNode = new OrganigramNode();
+    organigramNode.bUseHttpPrevent = false;
+    
+    Vector<OrganigramNode> vEntityOrganigramNodeAll 
+        = organigramNode.getAllWithWhereAndOrderByClause(
+            " WHERE " + wc.generateWhereClause("id_organigram_node"),
+            "",
+            connParaph);
+    
+
+    //System.out.print("\n***START**\n");
+    
+    for(int i=0; i < vParaphFolder.size();i++)
+    {
+    	//if( i == 5) break;
+    		
+    	ParaphFolder item = vParaphFolder.get(i);
+        
+        Vector<ParaphFolderEntity> vParaphFolderEntityIsuer  
+            = ParaphFolderEntity.getAllFromIdGedDocumentEntityType(
+                    item.getId(),
+                    GedDocumentEntityType.TYPE_ISSUER, 
+                    vParaphFolderEntityAll);
+
+        Vector<ParaphFolderEntity> vParaphFolderEntitySigner  
+            = ParaphFolderEntity.getAllFromIdGedDocumentEntityType(
+                item.getId(),
+                GedDocumentEntityType.TYPE_SIGNER, 
+                vParaphFolderEntityAll);
+
+
+        Vector<ParaphFolderEntity> vParaphFolderEntityRecipient  
+            = ParaphFolderEntity.getAllFromIdGedDocumentEntityType(
+                item.getId(),
+                GedDocumentEntityType.TYPE_RECIPIENT, 
+                vParaphFolderEntityAll);
+
+        
+        String sEntityList = "";
+        
+        
+        String sUndefined = "?";
+        String sLineDelimiter = ",";
+        
+        
+        String sIssuerList 
+            = ParaphFolderEntity.getEntityNameList(
+                    vParaphFolderEntityIsuer,
+                    vPersonnePhysique,
+                    vOrganisationService,
+                    vOrganisation,
+                    vPoste,
+                    vEntityOrganigramNodeAll,
+                    sLineDelimiter,
+                    sUndefined,
+                    ParaphFolderEntity.KEY_NAME);
+       
+        
+        String sSignerList 
+        = ParaphFolderEntity.getEntityNameList(
+                vParaphFolderEntitySigner,
+                vPersonnePhysique,
+                vOrganisationService,
+                vOrganisation,
+                vPoste,
+                vEntityOrganigramNodeAll,
+                sLineDelimiter,
+                sUndefined,
+                ParaphFolderEntity.KEY_NAME);
+        
+        String sRecipientList 
+            = ParaphFolderEntity.getEntityNameList(
+                vParaphFolderEntityRecipient,
+                vPersonnePhysique,
+                vOrganisationService,
+                vOrganisation,
+                vPoste,
+                vEntityOrganigramNodeAll,
+                sLineDelimiter,
+                sUndefined,
+                ParaphFolderEntity.KEY_NAME);
+        
+        
+        ParaphFolderState state = ParaphFolderState.getParaphFolderState(item.getIdParaphFolderState());
+        ParaphFolderType type = ParaphFolderType.getParaphFolderType(item.getIdParaphFolderType());
+        
+
+        /**
+         * il faut mettre la couleur dans la table ParaphFolderType
+         * ou ailleurs 
+         */
+        
+         String sCellBackgroundColor = "#FFFFFF";
+         String sCellTitle = type.getName();
+        switch((int)type.getId()){
+        case ParaphFolderType.TYPE_NOTE :
+            sCellBackgroundColor = "#97C0F3";
+            break;
+
+        case ParaphFolderType.TYPE_MAIL_IN :
+            sCellBackgroundColor = "#F6CEF6";
+            break;
+
+        case ParaphFolderType.TYPE_MAIL_OUT :
+            sCellBackgroundColor = "#B0E48E";
+            break;
+        
+        case ParaphFolderType.TYPE_FORM :
+            sCellBackgroundColor = "#F9E95E";
+            break;
+        }
+
+        String sUrlDisplayItem = "displayParaphFolder.jsp";
+        switch((int)state.getId()){
+        case ParaphFolderState.STATE_IN_CREATION :
+            sUrlDisplayItem = "prepareParaphFolder.jsp";
+            break;
+        }
+
+        if(!sSignerList.equals("")){
+        	sSignerList = "s : " + sSignerList + "<br/>";
+        }
+        String sDateParaphFolder = "";
+        
+        int iDatePositionLast = iDatePositionCurrent;
+        iDatePositionCurrent = CalendarUtil.getDatePosistion(item.getDateModification());
+        
+        switch(iDatePositionCurrent)
+        {
+        case CalendarUtil.DATE_POSITION_TODAY:
+        	sDatePositionName = "Aujourd'hui";
+            sDateParaphFolder = 
+                 CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy ")
+            	+ CalendarUtil.getDateWithFormat(item.getDateModification(), "HH:mm");
+            break;
+
+        case CalendarUtil.DATE_POSITION_YESTERDAY:
+            sDatePositionName = "Hier";
+            sDateParaphFolder = "yesterday " 
+                + CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy ")
+                + CalendarUtil.getDateWithFormat(item.getDateModification(), "HH:mm");
+            break;
+
+        case CalendarUtil.DATE_POSITION_CURRENT_WEEK:
+            sDatePositionName = "Cette semaine" ;
+            sDateParaphFolder = CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy");
+            break;
+
+        case CalendarUtil.DATE_POSITION_LAST_WEEK:
+            sDatePositionName = "Semaine dernière" ;
+            sDateParaphFolder = CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy");
+            break;
+
+        case CalendarUtil.DATE_POSITION_LAST_2WEEKS:
+            sDatePositionName = "Il y a 2 semaines" ;
+            sDateParaphFolder = CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy");
+            break;
+
+        case CalendarUtil.DATE_POSITION_CURRENT_MONTH:
+            sDatePositionName = "Ce mois-ci" ;
+            sDateParaphFolder = CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy");
+            break;
+
+        case CalendarUtil.DATE_POSITION_LAST_MONTH:
+            sDatePositionName = "Le mois dernier" ;
+            sDateParaphFolder = CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy");
+            break;
+            
+
+        case CalendarUtil.DATE_POSITION_BEFORE_LAST_MONTH:
+            sDatePositionName = "Avant le mois dernier" ;
+            sDateParaphFolder = CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy");
+            break;
+
+        default:
+            sDatePositionName = "pos id =" + iDatePositionCurrent ;
+	        sDateParaphFolder = CalendarUtil.getDateWithFormat(item.getDateModification(), "dd/MM/yyyy");
+            break;
+        }
+        
+        
+        boolean bAddNewTimeDivision = false;
+        
+        if(iDatePositionCurrent != iDatePositionLast)
+        {
+        	bAddNewTimeDivision = true;
+        }
+        
+        if(bAddNewTimeDivision)
+        {
+            String sIdTimeDivisionList = "divList_" + iDatePositionCurrent + "_" + i ;
+            String sIdTimeDivisionPlus = "divPlus_" + iDatePositionCurrent + "_" + i ;
+            String sIdTimeDivisionMinus = "divMinus_" + iDatePositionCurrent + "_" + i ;
+%>   
+            </table>
+        </div>
+
+       <div style="border: 1px solid #AAF;font-weight: bold;color: #55B;vertical-align: middle;">
+            <img src="<%= rootPath + "images/icons/bullet_toggle_minus.png" %>" 
+                id="<%= sIdTimeDivisionMinus %>"
+                style="cursor: pointer;"
+                onclick="Element.toggle('<%= sIdTimeDivisionList %>');Element.hide('<%= sIdTimeDivisionMinus %>');Element.show('<%= sIdTimeDivisionPlus %>');" />
+            <img src="<%= rootPath + "images/icons/bullet_toggle_plus.png" %>" 
+                id="<%= sIdTimeDivisionPlus %>"
+                style="cursor: pointer;display: none;"
+                onclick="Element.toggle('<%= sIdTimeDivisionList %>');Element.hide('<%= sIdTimeDivisionPlus %>');Element.show('<%= sIdTimeDivisionMinus %>');" />
+            <%= sDatePositionName %>
+       </div>
+        <div style="border: 1px solid #AAF;" id="<%= sIdTimeDivisionList %>" >
+            <table style="width: 100%;: 0px;" cellpadding="0px" cellspacing="0px" >
+ <%
+	    }
+%>
+
+         
+                <tr onclick="displayParaphFolder('<%= sUrlDisplayItem %>', <%= item.getId() %>)" 
+                    id="_tr_tabParapFolder_<%= item.getId() %>" >
+                    <td style="vertical-align:top; background-color: <%= sCellBackgroundColor
+                        %>;border-bottom: 1px solid #EEF ;width : 20px" > 
+                        <img src="<%= rootPath + "images/icons/folder_page_white.png" %>" />
+                    </td>
+                    <td style="border-bottom: 1px solid #EEF ; ">
+                        <div style="margin-left: 4px" >
+	                        à : <%= sRecipientList %><br/>
+	                        <%= sSignerList %>
+	                        de : <%= sIssuerList %>
+                        </div>
+                        <div style="color: #999;margin-left: 4px"  ><%= item.getName() %></div>
+                    </td>
+                    <td style="text-align: right;border-bottom: 1px solid #EEF ; ">
+                        <%= sDateParaphFolder %><br/>
+                        <img src="<%= rootPath + "images/icons/paperclipreal.png" %>" />
+                    </td>
+                    <td style="border-bottom: 1px solid #EEF ; cursor: pointer;width: 15px" 
+                        onclick="changeParaphFolderFlag('paraph_flag_<%= item.getId() %>')">
+                        <img src="<%= rootPath + "images/icons/flag-oxy-white.png" 
+                            %>"  name="off" id="paraph_flag_<%= item.getId() %>" />
+                    </td>
+                </tr>
+<%
+    }
+%>                
+            </table>
+        </div>
+<%
+	ConnectionManager.closeConnection(connParaph);
+}
+%>                
+    </td>

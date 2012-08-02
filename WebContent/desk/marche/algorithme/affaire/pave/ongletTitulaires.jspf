@@ -1,0 +1,303 @@
+<%
+{
+	if(bIsContainsCandidatureManagement)
+	{
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Statut <%= (iNbLots>1)?"des lots":"du marché" %></td>
+		<td class="pave_titre_droite"><%= (iNbLots>1)?iNbLots + " lots":"" %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%
+	if(iNbLots>1)
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Lots infructueux :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= vLotsInfructueux.size() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Lots "Attribué définitivement" :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= vLotsAttribues.size() %>
+		</td>
+	</tr>
+	<%
+	}
+	else
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Statut du march&eacute; :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= (vLotsAttribues.size()==1)?"Attribué définitivement":(vLotsInfructueux.size()==1)?"infructueux":"" %>
+		</td>
+	<%
+	}
+	%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />
+<%
+	}
+	for (int i = 0; i < vLotsAttribues.size(); i++)
+	{
+		MarcheLot lot = vLotsAttribues.get(i);
+
+		Vector vEnveloppesB = EnveloppeB.getAllEnveloppesBAttribueesDefinitifFromLot(lot.getIdMarcheLot());
+		if(vEnveloppesB.size() != 0)
+		{
+		EnveloppeB enveloppe = (EnveloppeB)vEnveloppesB.firstElement();
+		Candidature candidature = Candidature.getCandidature(enveloppe.getIdCandidature());
+		PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(candidature.getIdPersonnePhysique());
+		Organisation organisation = Organisation.getOrganisation(candidature.getIdOrganisation());
+		
+		Adresse oAdresse = Adresse.getAdresse(personne.getIdAdresse());
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveLot<%= i %>')">
+		<td class="pave_titre_gauche" colspan="2">
+			Identification du titulaire du <%= (vLots.size() > 1)?"lot "+lot.getNumero():"marché" %>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+			<table id="paveLot<%= i %>" summary="Lot <%=i%>">
+				<tr>
+					<td class="pave_cellule_gauche">
+					Nom du titulaire/Organisme :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= organisation.getRaisonSociale() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					A l'attention de :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= personne.getPrenomNom()  %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Adresse :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= oAdresse.getAllAdresseString("\n") %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Téléphone :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= personne.getTel() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Télécopieur/Fax :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= organisation.getFax() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Courrier électronique :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= personne.getEmail() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Site Internet :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= organisation.getSiteWeb() %>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />
+<%
+	sFormPrefix = "paveMontant" + i;
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveMontant')">
+		<td class="pave_titre_gauche" colspan="2">
+			Montant du <%= (vLots.size() > 1)?"lot "+lot.getNumero():"marché" %>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+			<table id="paveMontant">
+				<tr>
+					<td class="pave_cellule_droite" colspan="2">
+					Champs obligatoires au-dessus des seuils européens. Le cas échéant, la mention "indéfini(e)" peut cependant
+					y être renseignée.
+					</td>
+				</tr>
+				<%
+				if (lot.getMontantLot() != null && !lot.getMontantLot().equalsIgnoreCase(""))
+				{
+				%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Montant (en Euros HT) :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= lot.getMontantLot() %>
+					</td>
+				</tr>
+				<%
+				}
+				%>
+				<%
+			if ( (lot.getOffreBasse() != null) && !lot.getOffreBasse().equalsIgnoreCase("")
+				&& (lot.getOffreHaute() != null) && !lot.getOffreHaute().equalsIgnoreCase("") )
+			{
+			%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Offre :
+					</td>
+					<td class="pave_cellule_droite">
+						<table id="offre<%=lot.getNumero() %>">
+							<tr>
+								<td>
+								la plus basse : <%= lot.getOffreBasse() %>
+								</td>
+							</tr>
+							<tr>
+								<td>
+								la plus haute : <%= lot.getOffreHaute() %>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<%
+				}
+				%>
+			</table>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />
+<%
+	sFormPrefix = "paveSousTraitance" + i;
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveSousTraitance<%= i %>')">
+		<td class="pave_titre_gauche" colspan="2">
+			Sous-traitance du <%= (vLots.size() > 1)?"lot "+lot.getNumero():"marché" %>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td>
+			<table id="paveSousTraitance<%= i %>">	
+				<tr>
+					<td class="pave_cellule_gauche">
+					Sous-traitance :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+			String sSousTraitance = "";
+			boolean bSousTraite = false;
+			try
+			{
+				bSousTraite = lot.isSousTraite();
+			}
+			catch(Exception e)
+			{
+				// TODO : Mettre dans la log
+				// System.out.println(e.getMessage());
+			}
+			if ( bSousTraite )
+				sSousTraitance = "Oui";
+			else
+				sSousTraitance = "Non";
+%>		
+					<%= sSousTraitance %>
+					</td>
+				</tr>
+<%
+			if (bSousTraite)
+			{
+%>
+				<tr id="soustraitance<%= i %>">
+					<td class="pave_cellule_gauche">
+					Indiquer la part de sous-traitance :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+				String sResultat = "";
+				sResultat += lot.getPartSousTraitance();
+				switch(lot.getTypeSousTraitance())
+				{
+					case MarcheLot.REPONSE_INCONNUE: 
+						sResultat = "Réponse inconnue";
+						break;
+						
+					case MarcheLot.PART_VALEUR: 
+						sResultat += " (Valeur HT)";
+						break;
+						
+					case MarcheLot.PART_POURCENTAGE: 
+						sResultat += " %";
+						break;	
+				}
+%>
+					<%= sResultat %>
+					</td>
+				</tr>
+<%
+			}
+%>
+			</table>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>
+<br />
+<%
+		}
+	}
+}
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">
+		Montant total du marché
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>				
+		<td class="pave_cellule_gauche">
+		Valeur totale estimée (HT) :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= avisAttribution.getMontantMarche() %> Euros
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>

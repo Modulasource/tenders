@@ -1,0 +1,99 @@
+<%@page import="modula.graphic.Onglet"%>
+<%
+	
+// FLON : DK : C'est vraiment le bordel dans cette page ... merci de faire ménage
+// Il faut dissocié affichage des règles des gestions !!
+//if(bShowForm )
+if(sAction.equals("store") )
+{ 
+	boolean bisDCEModifieApresPublication = false;
+	try{bisDCEModifieApresPublication = marche.isDCEModifieApresPublication(); }
+	catch(Exception e){}
+	
+	boolean bisCandidatsPrevenusModificationDCE = true;
+	try{bisCandidatsPrevenusModificationDCE = marche.isCandidatsPrevenusModificationDCE();}
+	catch(Exception e){}
+	
+	if (!bisCandidatsPrevenusModificationDCE 
+	&& iIdOnglet == Onglet.ONGLET_AFFAIRE_DCE 
+	&& bisDCEModifieApresPublication)
+	{
+%>
+            <button type="button" 
+					onclick='OuvrirPopup("<%= 
+						response.encodeURL(
+							"prevenirCandidatsModificationDCEForm.jsp?iIdAffaire="+iIdAffaire)
+					%>",750,550)'>Prévenir les candidats de la modification du DCE</button>
+<%
+	}
+	if(bShowForm )
+	{ 
+%>
+					<input type="hidden" name="iIdAffaire" value="<%= iIdAffaire %>" />
+					<input type="hidden" name="sAction" value="<%= sAction %>" />
+					<input type="hidden" name="iIdOnglet" value="<%= iIdOnglet %>" />
+					<button type="submit" >Valider</button>
+<% 	
+	}
+	else
+	{
+%>
+					<button type="button"
+					 onclick='Redirect("<%= 
+					 	response.encodeURL("modifierAffaire.jsp?sAction=storeNoForm"
+					 		+ "&iIdOnglet="+iIdOnglet
+					 		+ "&iIdAffaire="+marche.getIdMarche() 
+					 		+ "&nonce=" + System.currentTimeMillis() ) %>")'>Valider</button>
+<%
+	}
+}
+else 
+{
+	boolean bisDCEModifieApresPublication = marche.isDCEModifieApresPublication(false); 
+	boolean bisCandidatsPrevenusModificationDCE = marche.isCandidatsPrevenusModificationDCE(false);
+ 	boolean bIsMarcheLectureSeule = marche.isLectureSeule(true); 
+	boolean bIsDCEDisponible = marche.isDCEDisponible(false); 
+
+	if (!bisCandidatsPrevenusModificationDCE 
+	&& iIdOnglet == Onglet.ONGLET_AFFAIRE_DCE 
+	&& bisDCEModifieApresPublication)
+	{
+	
+	%>
+						<button type="button" 
+					 	 onclick='OuvrirPopup("<%= 
+					 		 response.encodeURL("prevenirCandidatsModificationDCEForm.jsp?iIdAffaire="+iIdAffaire)
+					 		 %>",750,550)' >Prévenir les candidats de la modification du DCE</button>
+	<%
+	}
+	
+	boolean bDisplayButtonModifyAffaire = true;
+	if(sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-66" )
+	&& !(marche.getIdCreateur() == sessionUser.getIdIndividual())  )
+	{
+		bDisplayButtonModifyAffaire = false;
+	}
+	
+	if(sessionUserHabilitation.isSuperUser() ) bDisplayButtonModifyAffaire = true;
+
+	
+	if(
+	bDisplayButtonModifyAffaire
+	&& (
+		(!bIsMarcheLectureSeule) 
+		|| ( (iIdOnglet == Onglet.ONGLET_AFFAIRE_DCE) 
+			&& (bisDCEModifieApresPublication || !bIsDCEDisponible) )
+		|| (iIdOnglet == Onglet.ONGLET_AFFAIRE_ANNULATION) )
+	)
+	{ %>
+						<button 
+							type="button" 
+							onclick="Redirect('<%= 
+								response.encodeURL("afficherAffaire.jsp?"
+									+ "iIdAffaire="+marche.getIdMarche()
+									+ "&amp;iIdOnglet="+iIdOnglet
+									+ "&amp;sAction=store" 
+									+ "&amp;nonce=" + System.currentTimeMillis() ) %>') " >Modifier</button>
+	<% }
+}
+%>

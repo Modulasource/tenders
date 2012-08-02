@@ -1,0 +1,123 @@
+<%@page import="org.coin.fr.bean.CategorieJuridique"%>
+<%@page import="org.coin.fr.bean.CodeNaf"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+<%@page import="modula.marche.TypeAcheteurPublic"%>
+<%@page import="org.coin.fr.bean.OrganisationModelePDF"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.HashMap"%>
+
+<%@page import="org.coin.fr.bean.OrganisationClasseProfit"%>
+<%@page import="java.util.Vector"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sBlocNameAdministativeData %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr id="tr_infoRaisonSociale" style="display: none; visibility: hidden;">
+		<td class="pave_cellule_gauche" >&nbsp;</td>
+		<td class="pave_cellule_droite" >
+			<div class="rouge" style="text-align:left">
+			<%= locMessage.getValue(1,"Attention, la raison sociale saisie ci-dessous est déjà enregistrée dans la base de données.")%>
+			</div>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput(
+			organisation.getRaisonSocialeLabel() + "* :","sRaisonSociale",
+			organisation.getRaisonSociale(),
+			"onBlur=\"verifierRaisonSociale();\" onKeyUp=\"verifierRaisonSociale();\" size=\"80\" ",
+			true) %>
+	<input type="hidden" name="sRaisonSocialeOldValue" id="sRaisonSocialeOldValue" value="<%= 
+			organisation.getRaisonSociale() %>" />
+	<input type="hidden" name="sRaisonSocialeAuth" id="sRaisonSocialeAuth" value="<%= doh.bCheckDoublonRaisonSociale?"":"1" %>" />
+	<tr>
+		<td class="pave_cellule_gauche" ><%= organisation.getSiretLabel() %> :</td>
+		<td class="pave_cellule_droite" >
+		<%
+		ArrayList<HashMap<String, String>> listSiret = organisation.getSiretValueForm(adresse.getIdPays());
+		for(HashMap<String, String> mapSiret : listSiret){
+		%>
+			<input type="text" name="<%= mapSiret.get("name") %>" 
+			id="<%= mapSiret.get("id") %>" 
+			size="<%= mapSiret.get("size") %>" 
+			maxlength="<%= mapSiret.get("maxlength") %>" 
+			value="<%= mapSiret.get("value") %>" />
+		<%}%>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getTvaIntraLabel() + " :","sTvaIntra",organisation.getTvaIntra(),"") %>
+	<%if(!doh.bHideDetailedData){ %>
+	<tr>
+		<td class="pave_cellule_gauche"><%= organisation.getIdCategorieJuridiqueLabel() %> :</td>
+		<% 
+		String sCategorieJuridique = ""; 
+		int iIdCategorieJuridique = 0; 
+		%>
+		<% 
+		try{
+			sCategorieJuridique = CategorieJuridique.getCategorieJuridiqueName(organisation.getIdCategorieJuridique()); 
+			iIdCategorieJuridique = organisation.getIdCategorieJuridique(); 
+		}catch(Exception e){}
+		%>
+		<td class="pave_cellule_droite">
+			<button type="button" id="AJCL_but_iIdCategorieJuridique" ><%=
+				sCategorieJuridique!=""?sCategorieJuridique:"Cliquer pour sélectionner" %></button>
+			<input type="hidden" id="iIdCategorieJuridique" name="iIdCategorieJuridique" value="<%=iIdCategorieJuridique %>" />
+		</td>
+	</tr>
+		<% 
+		String sCodeNaf = ""; 
+		int iIdCodeNaf = 0; 
+		try{
+			sCodeNaf = CodeNaf.getCodeNafEtLibelle(organisation.getIdCodeNaf()); 
+			iIdCodeNaf = organisation.getIdCodeNaf(); 
+		}catch(Exception e){}
+		%>
+	<tr>
+		<td class="pave_cellule_gauche"><%= organisation.getIdCodeNafLabel() %> (ou APE) :</td>
+		<td class="pave_cellule_droite">
+			<button type="button" id="AJCL_but_iIdCodeNaf" ><%=
+				sCodeNaf!=""?sCodeNaf:"Cliquer pour sélectionner" %></button>
+			<input type="hidden" id="iIdCodeNaf" name="iIdCodeNaf" value="<%=iIdCodeNaf%>" />
+		</td>
+	</tr>
+    <%}%>
+<%
+
+	if(organisation.getIdOrganisationType() == OrganisationType.TYPE_ACHETEUR_PUBLIC) {
+%>
+	<% TypeAcheteurPublic oTypeAcheteurPublic = new TypeAcheteurPublic(organisation.getIdTypeAcheteurPublic()); %>
+	<%= hbFormulaire.getHtmlTrSelect(organisation.getIdTypeAcheteurPublicLabel()+ "* :","iIdTypeAcheteurPublic",oTypeAcheteurPublic) %>
+	
+<%
+	}
+
+	if (organisation.getIdOrganisationType() == OrganisationType.TYPE_PUBLICATION)
+	{ 
+	%>
+	<%= hbFormulaire.getHtmlTrSelect(organisation.getIdOrganisationModelePDFLabel() + " :","iIdOrganisationModelePDF",
+			OrganisationModelePDF.getOrganisationModelePDF(organisation.getIdOrganisationModelePDF())) %>
+	<%
+	}
+
+	if (organisation.getIdOrganisationType() == OrganisationType.TYPE_CANDIDAT){
+		if (vCompetencesOrganisation.size()>0){
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:top"><%= sLabelNameOrganizationSkill %> :</td>
+		<td class="pave_cellule_droite">
+		<%
+		for (int i=0; i < vCompetencesOrganisation.size(); i++)
+		{
+		%>
+			<%=vCompetencesOrganisation.get(i).getName()%><br />
+		<%
+		}
+		%>		
+		</td>
+	</tr>
+<%
+		}
+	}
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

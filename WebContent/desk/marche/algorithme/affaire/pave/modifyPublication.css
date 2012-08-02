@@ -1,0 +1,48 @@
+table .dataGrid{
+	border-collapse:separate;
+	cellspacing:2px;
+	text-align:left;
+}
+.sectionFrame{
+	padding:15px;
+	background-color:#EFEDE1;
+	border-left:1px solid #FFF;
+	border-top:1px solid #FFF;
+	border-right:1px solid #E3DFCB;
+	border-bottom:1px solid #E3DFCB;
+	clear:both;
+}
+.hide {
+	display:none;
+}
+.center {
+	text-align:center;
+}
+.pointer{
+	cursor:pointer;
+}
+.dataGrid {
+	margin:0;
+	padding:0;
+	border-top:1px solid #FFF;
+	border-left:1px solid #FFF;
+	background-color: #EFEDE1;
+}
+.dataGrid .header {
+	background-color:#F8F4DC;
+}
+.dataGrid .header .cell{
+	font-weight:bold;
+	color: #666;
+	padding-bottom: 4px;
+}
+.dataGrid .line {
+	background-color:#FAFAFA;
+}
+.dataGrid .cell {
+	vertical-align:top;
+	padding: 2px 4px 2px 4px;
+}
+.dataGrid input {	
+	padding: 2px;
+}

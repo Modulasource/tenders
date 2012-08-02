@@ -1,0 +1,202 @@
+<%@page import="org.coin.bean.UserStatus"%>
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<script type="text/javascript">
+<!--
+
+<%
+boolean bLinkEmailAndLogin = Configuration.isEnabledMemory("individual.email.link.logon", true);
+%>
+//mail personne physique
+var champMailPPAuth = "sEmailAuth";
+var champMailPP = "sEmail";
+var divMailPP = "tr_infoEmail";
+function verifierMailPP() 
+{
+	if($(champMailPP).value != '<%= personne.getEmail() %>')
+	{
+		verifierChamp(champMailPP,champMailPPAuth,divMailPP,<%= 
+			CheckAjaxVerifField.PERSONNE_PHYSIQUE_EMAIL %>,"","desk");
+	}
+}
+<%
+if(userPersonne != null)
+{
+%>
+//user login
+var champLoginAuth = "sLoginAuth";
+var champLogin = "sLogin";
+var divLogin = "tr_infoLogin";
+function verifierLogin() 
+{
+	if($(champLogin).value != $("sLoginOld").value)
+	{
+		verifierChamp(champLogin,champLoginAuth,divLogin,<%= 
+			CheckAjaxVerifField.COIN_USER_LOGIN %>,"","desk");
+	}
+}
+	<%
+	if(userPersonne.getIdUserStatus() == UserStatus.VALIDE)
+	{
+	%>
+	//user mdp
+	var champMDPAuth = "ancienAuth";
+	var champMDP = "ancien";
+	var divMDP = "tr_infoMDP";
+	function verifierMDP() 
+	{
+		verifierChamp(champMDP,champMDPAuth,divMDP,<%= 
+			org.coin.servlet.CheckAjaxVerifField.COIN_USER_MDP %>,[{data:"iIdUser",value:<%= userPersonne.getIdUser() %>}],"desk");
+	}
+<%
+	}
+}
+%>
+
+function generateInitials(){
+	var obj = {};
+	obj.sPrenomNom = $("sPrenom").value+" "+$("sNom").value;
+	PersonnePhysique.generateInitialsJSON(Object.toJSON(obj), function(sInitials){
+		if (sInitials.length>0) {
+			$("sInitials").value = sInitials;
+		}
+	});
+	return false;
+}
+
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+
+	<%
+	if( iIdOnglet == Onglet.ONGLET_PERSONNE_PHYSIQUE_DONNEES_ADMINISTRATIVES)
+	{
+	%>
+		if (isNull($("iIdCivilite").value)
+		|| $("iIdCivilite").value <= 0)
+		{
+			sError += "<%= locMessage.getValue(42,"Vous devez saisir la civilité")%>.<br />";
+			bResult = false;
+		}
+		if (isNull($("sNom").value))
+		{
+			sError += "<%= locMessage.getValue(43,"Vous devez saisir un nom")%>.<br />";
+			bResult = false;
+		}
+		if (isNull($("sPrenom").value))
+		{
+			sError += "<%= locMessage.getValue(44,"Vous devez saisir un prénom")%>.<br />";
+			bResult = false;
+		}
+		<%
+		if(userPersonne != null)
+		{
+		%>
+		if (!isMail(document.getElementById("sEmail").value))
+		{
+			sError += "<%= locMessage.getValue(12,"La syntaxe de l'email n'est pas correcte")%>.<br />";
+			bResult = false;
+		}
+		else if($("sEmailAuth").value == 0
+		&& $("sEmail").value != '<%= personne.getEmail() %>')
+		{
+			sError += "<%= locMessage.getValue(2,"L'adresse email que vous avez saisie est déjà inscrite dans la base de données.\nVous ne pouvez pas poursuivre cette opération.")%><br />";
+			bResult = false;
+		}
+		<%
+		}
+		%>
+	<%
+	}
+	%>
+	<%
+	if(iIdOnglet == Onglet.ONGLET_PERSONNE_PHYSIQUE_COMPTE_UTILISATEUR)
+	{
+		if(userPersonne != null)
+		{
+			if(userPersonne.getIdUserStatus() == UserStatus.VALIDE)
+			{
+				%>
+	if(isNotNull($("newMdp2").value) || isNotNull($("newMdp1").value) || isNotNull($("ancien").value))
+	{
+		if (isNull($("newMdp2").value))
+		{
+			sError += "<%= locMessage.getValue(45,"Vous devez confirmer le nouveau mot de passe")%>.<br />";
+			bResult = false;
+		}
+		if (isNull($("newMdp1").value))
+		{
+			sError += "<%= locMessage.getValue(46,"Vous devez saisir le nouveau mot de passe")%>.<br />";
+			bResult = false;
+		}
+		if (!isNull($("newMdp2").value)
+		&& $("newMdp1").value != document.getElementById("newMdp2").value)
+		{
+			sError += "<%= locMessage.getValue(47,"la confirmation du mot de passe saisi est erronée")%>.<br />";
+			bResult = false;
+		}
+			
+				<%
+				// TODO : ajouter un contrôle plus propre pour if(sessionUserHabilitation.isSuperUser())
+				if(!sessionUserHabilitation.isSuperUser())
+				{
+					%>
+		if (isNull($("ancien").value))
+		{
+			sError += "<%= locMessage.getValue(48,"Vous devez saisir votre ancien mot de passe")%>.<br />";
+			bResult = false;
+		}
+		if (!isNull($("ancien").value)
+		&& $("ancienAuth").value == 0)
+		{
+			sError += "<%= locMessage.getValue(49,"Votre ancien mot de passe n'est pas correct")%>.<br />";
+			bResult = false;
+		}
+			<% }%>
+	}
+		<%	} %>
+		
+<% 
+		if(bLinkEmailAndLogin ){ 
+%>
+				
+			if (!isMail($("sLogin").value))
+			{
+				sError += "<%= locMessage.getValue(50,"Le login doit avoir une syntaxe d'email correcte")%>.<br />";
+				bResult = false;
+			}
+			else 
+			
+<% 
+			}
+%>              if($("sLoginAuth").value == 0
+			    && $("sLogin").value != '<%= userPersonne.getLogin() %>')
+				{
+					sError += "<%= locMessage.getValue(51,"Le login que vous avez saisi est déjà inscrit dans la base de données. Vous ne pouvez pas poursuivre cette opération.")%><br />";
+					bResult = false;
+				}
+		
+<%
+		}
+		else if(personne.getEmail() == null || personne.getEmail().equalsIgnoreCase(""))
+		{
+			%>
+			sError += "<%= locMessage.getValue(52,"Vous devez préciser l'adresse email de la personne - Onglet Données administratives")%>.<br />";
+			bResult = false;
+			<%
+		}
+	}
+	%>
+	
+	$("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}
+//-->
+</script>

@@ -1,0 +1,163 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		String sPavePiecesDemandeesTitre;
+	*
+	*/
+	
+	// BUG 712
+%>
+<%@page import="modula.candidature.EnveloppeAPieceJointeType"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.candidature.EnveloppeBPieceJointeType"%>
+<%@page import="java.util.Vector"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePiecesDemandeesTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<img alt="Avertissement PDF" src="<%= rootPath + "images/icones/warning.gif" %>"/>
+		</td>
+		<td class="pave_cellule_droite" style="color:#FF0000;">
+		Ces données ne seront pas reprises dans l'AVIS généré automatiquement au format PDF,
+		 mais s'afficheront sur l'interface de constitution des enveloppes électroniques 
+		 côté entreprise.</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Liste des pièces demandées pour l'enveloppe A :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.PIECES) %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<select name="<%=sFormPrefix %>piecesInitiales" size="5" style="width:650px">
+<%
+Vector listePiecesA = 
+			EnveloppeAPieceJointeType.getAllEnveloppeAPieceJointeType();
+	
+for (int i = 0; i < listePiecesA.size(); i++)
+{
+	EnveloppeAPieceJointeType piece = (EnveloppeAPieceJointeType)listePiecesA.get(i);
+%>
+	<option value="<%= piece.getId() %>">
+	<%= piece.getName() %></option>
+<%
+}
+%>
+			</select>
+		</td>    
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<a href="javascript:Deplacer(document.formulaire.<%=sFormPrefix 
+				%>piecesFinales,document.formulaire.<%=sFormPrefix %>piecesInitiales)" >
+				<img src="<%= rootPath +Icone.ICONE_HAUT%>"  alt="Enlever une pi&egrave;ce" />
+			</a>
+			<a href="javascript:Deplacer(document.formulaire.<%=sFormPrefix 
+				%>piecesInitiales,document.formulaire.<%=sFormPrefix %>piecesFinales)" >
+				<img src="<%= rootPath +Icone.ICONE_BAS%>"  alt="Ajouter une pi&agrave;ce" />
+			</a>  
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<select name="<%=sFormPrefix %>piecesFinales" size="5" style="width:650px">
+<%
+int[] listePiecesEnveloppeA = Outils.parserChaineVersEntier(marche.getListePiecesEnveloppeA(), "|");
+if (listePiecesEnveloppeA != null)
+{
+	for (int i = 0; i < listePiecesEnveloppeA.length; i++)
+	{
+		EnveloppeAPieceJointeType type = 
+			EnveloppeAPieceJointeType.getEnveloppeAPieceJointeType(listePiecesEnveloppeA[i]);
+%>
+				<option value="<%= type.getId() %>">
+				<%= type.getName() %></option>
+<%
+	}
+}
+%>
+			</select>
+			<input type="hidden" name="<%=sFormPrefix %>sListePiecesEnveloppeA" value="" />
+
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Commentaire :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sCommentairePiecesEnveloppeA" rows="4" style="width:500px"><%=((marche.getCommentairePiecesEnveloppeA()==null)||(marche.getCommentairePiecesEnveloppeA().equals(""))?"":marche.getCommentairePiecesEnveloppeA()) %></textarea> 
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Liste des pièces demandées pour l'enveloppe B :
+		</td>
+		<td class="pave_cellule_droite">&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+						<select name="<%=sFormPrefix %>pieces2Initiales" size="5" style="width:650px">
+<%
+Vector listePiecesB = 
+				EnveloppeBPieceJointeType.getAllEnveloppeBPieceJointeType();
+	
+for (int i = 0; i < listePiecesB.size(); i++)
+{
+	EnveloppeBPieceJointeType piece = (EnveloppeBPieceJointeType)listePiecesB.get(i);
+%>   
+			<option value="<%= piece.getId() %>">
+			<%= piece.getName() %></option>
+<%
+}
+%>
+						</select>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<a href="javascript:Deplacer(document.formulaire.<%=sFormPrefix 
+				%>pieces2Finales,document.formulaire.<%=sFormPrefix %>pieces2Initiales)" >
+				<img src="<%= rootPath +Icone.ICONE_HAUT%>"  alt="Enlever une pi&egrave;ce" />
+			</a>
+			<a href="javascript:Deplacer(document.formulaire.<%=sFormPrefix 
+				%>pieces2Initiales,document.formulaire.<%=sFormPrefix %>pieces2Finales)" >
+				<img src="<%= rootPath +Icone.ICONE_BAS%>"  alt="Ajouter une pi&agrave;ce" />
+			</a>  
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<select name="<%=sFormPrefix %>pieces2Finales" size="5" style="width:650px">
+<%
+int[] listePiecesEnveloppeB = Outils.parserChaineVersEntier(marche.getListePiecesEnveloppeB(), "|");
+if (listePiecesEnveloppeB != null)
+{
+	for (int i = 0; i < listePiecesEnveloppeB.length; i++)
+	{
+		EnveloppeBPieceJointeType type = 
+			EnveloppeBPieceJointeType.getEnveloppeBPieceJointeType(listePiecesEnveloppeB[i]);
+%>
+				<option value="<%= type.getId() %>">
+				<%= type.getName() %></option>
+<%
+	}
+}
+%>
+			</select>
+			<input type="hidden" name="<%=sFormPrefix %>sListePiecesEnveloppeB" value="" />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>		

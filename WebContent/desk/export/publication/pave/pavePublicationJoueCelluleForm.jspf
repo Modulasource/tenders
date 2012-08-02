@@ -1,0 +1,110 @@
+<%
+	String sPublicationTypeName = "inconnu !";
+	String sPublicationEtatName = "inconnu !";
+	String sPublicationFormat = "inconnu !";
+	String sFieldPublicationType = "";
+	String sFieldPublicationEtat = "";
+
+	try {
+		sPublicationTypeName = PublicationType.getPublicationTypeName(publi.getIdPublicationType());
+	}catch (Exception e){}
+	try {
+		sPublicationEtatName = PublicationEtat.getPublicationEtatName(publi.getIdPublicationEtat());
+	}catch (Exception e){}
+
+	boolean bEnableChoicePublicationType = false;
+	boolean bEnableChoicePublicationEtat = false;
+	
+	try {
+		if(publi.isFormatPapier()) sPublicationFormat = "Papier";
+	}catch (Exception e){}
+	
+	if(!bEnableChoicePublicationType )
+	{
+		sFieldPublicationType 
+			= "<input type='hidden' sName='iIdPublicationType' value='" 
+			+ publi.getIdPublicationType()  + "' />" + sPublicationTypeName;
+	}
+	else
+	{
+		sFieldPublicationType = "<select name='iIdPublicationType' >\n";
+		Vector vPublicationType = PublicationType.getAllPublicationType();
+
+		for(int i = 0; i < vPublicationType.size() ; i++)
+		{
+			String sSelected = "";
+			PublicationType publiType = (PublicationType)vPublicationType.get(i);
+			if(publi.getIdPublicationType() == publiType.getId())
+			{
+				sSelected = " selected ";
+			}
+			sFieldPublicationType +=
+				"<option value='" + publiType.getId() + "' " + sSelected + " >" 
+				+ publiType.getName() + "</option>\n";
+		}
+		
+		sFieldPublicationType += "</select>\n";
+	}
+
+	if(!bEnableChoicePublicationEtat)
+	{
+		sFieldPublicationEtat
+			= "<input type='hidden' sName='iIdPublicationEtat' value='" 
+			+ publi.getIdPublicationEtat()  + "' />" + sPublicationEtatName;
+	}
+	else
+	{
+		sFieldPublicationEtat = "<select name='iIdPublicationEtat' >\n";
+		Vector vPublicationEtat = PublicationEtat.getAllPublicationEtat();
+
+		for(int i = 0; i < vPublicationEtat.size() ; i++)
+		{
+			String sSelected = "";
+			PublicationEtat publiEtat = (PublicationEtat)vPublicationEtat.get(i);
+			if(publi.getIdPublicationEtat() == publiEtat.getId())
+			{
+				sSelected = " selected ";
+			}
+			sFieldPublicationEtat +=
+				"<option value='" + publiEtat.getId() + "' " + sSelected + " >" 
+				+ publiEtat.getName() + "</option>\n";
+		}
+		
+		sFieldPublicationEtat += "</select>\n";
+	}
+
+%>	
+
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="org.coin.util.CalendarUtil"%><tr>
+	<td class="pave_cellule_gauche">Publication de l'AAPC au JOUE :</td>
+	<td class="pave_cellule_droite">
+		<%= sFieldPublicationType %>
+		<b>Etat :</b> <%= sFieldPublicationEtat %>
+		
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Type de journal : </td>
+	<td class="pave_cellule_droite">
+		<b>Parution : </b><%= publi.getNumeroParution() %>
+		<b>Annonce : </b><%= publi.getNumeroAnnonce() %>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date d'envoi : </td>
+	<td class="pave_cellule_droite">
+		<%= CalendarUtil.getDateFormattee(publi.getDateEnvoi()) %>
+		<i>(Date d'envoi effective : <%= CalendarUtil.getDateFormattee(publi.getDateEnvoiEffective()) %>)</i>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date de publication : </td>
+	<td class="pave_cellule_droite"><%= CalendarUtil.getDateFormattee(publi.getDatePublication()) %> <b>Format :</b> <%= sPublicationFormat %></td>
+</tr>
+<tr>
+	<td colspan="2">&nbsp;</td>
+</tr>
+		
+		

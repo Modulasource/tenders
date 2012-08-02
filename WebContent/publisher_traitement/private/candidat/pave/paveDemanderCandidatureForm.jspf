@@ -1,0 +1,45 @@
+<%@ include file="../../../../include/new_style/headerPublisher.jspf" %>
+
+<%@ page import="modula.marche.*" %>
+<%@ include file="../../../../publisher_traitement/public/include/beanCandidat.jspf" %> 
+<%  %>
+</head>
+<%
+	int iIdMarche = Integer.parseInt(request.getParameter("iIdAffaire"));
+	Marche marche = Marche.getMarche(iIdMarche);
+	
+	String sTitle = "Se porter candidat";
+    String sMessTitle = "";
+    String sMess ="En vous \"portant candidat\" vous devenez la seule personne de votre"
+        + " organisation à pouvoir télécharger le DCE depuis la plate-forme et à candidater pour ce marché.";
+    String sUrlIcone = Icone.ICONE_WARNING;
+
+%>
+<body>
+<%@ include file="../../../public/include/header.jspf" %>
+
+<form action="<%= response.encodeURL(rootPath+"publisher_traitement/private/candidat/demanderCandidature.jsp")
+    %>" method="post" name="formulaire" >
+    <input type="hidden" name="iIdAffaire" value="<%= marche.getIdMarche() %>" />
+
+<div style="padding:20px;text-align:center">
+    <div class="post" >
+        <div class="post-title" ><%= sTitle %></div>
+        <%@ include file="../../../../include/message.jspf" %>
+    </div>
+</div>
+        
+
+<div style="text-align:center">
+    <button type="button" name="non" 
+        onclick="Redirect('<%= response.encodeURL("indexCandidat.jsp") 
+        %>')" >Retour</button>
+    <button type="submit" name="submit" >Valider</button>
+</div>
+
+</form>
+
+<%@include file="../../../public/include/footer.jspf"%>
+</body>
+<%@page import="modula.graphic.Icone"%>
+</html>

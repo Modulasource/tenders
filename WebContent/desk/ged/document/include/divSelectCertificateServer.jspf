@@ -1,0 +1,99 @@
+<%@page import="org.coin.bean.pki.certificate.PkiCertificate"%>
+<%@page import="java.security.cert.X509Certificate"%>
+<%@page import="org.coin.security.CertificateUtil"%>
+
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.security.modula.ModulaAuth"%>
+<%@page import="org.coin.util.Outils"%><div id="divCertif">
+    <div style="margin-top:20px;padding:4px;text-transform:uppercase;font-weight:bold;color: rgb(51, 102, 204);"
+        >Choix du certificat 
+    </div>
+    
+    <div class="round greyBar" corner="6" border="1">
+      <div style="padding:5px">
+         <table class="formLayout">
+            <tr>
+              <td class="label" style="width: 120px">
+                   Serveur
+              </td>
+              <td class="value">
+
+<%
+
+    for(int i=0; i < vPkiCertificate.size() ;i++)
+    {
+        PkiCertificate certificate = vPkiCertificate.get(i);
+
+        certificate.loadCertificateFile();
+        X509Certificate certif = null;
+        try{certif = certificate.getCertificate();}
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(certif != null) {
+        	
+            ModulaAuth auth 
+            = ModulaAuth.newInstance(
+                    certif,
+                true);
+        
+            
+	        boolean bAuth = false;
+	        
+	        if(!sessionUserHabilitation.isSuperUser())
+	        {
+		        bAuth = auth.authenticate(ModulaAuth.AUTHENTICATE_LEVEL_MEDIUM);
+	        } else {
+	        	//bAuth = true;
+	        	bAuth = auth.authenticate(ModulaAuth.AUTHENTICATE_LEVEL_LOW);
+	        }
+	        
+	        String sCertificateException = ModulaAuth.getExceptionMessage(auth);
+	        String sIconShied = "";
+	        String sExceptionDivStyle = "";
+	        String sCertificateDisabled = "";
+	        
+	        if(bAuth) {
+	            sIconShied = rootPath + "images/icons/36x36/shield_ok.png";
+	            sExceptionDivStyle = "display:none;";
+	        } else {
+	            sIconShied = rootPath + "images/icons/36x36/shield_ko.png";
+	            sCertificateDisabled = "disabled='disabled'";
+	        }
+%>
+      <div >
+        <div style='float:left'>
+            <input 
+                <%= sCertificateDisabled %>
+                id="lIdPkiCertificate"
+                type="radio" 
+                name="lIdPkiCertificate" 
+                class="useragent"
+                value="<%= certificate.getId() %>"
+            /> 
+         </div>
+        <div style='margin-left:10px;float:left'>
+                <b>délivré à</b> <%=  CertificateUtil.getCertificateSubjectInfoCN(certif) %>
+                     (<%=  CertificateUtil.getCertificateSubjectInfoEmailAddress(certif)  %>)<br/>
+                <b>délivré par</b> <%= CertificateUtil.getCertificateIssuerInfoCN(certif) %><br/>
+                <b>expire le</b> <%= CalendarUtil.getFormatDateHeureStd(certif.getNotAfter()  ) %><br/>
+        </div>
+        <div style="cursor: pointer; margin-left: 10px; float: left;"><img 
+                src="<%= sIconShied %>"></div>
+        <div style='<%= sExceptionDivStyle %>min-height:36px;height:auto !important;height:36px;padding:5px;vertical-align:middle;color:#FFF;background:#EE5555;border:1px solid #CC3333;margin-left:10px;float:left'>
+        <%= Outils.getTextToHtml(sCertificateException) %>
+        </div>
+        <div style='clear:both'></div><br/>
+    </div>
+<%
+        }
+    }
+%>
+
+              </td>
+            </tr>
+          </table> 
+       </div>
+     </div>
+</div>

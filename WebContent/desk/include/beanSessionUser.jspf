@@ -1,0 +1,4 @@
+<jsp:useBean id="sessionUser" scope="session" class="org.coin.bean.User" />
+<jsp:useBean id="sessionUserHabilitation" scope="session" class="org.coin.bean.UserHabilitation" />
+<jsp:useBean id="sessionCommissionMembreHabilitation" scope="session" class="modula.commission.CommissionMembreHabilitation" />
+<jsp:useBean id="sessionLanguage" scope="session" class="org.coin.localization.Language" />

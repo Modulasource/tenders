@@ -1,0 +1,99 @@
+<%@ include file="/include/headerXML.jspf" %>
+<%@page import="modula.applet.*"%>
+<%@ page import="modula.marche.*,modula.configuration.*,modula.applet.util.*,org.coin.util.*,java.net.*,org.coin.fr.bean.*,modula.candidature.*" %>
+<%@ include file="/publisher_traitement/public/include/beanSessionUser.jspf" %>
+<%@ include file="/publisher_traitement/public/include/beanCandidat.jspf" %> 
+<% String sTitle ="Compléter le dossier demandé"; %>
+<%@ include file="/include/headerPublisher.jspf" %>
+<%
+
+	URL oURLImage = HttpUtil.getUrlWithProtocolAndPort(
+			rootPath+"images/icones/",
+			request); 
+	URL oURLServlet = HttpUtil.getUrlWithProtocolAndPort(
+				rootPath,
+				request);
+	
+	String sURL[] = Outils.parserChaineVersString(response.encodeURL(oURLServlet.toString()),";");
+	String sSessionId = "";
+	if(Outils.parserChaineVersString(response.encodeURL(oURLServlet.toString()),";") != null) sSessionId = ";"+sURL[1];
+	DemandeInfoComplementaire demande = DemandeInfoComplementaire.getDemandeInfoComplementaire(Integer.parseInt(request.getParameter("iIdDemandeInfoComp")));
+	int iIdMarche = Integer.parseInt(request.getParameter("iIdMarche"));
+	
+	Marche marche = Marche.getMarche(iIdMarche);
+%>
+<script type="text/javascript" src="<%= rootPath %>include/redirection.js"></script>
+</head>
+<body>
+<div class="titre_page"><%=sTitle %></div>
+<div style="clear:both"></div>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Dates de la période de remise</td>
+	</tr>
+	<tr>
+		<td>
+			<table >
+				<tr><td colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td class="pave_cellule_gauche" style="text-align:left">Date de début de remise :</td>
+					<td class="pave_cellule_droite" style="text-align:right">
+					<%= CalendarUtil.getDateFormattee(demande.getDateDebutRemise()) %></td>
+				</tr>
+
+				<tr>
+					<td class="pave_cellule_gauche" style="text-align:left">Date de fin de remise :</td>
+					<td class="pave_cellule_droite" style="text-align:right">
+					<%= CalendarUtil.getDateFormattee(demande.getDateFinRemise()) %></td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche" style="text-align:left">Informations complémentaires demandées :</td>
+					<td class="pave_cellule_droite" style="text-align:right">
+					<%= demande.getDemandeInfo() %></td>
+				</tr>
+				<tr>
+					<td colspan="2" style="text-align:center">
+
+<%
+    String sAppletTypeEnveloppe = DemandeInfoComplementaire.TYPE_ENVELOPPE_A;
+    Timestamp tsAppletDateLimiteEnvoi = demande.getDateFinRemise();
+    // ptite bidouille :)
+    marche.setTimingDoubleEnvoi(0);
+    // AppletConstant.APPLET_DEMANDE_INFOS_COMPLEMENTAIRES >  plus utilisé
+    
+    // <param name="iIdDemandeInfoComp" value=" demande.getIdDemandeInfoComp() 
+
+    request.setAttribute("marche", marche);
+    request.setAttribute("candidat", candidat);
+    request.setAttribute("sTitle", sTitle);
+    request.setAttribute("sAppletTypeEnveloppe", sAppletTypeEnveloppe);
+    request.setAttribute("sAppletAllLotSelectionne", sAppletAllLotSelectionne);
+    request.setAttribute("eEnveloppe", eEnveloppe );
+    request.setAttribute("tsAppletDateLimiteEnvoi", tsAppletDateLimiteEnvoi);
+    request.setAttribute("sessionUserHabilitation", sessionUserHabilitation);
+
+	
+%>
+<jsp:include page="/publisher_traitement/private/candidat/pave/paveAppletCachetage.jsp" />
+
+					</td>
+				</tr>
+				<tr><td colspan="2">&nbsp;</td></tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<br />
+<div style="text-align:center;width:100%">
+<form method="post" name="form" action="<%= 
+	response.encodeURL(rootPath+"publisher_traitement/private/candidat/completerEnveloppe.jsp")%>">
+	<input type="hidden" name="iIdDemandeInfoComp" value="<%= demande.getIdDemandeInfoComp() %>" />
+	<button type="submit" name="submit" style="color:#CC0000" 
+		>FERMER LA DEMANDE DE REMISE</button>
+</form>
+</div>
+<%@include file="../../../public/include/footer.jspf"%>
+</body>
+<%@page import="org.coin.bean.conf.Configuration"%>
+
+<%@page import="java.sql.Timestamp"%></html>

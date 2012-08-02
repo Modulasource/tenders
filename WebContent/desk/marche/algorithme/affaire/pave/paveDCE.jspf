@@ -1,0 +1,195 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		int nbPieces;
+	*		boolean bSuppression;
+	*		MarchePieceJointe[] pieces;
+	*
+	*/
+%>
+<%@page import="mt.modula.servlet.DownloadZipAffaireDceServlet"%>
+<div align="center">
+    Fichier zip contenant toutes pièces du DCE
+    <img alt="Fichier zip contenant toutes pièces du DCE"
+        style="cursor: pointer"
+        src="<%= 
+        rootPath %>images/icons/32x32/zip.png"
+        onclick="javascript:OuvrirPopup('<%= 
+        response.encodeURL(rootPath + "desk/DownloadZipAffaireDceServlet?"
+        + DownloadZipAffaireDceServlet
+            .getSecureTransactionString(marche.getIdMarche(), request)) 
+            %>',400,200,'menubar=no,scrollbars=yes,statusbar=no');" />
+</div>
+<%
+boolean bIsDCEDisponible = marche.isDCEDisponible(false);
+boolean bExistDCE = false;
+
+for(int j=-1;j<vLots.size();j++)
+{
+	int nbPieces = 0;
+	MarchePieceJointe[] pieces = null;
+	String sTitrePaveDCE = "Liste des pièces du DCE ";
+	
+	if(j < 0)
+	{
+		pieces = MarchePieceJointe.getAllMarchePieceJointeFromMarcheAndLot(marche.getIdMarche(),0);
+		if(vLots.size()>1)
+			sTitrePaveDCE += "communes à plusieurs lots";
+	}
+	else
+	{
+		MarcheLot lot = vLots.get(j);
+		pieces = MarchePieceJointe.getAllMarchePieceJointeFromMarcheAndLot(marche.getIdMarche(),lot.getIdMarcheLot());
+		sTitrePaveDCE += "pour le lot n°"+lot.getNumero();
+	}
+
+	if (pieces != null && pieces.length > 0)
+	{
+		bExistDCE = true;
+		nbPieces = pieces.length;
+	%>
+<%@page import="modula.marche.MarchePieceJointe"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="modula.Validite"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.marche.MarchePieceJointeType"%>
+<%@page import="modula.marche.MarcheConstant"%>
+<%@page import="modula.servlet.DownloadPieceMarche"%>
+<br/>
+	<table class="pave" >
+		<tr>
+			<td class="pave_titre_gauche"><%= sTitrePaveDCE %></td>
+			<td class="pave_titre_droite" style="font-weight:bold">
+				<%= nbPieces %> <%= (nbPieces > 1 ? "pièces" : "pièce")%>
+			</td>
+		</tr>
+		<tr>
+		<td colspan="2">
+			<table class="liste" summary="none">
+				<tr>
+					<th style="width:35%">Nom du document</th>
+					<th style="width:30%">Type</th>
+					<th style="width:30%">Date de création</th>
+					<%
+					if (bSuppression)
+					{
+					%>
+					<th style="width:5%"></th>
+					<%
+					}
+					%>
+				</tr>
+				<%
+				for (int i = 0; i < pieces.length; i++)
+				{
+					boolean bisSupprimeeVirtuellement = pieces[i].isLienActif();
+					boolean bIsPJCorrupted = MarchePieceJointe.contains(pieces[i],vPJCorrupted);
+					String url = response.encodeURL(rootPath 
+							 + "desk/DownloadPieceMarcheDesk?"
+							 + DownloadPieceMarche.getSecureTransactionString(
+	                                    marche.getIdMarche(), 
+	                                    pieces[i].getIdMarchePieceJointe(),
+	                                    request));
+					String sStyleTRPJ = "";
+					if(bIsPJCorrupted)
+						sStyleTRPJ = "background-color:#FAA";
+				%>
+				<tr style="<%= sStyleTRPJ %>">
+					<td>
+						<a href="<%= url %>">
+							<strong><%= pieces[i].getNomPieceJointe() %></strong>
+						</a><br />
+<%
+						/* Test sur date de création de la pièce jointe (après la mise en ligne du DCE) */
+						Vector<Validite> vValiditeOffres = Validite.getAllValiditeEnveloppeBFromAffaire(marche.getIdMarche());
+						Validite oFirstValiditeOffre = null;
+						Timestamp tsDateDebutOffre = null;
+						if(vValiditeOffres != null)
+						{
+							if(vValiditeOffres.size() >= 1)
+							{
+								oFirstValiditeOffre = vValiditeOffres.firstElement();
+								tsDateDebutOffre = oFirstValiditeOffre.getDateDebut();
+							}
+						}
+						
+						if(bIsPJCorrupted){
+							%>
+							<span class="mention">
+                            <i>Pièce corrompue le <%= CalendarUtil.getDateFormattee(pieces[i].getDateModif()) %></i><br/>
+                            </span>
+							<%
+						}
+				
+						if(!bisSupprimeeVirtuellement){ //si le lien n'est pas actif la pièce a été supprimée virtuellement
+%>
+							<span class="mention" style="color:#F00">
+							<i>Pièce supprimée le <%= CalendarUtil.getDateFormattee(pieces[i].getDateModif()) %></i>
+							</span>
+<%
+						}
+						else 
+						{
+							// FLON : à voir si cela est correct avec Juju et Will
+							try{	
+								if(bisSupprimeeVirtuellement 
+									&& (pieces[i].getDateModif().after(tsDateDebutOffre) 
+									|| pieces[i].getDateCreation().after(tsDateDebutOffre)))
+								{
+	%>
+							<span class="mention" style="color:#F00">
+							<i>Pièce ajoutée le <%= CalendarUtil.getDateFormattee(pieces[i].getDateModif()) %></i>
+							</span>
+	<%
+								}
+							} catch(Exception e)
+							{
+							
+							}
+						}
+%>
+					</td>
+					<td>
+						<%= MarchePieceJointeType.getMarchePieceJointeTypeNameMemory(pieces[i].getIdMarchePieceJointeType()) %>
+					</td>
+					<td>
+						<%= CalendarUtil.getDateFormattee(pieces[i].getDateCreation()) %>
+					</td>
+<%
+		if (bSuppression && bisSupprimeeVirtuellement || bIsPJCorrupted)
+		{
+			String sUrlRedirect = "supprimerPieceDCE.jsp"
+			    +"?iIdPiece=" + pieces[i].getIdMarchePieceJointe()
+			    + "&iIdAffaire=" + marche.getId();
+			if (bIsDCEDisponible && !bIsPJCorrupted) sUrlRedirect+="&amp;sAction=virtualRemove";
+			else sUrlRedirect+="&sAction=remove";
+%>
+					<td>
+						<a href="<%= response.encodeURL(rootPath + "desk/marche/algorithme/affaire/"+sUrlRedirect) %>"
+						onclick="javascript:if(confirm('Etes-vous sûr de vouloir supprimer cette pièce?')){return true;}else{return false;}" />
+							<img src="<%= rootPath+MarcheConstant.ICO_DEL_PIECE_JOINTE%>" alt="Supprimer" title="Supprimer"  />
+						</a>
+					</td>
+<%
+		}
+%>
+				</tr>
+<%
+	}
+%>
+			</table>
+		</td>
+	</tr>
+</table>
+<%
+}
+}
+if(!bExistDCE)
+{
+%>
+<p class="mention">Vous n'avez actuellement aucune pièce dans votre DCE.</p>
+<%
+}
+%>

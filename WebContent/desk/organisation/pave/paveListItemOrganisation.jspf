@@ -1,0 +1,28 @@
+<%@page import="org.coin.util.SearchEngine"%>
+<tr class="line<%=j%>" 
+onmouseover="className='liste_over'" 
+            onmouseout="className='line<%=j%>'"
+            style="cursor:pointer;"
+            onclick="Redirect('<%= response.encodeURL("afficherOrganisation.jsp?iIdOrganisation=" 
+            		+ organisation.getIdOrganisation()) %>')"> 
+	<td class="cell" style="width:30%"><%= organisation.getRaisonSociale() %></td>
+	<td class="cell" style="width:30%"><%= (!organisation.getMailOrganisation().equals(""))
+		?organisation.getMailOrganisation():SearchEngine.getLocalizedLabel(
+					SearchEngine.LABEL_UNDEFINED,sessionLanguage.getId()) %></td>
+	<td class="cell" style="width:25%">
+		<%= (organisation.getSiretDecomposition())[0] %> 
+		<%= (organisation.getSiretDecomposition())[1] %> 
+		<%= (organisation.getSiretDecomposition())[2] %> 
+		<%= (organisation.getSiretDecomposition())[3] %>
+	</td>
+	<td class="cell" style="width:25%"><%= (!organisation.getTelephone().equals(""))
+		?organisation.getTelephone():SearchEngine.getLocalizedLabel(
+				SearchEngine.LABEL_UNDEFINED,sessionLanguage.getId()) %></td>
+    <td class="cell" style="width:25%"><%= adresseOrganisation.getIdPays() %></td>
+	<td class="cell" style="width:5%"><%= organisation.getReferenceExterne() %></td>
+	<td class="cell" style="text-align:right;width:5%">
+		<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE%>" alt="<%= 
+			SearchEngine.getLocalizedLabel(SearchEngine.LABEL_DISPLAY,sessionLanguage.getId()) 
+			%>" title="<%= SearchEngine.getLocalizedLabel(SearchEngine.LABEL_DISPLAY,sessionLanguage.getId()) %>"/>
+	</td>
+</tr>

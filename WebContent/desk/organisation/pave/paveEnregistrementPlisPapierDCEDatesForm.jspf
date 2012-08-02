@@ -1,0 +1,17 @@
+<table  id="DCEDatesForm">
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			<%= sTitreRetraitDCE %>
+		</td>
+		<td class="pave_cellule_droite">
+			<strong>Date:</strong>&nbsp;
+			<input type="text" name="<%= sFormPrefix %>tsDateRetraitDCE" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(tsDateRetraitDCE) %>" />
+			
+			<strong>Heure:</strong>&nbsp;
+			<input type="text" name="<%=sFormPrefix %>tsHeureRetraitDCE" size="5" maxlength="5" 
+			value="<%=  CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateRetraitDCE)%>" />&nbsp;
+		</td> 
+	</tr>
+</table>

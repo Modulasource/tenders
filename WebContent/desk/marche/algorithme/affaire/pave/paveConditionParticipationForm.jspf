@@ -1,0 +1,168 @@
+<%
+	MarcheConditionParticipation mcp = null;
+	try {
+		mcp =  MarcheConditionParticipation.getMarcheConditionParticipationFromIdMarche(marche.getId());
+	}catch (Exception e ) {
+		mcp = new MarcheConditionParticipation();
+	}
+
+%>
+<%@page import="org.coin.bean.question.AnswerGroup"%>
+<%@page import="org.coin.bean.question.Answer"%>
+<%@page import="modula.marche.MarcheConditionParticipation"%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+
+<%@page import="modula.graphic.CSS"%><table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Conditions de participation</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Critères de sélection des candidatures :
+		</td>
+		<td class="pave_cellule_droite">
+			<table >
+				<tr>
+					<td><textarea name="<%=sFormPrefix %>sCriteresCandidature" id="<%=sFormPrefix 
+					%>sCriteresCandidature" cols="100" rows="6"><%= marche.getCriteresCandidature()
+					%></textarea></td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdCriteresCandidature",rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Situation juridique - références requises :<br />
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.SITUATION_JURIDIQUE) %>
+		</td>
+		<td class="pave_cellule_droite">
+			<table >
+				<tr>
+					<td><textarea name="<%=sFormPrefix %>sReferenceJuridique" id="<%=sFormPrefix %>sReferenceJuridique" cols="100" rows="6"><%= marche.getReferenceJuridique() %></textarea></td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdReferenceJuridique",rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Capacité économique et financière<br />
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CAPACITE_ECO) %>
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td>
+									Références requises : <br/>
+									<textarea name="<%=sFormPrefix %>sReferenceEco" id="<%=sFormPrefix 
+									%>sReferenceEco" cols="45" rows="6"><%= marche.getReferenceEco().trim() 
+									%></textarea>
+								</td>
+								<td>
+									Niveau(x) spécifique(s) minimal(aux) exigé(s)<br/>
+									<textarea rows="6" cols="45" name="sCapaciteEcoFinNiveauMin" ><%= 
+									mcp.getCapaciteEcoFinNiveauMin().trim()  %></textarea>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdReferenceEco",
+							rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Référence professionnelle et capacité technique<br />
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CAPACITE_TECH) %>
+		</td>
+		<td class="pave_cellule_droite">
+			<table >
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td>
+									Références requises : <br/>
+									<textarea name="<%=sFormPrefix %>sReferenceTech" id="<%=sFormPrefix 
+									%>sReferenceTech" cols="45" rows="6"><%= marche.getReferenceTech() 
+									%></textarea>
+								</td>
+								<td>
+									Niveau(x) spécifique(s) minimal(aux) exigé(s)<br/>
+									<textarea rows="6" cols="45" name="sCapaciteTechNiveauMin" ><%= 
+									mcp.getCapaciteTechNiveauMin() %></textarea>
+								</td>
+							</tr>
+						</table>
+					</td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdReferenceTech",rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<% 
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE)){
+	%>		
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserve", 
+			"lIdQaMarcheReserve",
+			mcp.getIdQaMarcheReserve(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_SELECT) %>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserveAtelierProtege", 
+			"lIdQaReserveAtelierProtege",
+			mcp.getIdQaReserveAtelierProtege(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_CHECKBOX) %>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserveProgrammeEmploiProtege", 
+			"lIdQaProgrammeEmploiProtege",
+			mcp.getIdQaProgrammeEmploiProtege(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_CHECKBOX) %>
+	
+	<tr><td colspan="2"><strong>CONDITIONS PROPRES AUX MARCHES DE SERVICES OU DE CONCOURS</strong></td></tr>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserveProfessionParticuliere", 
+			"lIdQaReserveProfParticuliere",
+			mcp.getIdQaReserveProfParticuliere(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_SELECT) %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Dans l'affirmative, indiquez les références des dispositions législatives, réglementaires ou administratives 
+		applicables ou bien en cas de concours quelle profession :
+	</td>
+		<td class="pave_cellule_droite">
+		<textarea rows="3" cols="60" name="sReserveProfParticuliereReference" ><%= 
+			mcp.getReserveProfParticuliereReference() %></textarea>
+		</td>
+	</tr>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationIndiquerNomEtQualification", 
+			"lIdQaIndiquerNomEtQualification",
+			mcp.getIdQaIndiquerNomEtQualification(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_SELECT) %>
+
+	<%} %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

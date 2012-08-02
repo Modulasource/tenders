@@ -1,0 +1,61 @@
+<%@page import="org.coin.autoform.component.AutoFormCptBlock"%>
+<%@page import="org.coin.bean.boamp.BoampMotCleItem"%>
+<%@page import="org.coin.bean.boamp.BoampMotCle"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.autoform.component.AutoFormCptDoubleMultiSelect"%>
+<%
+AutoFormCptBlock afBlockMotCle = new AutoFormCptBlock("Liste des mots Clefs pour l'indexation au BOAMP", "block_motcle");
+
+AutoFormCptLabel label = new AutoFormCptLabel("Cochez les mots clefs associés à l'objet du marché pour l'indéxation de l'annonce.","");
+label.afLabel.setClassName("mention");
+afBlockMotCle.addComponent(label);
+
+AutoFormCptInputCheckbox cbx = new AutoFormCptInputCheckbox("Restreindre la liste aux mots en relation avec les classifications de produits séléctionnées","bRestrictCPF","",true);
+cbx.setOnClick("javascript:updateMotCleListFromCPF()");
+afBlockMotCle.addComponent(cbx);
+
+AutoFormCptDoubleMultiSelect afMotCle = new AutoFormCptDoubleMultiSelect(
+		"Liste des mots Clefs", "lIdBoampMotCle", true, rootPath);
+afMotCle.setEnabledSearch(true);
+
+Vector<BoampMotCle> vMots = BoampMotCle.getAllStaticMemory();
+Vector<BoampMotCleItem> vMotsMarche = BoampMotCleItem.getAllFromTypeAndReferenceObjet(ObjectType.AFFAIRE,marche.getIdMarche());
+afMotCle.setBeans((Vector)BoampMotCleItem.toBoampMotCleVector(vMotsMarche),(Vector)vMots);
+afBlockMotCle.addComponent(afMotCle);
+%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="org.coin.autoform.component.AutoFormCptInputCheckbox"%>
+<%@page import="org.coin.autoform.component.AutoFormCptLabel"%>
+<script type="text/javascript" >
+<%= afMotCle.getAjaxCode()  %>
+
+function updateMotCleListFromCPF(){
+	var bRestrict = $('bRestrictCPF').checked;
+	if(bRestrict){
+		var listCPF = $('iIdCompetenceSelection');
+		mt.html.setSuperCombo(listCPF);
+		var arr = [];
+		for (var z=0; z<listCPF.options.length; z++) {
+			arr.push(listCPF.options[z].value);
+		}
+	
+		BoampCPFMotCle.getJSONArrayMotCleFromCPFList(
+						Object.toJSON(arr),
+						function (s) {
+							<%= afMotCle.getId() %>_updateCompleteList(s.evalJSON());
+						});
+	}else{
+		<%= afMotCle.getId() %>_updateCompleteList();
+	}
+}
+Event.observe(window, 'load', function(){
+	updateMotCleListFromCPF();
+	
+	$('<%= afMotCle.afSearch.getId() %>').onkeyup = function(){
+		updateMotCleListFromCPF();
+	}
+
+});
+</script>
+<%= afBlockMotCle.getHTML() %>

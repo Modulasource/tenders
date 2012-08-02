@@ -1,0 +1,447 @@
+<%@page import="org.coin.util.HttpUtil"%>
+<%@page import="org.coin.bean.geo.Town"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="org.coin.db.ConnectionManager"%>
+<%@page import="org.coin.bean.geo.util.GeoCenter"%>
+<% 
+  if (true || bAfficheSearchEngine){ 
+	    String sDisplaySearchEngineMessage= " style='display:none;' ";
+	    String sDisplaySearchEngineForm = " ";
+	    
+	    if(!bDisplaySearchEngine || !"".equals( filtre) )
+	    {
+	    	 sDisplaySearchEngineForm = " style='display:none;' ";
+	         sDisplaySearchEngineMessage = " ";
+	    }
+%>
+
+<%@page import="org.coin.bean.geo.util.GeoMap"%><div id="searchEngineMessage" <%= sDisplaySearchEngineMessage %>  
+    onclick="javascript:showSearchEnginForm()" 
+    style="cursor:pointer;" >
+    <div class="sb__" style="text-align:left;padding:3px;font-family:Tahoma,Arial;font-size:11px;width:400px;margin:0 auto;border: 1px solid #AFCCFD">
+        <div style="background-color:#FAFAFA">
+            <div style="padding: 6px 4px 4px 4px;text-align:center;background-color:#EFF5FF;">
+			    Modifier votre recherche
+            </div>
+        </div>
+    </div>    
+</div>
+        
+<script type="text/javascript">
+<!--
+
+function showSearchEnginForm()
+{
+    Element.show("searchEngineForm");
+    Element.hide("searchEngineMessage");
+
+    try {
+        var iframeHeight = Element.getHeight(document.body);
+        top.resizeIframe(iframeHeight);
+    } catch(e){}
+}
+
+//-->
+</script>
+<div id="searchEngineForm" <%= sDisplaySearchEngineForm %>  >
+	<jsp:include page="/publisher_traitement/public/annonce/paveAfficherSearchEngineAnnonces.jsp" flush="false">
+	    <jsp:param name="sType_avis" value="<%= sType_avis %>" />
+	    <jsp:param name="sFormPrefix" value="<%= sFormPrefix %>" />
+	    <jsp:param name="sIdMarcheType" value="<%= sIdMarcheType %>" />
+	    <jsp:param name="filtreType" value="<%= filtreType %>" />
+	    <jsp:param name="filtre" value="<%= filtre %>" />
+        <jsp:param name="iIdDepartement" value="<%= sIdDepartement %>" />
+        <jsp:param name="sIsAnnonceDemat" value="<%= sIsAnnonceDemat %>" />
+        <jsp:param name="sIsAnnonceDce" value="<%= sIsAnnonceDce %>" />
+        <jsp:param name="sIsOnlyUnreadedAnnonceChecked" value="<%= sIsOnlyUnreadedAnnonceChecked %>" />
+        <jsp:param name="iIdGroupCompetence" value="<%= sIdGroupCompetence %>" />
+        <jsp:param name="sSEOperatorValue" value="<%= sSEOperatorValue %>" />
+        <jsp:param name="se_iMaxElementPerPage" value="<%= iMAXP %>" />
+        <jsp:param name="se_bDisplayMapAnnounce" value="<%= bDisplayMapAnnounce %>" />
+	</jsp:include>
+</div>
+<%
+	if(sessionUserHabilitation != null && sessionUserHabilitation.isSuperUser())
+	{
+%>
+<button type="button" onclick="Element.toggle('sqlQuery');">Afficher SQL</button>
+<div id="sqlQuery" style="display: none;border: 1px solid #AAA;margin: 2px">
+<%= Outils.getTextToHtml(sFullQuerySql ) %>
+</div>
+<%
+	}
+%>
+
+<% 
+
+	} // if (true || bAfficheSearchEngine){ 
+
+if(bLaunchSearch)
+{
+	  // pour ne pas afficher les résultats
+%>
+
+<script type="text/javascript">
+function selectAllAnnonce()
+{
+    $$(".classCheckBoxSelectIdMarche").each(function(item, index){
+        item.checked = true;
+    });
+}
+
+function unselectAllAnnonce()
+{
+    $$(".classCheckBoxSelectIdMarche").each(function(item, index){
+        item.checked = false;
+    });
+}
+
+
+function selectAnnonce(iIdMarche)
+{
+    $$(".classCheckBoxSelectIdMarche").each(function(item, index){
+        if(item.value == iIdMarche)
+            item.checked = true;
+    });
+}
+
+function setAllAnnonceInForm(
+		sInputName,
+		bControlChecked)
+{
+	var sListAnnonce = "";
+    $$(".classCheckBoxSelectIdMarche").each(function(item, index){
+        if(bControlChecked)
+        {
+	    	if(item.checked)
+	        {
+	        	sListAnnonce += item.value + ",";
+	        }
+        } else {
+            sListAnnonce += item.value + ",";
+        }
+    });
+
+    if(sListAnnonce.indexOf(","))
+    {
+    	sListAnnonce = sListAnnonce.substring(0, sListAnnonce.length - 1);
+    }
+    
+    $(sInputName).value = sListAnnonce;
+}
+
+function hideAllAnnonceReaded()
+{
+	setAllAnnonceInForm("sMarchePersonneItemListMarche", true);
+    setAllAnnonceInForm("sMarchePersonneItemListMarcheAll", false);
+
+	var btn = $("seForm"); 
+    $("sActionMarchePersonneItem").value="hideAll";
+    btn.submit();
+}
+
+
+</script>
+
+<%
+	if(sessionUser.isLogged )
+	{
+		if(recherche.getNbResultats() > 0)
+		{
+%>
+<div style="text-align: center;">
+    <button onclick="selectAllAnnonce()" >Tout sélectionner</button>
+    <button onclick="unselectAllAnnonce()" >Tout désélectionner</button>
+    <button onclick="hideAllAnnonceReaded()" >Masquer les annonces sélectionnées</button>
+</div>
+<%
+		}
+	} else {
+%>
+<div style="text-align: center;">
+   <i>Connectez-vous pour avoir plus de fonctionnalités</i>
+</div>
+
+<%
+	} // END : isLogged
+%>
+
+
+
+
+
+
+
+<!-- Maps part -->
+<%
+
+if(Configuration.isEnabledMemory("publisher.portail.announce.geoloc") 
+&& bDisplayMapAnnounce)
+{
+	GeoMap geoMap = new GeoMap();
+
+	geoMap.bUseGoogleMaps = false;
+	geoMap.bUseOpenStreetMap = true;
+	geoMap.bUseOpenLayerMap = false;
+
+%>
+<%@ include file="/include/geo/headerGeoBloc.jspf" %>
+
+<script type="text/javascript">
+function Map_initMarkers()
+{    
+	layerMarkers = new OpenLayers.Layer.Markers("Markers");
+	g_map.addLayer(layerMarkers);
+
+	var size = new OpenLayers.Size(24,24);
+	var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+	var icon = null;
+	var marker = null;
+	var lonLat = null;
+<%    
+
+	String sIdCountry = "FRA";
+	Vector<Adresse> vAdresseTotalWithZipCode = new Vector<Adresse>();
+	for (int i = 0; i < vAdresseTotal.size(); i++)  
+	{
+		Adresse adresseGeo = (Adresse) vAdresseTotal.get(i);
+		if(!adresseGeo.getCodePostal().trim().equals("")) vAdresseTotalWithZipCode.add(adresseGeo);
+	}
+
+	
+	String[] sarrZipCode = new String[vAdresseTotalWithZipCode.size()];
+	for (int i = 0; i < vAdresseTotalWithZipCode.size(); i++)  
+	{
+		Adresse adresseGeo = (Adresse) vAdresseTotalWithZipCode.get(i);
+		sarrZipCode[i] = adresseGeo.getCodePostal();
+	}
+
+	Connection connGeo = ConnectionManager.getConnection();
+
+	
+	Vector<Town> vTown = null;
+	
+	try{
+		vTown = Town.getAllTownFromZipCodeAndCountry(sIdCountry, sarrZipCode, true, false, connGeo);
+	} catch (Exception e ){
+		e.printStackTrace();
+		vTown = new Vector<Town>();
+	}
+
+
+	GeoCenter geoCenter = new GeoCenter();
+	
+	for (int i = 0; i < vRecherche.size(); i++)  
+	{
+		Marche marche = (Marche)vRecherche.get(i);
+		Commission commission = Commission.getCommission(marche.getIdCommission(), vCommissionTotal);
+		Organisation organisationAcheteuse = Organisation.getOrganisation(commission.getIdOrganisation() , vOrganisationTotal);
+		Adresse	adresseGeo = Adresse.getAdresse(organisationAcheteuse.getIdAdresse(), vAdresseTotal);
+		double dLongitude = adresseGeo.getLongitude();
+		double dLatitude = adresseGeo.getLatitude();
+		
+		String sUrlIframeAnnonce =  response.encodeURL(rootPath 
+	        	+ "publisher_portail/public/annonce/afficherAnnonce.jsp?a="
+		        + SecureString.getSessionSecureString(
+         	   Long.toString(marche.getId()), session)) ;
+		
+		String sTitlelIframeAnnonce = 
+			"Petite annonce référence "
+	        + Outils.replaceAll( marche.getReference(), "'", "''");
+
+		String sOnClickAnnounce = " onclick=\\\"openAnnounceModalOrPopup('" 
+				+ sTitlelIframeAnnonce 
+				+ "','" 
+				+ sUrlIframeAnnonce + "');\\\" ";
+			
+		if(dLatitude == 0 && dLongitude == 0)
+		{
+			String sZipCodeToFind = adresseGeo.getCodePostal().trim();
+			Town town = GeoCenter.getTown(sIdCountry, adresseGeo.getCommune(), sZipCodeToFind, vTown, connGeo);
+			
+			if(town != null){
+				dLatitude = town.getLatitude() ;
+				dLongitude = town.getLongitude();
+			}
+		}
+		
+		if(dLatitude != 0 && dLongitude != 0)
+		{
+			geoCenter.addPoint(
+				dLongitude ,
+				dLatitude );
+					
+
+%>
+
+	icon = new OpenLayers.Icon('<%= rootPath + "images/icons/36x36/affair.png" %>',size, offset);
+	// for normal Map
+	lonLat = new OpenLayers.LonLat(<%= dLongitude%>, <%= dLatitude %>);
+
+	// for open street Map use a specific projection
+	lonLat = Map_getLonLatProjected(lonLat );
+
+	marker = new OpenLayers.Marker(lonLat ,icon);
+	layerMarkers.addMarker(marker);
+	marker.events.register("mousedown", marker, function() {
+		openAnnounceModalOrPopup(
+				"<%= sTitlelIframeAnnonce%>",
+                "<%= sUrlIframeAnnonce %>");
+	});
+<%
+					
+		} else {
+%>
+	$("mapMessage").innerHTML += 
+		"<a href='javascript:void(0)' <%= sOnClickAnnounce 
+		%> > Pas de donnée géographique pour le marché ref \"<%= marche.getReference() 
+		%>\" et le code postal <%= adresseGeo.getCodePostal() %> <%= adresseGeo.getCommune() %> </a><br/>";
+<%
+		}
+
+		
+	} // END for vRecherche
+	ConnectionManager.closeConnection(connGeo);
+
+
+	
+	geoCenter.computeCenter();
+%>
+
+
+	var lonLatCenter = new OpenLayers.LonLat(<%= geoCenter.dLonCenter  %>, <%= geoCenter.dLatCenter %>);
+
+	// for open street Map use a specific projection
+	lonLatCenter = Map_getLonLatProjected(lonLatCenter );
+    g_map.setCenter(lonLatCenter, <%= geoCenter.iZoom %>);
+    g_map.addControl(new OpenLayers.Control.LayerSwitcher());
+
+}
+
+Event.observe(window, "load", function() {
+	Map_initMaps();
+	Map_initMarkers();
+});
+
+</script>
+    
+
+<table width="100%">
+  <tr>
+    <td >&nbsp;</td>
+    <td style="text-align: center;border: 1px solid #AAA;width: 600px;height: 400px">
+		<div id="map" style="width: 600px;height: 400px" class="smallmap"></div>
+		<div id="mapMessage"></div>
+    </td>
+    <td >&nbsp;</td>
+  </tr>
+</table>
+
+
+
+
+<%
+} // publisher.portail.announce.geoloc
+%>
+
+
+
+<!-- Search results -->
+<script type="text/javascript">
+<!--
+function openAnnounceModalOrPopup(sTitle, sUrl)
+{
+    if(sUserAgent == "ie6" || <%= 
+	Configuration.isTrueMemory("publisher.display.annonce.detail.force.popup", false) %>)
+	{
+		OuvrirPopup(sUrl,800,650,"menubar=no,scrollbars=yes,statusbar=no");
+	    return ;
+	}
+	
+	openAnnounceModal(sTitle, sUrl);
+}
+
+function openAnnounceModal(sTitle, sUrl)
+{
+    var doc;
+    try{doc = parent.document;doc.appendChild(doc.createTextNode(""));}
+    catch(e){doc = document;}
+   
+    
+   
+    var popupDiv = doc.createElement("div");
+    popupDiv.style.position = "relative";
+    popupDiv.style.backgroundColor = "#EFF5FF";
+    popupDiv.style.padding = "0 7px 0 7px";
+
+    var img = doc.createElement("img");
+    img.style.position = "absolute";
+    img.style.top = "3px";
+    img.style.right = "3px";
+    img.style.cursor = "pointer";
+    img.src = "<%=rootPath%>images/icons/close.gif";
+    img.onclick = function(){
+        try {new parent.Control.Modal.close();}
+        catch(e) { Control.Modal.close();}
+    }
+
+    popupDiv.appendChild(img);
+    
+    
+    var divHeader = doc.createElement("div");
+    divHeader.style.textAlign = "center";
+    divHeader.style.lineHeight = "28px";
+    divHeader.innerHTML = sTitle;
+    divHeader.style.height = "28px";
+    
+    var divIframe = doc.createElement("div");
+    divIframe.style.border = "1px solid #888";
+    divIframe.style.backgroundColor = "#AAA";
+    
+    var iframe = doc.createElement("iframe");
+    iframe.name = "offerPopup";
+    iframe.id = "offerPopup";
+    iframe.src = sUrl;
+    iframe.style.width = "100%";
+    iframe.style.height = "430px";
+    iframe.style.border = 0;
+    iframe.style.margin = 0;
+    iframe.align = "top";
+    iframe.frameBorder = "0";
+    iframe.border = "1";
+    divIframe.appendChild(iframe);
+                                
+    var divFooter = doc.createElement("div");
+    divFooter.style.textAlign = "center";
+    divFooter.style.lineHeight = "6px";
+    divFooter.style.height = "6px";
+    
+    popupDiv.appendChild(divHeader);
+    popupDiv.appendChild(divIframe);
+    popupDiv.appendChild(divFooter);
+
+    var modal ;
+   try{ 
+       modal = new parent.Control.Modal(false,{width: 700, contents: popupDiv, overlayCloseOnClick:false, overlayDisplay: false});
+   } catch(e) {
+       modal = new Control.Modal(false,{width: 700, contents: popupDiv, overlayCloseOnClick:false, overlayDisplay: false});
+   }
+
+    modal.container.insert(popupDiv);
+    modal.open();
+
+}
+
+//-->
+</script>
+
+
+<%@ include file="paveSearchEnginePagination.jspf"%>
+<%@ include file="paveAfficherAnnonce.jspf" %>
+<%@ include file="paveSearchEnginePagination.jspf"%>
+<%
+	} // bLaunchSearch
+%>    
+
+  
+

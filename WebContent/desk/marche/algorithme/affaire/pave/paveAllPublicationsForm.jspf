@@ -1,0 +1,28 @@
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('pavePublications')">
+		<td class="pave_titre_gauche" colspan="2">Publications et publicités</td>
+	</tr>
+	<tr>
+		<td>
+			<table id="pavePublications" summary="publications">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<%@ include file="pavePublicationBoampForm.jspf" %>
+				<%@ include file="pavePublicationJoueForm.jspf" %>
+				<tr>
+					<td class="pave_cellule_gauche">Publication de l'avis de pré-information au JOUE :</td>
+					<td class="pave_cellule_droite">Ajouter cette publication (WS ou papier)</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Publication de la petite annonce de l'AAPC à la PQR :</td>
+					<td class="pave_cellule_droite">Ajouter cette publication (PDF, email ou papier)</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+	

@@ -1,0 +1,101 @@
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt"><%=sTitle %></strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" >
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="width:110px;text-align:center">
+				<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/minefi.gif" />
+			</td>
+			<td style="text-align:justify;vertical-align:middle">
+			Rubrique marchés publics du site du ministère de l'économie, des finances et de l'industrie (MINEFI)<br />
+			<a href="http://www.minefi.gouv.fr/minefi/publique/marches_publics/index.htm" target="_blank">
+			http://www.minefi.gouv.fr
+			</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="width:110px;text-align:center">
+				<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/minefi.gif" />
+			</td>
+			<td style="text-align:justify;vertical-align:middle">
+			Vade-mecum juridique sur la dématérialisation des marchés publics élaboré par le MINEFI.<br />
+			<a href="http://www.minefi.gouv.fr/minefi/publique/marches_publics/index.htm" target="_blank">
+			http://www.minefi.gouv.fr
+			</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="width:110px;text-align:center">
+				<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/minefi.gif" />
+			</td>
+			<td style="text-align:justify;vertical-align:middle">
+			Rapport 2004 du groupe « Dématérialisation des marchés publics » de la Mission pour l'économie numérique MINEFI<br />
+			<a href="http://www.men.minefi.gouv.fr/webmen/themes/adm/dematentrep.pdf" target="_blank">
+			http://www.men.minefi.gouv.fr
+			</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="width:110px;text-align:center">
+				<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/minefi.gif" />
+			</td>
+			<td style="text-align:justify;vertical-align:middle">
+			Rubrique marchés publics du site du ministère de l?économie et des finances (MINEFI)<br />
+			<a href="http://www.minefi.gouv.fr/minefi/publique/marches_publics/index.htm" target="_blank">
+			http://www.minefi.gouv.fr
+			</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="width:110px;text-align:center">
+				<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/adae.gif" />
+			</td>
+			<td style="text-align:justify;vertical-align:middle">
+			Article de l'Agence pour le développement de l'administration électronique (ADAE) sur la dématérialisation des marchés publics.<br />
+			<a href="http://www.adae.gouv.fr/article.php3?id_article=328" target="_blank">
+			http://www.adae.gouv.fr/article.php3?id_article=328
+			</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="width:110px;text-align:center">
+				<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/journalofficiel.gif" />&nbsp;
+			</td>
+			<td style="text-align:justify;vertical-align:middle">
+			Portail des journaux officiels français et notamment annonces publiées au BOAMP.<br />
+			<a href="http://www.journal-officiel.gouv.fr/accueil.php" target="_blank">
+			http://www.journal-officiel.gouv.fr
+			</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="width:110px;text-align:center">&nbsp;
+			</td>
+			<td style="text-align:justify;vertical-align:middle">
+			Portail pour trouver le droit français, communautaire et international.<br />
+			<a href="http://www.legifrance.gouv.fr" target="_blank">
+			http://www.legifrance.gouv.fr
+			</a>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+	</table>
+</div>
+</div>

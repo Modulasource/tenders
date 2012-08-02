@@ -1,0 +1,111 @@
+
+<%@page import="java.io.FileInputStream"%>
+<%@page import="java.io.File"%>
+<%@page import="org.coin.util.FileUtilBasic"%>
+<%@page import="org.coin.bean.ged.GedDocumentMetadata"%>
+<%@page import="org.coin.bean.ged.GedDocumentRevision"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.ged.GedDocument"%>
+<%@page import="org.coin.bean.ged.GedFolderUtilPki"%>
+<%@page import="org.coin.bean.pki.certificate.signature.PkiCertificateSignature"%>
+<%@page import="org.coin.bean.pki.certificate.signature.PkiCertificateSignatureState"%>
+<%@page import="org.coin.util.HttpUtil"%>
+<%@page import="org.coin.security.PreventInjection"%>
+<%
+
+	String sJsonPkiCertificateSignature 
+	= PreventInjection.preventXML(request.getParameter("sJsonPkiCertificateSignature"));
+	
+	PkiCertificateSignature pkiCertificateSignature 
+	    = PkiCertificateSignature.updateFromJSONObject(
+	            sJsonPkiCertificateSignature);
+
+    /**
+     * lIdReferenceObject : provided by the JSP calling
+     * lIdTypeObject : provided by the JSP calling
+     */
+     pkiCertificateSignature.setIdReferenceObject( lIdReferenceObject );
+     pkiCertificateSignature.setIdTypeObject( lIdTypeObject );
+     pkiCertificateSignature.setIdIndividual( HttpUtil.parseLong("lIdIndividual", request));
+
+	
+	if(bIsSSPV) {
+	    /** 
+	     * need to generalize is on a method
+	     */
+	    long lIdGedDocument = HttpUtil.parseLong("lIdGedDocument", request);
+	    
+	    pkiCertificateSignature.setIdPkiCertificateSignatureState(
+	            HttpUtil.parseLong(
+	                "lIdPkiCertificateSignatureState",
+	                request,
+	                PkiCertificateSignatureState.STATE_VALID));
+	    pkiCertificateSignature.setIdPkiCertificate( HttpUtil.parseLong("lIdPkiCertificate", request, 0));
+
+	    GedDocument doc = GedDocument.getGedDocument(lIdGedDocument, false, conn);
+
+	    /**
+	     * Set the working copy as doc revisions
+	     */
+		String wn = "temp.applet.signature.working.document.revision.id";
+	    try {
+	    	GedDocumentMetadata workingRevId = GedDocumentMetadata.getGedDocumentMetadata(doc.getId(),wn);
+	    	GedDocumentRevision gdrWork 
+	    		= GedDocumentRevision.getGedDocumentRevision(
+	    			Long.parseLong(workingRevId.getValue()),
+	    			false,
+	    			conn);
+	    	gdrWork.setIdGedDocument(doc.getId());
+	    	gdrWork.store(conn);
+	    	workingRevId.remove(conn);
+
+			/**
+			 * if necessary we have to update the last revision with the PAdES pdf file
+			 */
+	    	String sGedDocumentRevisionPadesBase64Encoded 
+				= HttpUtil.parseString(
+						"sGedDocumentRevisionPadesBase64Encoded", 
+						request, 
+						null);
+			
+			if(sGedDocumentRevisionPadesBase64Encoded != null)
+			{
+				File filePades =  FileUtilBasic.decodeBase64TempFile(sGedDocumentRevisionPadesBase64Encoded, ".pdf");
+				gdrWork.uploadDocumentFile(filePades , conn);
+				System.out.println("filePades " + filePades );
+				filePades.delete();
+			}
+
+	    	
+	    } catch (Exception e){ 
+	    	e.printStackTrace();
+	    }
+	    /**
+	     * Get doc revisions
+	     */
+	    Vector<GedDocumentRevision> vGedDocumentRevision 
+	        = GedDocument.getAllGedDocumentRevisionOrderDesc(doc);
+	    
+	    /**
+	     * store in bdd the sealing
+	     */
+	    GedFolderUtilPki.createDocumentLastRevision(
+	            doc, 
+	            vGedDocumentRevision,
+	            pkiCertificateSignature.getIdIndividual(),
+	            pkiCertificateSignature,
+	            conn);
+	} else {
+
+		 
+		pkiCertificateSignature.setIdPkiCertificateSignatureState(
+		         HttpUtil.parseLong(
+		             "lIdPkiCertificateSignatureState",
+		             request,
+		             PkiCertificateSignatureState.STATE_VALID));
+		pkiCertificateSignature.setIdPkiCertificate( HttpUtil.parseLong("lIdPkiCertificate", request, 0));
+		 
+		pkiCertificateSignature.store(conn);
+	}
+
+%>

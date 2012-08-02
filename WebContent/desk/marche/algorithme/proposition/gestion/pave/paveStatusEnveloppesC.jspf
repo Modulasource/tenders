@@ -1,0 +1,298 @@
+<%
+	String sLibelleLot = "";
+	if(vLots.size()==1) sLibelleLot = "marché";
+	else sLibelleLot = "Lot " + lot.getNumero();
+%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.EnveloppeC"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<script type="text/javascript">
+function selectAction(hidden,action)
+{
+	return hidden.value = action;
+}
+function enregistrerListes()
+{
+	Visualise(document.formulaire.listeRetenues,document.formulaire.idRetenues);
+	Visualise(document.formulaire.listeNonConformes,document.formulaire.idNonConformes);
+
+	document.formulaire.submit();
+}
+function figerClassement()
+{
+	if(confirm("Etes vous sûr de vouloir figer les statuts du <%= sLibelleLot %> définitivement ?"))
+	{
+		selectAction(document.formulaire.sAction,'figer');
+		Visualise(document.formulaire.listeRetenues,document.formulaire.idRetenues);
+		Visualise(document.formulaire.listeNonConformes,document.formulaire.idNonConformes);
+		
+		return true;
+	}
+	return false;
+}
+</script>
+<%
+	Vector<EnveloppeC> vRetenues = EnveloppeC.getAllEnveloppesCRetenuesFromLot(lot.getIdMarcheLot());
+	Vector<EnveloppeC> vNonConformes = EnveloppeC.getAllEnveloppesCNonConformesFromLot(lot.getIdMarcheLot());
+	
+	/* Récupération de la localisation des icônes des flèches */
+	String sFlecheGauche = rootPath + modula.graphic.Icone.ICONE_GAUCHE;
+	String sFlecheDroite = rootPath + modula.graphic.Icone.ICONE_DROITE;
+	String sFlecheHaut = rootPath + modula.graphic.Icone.ICONE_HAUT;
+	String sFlecheBas = rootPath + modula.graphic.Icone.ICONE_BAS;
+	
+%>
+<form action="<%= response.encodeURL("validerEnveloppesCClassement.jsp?nonce="+System.currentTimeMillis()) %>" method="post" name="formulaire">
+<table class="pave" id="tabClassement">
+	<tr>
+		<td colspan="3" style="width:100%">
+			<table summary="none">
+				<tr>
+					<td class="pave_titre_gauche">Classement des offres de prestation</td>
+					<td class="pave_titre_droite" >
+					<%
+					boolean bIsClassementEnveloppesCFige = false;
+					try{bIsClassementEnveloppesCFige = lot.isClassementEnveloppesCFige();}
+					catch(Exception e){}
+					if(bIsClassementEnveloppesCFige)
+					{
+					%>
+					Classement fig&eacute;
+					<%
+					}
+					%>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="text-align:left;">
+		<%
+		if(!bIsClassementEnveloppesCFige)
+		{
+		%>
+			<a href='javascript:OuvrirPopup("<%= rootPath%>include/avertissementUtilisateur.jsp?id=<%=
+				InfosBullesConstant.FLECHES %>",400,250,"menubar=no,scrollbars=yes,statusbar=no")'>
+			<img src="<%=rootPath+Icone.ICONE_AU
+			%>" alt="Avertissement utilisateur" title="Avertissement utilisateur" width="21" height="21"  style="vertical-align:middle" />
+			</a>
+		<%
+		}
+		else
+		{
+		%>
+		&nbsp;
+		<%
+		}
+		%>
+		</td>
+	</tr>
+	<%
+	if(!bIsClassementEnveloppesCFige)
+	{
+	%>
+	<tr>
+		<td class="mention" colspan="3">
+			<br />
+			Attention!<br />
+			Cliquer sur le bouton "Enregistrer le classement" revient &agrave; enregistrer le classement des offres et &agrave; le conserver.<br />
+			Cliquer sur le bouton "Figer les statuts" revient &agrave; confirmer d&eacute;finitivement le classement des offres.<br />
+			<br />
+		</td>
+	</tr>
+	<%
+	}
+	%>
+	<!-- candidatures recevables -->
+	<tr>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+		<td style="font-weight:bold;text-align:left;width:80%">
+		Offres retenues (avec rang de classement)
+		</td>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td style="width:10%">
+			<img src="<%=rootPath+"images/icones/liste-candidats-recevables.gif"%>" alt="liste des candidats recevables" title="liste des candidats recevables" width="57" height="86"  style="vertical-align:middle" />
+		</td>
+		<td style="text-align:left;width:80%">
+			<select name="listeRetenues" size="10" style="width:100%">
+			<%
+				for (int i = 0; i < vRetenues.size(); i++)
+				{
+					EnveloppeC oEnveloppeC = vRetenues.get(i);
+					Candidature oCandidature = null;
+					try
+					{
+						oCandidature = Candidature.getCandidature(oEnveloppeC.getIdCandidature());
+					}
+					catch(Exception e)
+					{
+						System.out.println("Pas de candidature associée à l'enveloppe C:"+oEnveloppeC.getId());
+					}
+					PersonnePhysique candidat = PersonnePhysique.getPersonnePhysique(oCandidature.getIdPersonnePhysique());
+					Organisation org = Organisation.getOrganisation(oCandidature.getIdOrganisation());
+					
+					String sCandidature = (i+1)+". "+candidat.getCivilitePrenomNom() +" - "+org.getRaisonSociale();
+					if(bIsAnonyme)
+						sCandidature =  (i+1)+". Candidature ORG"+org.getId();
+			%>
+					<option value="<%= oEnveloppeC.getId() %>">
+					<%= sCandidature %>
+					</option>
+			<%
+				}
+			%>
+			</select>
+		</td>
+		<td style="width:10%">
+		<%
+		if(!bIsClassementEnveloppesCFige)
+		{
+		%>
+			<table summary="none">
+				<tr>
+					<td style="text-align:center">
+					<a href="javascript:monter(document.formulaire.listeRetenues)">
+						<img src="<%= sFlecheHaut %>" />
+					</a>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:center">
+						<a href="javascript:descendre(document.formulaire.listeRetenues)">
+						<img src="<%= sFlecheBas %>" />
+						</a>
+					</td>
+				</tr>
+			</table>
+		<%
+		}
+		%>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="width:100%">
+		&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="text-align:center;width:100%">
+		<%
+		if(!bIsClassementEnveloppesCFige)
+		{
+		%>
+			<input type="hidden" name="sAction" value="" />
+			<input type="hidden" name="idRetenues" value="" />
+			<input type="hidden" name="idNonConformes" value="" />
+			<input type="hidden" name="iIdLot" value="<%= lot.getIdMarcheLot() %>" />
+			<input type="hidden" name="iIdNextPhaseEtapes" value="<%= iIdNextPhaseEtapes %>" />
+			<input type="submit" name="classement" value="Enregistrer le classement" onclick="selectAction(document.formulaire.sAction,'enregistrer');Visualise(document.formulaire.listeRetenues,document.formulaire.idRetenues);Visualise(document.formulaire.listeNonConformes,document.formulaire.idNonConformes);" />&nbsp;&nbsp;
+			<input type="submit" name="classement" value="Figer les statuts" onclick="return figerClassement();" />
+		<%
+		}
+		%>
+		</td>
+	</tr>
+		<tr>
+		<td colspan="3" style="width:100%">
+		&nbsp;
+		</td>
+	</tr>
+	<!-- /candidatures recevables -->
+	<!-- candidatures non recevables -->
+	<tr>
+		<td colspan="3" style="font-weight:bold;text-align:center;width:100%">
+		<%
+		if(!bIsClassementEnveloppesCFige)
+		{
+		%>
+			<table summary="none">
+				<tr>
+					<td style="text-align:center">
+					<a href="javascript:Deplacer(document.formulaire.listeNonConformes,document.formulaire.listeRetenues);enregistrerListes();">
+					<img src="<%= sFlecheHaut %>" />
+					</a>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:center">
+					<a href="javascript:Deplacer(document.formulaire.listeRetenues,document.formulaire.listeNonConformes);enregistrerListes();">
+					<img src="<%= sFlecheBas %>" />
+					</a>
+					</td>
+				</tr>
+			</table>
+		<%
+		}
+		%>
+		</td>
+	</tr>
+	<tr>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+		<td style="font-weight:bold;text-align:left;width:80%">
+		Offres non conformes
+		</td>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td style="width:10%">
+			<img src="<%=rootPath+"images/icones/liste-candidats-non-conformes.gif"%>" alt="liste des candidats non conformes" title="liste des candidats non conformes" width="45" height="86"  style="vertical-align:middle" />
+		</td>
+		<td style="text-align:left;width:80%">
+			<select name="listeNonConformes" size="10" style="width:100%">
+			<%
+				for (int i = 0; i < vNonConformes.size(); i++)
+				{
+					EnveloppeC oEnveloppeC = vNonConformes.get(i);
+					Candidature oCandidature = null;
+					try
+					{
+						oCandidature = Candidature.getCandidature(oEnveloppeC.getIdCandidature());
+					}
+					catch(Exception e)
+					{
+						System.out.println("Pas de candidature associée à l'enveloppe C:"+oEnveloppeC.getId());
+					}
+
+					PersonnePhysique candidat = PersonnePhysique.getPersonnePhysique(oCandidature.getIdPersonnePhysique());
+					Organisation org = Organisation.getOrganisation(oCandidature.getIdOrganisation());
+					
+					String sCandidature = candidat.getCivilitePrenomNom() +" - "+org.getRaisonSociale();
+					if(bIsAnonyme)
+						sCandidature =  "Candidature ORG"+org.getId();
+					%>
+					<option value="<%= oEnveloppeC.getId() %>">
+					<%= sCandidature %>
+					</option>
+					<%
+				}
+			%>
+			</select>
+		</td>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+	</tr>
+	<!-- /candidatures non recevables -->
+	<tr>
+		<td colspan="3" style="width:100%">
+		&nbsp;
+		</td>
+	</tr>
+</table>
+</form>
+

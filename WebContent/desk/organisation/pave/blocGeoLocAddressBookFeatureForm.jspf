@@ -1,0 +1,98 @@
+<%
+if(bUseGeoloc  )
+{
+	if(sessionUserHabilitation.isSuperUser() )
+	{
+%>
+<script type="text/javascript">
+var g_vectors;
+var g_featurePoint; 
+
+function createFeaturePoint(X,Y){
+var point = new OpenLayers.Geometry.Point(X,Y);
+point = Map_getLonLatProjected(point);
+var feat = new OpenLayers.Feature.Vector(point,null,null);
+g_vectors.addFeatures([feat]);
+
+return point ;
+}
+
+function toggleControl(element) {
+for(key in controls) {
+var control = controls[key];
+if(element.value == key && element.checked) {
+control.activate();
+} else {
+control.deactivate();
+}
+}
+}
+
+
+function Map_initDragablePoint()
+{    
+g_vectors = new OpenLayers.Layer.Vector("Vector Layer");
+g_map.addLayer( g_vectors);
+g_featurePoint = createFeaturePoint(<%= geoCenter.dLonCenter  %>, <%= geoCenter.dLatCenter %>);                
+
+
+
+var lonLatCenter = new OpenLayers.LonLat(<%= geoCenter.dLonCenter  %>, <%= geoCenter.dLatCenter %>);
+// for open street Map use a specific projection
+lonLatCenter = Map_getLonLatProjected(lonLatCenter );
+g_map.setCenter(lonLatCenter, <%= geoCenter.iZoom %>);
+
+
+g_map.addControl(new OpenLayers.Control.LayerSwitcher());
+g_map.addControl(new OpenLayers.Control.MousePosition());
+
+
+controls = {
+drag: new OpenLayers.Control.DragFeature(g_vectors)
+};
+
+for(var key in controls) {
+g_map.addControl(controls[key]);
+}
+
+// set navigation control instead of drag ctrl
+$('noneToggle').checked = true;
+}
+
+Event.observe(window, "load", function() {
+Map_initMaps();
+Map_initDragablePoint();
+});
+
+function savePosition()
+{
+var point = Map_getLonLatUnprojected(g_featurePoint);
+$("dLongitude").value = g_featurePoint.x ;
+$("dLatitude").value = g_featurePoint.y ;
+}
+
+</script>
+
+<div id="controls">
+<ul id="controlToggle">
+<li>
+<input type="radio" name="type" value="none" id="noneToggle"
+       onclick="toggleControl(this);" checked="checked" />
+<label for="noneToggle">navigate</label>
+</li>
+<li>
+<input type="radio" name="type" value="drag" id="dragToggle"
+       onclick="toggleControl(this);" />
+<label for="dragToggle">drag feature</label>
+</li>
+</ul>
+Longitude : <input name="<%= sFormPrefix %>dLongitude"  id="<%= sFormPrefix %>dLongitude"  value="<%= adresse.getLongitude() %>" />
+Latidude : <input name="<%= sFormPrefix %>dLatitude"  id="<%= sFormPrefix %>dLatitude"  value="<%= adresse.getLatitude() %>" />
+<button type="button" onclick="savePosition()" >Get position</button>
+</div>
+
+<%
+	} // end isSuperUser
+} // end bUseGeoloc
+
+%>

@@ -1,0 +1,185 @@
+/*==============================================*/
+/* index.php body                               */
+/*==============================================*/
+
+body {
+   padding: 0px;
+   margin: 5px 0px;
+   text-align: left;
+   background-color: #B3B3B3;
+   color: #000000;
+   font-family: verdana,helvetica;
+   font-size: x-small;
+   z-index:1;
+}
+
+/*==============================================*/
+/* ConceptRTE body                              */
+/*==============================================*/
+
+
+body.rte {
+   padding: 0px;
+   margin: 5px 0px;
+   text-align: left;
+   background-color: #B3B3B3;
+   color: #000000;
+   font-family: verdana,helvetica;
+   font-size: x-small;
+   z-index:1;
+}
+
+/*==============================================*/
+/* form tags                                    */
+/*==============================================*/
+
+input.button  {
+   font-family: verdana,helvetica;
+   color: #ffffff;
+   font-size: xx-small;
+   background-color: #4D4D4D;
+   border: 1px solid #000000;
+   z-index:1;
+   cursor:pointer;
+   cursor:hand;
+}
+
+input {
+   font-family: verdana,helvetica;
+   color: #555566;
+   font-size: xx-small;
+   background-color: #ffffff;
+   border: 1px solid #000000;
+   z-index:1;
+}
+
+select {
+   font-family: verdana,helvetica;
+   color: #555566;
+   font-size: xx-small;
+   background-color: #ffffff;
+   border: 1px solid #000000;
+   z-index:1;
+}
+
+/*==============================================*/
+/* Links                                        */
+/*==============================================*/
+
+a:hover {
+   color: #ff6666;
+   text-decoration: none;
+   z-index:1;
+}
+
+a {
+   color: #555566;
+   text-decoration: none;
+   font-weight: bold;
+   z-index:1;
+}
+
+/*==============================================*/
+/* Applicable to a DIV tag                      */
+/*==============================================*/
+
+.rowTitle {
+   border: none;
+   text-decoration: none;
+   positon:relative;
+   margin: 3px 20px 3px 20px;
+   visibility:visible;
+   font-size:small;
+   font-weight: bold;
+   width: 800px;
+   z-index:1;
+   clear:both;
+}
+
+.row {
+   border: none;
+   text-decoration: none;
+   positon:relative;
+   margin: 3px 20px 3px 20px;
+   visibility:visible;
+   font-size:x-small;
+   width: 800px;
+   z-index:1;
+   text-align: justify;
+   clear:both;
+}
+
+.rowPopup {
+   border: none;
+   text-decoration: none;
+   text-align: center;
+   positon:relative;
+   margin: 3px 20px 3px 20px; 
+   visibility:visible;
+   font-size:x-small;
+   z-index:1;
+   clear:both;
+}
+
+/*==============================================*/
+/* Applicable to a SPAN tag to be used in a row */
+/*==============================================*/
+
+.label {
+   position: relative;
+   text-align: right;
+   vertical-align: baseline;
+   padding-right: 15;
+   left: 0;
+   font-weight: bold;
+   width: 50%;
+   z-index:1;
+   font-size: xx-small;
+   float:left;
+}
+
+.field {
+   vertical-align: baseline;
+   position: relative;
+   font-size: xx-small;
+   z-index:1;
+   float:left;
+}
+
+.rteColumn {
+   position: relative;
+   text-align: left;
+   vertical-align: top;
+   padding-left: 15;
+   left: 0;
+   width: 570px;
+   z-index:1;
+   float:left;
+}
+
+.downalodColumn {
+   position: relative;
+   text-align: right;
+   vertical-align: top;
+   left: 570px;
+   width: 230px;
+   z-index:1;
+   float:left;
+}
+
+.labelPopup {
+   position: relative;
+   vertical-align: baseline;
+   font-weight: bold;
+   z-index:1;
+   font-size: xx-small;
+   float:left;
+}
+
+.fieldPopup {
+   vertical-align: baseline;
+   position: relative;
+   font-size: xx-small;
+   z-index:1;   
+   float:left;
+}

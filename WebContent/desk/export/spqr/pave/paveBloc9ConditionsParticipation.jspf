@@ -1,0 +1,36 @@
+<%
+	Node nodeSituation =  BasicDom.getChildNodeByNodeName(nodeAnn, "situation" );
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc9')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 9 Conditions de participation</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc9" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000" >* Critères de sélection des candidatures : </font></td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Situation juridique - références requises : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeSituation , "formeJuridique" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Capacité économique et financière - références requises : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeSituation , "capaEcoFi" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Référence professionnelle et capacité technique - références requises : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeSituation , "capaTech" ) %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,37 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Transfert Mode FTP</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">Adresse IP :</td>
+		<td class="pave_cellule_droite">
+			<%= exportModeFTP.getAdresseIP() %>
+		</td>
+	</tr>
+
+	<tr>
+		<td class="pave_cellule_gauche">Nom d'utilisateur :</td>
+		<td class="pave_cellule_droite">
+			<%= exportModeFTP.getUserName() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Mot de passe :</td>
+		<td class="pave_cellule_droite">*********</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Chemin local :</td>
+		<td class="pave_cellule_droite">
+			<%= exportModeFTP.getPathLocal() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Chemin distant :</td>
+		<td class="pave_cellule_droite">
+			<%= exportModeFTP.getPathRemote() %>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

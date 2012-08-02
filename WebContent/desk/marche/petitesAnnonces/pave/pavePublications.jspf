@@ -1,0 +1,35 @@
+<%
+	Vector<Validite> vValiditesAnnonce = Validite.getAllValiditeAffaireFromAffaire(marche.getIdMarche());
+	Validite oValiditeAnnonce = null;
+	Timestamp tsDateAnnonceDebut = null;
+	Timestamp tsDateAnnonceFin = null;
+	if(vValiditesAnnonce != null)
+	{
+		if(vValiditesAnnonce.size() == 1) 
+		{
+			oValiditeAnnonce = vValiditesAnnonce.firstElement();
+			tsDateAnnonceDebut = oValiditeAnnonce.getDateDebut();
+			tsDateAnnonceFin = oValiditeAnnonce.getDateFin();
+		}
+	}
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('pavePublications')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePublicationsTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td> 
+			<strong>Date de mise en ligne* :</strong>&nbsp; 
+			<%= (CalendarUtil.getDateCourte(tsDateAnnonceDebut)!=""?CalendarUtil.getDateCourte(tsDateAnnonceDebut)
+				+"&nbsp;<strong>Heure :</strong>&nbsp;"+CalendarUtil.getHeureMinuteSecLitterale(tsDateAnnonceDebut):"Néant") %>
+		</td>
+		<td>
+			<strong>Date limite d'affichage* :</strong>&nbsp;
+			<%= (CalendarUtil.getDateCourte(tsDateAnnonceFin)!=""?CalendarUtil.getDateCourte(tsDateAnnonceFin)
+				+"&nbsp;<strong>Heure :</strong>&nbsp;"+CalendarUtil.getHeureMinuteSecLitterale(tsDateAnnonceFin):"Néant") %>&nbsp;&nbsp;&nbsp;
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

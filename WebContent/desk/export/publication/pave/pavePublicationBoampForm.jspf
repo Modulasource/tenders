@@ -1,0 +1,21 @@
+		<%@ include file="pavePublicationForm.jspf" %>
+		<tr>
+			<td class="pave_cellule_gauche">id pub boamp : </td>
+			<td class="pave_cellule_droite"><input type="text" name="iIdPublicationBoamp" value="<%= publi.getIdPublicationBoamp() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Type de journal : </td>
+			<td class="pave_cellule_droite"><input type="text" name="sTypeJournal" value="<%= publi.getTypeJournal() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Nom du fichier : </td>
+			<td class="pave_cellule_droite"><input type="text" name="sNomFichier" value="<%= publi.getNomFichier() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Fichier Xml envoyé : </td>
+			<td class="pave_cellule_droite"><input type="text" name="sFichier" value="<%= org.coin.util.Outils.convertXmlToHtmlOptional(publi.getFichier()) %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Accusé de réception : </td>
+			<td class="pave_cellule_droite"><input type="text" name="sArXml" value="<%= org.coin.util.Outils.convertXmlToHtmlOptional(publi.getArXml()) %>" /></td>
+		</tr>		

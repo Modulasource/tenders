@@ -1,0 +1,160 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*	String sPaveNomenclatureTitre;
+	*	Vector vCpvPrincipaux;
+	*	Vector vCpvSupplementaire;
+	*/
+{
+	Vector vCpvDescripteur;
+	Vector vCpvSupplementaire;
+
+	Vector vCpvPrincipaux = MarcheCPVObjet.getAllMarcheCPVObjetFromLot(lot.getIdMarcheLot());
+	
+%>
+<script type="text/javascript">
+<!--
+
+function prepareCPVButton()
+{
+var item = "";
+<%
+	for(int i =0 ; i < 4; i++)
+	{
+%>
+		item = new AjaxComboList("sIdDescripteurPrincipal<%=i%>", "getCPVDescripteurPrincipal");
+		item.bShowId = "true";
+<% 
+		String[] arrsIdDescripteurSupp = new String [3];
+		for(int j = 0; j < arrsIdDescripteurSupp.length; j++)
+		{
+			String sChampName = sFormPrefix + "iIdDescripteurSupp" + i + "_" + j ;
+			%>
+			item = new AjaxComboList("<%= sChampName %>", "getCPVDescripteurSupplementaire");
+			item.bShowId = "true";
+	<% 
+			
+		}
+
+	}
+%>
+}
+//-->
+</script>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarcheCPVObjet"%>
+<%@page import="modula.marche.cpv.CPVDescripteurSupplementaire"%>
+<%@page import="modula.marche.cpv.CPVDescripteur"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveNomenclatureTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+<%
+	for(int i =0 ; i < 4; i++)
+	{
+		String sIdDescripteurPrincipal = "";
+		String[] arrsIdDescripteurSupp = new String [3];
+		arrsIdDescripteurSupp[0] = "";
+		arrsIdDescripteurSupp[1] = "";
+		arrsIdDescripteurSupp[2] = "";
+		
+		try 
+		{
+			MarcheCPVObjet cpvPrincipal = (MarcheCPVObjet)vCpvPrincipaux.get(i);
+			vCpvDescripteur = CPVDescripteur.getAllCPVDescripteur(cpvPrincipal.getIdMarcheCpvObjet());
+			if (vCpvDescripteur.size() > 0)
+			{
+				CPVDescripteur cpvDescripteur = (CPVDescripteur)vCpvDescripteur.get(0);
+				sIdDescripteurPrincipal = cpvDescripteur.getIdCpvPrincipal();
+				vCpvSupplementaire = 
+					CPVDescripteurSupplementaire.
+						getAllCPVDescripteurSupplementaireFromDescripteur(
+							cpvDescripteur.getIdCpvDescripteur());
+				
+				for(int j = 0; j < vCpvSupplementaire.size(); j++)
+				{
+					CPVDescripteurSupplementaire cpvSupp 
+						= (CPVDescripteurSupplementaire)vCpvSupplementaire.get(j);
+					arrsIdDescripteurSupp[j] = cpvSupp.getName();
+				}
+			}
+		}
+		catch (Exception e) {}
+		
+	%>
+	<tr id="<%=sFormPrefix %>objetSupp<%= i %>">
+		<td style="vertical-align:top;width:20%;font-weight:bold;text-align:right">
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CPV) %>
+			&nbsp;
+			Objet <%= i==0?"principal":"complémentaire" %> :
+		</td>
+		<td style="width:80%">
+			<table style="text-align:left;width:100%">
+				<tr>
+					<td width="25%">Descripteur principal</td>
+					<td width="25%">Descripteur supplémentaire</td>
+					<td width="25%">Descripteur supplémentaire</td>
+					<td width="25%">Descripteur supplémentaire</td>
+				</tr>
+				<tr>
+					<td>
+
+					<button type="button" id="AJCL_but_sIdDescripteurPrincipal<%= i %>" 
+					 ><%= sIdDescripteurPrincipal==""?"Choisissez":sIdDescripteurPrincipal %></button>
+						<input 
+							type="hidden" 
+							name="<%=sFormPrefix + "sIdDescripteurPrincipal" + i %>" 
+							id="<%=sFormPrefix + "sIdDescripteurPrincipal" + i %>" 
+							value="<%= sIdDescripteurPrincipal %>" 
+							 />
+					</td>
+					<%
+						for(int j = 0; j < arrsIdDescripteurSupp.length; j++)
+						{	
+							String sChampName = sFormPrefix + "iIdDescripteurSupp" + i + "_" + j ;
+					 %>
+					 <td>
+					<button type="button" id="AJCL_but_<%= sChampName %>" 
+					 ><%= arrsIdDescripteurSupp[j]==""?"Choisissez":arrsIdDescripteurSupp[j] %></button>
+						<input 
+							type="hidden" 
+							id="<%= sChampName %>" 
+							name="<%= sChampName %>" 
+							value="<%= arrsIdDescripteurSupp[j] %>" 
+							/>
+					</td>
+						<%
+						}
+						%>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<%	}	
+
+ %>	<tr>
+		<td colspan="2" style="text-align:left">
+		<div id="<%=sFormPrefix %>ajouterCPV"><br />&nbsp;&nbsp;&nbsp;
+			<a href="javascript:ajouterDiv('<%=sFormPrefix %>');">
+				<img src="<%=rootPath + modula.graphic.Icone.ICONE_PLUS %>"   style="vertical-align:middle" />
+					Ajouter un objet supplémentaire
+			</a>
+		</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+			Les listes de codes suivants proviennent du site http://simap.eu.int<br/>
+            <i>Attention pour les formulaires envoyés au JOUE vous devez spécifier au moins un code CPV</i>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+<%
+}
+%>
+</table>

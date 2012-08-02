@@ -1,0 +1,59 @@
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%
+	try{
+		candidat = (PersonnePhysique)session.getAttribute("candidat");
+		organisation = (Organisation)session.getAttribute("organisation");
+	}
+	catch(Exception e){}
+	
+	if (sessionUser.isLogged)
+	{
+			candidat = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual());
+			session.setAttribute("candidat", candidat);
+
+			organisation = Organisation.getOrganisation(candidat.getIdOrganisation());
+			session.setAttribute("organisation", organisation);
+	}	
+	
+	String sPublisherServerDatetimeName = "";
+	String sPublisherServerDatetimeOptionalName = "";
+	int iPublisherServerDatetimeOptionalOffset = 0;
+	String sPublisherServerDatetimeOptional = "";
+	
+	try{
+		sPublisherServerDatetimeOptionalName = Configuration.getConfigurationValueMemory("publisher.server.datetime.optional.name");
+	
+		iPublisherServerDatetimeOptionalOffset 
+			= Integer.parseInt( Configuration.getConfigurationValueMemory("publisher.server.datetime.optional.offset"));
+		
+		Timestamp tsCurrent = new Timestamp( System.currentTimeMillis());
+		Calendar calPublisherServerDatetimeOptional = Calendar.getInstance();
+		calPublisherServerDatetimeOptional.setTimeInMillis(tsCurrent.getTime());
+		calPublisherServerDatetimeOptional.add(Calendar.HOUR_OF_DAY, iPublisherServerDatetimeOptionalOffset);
+		String siPublisherServerDatetimeOptionalOffset = "";
+		if(iPublisherServerDatetimeOptionalOffset >= 0)
+		{
+			siPublisherServerDatetimeOptionalOffset = "+"+iPublisherServerDatetimeOptionalOffset;
+		} else {
+			siPublisherServerDatetimeOptionalOffset = ""+iPublisherServerDatetimeOptionalOffset;
+		}
+	
+		sPublisherServerDatetimeOptional 
+			= sPublisherServerDatetimeOptionalName
+			+ " " +CalendarUtil.getDateFormattee(calPublisherServerDatetimeOptional) 
+			+ " (GMT"+siPublisherServerDatetimeOptionalOffset+")";
+		
+	} catch(Exception e){}
+
+	
+	try{
+		sPublisherServerDatetimeName = Configuration.getConfigurationValueMemory("publisher.server.datetime.name");
+	} catch(Exception e){}
+
+%>	
+<div class="bandeau"></div>

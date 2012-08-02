@@ -1,0 +1,53 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+//mail pp
+var champMailAuth = "sEmailAuth";
+var champMail = "sEmail";
+var divMailGerant = "tr_infoEmail";
+function verifierMailPP() 
+{
+	verifierChamp(champMail,champMailAuth,divMailGerant,<%= 
+	    CheckAjaxVerifField.PERSONNE_PHYSIQUE_EMAIL 
+	%>,"","publisher_portail");
+}
+
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+	
+	if (isNull(document.getElementById("iIdCivilite").value)
+	|| document.getElementById("iIdCivilite").value <= 0)
+	{
+		sError += "Vous devez saisir la civilit&eacute;.<br />";
+		bResult = false;
+	}
+	if (isNull(document.getElementById("sNom").value))
+	{
+		sError += "Vous devez saisir le nom.<br />";
+		bResult = false;
+	}
+	if (isNull(document.getElementById("sPrenom").value))
+	{
+		sError += "Vous devez saisir le prenom.<br />";
+		bResult = false;
+	}
+	if (!isMail(document.getElementById("sEmail").value))
+	{
+		sError += "La syntaxe de l'email n'est pas correcte.<br />";
+		bResult = false;
+	}
+	else if(document.getElementById("sEmailAuth").value == 0)
+	{
+		sError += "L'adresse email que vous avez saisie est déjà inscrite dans la base de données.\nVous ne pouvez pas poursuivre cette opération.<br />";
+		bResult = false;
+	}
+	
+	document.getElementById("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}

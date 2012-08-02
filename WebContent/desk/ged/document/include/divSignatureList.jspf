@@ -1,0 +1,242 @@
+<%@page import="org.coin.fr.bean.*"%>
+<%@page import="org.coin.bean.pki.certificate.signature.*"%>
+<%@page import="org.coin.bean.pki.certificate.*"%>
+<%@page import="org.coin.bean.pki.*"%>
+<%@page import="java.security.cert.X509Certificate"%>
+<%@page import="org.coin.bean.ged.*"%>
+<%@page import="org.coin.security.CertificateUtil"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.util.FileUtil"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.io.File"%>
+<%
+{
+	/**
+	 * Localization
+	 */
+	PkiCertificateSignature pkiCertificateSignatureLoc = new PkiCertificateSignature ();
+	pkiCertificateSignatureLoc.setAbstractBeanLocalization (sessionLanguage);
+%>
+
+<div id="divSignatureList" style="" >
+
+
+   
+    <div class="dataGridHolder fullWidth">
+        <table class="dataGrid fullWidth">
+        <tr class="header">
+            <td>&nbsp;</td>
+            <td><%=locTitle.getValue (57, "Date signature")%></td>
+            <td><%=pkiCertificateSignatureLoc.getIdIndividualLabel()%></td>
+            <td><%=pkiCertificateSignatureLoc.getIdTypeObjectLabel()%></td>
+            <td><%=pkiCertificateSignatureLoc.getIdPkiSignatureAlgorithmTypeLabel()%></td>
+            <td><%=pkiCertificateSignatureLoc.getIdPkiCertificateLabel()%></td>
+            <td><%=locTitle.getValue (58, "Revision")%></td>
+            <td>&nbsp;</td>
+        </tr>
+<%}%>
+<%
+    int ii = 0;
+    for(PkiCertificateSignature certificateSignature : vPkiCertificateSignature )
+    {
+        
+        PersonnePhysique ppSigner = null;
+        try{
+            ppSigner = PersonnePhysique.getOrLoadPersonnePhysique(
+                    certificateSignature.getIdIndividual(), vPersonnePhysique);
+        } catch(Exception e ) {
+            ppSigner = new PersonnePhysique();
+        }
+        
+        PkiCertificateSignatureType csType 
+            = PkiCertificateSignatureType.getPkiCertificateSignatureTypeMemory(
+                    certificateSignature.getIdPkiCertificateSignatureType());
+        
+        PkiSignatureAlgorithmType saType = 
+            PkiSignatureAlgorithmType.getPkiSignatureAlgorithmTypeMemory(
+                    certificateSignature.getIdPkiSignatureAlgorithmType());
+        
+        X509Certificate certif = CertificateUtil.getCertificate(certificateSignature.getCertificate());
+    
+        /**
+         * Revision
+         */
+         
+         
+        String sRevision = GedDocumentRevision.getRevisionName(
+                certificateSignature,
+                vGedDocumentRevision);
+         
+        /**
+         * Vérification
+         */
+        boolean bVerify = false;
+        String sIconVerification = rootPath;
+        String sIconVerificationAlt = "";
+        String sErrorMsg = "";
+        try{
+            File tempFile = hmFile.get(sRevision);
+            if(tempFile == null) {
+                 
+                tempFile = GedDocumentRevision.downloadFileTemp(
+                        sSubDirTemp, 
+                        certificateSignature,
+                        item,
+                        vGedDocumentRevision);
+                
+                hmFile.put(sRevision,tempFile);
+            }
+            bVerify = certificateSignature.verify(tempFile);
+        } catch (Exception ee) {
+            ee.printStackTrace();
+            sErrorMsg = Outils.getTextToHtml(ee.getMessage()) ;
+        }
+
+        sIconVerification += (bVerify? Icone.ICONE_SUCCES : Icone.ICONE_ERROR);
+        sIconVerificationAlt = (bVerify? locTitle.getValue (65, "signature ok") : (locTitle.getValue (66, "signature erronée") + " : " + sErrorMsg));
+        
+%>
+ <tr class="liste<%=ii%2%>" >
+            <td >
+                <img src="<%= sIconVerification %>"
+                     alt="<%= sIconVerificationAlt %>" 
+                     title="<%= sIconVerificationAlt %>" 
+                        />
+            </td> 
+            <td><%= CalendarUtil.getFormatDateHeureStd( certificateSignature.getDateCreation()) %></td>
+            <td><%= ppSigner.getPrenomNom() %></td>
+            <td><%= csType.getName() %></td>
+            <td><%= saType.getName() %></td>
+            <td>
+                <b><%=locTitle.getValue (59, "délivré à") %></b> <%=  CertificateUtil.getCertificateSubjectInfoCN(certif) %>
+                     (<%=  CertificateUtil.getCertificateSubjectInfoEmailAddress(certif)  %>)<br/>
+                <b><%=locTitle.getValue (60, "délivré par") %></b> <%= CertificateUtil.getCertificateIssuerInfoCN(certif) %><br/>
+                <b><%=locTitle.getValue (61, "expire le") %></b> <%= CalendarUtil.getFormatDateHeureStd(certif.getNotAfter()  ) %> <br/>
+            </td>
+            <td><%= sRevision %></td>
+            <td>
+                <img style="cursor: pointer;"
+                     src="<%= rootPath + "images/icons/file_locked.png" %>"
+                     onclick="doUrl('<%= 
+                           response.encodeURL(
+                                   rootPath + "desk/PkiDownloadCertificateSignature?" 
+                                   + "sAction=getSignature"
+                                   + "&lId=" + certificateSignature.getId()
+                                   
+                           ) %>');" 
+                    alt="<%=locTitle.getValue (62, "Télécharger la signature électronique")%>" 
+                    title="<%=locTitle.getValue (62, "Télécharger la signature électronique")%>" 
+                    />
+
+                <img style="cursor: pointer;"
+                     src="<%= rootPath + "images/icons/page_white_key.png" %>"
+                     onclick="doUrl('<%= 
+                           response.encodeURL(
+                                   rootPath + "desk/PkiDownloadCertificateSignature?" 
+                                   + "sAction=getCertificate"
+                                   + "&lId=" + certificateSignature.getId()
+                                   
+                           ) %>');" 
+                    alt="<%=locTitle.getValue (63, "Télécharger le certificat")%>" 
+                    title="<%=locTitle.getValue (63, "Télécharger le certificat")%>" 
+                    />
+<%
+
+    if(certificateSignature.getIdPkiSignatureAlgorithmType() == PkiSignatureAlgorithmType.SIGNATURE_TYPE_PKCS7
+    || certificateSignature.getIdPkiSignatureAlgorithmType() == PkiSignatureAlgorithmType.SIGNATURE_TYPE_XMLDSIG
+    )
+    {
+%>
+
+                <img style="cursor: pointer;"
+                     src="<%= rootPath + "images/icons/drive_key.png" %>"
+                     onclick="doUrl('<%= 
+                           response.encodeURL(
+                                   rootPath + "desk/PkiDownloadCertificateSignature?" 
+                                   + "sAction=getSignatureAttached"
+                                   + "&lId=" + certificateSignature.getId()
+                                   + "&lIdGedDocument=" + item.getId()
+                           ) %>');" 
+                    alt="<%=locTitle.getValue (64, "Télécharger la signature attachée") %>" 
+                    title="<%=locTitle.getValue (64, "Télécharger la signature attachée") %>" 
+                    />
+<%
+
+    }
+%>
+
+<%
+	if(sessionUserHabilitation.isSuperUser())
+	{
+%>
+                <img style="cursor: pointer;"
+                     src="<%= rootPath + Icone.ICONE_SUPPRIMER_NEW_STYLE %>"
+                     onclick="doUrlConfirm('<%= 
+                           response.encodeURL("modifyDocumentSignature.jsp?" 
+                                   + "sAction=remove"
+                                   + "&lId=" + certificateSignature.getId()
+                                   + "&lIdGedDocument=" + item.getId()
+                           ) %>','<%=locMessage.getValue (37, "Etes-vous sûr de vouloir supprimer ?") %>');" 
+                    title="<%=localizeButton.getValueDelete()%>"
+                    alt="<%=localizeButton.getValueDelete()%>" />
+                    
+<%
+	}
+%>                    
+            </td>
+
+<%
+        ii++;
+    }
+%>
+        </table>
+    </div>
+    
+<%
+	if(sessionUserHabilitation.isSuperUser())
+	{
+%>    
+<script type="text/javascript">
+
+/**
+ * Signature
+ */
+function addSignatureLastDocumentRevisionClient()
+{
+    location.href = '<%= response.encodeURL("modifyDocumentSignatureClientForm.jsp?sAction=create&lIdGedDocument=" + item.getId()) %>';
+}
+
+function addSignatureLastDocumentRevisionServer()
+{
+    location.href = '<%= response.encodeURL("modifyDocumentSignatureServerForm.jsp?sAction=createServer&lIdGedDocument=" + item.getId()) %>';
+}
+
+/**
+ * Seal
+ */
+function sealLastDocumentRevisionClient()
+{
+    location.href = '<%= response.encodeURL("modifyDocumentSignatureClientForm.jsp?sAction=sealLastRevision&lIdGedDocument=" + item.getId()) %>';
+}
+
+function sealLastDocumentRevisionServer()
+{
+    location.href = '<%= response.encodeURL("modifyDocumentSignatureServerForm.jsp?sAction=sealLastRevisionServer&lIdGedDocument=" + item.getId()) %>';
+}
+ 
+</script>
+
+
+    <button type="button" onclick="javascript:addSignatureLastDocumentRevisionClient();">
+            <%=locButton.getValue (17, "Add client signature")%></button>
+    <button type="button" onclick="javascript:addSignatureLastDocumentRevisionServer();">
+            <%=locButton.getValue (18, "Add server signature")%></button>
+    <button type="button" onclick="javascript:sealLastDocumentRevisionClient();">
+            <%=locButton.getValue (19, "Seal last revisions client")%></button>
+    <button type="button" onclick="javascript:sealLastDocumentRevisionServer();">
+            <%=locButton.getValue (20, "Seal last revisions server")%></button>
+<%
+	}
+%>
+</div>

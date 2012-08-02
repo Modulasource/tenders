@@ -1,0 +1,180 @@
+<%@page import="modula.marche.MarcheProcedureRecours"%>
+<%@page import="org.coin.fr.bean.Adresse"%>
+<%@page import="org.coin.fr.bean.CorrespondantOrganisation"%>
+<%@page import="org.coin.fr.bean.CorrespondantOrganisationInfo"%>
+<%
+	MarcheProcedureRecours marcheProcedureRecours = null;
+	try {
+		marcheProcedureRecours = MarcheProcedureRecours
+			.getMarcheProcedureRecoursFromIdMarche(marche.getId());
+	} catch (Exception e) {
+		marcheProcedureRecours = new MarcheProcedureRecours();
+	}
+
+
+	String sPaveAdresseTitre = "Adresse ";
+
+	CorrespondantOrganisation coRecours = marcheProcedureRecours.getOrNewCorrespondantOrganisationRecours(false);
+	CorrespondantOrganisation coMediation = marcheProcedureRecours.getOrNewCorrespondantOrganisationMediation(false);
+	CorrespondantOrganisation coIntroductionRecours = marcheProcedureRecours.getOrNewCorrespondantOrganisationIntroductionRecours(false);
+
+	Adresse adresseRecours = (Adresse) CoinDatabaseAbstractBean.getOrNewAbstractBean(coRecours.getIdAdresse(),	new Adresse());
+	Adresse adresseMediation = (Adresse) CoinDatabaseAbstractBean.getOrNewAbstractBean(coMediation.getIdAdresse(),	new Adresse());
+	Adresse adresseIntroductionRecours = (Adresse) CoinDatabaseAbstractBean.getOrNewAbstractBean(coIntroductionRecours.getIdAdresse(),	new Adresse());
+
+	
+	
+	Adresse adresse = null;
+	
+	CorrespondantOrganisationInfo coiRecours 
+		= CorrespondantOrganisationInfo
+			.getOrNewCorrespondantOrganisationInfoFromIdCorrespondantOrganisation(coRecours.getId(), false);
+	
+	CorrespondantOrganisationInfo coiMediation 
+		= CorrespondantOrganisationInfo
+			.getOrNewCorrespondantOrganisationInfoFromIdCorrespondantOrganisation(coMediation.getId(), false);
+
+	CorrespondantOrganisationInfo coiIntroductionRecours 
+		= CorrespondantOrganisationInfo
+			.getOrNewCorrespondantOrganisationInfoFromIdCorrespondantOrganisation(coIntroductionRecours.getId(), false);
+
+	CorrespondantOrganisationInfo correspondantOrganisationInfo = null;
+
+%>  
+<%@page import="org.coin.bean.html.HtmlBeanTableTrPave"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="org.coin.util.Outils"%>
+<input type="hidden" name="MarcheProcedureRecours_lIdCoRecours" value="<%= marcheProcedureRecours.getIdCoRecours()%>" />
+<input type="hidden" name="MarcheProcedureRecours_lIdCoMediation" value="<%= marcheProcedureRecours.getIdCoMediation()%>" />
+<input type="hidden" name="MarcheProcedureRecours_lIdCoIntroductionRecours" value="<%= marcheProcedureRecours.getIdCoIntroductionRecours()%>" />
+
+
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Procédure de recours</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align:left"><b>Procédures de recours</b></td>
+	</tr>
+<%
+		String sProcedureRecoursNone = "";
+		String sProcedureRecoursSelected = "";
+				
+		if(coRecours.getId() == 0)
+		{
+			sProcedureRecoursNone = " checked='checked' ";
+		} else {
+			sProcedureRecoursSelected = " checked='checked' ";
+		}
+		
+%>
+	<tr>
+		<td colspan="2" style="text-align:left">
+			<input type="radio" name="radioRecours" value="none" <%= sProcedureRecoursNone %> /> 
+			Néant</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:left">
+			<input type="radio" name="radioRecours" value="yes" <%= sProcedureRecoursSelected %> /> 
+			Instance chargée des procédures de recours</td>
+	</tr>
+			
+	<% 	
+		sFormPrefix = "CoRecours_"; 
+		adresse = adresseRecours;
+		correspondantOrganisationInfo = coiRecours;
+		
+		String sProcedureMediationNone = " checked='checked' ";
+		String sProcedureMediationSelected = "";
+
+		if(coMediation.getId() == 0)
+		{
+			sProcedureMediationNone = " checked='checked' ";
+		} else {
+			sProcedureMediationSelected = " checked='checked' ";
+		}
+
+	%>
+	<%@ include file="correspondantOrganisationInfoFormTr.jspf" %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align:left"><b>Procédures de médiation</b></td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:left">
+			<input type="radio" name="radioMediation" value="none" <%= sProcedureMediationNone %> /> 
+			Néant</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:left">
+			<input type="radio" name="radioMediation" value="yes" <%= sProcedureMediationSelected %>  /> 
+			Organe chargé des procédures de médiations</td>
+	</tr>
+	<% 	
+		sFormPrefix = "CoMediation_"; 
+		adresse = adresseMediation;
+		correspondantOrganisationInfo = coiMediation;
+
+		String sIntroductionRecoursNone = "";
+		String sIntroductionRecoursFreeText = "";
+		String sIntroductionRecoursSelected = "";
+
+		if(coiIntroductionRecours.getId() == 0)
+		{
+			if(Outils.isNullOrBlank( marcheProcedureRecours.getIntroductionRecoursDescription())){
+				sIntroductionRecoursNone = " checked='checked' ";
+			}else {
+				sIntroductionRecoursFreeText = " checked='checked' ";
+			}
+		} else {
+			sIntroductionRecoursSelected = " checked='checked' ";
+		}
+	
+	%>
+	<%@ include file="correspondantOrganisationInfoFormTr.jspf" %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align:left">
+			<b>Introduction des recours</b>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:left">
+			<input type="radio" name="radioIntroductionRecours" value="none" <%= sIntroductionRecoursNone %> /> 
+			Néant</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:left" >
+			<input type="radio" name="radioIntroductionRecours"  value="freetext" <%= sIntroductionRecoursFreeText %> /> 
+			Introduction des recours au format libre.
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Précision(s) concernant le(s) délai(s) d'introduction des recours :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea rows="5" cols="60" name="MarcheProcedureRecours_sIntroductionRecoursDescription"><%= 
+				marcheProcedureRecours.getIntroductionRecoursDescription() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:left" >
+			<input type="radio" name="radioIntroductionRecours" value="yes" <%= sIntroductionRecoursSelected %> /> 
+			Service auprès duquel des renseignements peuvent être obtenus concernant l'introduction des recours.
+		</td>
+	</tr>
+	<% 	
+		sFormPrefix = "CoIntroductionRecours_"; 
+		adresse = adresseIntroductionRecours;
+		correspondantOrganisationInfo = coiIntroductionRecours;
+	%>
+	<%@ include file="correspondantOrganisationInfoFormTr.jspf" %>
+	
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

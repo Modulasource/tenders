@@ -1,0 +1,227 @@
+<%@page import="org.coin.util.Outils"%>
+
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="modula.marche.MarcheType"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="org.coin.bean.boamp.BoampCpfSimplifie"%>
+
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveObjet')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePetiteAnnonceTitre %></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<table id="paveObjet" summary="La petite annonce">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					R&eacute;f&eacute;rence de la petite annonce* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant( marche.getReference())%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					N° d'ordre d'insertion :<br/>
+					<i>référence externe</i>
+					</td>
+					<td class="pave_cellule_droite">
+					<%=Outils.getStringNotNullNeant( marche.getReferenceExterne())%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Objet du march&eacute;* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= 
+						Outils.linkify( 
+								Outils.getTextToHtml( 
+										Outils.getStringNotNullNeant( 
+												marche.getObjet())),
+								" target='_blank'") 
+                     %>
+					</td>
+				</tr>
+				<tr>
+					<% 
+					String sTypePetiteAnnonce = "<b><span class='rouge' >Indéfini !</span></b>";
+				 	if ( marche.isAffaireAAPC(false)) 
+				 	{
+					 	sTypePetiteAnnonce = "AAPC";
+				 	}
+				 	if( marche.isAffaireAATR(false) )
+				 	{
+					 	sTypePetiteAnnonce = "AATR";
+				 	}
+				 	if( marche.isRecapAATR(false) )
+				 	{
+					 	sTypePetiteAnnonce = "Récapitulatif d'attribution";
+				 	}
+				
+					%><td class="pave_cellule_gauche">
+					Type de petite annonce :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= sTypePetiteAnnonce %>&nbsp;&nbsp;&nbsp;
+					<strong>Avis rectificatif :</strong>
+<%
+					boolean bIsAvisRectifPA = false;
+					try{
+						bIsAvisRectifPA = marche.isAvisRectifPA() ;
+					}
+					catch(Exception e){}
+%> 
+					<%= bIsAvisRectifPA ?"oui":"non" %>&nbsp;&nbsp;&nbsp;
+					<strong>Annonce groupée :</strong>
+					<%= bIsPAGrouped?"oui":"non" %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche" style="vertical-align : top;" >
+						Edition de la petite annonce : 
+					</td>
+					<td class="pave_cellule_droite">
+<%
+						String sDesc = "";
+						try {
+							sDesc = marche.getPetiteAnnonceTexteLibre();
+							sDesc = Outils.replaceAll(sDesc,"¤","&euro;");
+							sDesc = Outils.linkify( 
+		                                Outils.getTextToHtml( 
+		                                		sDesc),
+		                                " target='_blank'") ;
+
+						} catch (Exception e) {}
+%>
+						<%= sDesc %>
+					</td>
+				</tr>
+				<%
+				String sUrlPj = "";
+				if(!marche.getNomAAPC().equals("")) {
+					sUrlPj = "desk/DownloadFileDesk?"
+	                    + DownloadFile.getSecureTransactionStringFullJspPage(
+	                            request, 
+	                            marche.getIdMarche(), 
+	                            TypeObjetModula.AAPC);
+	            
+					sUrlPj = response.encodeURL(rootPath + sUrlPj);
+				}
+                %>
+				<tr>
+					<td class="pave_cellule_gauche" style="vertical-align:middle">Pièce jointe :</td>
+					<td class="pave_cellule_droite" style="vertical-align:middle">
+                        <a href='<%= sUrlPj %>'>
+	                        <%= Outils.getString(marche.getNomAAPC(),"Pas de pièce jointe")%>
+                        </a>
+						<img src="<%=rootPath + Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE %>" alt="pièce jointe" /><br/>
+						<input disabled="disabled" type="checkbox" name="bIsDCEDisponible" <%= 
+							marche.isDCEDisponible(false)?"checked='checked'":"" 
+							%> /> est un DCE<br/>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Supports de publication :</td>
+					<td class="pave_cellule_droite">
+<%
+	Vector<Export> vExports = Export.getAllExportFromSource(marche.getIdMarche(),ObjectType.AFFAIRE);
+	for(int i=0;i<vExports.size();i++){
+		try{
+			Organisation organisationPublication 
+				= Organisation.getOrganisation(
+						vExports.get(i).getIdObjetReferenceDestination());
+			
+%>
+			<%=organisationPublication.getRaisonSociale()+"<br />" %>
+			
+<%		}
+		catch(Exception e){}
+	}
+
+
+%>	<%=vExports.size()<1?"Pas de supports de publication":"" %>				
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Type de marché* :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= (marche.getIdMarcheType() != 0) ? MarcheType.getMarcheTypeLibelle(marche.getIdMarcheType()):"Indéfini" %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Type de prestations* :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= (marche.getIdMarcheType() != 0) ? MarcheType.getLibelleDetail(marche.getIdMarcheType()):"Indéfini" %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Mode de passation* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sPassation = "";
+			try
+			{
+				sPassation = MarchePassation.getMarchePassationNameMemory(marche.getPetiteAnnoncePassation());
+			}
+			catch(Exception e){}
+		%>
+	    <%= sPassation %>
+		</td>
+	</tr>
+	<tr>
+        <td class="pave_cellule_gauche">
+        Secteur d'activité* :
+        </td>
+        <td class="pave_cellule_droite">
+        <%
+            String sSecteurActivite = "";
+            try
+            {
+            	Vector<BoampCPFItem> vBoampCPFItems = BoampCPFItem.getAllFromTypeAndReferenceObjet(TypeObjetModula.AFFAIRE, marche.getIdMarche());
+            	if(vBoampCPFItems.size() != 0) {
+	            	long lIdBoamp = vBoampCPFItems.firstElement().getIdOwnedObject();
+	            	if(lIdBoamp == 0) {
+		           		lIdBoamp = vBoampCPFItems.firstElement().getIdBoampCpfSimplifie();
+		           		if(lIdBoamp == 0) {
+		           			sSecteurActivite = "Indéfini";
+		           		} else {
+		           		   sSecteurActivite = BoampCpfSimplifie.getBoampCpfSimplifie(lIdBoamp).getLibelle();
+		           		}
+	            	} else {
+	            	    sSecteurActivite = BoampCPF.getBoampCPF(lIdBoamp).getName();
+	            	}
+            	} else {
+                    sSecteurActivite = "Indéfini";            		
+            	}
+            }
+            catch(Exception e){}
+        %>
+        <%= sSecteurActivite %>
+        </td>
+    </tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>
+<br />

@@ -1,0 +1,139 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		String sPaveConditionsTitre;
+	*
+	*	Champs renvoyés :
+	*		String sCautionnement;
+	*		String sFinancement;
+	*		String sFormeGroupement;
+	*		String sCritereCandidature;
+	*		String sReferenceJuridique;
+	*		String sReferenceEco;
+	*		String sReferenceTech;
+	*		int iNbMinCandidats;
+	*		int iNbMaxCandidats;
+	*/
+
+
+%>
+<%@page import="org.coin.bean.question.*"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.MarcheConditionParticipation"%>
+<%@page import="modula.marche.MarcheConditionRelative"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="java.util.Vector"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveConditionsTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Cautionnement et garanties exigées :<br />
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CAUTIONNEMENT) %>
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td><textarea name="<%=sFormPrefix %>sCautionnement" id="<%=sFormPrefix %>sCautionnement" cols="100" rows="6"><%= marche.getCautionnement() %></textarea></td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdCautionnement",rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Modalit&eacute;s essentielles de financement et de paiement et/ou r&eacute;f&eacute;rences des dispositions applicables :<br />
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.MODALITE) %>
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td><textarea name="<%=sFormPrefix %>sFinancement" id="<%=sFormPrefix %>sFinancement" cols="100" rows="6"><%= marche.getFinancement() %></textarea></td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdFinancement",rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Forme juridique que devra rev&ecirc;tir le groupement d'entrepreneur, de fournisseurs ou de prestataires de services attributaire du march&eacute;:
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.FORME) %>
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td><textarea name="<%=sFormPrefix %>sFormeGroupement" id="<%=sFormPrefix %>sFormeGroupement" cols="100" rows="6"><%= marche.getFormeGroupement() %></textarea></td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdFormeGroupement",rootPath,sessionUserHabilitation) %>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<% 
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE) )
+	{
+	%>		
+	<%= QuestionAnswer.getHTML(
+			"ExecutionMarcheSoumiseAutreConditionParticuliere", 
+			"lIdQaAutreCondition",
+			mcr.getIdQaAutreCondition(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_SELECT) %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Dans l'affirmative, description de ces conditions :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea rows="3" cols="60" name="sAutreCondition" ><%= mcr.getAutreCondition() %></textarea>
+		</td>
+	</tr>
+	<%
+	} 
+	%>
+	<% 
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE) )
+	{
+	%>		
+	<%= QuestionAnswer.getHTML(
+			"fondsCommunautaires", 
+			"lIdQaFondCommunautaire",
+			joueInfo.getIdQaFondCommunautaire(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_SELECT) %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Dans l'affirmative, référence du ou des projet(s) et/ou programme(s) :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea rows="3" cols="60" name="sReferenceFondCommunautaire" ><%= joueInfo.getReferenceFondCommunautaire("") %></textarea>
+		</td>
+	</tr>
+	<%
+	} 
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Unité monétaire utilisée, l'euro :<br/>
+            <i>ne sera pas repris dans la publication au JOUE</i>
+		</td>
+		<td class="pave_cellule_droite">
+			<% 
+				boolean bIsEuro = false;
+				try{
+					bIsEuro	= marche.isEuro(); 
+				}
+				catch(Exception e){}
+				String sEuroSelected = bIsEuro?"checked=\"checked\"":"";
+			%>
+			<input type="checkbox" name="<%=sFormPrefix %>bEuro" value="1" style="vertical-align:middle" <%=sEuroSelected %> />
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />
+

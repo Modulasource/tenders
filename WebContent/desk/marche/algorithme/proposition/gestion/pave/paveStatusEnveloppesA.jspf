@@ -1,0 +1,87 @@
+<%@page import="modula.candidature.*"%>
+<%@page import="org.coin.fr.bean.*"%>
+<%
+		/* Récupération de l'enveloppe B */
+		EnveloppeALot oEnveloppeALot = vItems.get(i);
+		Candidature oCandidature = null;
+		try	{oCandidature = Candidature.getCandidatureFromEnveloppeA(oEnveloppeALot.getIdEnveloppeA());}
+		catch(Exception e)	{System.out.println("Pas de candidature associée à l'enveloppe A:"+oEnveloppeALot.getIdEnveloppeA());}
+		
+		PersonnePhysique candidat = PersonnePhysique.getPersonnePhysique(oCandidature.getIdPersonnePhysique());
+		Organisation org = Organisation.getOrganisation(oCandidature.getIdOrganisation());
+		
+		String sCandidature = candidat.getCivilitePrenomNom() +" ("+org.getRaisonSociale()+")";
+		if(bIsAnonyme)
+			sCandidature = "Candidature ORG"+org.getId();
+		
+		boolean bHorsDelais = false;
+		String sDelais = "";
+		EnveloppeA envA = EnveloppeA.getEnveloppeA(oEnveloppeALot.getIdEnveloppeA());
+		if(envA != null) bHorsDelais = envA.isHorsDelais(false);
+		if(bHorsDelais) sDelais = "<span class=\"altColor\">Hors Delais</span>";
+		
+		boolean bIsCandidaturePapier = oCandidature.isCandidaturePapier(false);
+		boolean bIsValide = oCandidature.isValide(false);
+		String sFormat = "Electronique";
+		if(bIsCandidaturePapier) sFormat = "Papier";
+		if(bIsValide){
+		%>
+
+<li class="list_item" id="candidat_<%= oEnveloppeALot.getId() %>">
+	     <div style="float:left;padding-top:3px" id="candidat_desc_<%= oEnveloppeALot.getId() %>">
+	     <span style="color:#124D85;font-weight:bold">
+	     <span id="candidat_order_<%= oEnveloppeALot.getId() %>"><%= (i+1)+". "%></span>
+	     <%= sCandidature %>
+	     </span>
+	     <%= !sDelais.equalsIgnoreCase("")?" - " + sDelais:"" %> - <%= sFormat %>
+	     </div>
+	     <div style="float:right" id="candidat_actions_<%= oEnveloppeALot.getId() %>">
+	     <%
+			if(bAfficherBoutonContenu)
+			{
+			%>
+			<span id="candidat_content_<%= oEnveloppeALot.getId() %>"
+			onclick="javascript:openModal('<%= response.encodeURL(rootPath + "desk/marche/algorithme/proposition/gestion/ouvrirEnveloppeA.jsp?iIdLot="+lot.getIdMarcheLot()+"&iIdCandidature="+oCandidature.getIdCandidature() )%>','Contenu de la candidature de <%= sCandidature%>')">
+			<img src="<%=rootPath+"images/icons/candidat_dossier.png"%>" style="vertical-align:middle;cursor:pointer" />
+			</span>
+			<script>
+			Event.observe(window, 'load', function(){
+				new Control.ToolTip($("candidat_content_<%=oEnveloppeALot.getId() %>"),"Voir le contenu",{
+					className:'infobulle_tooltip',
+					position: 'mouse',
+					offsetTop: 30,
+					offsetLeft: -15
+				});
+			});
+			</script >
+			<%
+			}
+			%>
+			&nbsp;
+			<%
+			if(bAfficherBoutonCommentaire)
+			{
+			%>
+			<span id="candidat_comment_<%= oEnveloppeALot.getId() %>"
+			onclick="javascript:openModal('<%= response.encodeURL(rootPath + "desk/marche/algorithme/proposition/gestion/modifierCommentaireEnveloppeAForm.jsp?iIdLot="+lot.getIdMarcheLot()+"&iIdCandidature="+oCandidature.getIdCandidature() )%>','Commentaires de la candidature de <%= sCandidature%>')">
+			<img src="<%=rootPath+"images/icons/comment.png"%>" style="vertical-align:middle;cursor:pointer" />
+			</span>
+			<script>
+			Event.observe(window, 'load', function(){
+				new Control.ToolTip($("candidat_comment_<%=oEnveloppeALot.getId() %>"),"Commentaires",{
+					className:'infobulle_tooltip',
+					position: 'mouse',
+					offsetTop: 30,
+					offsetLeft: -15
+				});
+			});
+			</script >
+			<%
+			}
+			%>
+			</div>
+			<div style="clear:both"></div>
+	   	</li>
+<%
+		}
+%>

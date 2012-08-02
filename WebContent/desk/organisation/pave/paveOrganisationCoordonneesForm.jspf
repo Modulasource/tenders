@@ -1,0 +1,48 @@
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="org.coin.fr.bean.OrganisationService"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="mt.common.addressbook.AddressBookOwner"%>
+
+
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sBlocNameIdentity %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getMailOrganisationLabel() + " :","sMailOrganisation",organisation.getMailOrganisation(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getTelephoneLabel()+ " :","sTelephone",organisation.getTelephone(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getFaxLabel() + " :","sFax",organisation.getFax(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getSiteWebLabel() + " :","sSiteWeb",organisation.getSiteWeb(),"") %>
+<%
+	if(doh.bDisplayExternalReference)
+	{
+%><%= hbFormulaire.getHtmlTrInput( "Reference externe :","sReferenceExterne", organisation.getReferenceExterne()) %><%
+		if(doh.bDisplayReferenceExterneAP)
+		{ 
+%><%= hbFormulaire.getHtmlTrInput( "Reference externe AP :","sReferenceExterneAP", organisation.getReferenceExterneAP()) %>
+<%
+		}
+	}
+
+	if(doh.bDisplayOwner ){ 
+		AddressBookOwner addressBookOwner = new AddressBookOwner ();
+		addressBookOwner.setItemOwned(organisation);
+		addressBookOwner.compute(conn);
+
+		request.setAttribute("addressBookOwner", addressBookOwner);
+%>
+	<tr>
+		<td class="pave_cellule_gauche" >Appartient à (owner)</td>
+		<td class="pave_cellule_droite" >
+		<jsp:include page="/desk/organisation/bloc/blocDisplayAddressBookOwner.jsp"></jsp:include>	
+		</td>
+	</tr>		
+<%
+	}
+%>
+
+ 	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

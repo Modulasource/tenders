@@ -1,0 +1,167 @@
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="org.coin.fr.bean.export.PublicationBoamp"%>
+<%@page import="modula.ws.boamp.suivi.Annonce"%>
+<%@page import="org.coin.util.Outils"%>
+<%
+		 	ListSuivi listSuivi = null;
+		 	if(vPublicationBoamp.size() > 0)
+		 	{
+		 		listSuivi = ServeurFichiersXMLBoamp.recupererSuiviPublicationBoamp(marche.getIdMarche(),export);
+		 	} else {
+				bSendPublicationBoampTest = true;
+		 	}
+		 	
+		 	%>
+<%@page import="modula.ws.boamp.suivi.ListSuivi"%>
+<%@page import="modula.ws.boamp.ServeurFichiersXMLBoamp"%>
+
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<table class="pave" >
+	<tr><td colspan="2" class="pave_titre_gauche">Test de conformité de votre annonce au B.O.A.M.P</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			<img src="<%=rootPath + modula.graphic.Icone.ICONE_WARNING %>" style="vertical-align:middle" alt ="Attention" />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+Pour publier votre avis au B.O.A.M.P vous devez auparavant tester la conformité
+de votre avis suivant les règles imposées par le B.O.A.M.P afin de vous assurer
+de sa bonne validité.<br/>
+<br/>
+En cas de rejet nous vous laissons la possibilité de modifier votre annonce pour
+la rendre conforme aux normes de la Direction des Journaux Officiels.<br/>
+<br/>
+Le test de conformité au B.O.A.M.P peut durer jusqu'à 30 minutes. Les tests
+étant réalisés dans les conditions du réel, MODULA attendra la réponse du
+Serveur BOAMP avant de vous permettre de passer à l'étape suivante.<br/>
+</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+<% 
+    vPublicationBoamp = PublicationBoamp.getAllPublicationBoampWithTestFromAffaire(marche.getIdMarche(), iIdPublicationType);
+
+	boolean bIsLectureSeule = true;
+	if(vPublicationBoamp != null && vPublicationBoamp.size() > 0) {
+		bIsLectureSeule = true;
+	} else {
+		bIsLectureSeule = false;
+	}
+	String sMessagePublicationType = "";
+	if(iIdPublicationTypeToSend == PublicationType.TYPE_AAPC)
+	{
+	    sMessagePublicationType = "BOAMP AAPC";
+	}
+	if(iIdPublicationTypeToSend == PublicationType.TYPE_AATR)
+	{
+	    sMessagePublicationType = "BOAMP AATR";
+	}
+	
+	if(iIdPublicationTypeToSend == PublicationType.TYPE_JOUE_FORM)
+	{
+	    sMessagePublicationType = "JOUE Formulaire " + iIdFormulaireJoue;
+	}
+	
+		for(int k=0;k<vPublicationBoamp.size();k++)
+			{
+				PublicationBoamp publi = vPublicationBoamp.get(k);
+				publi.checkArXml();
+			    
+				String sPublicationEtatName = "?";
+				
+				try {
+					sPublicationEtatName 
+					   = PublicationEtat.getPublicationEtat(
+							   publi.getIdPublicationEtat()).getName();
+				} catch (CoinDatabaseLoadException e) {}
+
+                if(publi.getIdPublicationEtat() == PublicationEtat.ETAT_ENVOI_ACCEPTE) {
+                    sPublicationEtatName = "TEST BOAMP EN COURS";
+                }
+                
+				if(publi.getIdPublicationEtat() == PublicationEtat.ETAT_ENVOI_REFUSE
+				|| publi.getIdPublicationEtat() == PublicationEtat.ETAT_REJETEE_PARSING_XML 
+				|| publi.getIdPublicationEtat() == PublicationEtat.ETAT_REJETEE_VALIDATION_DJO
+				|| publi.getIdPublicationEtat() == PublicationEtat.ETAT_REJETEE_VALIDATION_EDITORIALE
+				)
+				{
+					bSendPublicationBoampTest = true;
+					bIsLectureSeule = false;
+				}
+				
+				/**
+				 * les différents états 
+				 1) A envoyer
+				 2) Envoi accepté / Envoi refusé
+				 3) En cours de validation éditoriale / Annonce rejetée ne respectant pas les règles de validation de la D.J.O.
+				 4) En cours de publication / Rejetée après validation éditoriale
+				 5) Publiée
+				 */
+				if(publi.getIdPublicationEtat() == PublicationEtat.ETAT_ENCOURS_PUBLICATION
+				|| publi.getIdPublicationEtat() == PublicationEtat.ETAT_ENCOURS_VALIDATION_EDITORIALE
+				|| publi.getIdPublicationEtat() == PublicationEtat.ETAT_PUBLIEE
+				)
+				{
+                    sPublicationEtatName = "TEST BOAMP TERMINE - VOUS POUVEZ DESORMAIS VALIDER VOTRE MARCHE";
+					bAllowValidateAvis = true;
+				}
+				 
+				String sMessageReturn = "";
+				if(listSuivi != null)
+				{
+					Annonce annonce = listSuivi.getAnnonce(publi.getNomFichier());
+					if(annonce != null)
+					{
+						sMessageReturn = annonce.getErreursToString(marche.getIdMarche());
+					}
+				}
+				sMessageReturn += Outils.getTextBetweenOptional(publi.getArXml(), "<MESSAGE>", "</MESSAGE>");
+				
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			Test de conformité : <br/>
+            <i>(Publication type <%= sMessagePublicationType  %>)</i>
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+				Numéro <%= publi.getId() %>, état : <%= sPublicationEtatName %><br/>
+				<%= Outils.getTextToHtml( sMessageReturn) %>
+		</td>
+	</tr>
+<%
+				if(!bAllowValidateAvis
+				&& publi.getIdPublicationEtat() != PublicationEtat.ETAT_ENVOI_ACCEPTE)
+					publi.remove();
+			} 
+
+			if(bIsLectureSeule || bAllowValidateAvis) {
+				marche.setLectureSeule(true);
+			} else {
+				marche.setLectureSeule(false);
+			}
+			marche.store();
+			
+			if(bSendPublicationBoampTest)
+			{
+%>
+	<tr><td colspan="2" style="text-align:center">
+						<button type="button" class="disableOnClick" 
+							onclick="Redirect('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + export.getIdExport()
+								+ "&amp;iIdPublicationType=" + iIdPublicationTypeToSend
+								+ "&amp;iIdFormulaireJoue=" + iIdFormulaireJoue
+                                + "&amp;sUrlReturn=" + sUrlReturnToSend
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+								+ "&amp;bIsPublicationTest=true"
+								+ "&amp;bRemovePreviousPublication=true"
+								+ "&amp;bIsLectureSeule=true"
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Tester 
+								la conformité de mon avis pour le <%= sMessagePublicationType %></button>
+	</td></tr>
+<%
+			}
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

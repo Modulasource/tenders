@@ -1,0 +1,102 @@
+<%
+	Node nodeConditions =  BasicDom.getChildNodeByNodeName(nodeAnn, "conditions" );
+	String sImgUniteMonetaire = sSrcImageChecked ;
+	try{
+		BasicDom.getChildNodeByNodeName(nodeConditions, "euro" );
+	} catch (Exception e)
+	{
+		sImgUniteMonetaire = sSrcImageNotChecked ;
+	}
+	
+	String sImgRedactionOffreEtCandidatureEnFrancais = sSrcImageChecked ;
+	try{
+		BasicDom.getChildNodeByNodeName(nodeConditions, "langueFR" );
+	} catch (Exception e)
+	{
+		sImgRedactionOffreEtCandidatureEnFrancais = sSrcImageNotChecked ;
+	}
+	
+	
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc7')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 7 Conditions relatives au marché</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc7" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Cautionnement et garanties exigés : (le cas échéant) </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeConditions, "garanties" )  %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Modalités de financement et de paiement et/ou références aux textes qui les réglementent :</td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeConditions, "modFinancement" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Forme juridique que devra revêtir le groupement d'entrepreneurs, de fournisseurs ou de prestataires de services : (le cas échéant)</td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeConditions, "formejuridique" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">(champ forcé à "vrai" dans Modula) <img src="<%= sImgUniteMonetaire %>" /></td>
+				<td class="pave_cellule_droite">Unité monétaire utilisée, l'euro
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Langues pouvant être utilisées dans l'offre ou la candidature autre que la langue française :</td>
+				<td class="pave_cellule_droite">
+<%
+{
+	try {
+		Node nodeConditionsLangue =  BasicDom.getChildNodeByNodeName(nodeConditions, "langue" );
+	
+		Node noteLangueTemp = BasicDom.getFirstChildElementNode(nodeConditionsLangue);
+		while (noteLangueTemp != null)
+		{
+			if(noteLangueTemp.getNodeName().equals("langEC") )
+			{
+				%><%= noteLangueTemp.getTextContent()  %><br /><%
+			}
+			
+			noteLangueTemp = BasicDom.getNextSiblingElementNode(noteLangueTemp );
+	 	}
+	} catch (Exception e) {}
+ }%>	
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Autre(s) : </td>
+				<td class="pave_cellule_droite">
+<%
+{
+	try {
+		Node nodeConditionsLangue =  BasicDom.getChildNodeByNodeName(nodeConditions, "langue" );
+	 
+		Node noteLangueTemp = BasicDom.getFirstChildElementNode(nodeConditionsLangue);
+		while (noteLangueTemp != null)
+		{
+			if(noteLangueTemp.getNodeName().equals("langAutre") )
+			{
+				%><%= noteLangueTemp.getTextContent()  %><br /><%
+			}
+			
+			noteLangueTemp = BasicDom.getNextSiblingElementNode(noteLangueTemp );
+	 	}
+	} catch (Exception e) {}
+ }%>	
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">(champ forcé à "vrai" dans Modula) <img src="<%= sImgRedactionOffreEtCandidatureEnFrancais  %>" /></td>
+				<td class="pave_cellule_droite">Les candidatures et les offres seront entièrement rédigées en langue française ainsi que les documents de présentation associés.
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

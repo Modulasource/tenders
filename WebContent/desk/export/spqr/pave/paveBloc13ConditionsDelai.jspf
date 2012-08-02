@@ -1,0 +1,81 @@
+<%
+	Node nodeDelais = BasicDom.getChildNodeByNodeName(nodeAnn, "delais");
+	String sReceptCandidatures = "" ;
+	String sReceptionOffres = "" ;
+	String sEnvoiInvitation = "" ;
+	try{
+		java.sql.Timestamp tsReceptionCandidatures
+			= org.coin.util.CalendarUtil.getConversionXmlDateTimeToTimestamp(
+				BasicDom.getChildNodeValueByNodeNameOptional(nodeDelais, "ReceptCandidatures"));
+				
+		sReceptCandidatures = org.coin.util.CalendarUtil.getDateFormattee(tsReceptionCandidatures);
+	} catch (Exception e) {}
+
+	try{
+		java.sql.Timestamp tsReceptionOffres 
+			= org.coin.util.CalendarUtil.getConversionXmlDateTimeToTimestamp(
+				BasicDom.getChildNodeValueByNodeNameOptional(nodeDelais, "ReceptionOffres"));
+				
+		sReceptionOffres = org.coin.util.CalendarUtil.getDateFormattee(tsReceptionOffres);
+	} catch (Exception e) {}
+	
+	try{
+		java.sql.Timestamp tsEnvoiInvitation
+			= org.coin.util.CalendarUtil.getConversionXmlDateTimeToTimestamp(
+				BasicDom.getChildNodeValueByNodeNameOptional(nodeDelais, "EnvoiInvitation"));
+				
+		sEnvoiInvitation = org.coin.util.CalendarUtil.getDateFormattee(tsEnvoiInvitation);
+	} catch (Exception e) {}
+	
+	String sDelaiMinValiditeOffres = "";
+	try{
+		Node nodeValidite = BasicDom.getChildNodeByNodeName(nodeDelais, "validite");
+		try{
+			sDelaiMinValiditeOffres 
+				= BasicDom.getChildNodeValueByNodeName(nodeValidite, "nbmois") + " mois";
+		} catch (Exception e) {}
+		try{
+			sDelaiMinValiditeOffres 
+				+= BasicDom.getChildNodeValueByNodeName(nodeValidite, "nbjours") + " jours";
+		} catch (Exception e) {}
+		
+		try{
+			sDelaiMinValiditeOffres 
+				= "jusqu'au " + BasicDom.getChildNodeValueByNodeName(nodeValidite, "dateJusquau") ;
+		} catch (Exception e) {}
+	} catch (Exception e) {}
+	
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc13')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 13 Conditions de délai</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc13" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche"><span class="rouge">* Date limite de réception des candidatures : </span></td>
+				<td class="pave_cellule_droite"><%= sReceptCandidatures %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><span class="rouge">* Date limite de réception des offres : </span></td>
+				<td class="pave_cellule_droite"><%= sReceptionOffres %>
+				</td>
+			</tr>
+			<tr>	
+				<td class="pave_cellule_gauche">Date prévue pour l'envoi de l'invitation à présenter une offre aux candidats sélectionnés : </td>
+				<td class="pave_cellule_droite"><%= sEnvoiInvitation %> c'est un champ "dateTime" pour le Boamp et non un champ "date" voir avec Leila
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Délai minimum de validité des offres : </td>
+				<td class="pave_cellule_droite"><%= sDelaiMinValiditeOffres  %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,57 @@
+<%
+	/*
+	* 	Nécessite les objets suivants :
+	* 	
+	*/
+	
+%>
+<input type="hidden" name="iIdMailType" value="<%= oMailType.getIdMailType() %>" />
+<input type="hidden" name="sAction" value="<%= sAction %>" />
+<table class="pave" summary="none">		
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"> 
+			Mail type 
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Id :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oMailType.getIdMailType() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Libelle* :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix %>sLibelle" size="100" maxlength="255"
+				value="<%= oMailType.getLibelle() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Objet* :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix %>sObjetType" size="100" maxlength="255"
+				value="<%= oMailType.getObjetType() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align : top">
+			Corps* :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea ="text"  cols="100" rows="30" name="<%=sFormPrefix %>sContenuType" ><%= oMailType.getContenuType() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>
+

@@ -1,0 +1,105 @@
+<%
+Vector vObjetsPrincipauxLots = MarcheCPVObjet.getAllMarcheCPVObjetFromLot(lot.getIdMarcheLot());
+
+for (int k = 0; k < vObjetsPrincipauxLots.size(); k++)
+{
+	MarcheCPVObjet cpv = (MarcheCPVObjet)vObjetsPrincipauxLots.get(k);
+	
+	/* Récupération du CPVDescripteur associé à l'objet CPV principal */
+	Vector vCpvDescripteurs = CPVDescripteur.getAllCPVDescripteur(cpv.getIdMarcheCpvObjet());
+	CPVDescripteur cpvDescripteur = null;
+	Vector vCpvDescripteurSupplementaires = null;
+%>
+
+<%@page import="modula.marche.cpv.CPVPrincipal"%>
+<%@page import="modula.marche.cpv.CPVDescripteurSupplementaire"%>
+<%@page import="modula.marche.cpv.CPVDescripteur"%>
+<%@page import="modula.marche.MarcheCPVObjet"%>
+<%@page import="modula.marche.cpv.CPVSupplementaire"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="java.util.Vector"%>
+<table class="pave" >
+	<tr onclick="montrer_cacher('paveNomenclatureLot<%= lot.getNumero() %>')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveNomenclatureLotTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveNomenclatureLot<%= lot.getNumero() %>" summary="Nomenclature">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+<%
+	for (int j = 0; j < vCpvDescripteurs.size(); j++)
+	{
+		cpvDescripteur = (CPVDescripteur)vCpvDescripteurs.get(j);
+
+		/* Récupération des CPV descripteurs supplémentaires */
+		vCpvDescripteurSupplementaires = 
+			CPVDescripteurSupplementaire.getAllCPVDescripteurSupplementaireFromDescripteur(
+					cpvDescripteur.getIdCpvDescripteur());
+%>
+				<tr>
+					<td class="pave_cellule_droite" colspan="2"  style="font-weight:bold;text-decoration:underline">
+					Objet <%= (cpv.getCpvType() == MarcheCPVObjet.PRINCIPAL ? "principal" : "supplémentaire") %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Descripteur principal :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+		CPVPrincipal cpvPrincipal = null ;
+		try{
+	        cpvPrincipal = CPVPrincipal.getCPVPrincipal(cpvDescripteur.getIdCpvPrincipal());
+		} catch (CoinDatabaseLoadException e){
+			cpvPrincipal = new CPVPrincipal();
+			cpvPrincipal.setId(cpvDescripteur.getIdCpvPrincipal());
+			cpvPrincipal.setName("Inconnu !");
+		}
+%>
+            		<%= cpvPrincipal.getIdString() + " - " + cpvPrincipal.getName() %>
+					</td>
+				</tr>
+<%
+		if ( vCpvDescripteurSupplementaires.size() > 0)
+		{
+			for(int l = 0; l < vCpvDescripteurSupplementaires.size(); l++)
+			{
+				CPVDescripteurSupplementaire cpvDescSupp 
+					= (CPVDescripteurSupplementaire)vCpvDescripteurSupplementaires.get(l);
+				
+				CPVSupplementaire cpvSupp ;
+				try{
+					cpvSupp = CPVSupplementaire.getCPVSupplementaire(cpvDescSupp.getName());
+				} catch (CoinDatabaseLoadException e) {
+					cpvSupp = new CPVSupplementaire();
+					cpvSupp .setName(e.getMessage());
+				}
+%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Descripteur suppl&eacute;mentaire :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= cpvSupp.getIdString() + " - " + cpvSupp.getName() %>
+					</td>
+				</tr>
+<%
+			}
+		}
+%>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+<%
+	}
+%>
+			</table>
+		</td>
+	</tr>
+</table>
+<br />
+<%
+}
+%>

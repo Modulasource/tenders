@@ -1,0 +1,132 @@
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.EnveloppeB"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche"><%= sTitre %></td>
+		<td class="pave_titre_droite"><%= vOffres.size() %> 
+		candidat<%= (vOffres.size() > 1 ? "s" : "") %></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<table class="liste" summary="none">
+				<tr>
+					<th>Soumissionnaire</th>
+					<th>Organisation</th>
+					<%
+					if(iStatut != -1)
+					{
+					%>
+					<th>Statut</th>
+					<%
+					}
+					%>
+					<th>Format</th>
+					<th>&nbsp;</th>
+					<th>&nbsp;</th>
+				</tr>
+				<%
+					for (int i = 0; i < vOffres.size(); i++)
+					{
+						int j = i % 2;
+						
+						Candidature candidature = vOffres.get(i);
+						
+						boolean bIsCandidaturePapier = candidature.isCandidaturePapier(false);
+						Organisation organisationCDT = Organisation.getOrganisation(candidature.getIdOrganisation());
+						PersonnePhysique candidat = PersonnePhysique.getPersonnePhysique(candidature.getIdPersonnePhysique());
+						
+						boolean bHorsDelais = false;
+						Vector<EnveloppeB> vEnveloppeB = EnveloppeB.getAllEnveloppeBFromCandidatureAndLotAndValidite(candidature.getIdCandidature(), lot.getIdMarcheLot(),lot.getIdValiditeEnveloppeBCourante());
+						EnveloppeB envB = null;
+						if(vEnveloppeB != null && vEnveloppeB.size() == 1)
+						{
+							envB = vEnveloppeB.firstElement();
+							bHorsDelais = envB.isHorsDelais(false);
+						}
+						
+						String sCandidat = candidat.getCivilitePrenomNom() ;
+						if(bIsAnonyme)
+							sCandidat = "-";
+						
+						String sNomOrganisation = organisationCDT.getRaisonSociale();
+						if(bIsAnonyme)
+							sNomOrganisation = "-";
+				%>
+				<tr class="liste<%=j%>" onmouseover="className='liste_over'" onmouseout="className='liste<%=j%>'"> 
+					<td>
+					<%= sCandidat %>
+					</td>
+					<td>
+					<%= sNomOrganisation %>
+					</td>
+					<%
+					if(iStatut != -1)
+					{
+					%>
+					<td>
+					<%
+					String sDelais = "";
+					if(bHorsDelais) sDelais = "<span class=\"rouge\">&nbsp;(Hors Delais)</span>";
+					%>
+					<%=  envB.getStatutLibelleValue(iStatut) +  sDelais %>
+					</td>
+					<%
+					}
+					%>
+					<td>
+					<%
+					String sFormat = "Electronique";
+					String sTitreBouton = "Voir le contenu";
+					if(bIsCandidaturePapier)
+					{
+						sFormat = "Papier";
+					}
+					%>
+					<%= sFormat %>
+					</td>
+					<td>
+					<%
+					if(bAfficherBoutonContenu)
+					{
+					%>
+					<button type="button" name="ouvrirEnveloppe" 
+					onclick="openModal('<%= response.encodeURL(
+						rootPath + "desk/marche/algorithme/proposition/gestion/ouvrirEnveloppeB.jsp?iIdLot="+lot.getIdMarcheLot()
+									+"&amp;iIdCandidature="+candidature.getIdCandidature() 
+									+"&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes +"&amp;iIdAffaire="+iIdAffaire)
+							%>','<%= sTitreBouton %>','700px','500px');" ><%= sTitreBouton %></button>
+					<%
+					}
+					%>
+					</td>
+					<td>
+					<%
+					if(bAfficherBoutonCommentaire)
+					{
+					%>
+					<a href="javascript:openModal('<%= 
+						response.encodeURL(
+								rootPath + "desk/marche/algorithme/proposition/gestion/modifierCommentaireEnveloppeBForm.jsp?iIdLot="
+										+lot.getIdMarcheLot()
+										+"&amp;iIdCandidature="+candidature.getIdCandidature()
+										+"&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes+"&amp;iIdAffaire="+iIdAffaire)
+										%>','Commentaire','700px','500px');">
+					<img src="<%=rootPath+"images/icones/post_it.gif"%>" alt="Commentaire" title="Commentaire" height="21"  style="vertical-align:middle" />
+					</a>
+					<%
+					}
+					else out.write("&nbsp;");
+					%>
+					</td>
+				</tr>
+				<%
+					}
+				%>
+			</table>
+		</td>
+	</tr>
+</table>
+<br />

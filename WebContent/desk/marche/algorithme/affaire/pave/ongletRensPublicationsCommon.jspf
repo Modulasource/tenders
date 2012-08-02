@@ -1,0 +1,101 @@
+
+<%@page import="modula.marche.joue.MarcheJoueFormulaire"%>
+<%@page import="org.coin.fr.bean.export.PublicationBoamp"%>
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="org.coin.fr.bean.export.PublicationDestinationType"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.Validite"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="java.sql.Timestamp"%>
+<%
+
+
+Export exportBoamp = null;
+//Recherche de l'export BOAMP
+Vector<Export> vExportsAFF = Export.getAllExportFromSource(marche.getIdMarche(),ObjectType.AFFAIRE);
+for(int j=0;j<vExportsAFF.size();j++)
+{
+	Export exportAFF = vExportsAFF.get(j); 
+	if(exportAFF.getIdObjetReferenceDestination() == PublicationBoamp.getIdOrganisationBoampOptional())
+	{
+		exportBoamp = exportAFF;
+	}
+}
+
+int iIdPublicationType = MarcheJoueFormulaire.getFirstIdPublicationType(marche, PublicationType.TYPE_AAPC);
+PublicationBoamp avisInitial = null;
+
+if (exportBoamp != null)
+{
+	Vector<PublicationBoamp> vPublicationBoampValides = null;
+	try{
+		vPublicationBoampValides 
+			= PublicationBoamp.getAllPublicationBoampAapcValideWithoutTestFromAffaire(
+				marche.getIdMarche(),
+				iIdPublicationType);
+	}catch(Exception e){}
+	
+	if(vPublicationBoampValides != null
+	&& vPublicationBoampValides.size() == 0) {
+		/**
+		 * Modula ne connait pas l'AAPC rattaché à l'AATR et de ce fait, il n'est pas possible
+		 * de créer le flux XML complet car il va manquer les infos suivantes :
+		 * 	 
+	     * <A>
+	     *   <parution>20030008</parution>		(Numéro de parution par exemple : 2003012 est le numéro 12 de l'année 2003
+	     *   <num_ann_par>125</num_ann_par>		(numéro de l'annonce dans la parution)
+	     *   <datePub>2003-05-10</datePub>		(Date de publication)
+	     * </A>
+		 *
+		 * Il est nécessaire d'afficher un bouton pour la création d'une publication BOAMP relative à l'AAPC publié 
+		 * qui n'est pas dématérialisé sur sur la plateforme Modula. 	 
+		 */
+	
+		
+		avisInitial = new PublicationBoamp ();
+	
+	//	 Champs non renseignables
+		avisInitial.setNomFichier("");
+		avisInitial.setFichier("");
+		avisInitial.setArXml("");
+		avisInitial.setMessage("");
+		avisInitial.setXml("");
+		avisInitial.setIdPublicationReference(0);
+		avisInitial.setReferenceExterne("");
+	
+	
+	//	champs automatiques
+		avisInitial.setIdPublicationEtat(PublicationEtat.ETAT_PUBLIEE /*= 8*/);
+		avisInitial.setIdPublicationDestinationType(PublicationDestinationType.TYPE_BOAMP /*= 1*/);
+		avisInitial.setIdTypeObjet(TypeObjetModula.AFFAIRE /*= 1*/);
+		avisInitial.setIdReferenceObjet(marche.getIdMarche() );
+		avisInitial.setIdExport(exportBoamp.getIdExport()); 
+		avisInitial.setFormatWebService(true);
+		avisInitial.setFormatPapier(false);
+		avisInitial.setIdPublicationType(PublicationType.TYPE_AAPC); 
+	}
+	else {
+		avisInitial = vPublicationBoampValides.firstElement();
+	}
+	
+	/**
+	
+	        "<" + avisInitial.getTypeJournal() + ">\n" 
+	    	+ "<parution>" 
+	    	+ avisInitial.getNumeroParution()
+	    	+ "</parution>\n"
+	    	+ "<num_ann_par>" 
+	    	+ avisInitial.getNumeroAnnonce()
+	    	+ "</num_ann_par>\n"
+	    	+ "<datePub>" 
+	    	+ dDateFormatJO.format(avisInitial.getDatePublication())
+	    	+ "</datePub>\n"
+	    	+ "</" + avisInitial.getTypeJournal() + ">\n";
+	
+	*/
+}
+%>

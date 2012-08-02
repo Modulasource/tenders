@@ -1,0 +1,54 @@
+.cpt-calendar {
+	background-color:#FFF;
+	font:11px Tahoma;
+	width:100%;
+	border-spacing:0;
+	padding:0;
+}
+.cpt-calendar button{
+	padding:0 2px 0 2px;
+	color:#36C;
+	font:bold 11px Arial;
+}
+.cpt-calendar thead td {
+	font-weight: bold;
+	background: #EFF5FF;
+}
+.cpt-calendar thead td.weekend {
+	background: #EEE;
+}
+.cpt-calendar td {
+	text-align:center;
+	margin: 0;
+	border:1px solid #DDD;
+	border-style:solid;
+}
+.cpt-calendar td.day {
+	width:1.7em;
+	padding: 2px 3px 2px 3px;
+}
+.cpt-calendar tr.days td {	
+	padding: 2px 3px 2px 3px;
+}
+
+.cpt-calendar td.weekend {
+	color: #666;
+	background: #F4F4F4;
+}
+.cpt-calendar td.today {
+	color:#36C;
+	font-weight:bold;
+}
+.cpt-calendar td.lastmonth {
+	color: #ccc;
+}
+.cpt-calendar table.month_header {
+	width:100%;
+	border:none;
+	color:#36C;
+	border-spacing:0;
+	padding:0;
+}
+.cpt-calendar table.month_header td{
+	border:none;
+}

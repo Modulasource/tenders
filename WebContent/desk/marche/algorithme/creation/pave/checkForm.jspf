@@ -1,0 +1,54 @@
+<%@ include file="/desk/include/checkHabilitationPage.jspf" %>
+<%
+	String sFormPrefix = "";
+	
+	String sUrlTraitement = HttpUtil.parseStringBlank("sUrlTraitement", request);
+	int iIdNextPhaseEtapes = HttpUtil.parseInt("iIdNextPhaseEtapes", request, -1);
+	
+	boolean bIsContainsAAPCPublicity = AffaireProcedure.isContainsAAPCPublicity(marche.getIdAlgoAffaireProcedure());
+	Organisation organisationPRM = null;
+	try{
+		organisationPRM = Organisation.getOrganisation(Commission.getCommission(marche.getIdCommission()).getIdOrganisation());
+	}catch(Exception e){}
+%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="modula.commission.Commission"%>
+<%@page import="org.coin.util.HttpUtil"%>
+<script src="<%= rootPath %>include/cacherDivision.js" type="text/javascript"></script>
+<script type="text/javascript">
+function checkForm() 
+{
+        if(document.formulaire.valider.checked) return true;
+        else alert("Vous devez affirmer avoir pris connaissance des informations de cet avis avant de valider!");
+        
+        return false;
+}
+</script>
+</head>
+<body>
+<%@ include file="/include/new_style/headerFiche.jspf" %>
+<br/>
+<div style="padding:15px">
+<% 
+	String sHeadTitre = "Validation de l'avis"; 
+	boolean bAfficherPoursuivreProcedure = false;
+	int iTypeProcedure = AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure());
+	String sAction = "";
+
+%>
+<%
+	if (iTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE )
+	{
+%><%@ include file="/desk/include/headerPetiteAnnonce.jspf" %><%
+	} else {
+%><%@ include file="/include/new_style/headerAffaireOnlyButtonDisplayAffaire.jspf" %><%
+	}
+%>
+<p class="mention">
+Attention, la validation de l'avis fige les onglets et inscrit définitivement 
+l'affaire dans la base de données de Modula Dématérialisation. 
+Après validation de l'Avis, vous pourrez <%= bIsContainsAAPCPublicity
+	?"publier votre affaire et choisir certains supports de publication."
+	:"poursuivre votre procédure." %>
+<br />
+</p>

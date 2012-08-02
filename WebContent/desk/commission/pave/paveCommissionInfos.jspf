@@ -1,0 +1,30 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Commission</td>
+		<td class="pave_titre_droite"><%= commission.getNom() %>&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<input type="hidden" name="iIdOrganisation" value="<%= organisation.getIdOrganisation() %>" />
+		&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Nom* :</td>
+		<td class="pave_cellule_droite"><%= commission.getNom() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Compétence :</td>
+		<td class="pave_cellule_droite"><%= commission.getCompetence() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Organisme passant le marché :</td>
+		<td class="pave_cellule_droite"><%= organisation.getRaisonSociale() %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

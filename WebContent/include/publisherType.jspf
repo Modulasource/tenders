@@ -1,0 +1,17 @@
+<%@page import="modula.UserConstant"%>
+<%
+	String sAppliName = (String) session.getAttribute("sessionCurrentApplicationName");
+    //String sAppliName = (String) session.getAttribute("sAppliName");
+	if( sAppliName == null) sAppliName = "";
+	
+	String sPublisherPath = "publisher_portail";	
+    if( sAppliName.equals( UserConstant.USER_SESSION_APPLICATION_PUBLISHER_GENERIQUE) )
+    {
+    	sPublisherPath = "publisher";
+    }
+
+    if( sAppliName.equals( UserConstant.USER_SESSION_APPLICATION_PUBLISHER_PORTAIL) )
+    {
+    	sPublisherPath = "publisher_portail";
+    }
+%>

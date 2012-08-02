@@ -1,0 +1,160 @@
+<%@ include file="/include/headerXML.jspf" %>
+
+<%@page import="modula.applet.*"%>
+<%@ page import="modula.configuration.*,modula.applet.util.*,java.sql.*,java.net.*,java.util.*,org.coin.fr.bean.*,modula.marche.*,modula.*, modula.candidature.*, org.coin.util.*" %>
+<%@ include file="/publisher_traitement/public/include/beanSessionUser.jspf" %>
+<%@ include file="/publisher_traitement/public/include/beanCandidat.jspf" %> 
+<%
+	EnveloppeC eEnveloppe = EnveloppeC.getEnveloppeC(Integer.parseInt(request.getParameter("iIdEnveloppe")));
+	Candidature candidature = Candidature.getCandidature(eEnveloppe.getIdCandidature());
+	Marche marche = Marche.getMarche(candidature.getIdMarche());
+	Vector<MarcheLot> vLots = MarcheLot.getAllLotsFromMarche(marche.getIdMarche());
+	
+	String sTitle = "Constitution de l'offre de prestation";
+	MarcheLot lot = null;
+	if (eEnveloppe.getIdLot() != 0)
+	{
+		lot = MarcheLot.getMarcheLot(eEnveloppe.getIdLot());
+		if(lot != null && vLots.size() > 1) sTitle += " pour le lot n°" + lot.getNumero();
+	}
+	String sPageUseCaseId = "IHM-PUBLI-AFF-12";	
+%>
+<%@ include file="/include/headerPublisher.jspf" %>
+<%@ include file="/publisher_traitement/public/include/checkHabilitationPage.jspf" %>
+<%	
+	URL oURLImage = HttpUtil.getUrlWithProtocolAndPort(
+			rootPath+"images/icones/",
+			request); 
+	URL oURLServlet = HttpUtil.getUrlWithProtocolAndPort(
+				rootPath,
+				request);
+
+	String sURL[] = Outils.parserChaineVersString(response.encodeURL(oURLServlet.toString()),";");
+	
+	String sSessionId = "";
+	if(Outils.parserChaineVersString(response.encodeURL(oURLServlet.toString()),";") != null) sSessionId = ";"+sURL[1];
+	
+	Validite oValiditeEnveloppeB = Validite.getValidite(lot.getIdValiditeEnveloppeBCourante());
+	Timestamp tsDateValiditeEnveloppeBFin = null;
+	if(oValiditeEnveloppeB != null)
+	{
+		tsDateValiditeEnveloppeBFin = oValiditeEnveloppeB.getDateFin();
+	}
+%>
+<script src="<%= rootPath %>include/redirection.js" type="text/javascript"></script>
+<script src="<%= rootPath %>include/popup.js" type="text/javascript"></script>
+</head>
+<body>
+<div class="titre_page"><%= sTitle %></div> 
+
+<table style="vertical-align:top;width:100%">
+	<tr>
+		<td colspan="2"></td>
+	</tr>
+	<tr>
+		<td style="vertical-align:top">
+			<table style="vertical-align:top;width:100%">
+				<!-- l'objet content -->
+				<tr>
+					<td>
+						<table class="pave" >
+							<tr>
+								<td>
+									<table >
+										<tr>
+											<td colspan="2">
+											<div class="contour" style="width:100%">
+												<table class="liste" style="width:100%" summary="none">
+													<tr>
+														<th>Liste des pèces demandées</th>
+													</tr>
+													
+
+<%
+
+int[] listePiecesEnveloppeC = Outils.parserChaineVersEntier("", "|");
+if (listePiecesEnveloppeC != null)
+{
+	for (int j = 0; j < listePiecesEnveloppeC.length; j++)
+	{
+		EnveloppeCPieceJointeType type = 
+			EnveloppeCPieceJointeType.getEnveloppeCPieceJointeType(listePiecesEnveloppeC[j]);
+%>
+													<tr  class="liste<%=j%>" onmouseover="className='liste_over'" 
+													onmouseout="className='liste<%=j%>'">
+													<td><%= type.getName() %></td>
+													</tr>
+<%
+	}
+}
+else
+{
+%>
+
+													<tr  class="liste0" onmouseover="className='liste_over'" onmouseout="className='liste0'">
+													<td>Aucune pièce indiquée</td>
+													</tr>
+<%
+}
+%>
+												</table>
+											</div>
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align : center;" colspan="2">
+												<form method="post" name="form" action="<%= response.encodeURL(rootPath+"publisher_traitement/private/candidat/constituerOffreC.jsp")%>" >
+												<input type="hidden" name="iIdEnveloppe" value="<%= eEnveloppe.getIdEnveloppe() %>" />
+												<textarea name="commentaireEnveloppe" cols="125" rows="10"><%= (eEnveloppe.getCommentaire().equals("")?"Ecrivez votre commentaire ici...":eEnveloppe.getCommentaire()) %></textarea>
+												<br /><br />
+												<button type="submit" name="submit" >Enregistrer le commentaire</button>
+												</form>
+											</td>
+										</tr>
+										<tr>
+										  <td colspan="2" style="text-align:left">
+										  <br />
+
+<%
+    String sAppletTypeEnveloppe = "C";
+    Timestamp tsAppletDateLimiteEnvoi = tsDateValiditeEnveloppeBFin;
+    
+    
+    request.setAttribute("marche", marche);
+    request.setAttribute("candidat", candidat);
+    request.setAttribute("sTitle", sTitle);
+    request.setAttribute("sAppletTypeEnveloppe", sAppletTypeEnveloppe);
+    request.setAttribute("sAppletAllLotSelectionne", sAppletAllLotSelectionne);
+    request.setAttribute("eEnveloppe", eEnveloppe );
+    request.setAttribute("tsAppletDateLimiteEnvoi", tsAppletDateLimiteEnvoi);
+    request.setAttribute("sessionUserHabilitation", sessionUserHabilitation);
+
+%>
+<jsp:include page="/publisher_traitement/private/candidat/pave/paveAppletCachetage.jsp" />
+
+
+										  </td>
+										</tr>
+										<tr>
+											<td style="text-align:center" colspan="2">
+											<button type="button" name="retour" 
+												onclick="RedirectURL('<%= response.encodeURL(rootPath +"publisher_portail/private/candidat/consulterDossier.jsp?cand="
+													+ SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session)
+															+ "&iIdOnglet=2&nonce="+System.currentTimeMillis()) 
+															%>')" >Retour au dossier</button>
+											</td>
+										</tr>
+										<tr><td colspan="2">&nbsp;</td></tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</body>
+<%@page import="org.coin.bean.conf.Configuration"%>
+</html>

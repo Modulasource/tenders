@@ -1,0 +1,101 @@
+<!-- Renseignements complementaires -->
+
+<%@page import="org.coin.util.Outils"%><table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Renseignements complémentaires</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Date d'attribution du marché* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= CalendarUtil.getDateCourte(avisAttribution.getDateAttributionMarche()) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Nombre total d'offre reçues :&nbsp;
+		<a href='javascript:OuvrirPopup("<%=response.encodeURL(rootPath+"include/infosBulles.jsp?id="+InfosBullesConstant.NBOFFRES)%>",400,250,"menubar=no,scrollbars=yes,statusbar=no")'>
+		<img src="<%=rootPath+modula.graphic.Icone.ICONE_AU%>" alt="Avertissement utilisateur" title="Avertissement utilisateur" width="21" height="21"  style="vertical-align:middle" />
+		</a>
+		</td>
+		<td class="pave_cellule_droite">
+		<%= avisAttribution.getNbOffres() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Autres informations : (le cas échéant notamment, précision des lots ou du marché déclarés infructueux ou sans suite)
+		</td>
+		<td class="pave_cellule_droite">
+<%
+	String sAutresInfos = avisAttribution.getAutresInfos();
+
+	if (sAutresInfos != null && !sAutresInfos.equalsIgnoreCase(""))
+	{
+%>
+		<%= avisAttribution.getAutresInfos() %>
+<%
+	}
+	else
+	{
+		String sUnique = "";
+		if(vLotsInfructueux != null)
+		{
+			if(vLotsInfructueux.size() == 1) sUnique = "unique";
+			for (int i = 0; i < vLotsInfructueux.size(); i++)
+			{
+				MarcheLot lot = vLotsInfructueux.get(i);
+	
+				out.write("Le marche "+sUnique+" n°" + lot.getNumero() + "de l'affaire - " + lot.getDesignationReduite() + " a été déclaré infructueux.\n");
+			}
+		}
+	}
+%>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		<p class="mention">En cas de concours, de marché de conception - réalisation ou de dialogue compétitif</p>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Nombre de participants :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= avisAttribution.getNbParticipants() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Nombre de participants étrangers :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= avisAttribution.getNbParticipantsEtrangers() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Valeur de la prime (ou des primes) attribuées :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+		if(!Outils.isNullOrBlank( avisAttribution.getValeurPrime()) )
+		{
+		%>
+		<%= avisAttribution.getValeurPrime() %> Euros
+		<%
+		}
+		%>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<!-- /Renseignements complementaires -->

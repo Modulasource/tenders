@@ -1,0 +1,172 @@
+
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="modula.applet.*"%>
+<%@ page import="modula.configuration.*,modula.applet.util.*,java.sql.*,java.net.*,java.util.*,org.coin.fr.bean.*,modula.marche.*,modula.*, modula.candidature.*, org.coin.util.*" %>
+<%
+
+	URL oURLImage = HttpUtil.getUrlWithProtocolAndPort(
+			rootPath+"images/icones/",
+			request); 
+	URL oURLServlet = HttpUtil.getUrlWithProtocolAndPort(
+				rootPath,
+				request);
+	String sURL[] = Outils.parserChaineVersString(response.encodeURL(oURLServlet.toString()),";");
+
+	String sSessionId = "";
+	if(Outils.parserChaineVersString(response.encodeURL(oURLServlet.toString()),";") != null) sSessionId = ";"+sURL[1];
+	
+	EnveloppeA eEnveloppe = EnveloppeA.getEnveloppeA(Integer.parseInt(request.getParameter("iIdEnveloppe")));
+		
+	Vector<Validite> vValiditeEnveloppeA = Validite.getAllValiditeEnveloppeAFromAffaire(marche.getIdMarche());
+	Validite oValiditeEnveloppeA = null;
+	Timestamp tsDateValiditeEnveloppeAFin = null;
+	if(vValiditeEnveloppeA != null)
+	{
+		if(vValiditeEnveloppeA.size() == 1)
+		{
+			oValiditeEnveloppeA = vValiditeEnveloppeA.firstElement();
+			tsDateValiditeEnveloppeAFin = oValiditeEnveloppeA.getDateFin();
+		}
+	}
+	
+	
+	if(request.getParameter("selectionLotsA") != null)
+	{
+		
+		String[] sSelectionLotsA = request.getParameter("selectionLotsA").split(",");
+		sAppletAllLotSelectionne = ", pour les lots " ;
+		if(sSelectionLotsA != null)
+		{	
+			
+			CandidatureUtil.updateEnvelopppeASelected(
+					candidature,
+					eEnveloppe,
+					sSelectionLotsA,
+					vLots);
+		}
+		
+        for (int i = 0; i < vLots.size() ; i++)
+        {
+        	MarcheLot lot = vLots.get(i);
+        
+        	for (int j = 0; j < sSelectionLotsA.length ; j++)
+            {
+                if(Integer.parseInt(sSelectionLotsA[j]) == lot.getIdMarcheLot())
+                {
+                    sAppletAllLotSelectionne += 
+                        lot.getNumero() 
+                        + " " + lot.getReference()
+                        + " " + lot.getIntitule() + ",";
+                }
+            }
+        }
+	}
+%>
+<%@page import="org.coin.security.SecureString"%>
+
+<%@page import="mt.modula.affaire.candidature.CandidatureUtil"%><div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Liste des pièces demandées</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00"></strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+    
+    <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="top">
+ 				<table class="liste" >
+
+<%
+//* Récupération des pièces jointes demandées */
+int[] listePiecesEnveloppeA = Outils.parserChaineVersEntier(marche.getListePiecesEnveloppeA(), "|");
+if (listePiecesEnveloppeA != null)
+{
+	for (int j = 0; j < listePiecesEnveloppeA.length; j++)
+	{
+		EnveloppeAPieceJointeType type = 
+			EnveloppeAPieceJointeType.getEnveloppeAPieceJointeType(listePiecesEnveloppeA[j]);
+%>
+					<tr  class="liste<%=j%>" onmouseover="className='liste_over'" 
+						onmouseout="className='liste<%=j%>'">
+					   <td><%= type.getName() %></td>
+					</tr>
+<%
+	}
+}
+else
+{
+%>
+					<tr  class="liste0" onmouseover="className='liste_over'" 
+						onmouseout="className='liste0'">
+					    <td>Aucune pièce indiquée</td>
+					</tr>
+<%
+}
+%>
+    	       </table>
+         </td>
+    </tr>
+    </table>
+    </div>
+</div>
+  
+<br/>
+    
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Coffre fort </strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00"></strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+
+    <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="top">
+<%
+    String sAppletTypeEnveloppe = "A";
+    Timestamp tsAppletDateLimiteEnvoi = tsDateValiditeEnveloppeAFin;
+
+    request.setAttribute("marche", marche);
+    request.setAttribute("candidat", candidat);
+    request.setAttribute("sTitle", sTitle);
+    request.setAttribute("sAppletTypeEnveloppe", sAppletTypeEnveloppe);
+    request.setAttribute("sAppletAllLotSelectionne", sAppletAllLotSelectionne);
+    request.setAttribute("eEnveloppe", eEnveloppe );
+    request.setAttribute("tsAppletDateLimiteEnvoi", tsAppletDateLimiteEnvoi);
+    request.setAttribute("sessionUserHabilitation", sessionUserHabilitation);
+
+    
+%>
+<jsp:include page="/publisher_traitement/private/candidat/pave/paveAppletCachetage.jsp" />
+	
+			 <div style="text-align:center">
+				<button type="button" name="retour"  
+					onclick="javascript:doUrl('<%= 
+						response.encodeURL( rootPath 
+							+ "publisher_portail/private/candidat/consulterDossier.jsp?cand=" 
+							+ SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session)
+									+ "&amp;iIdOnglet=2&amp;nonce="+System.currentTimeMillis() ) 
+									%>')" >Retour au dossier</button>
+			</div>
+        </div>
+     </td>
+   </tr>
+   </table>
+   </div>
+</div>

@@ -1,0 +1,13 @@
+<%
+	String sPaveProcedureTitre = "Procédure";
+	sFormPrefix = "";
+%>
+<%@ include file="paveProcedure.jspf" %>
+<br/>
+<%@ include file="paveMarcheForme.jspf" %>
+<br />
+<%
+	String sPaveCriteresAttributionTitre = "Critères d'attribution";
+	sFormPrefix = "";
+%>
+<%@ include file="paveCriteresAttributions.jspf" %>

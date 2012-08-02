@@ -1,0 +1,29 @@
+.tabContent {
+    width:100%;
+}
+.checkbox2 {
+  cursor : pointer;
+  padding-left:10px;
+  background-image:url(../../images/check_all.gif);
+}
+.checkbox3 {
+  cursor : pointer;
+  padding-left:10px;
+  background-image:url(../../images/check_all.gif);
+}
+.checkbox4 {
+  cursor : pointer;
+  padding-left:10px;
+  background-image:url(../../images/check_all_4.gif);
+}
+.checkbox5 {
+  cursor : pointer;
+  padding-left:10px;
+  background-image:url(../../images/check_all_5.gif);
+}
+.closeTab {
+  margin-left : 10px;
+  padding-bottom:4px;
+  padding-left:13px;
+  background-image:url(../../images/closeAll.gif);
+}

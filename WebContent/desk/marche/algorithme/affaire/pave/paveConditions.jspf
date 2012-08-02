@@ -1,0 +1,109 @@
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.question.Answer"%>
+<%@page import="org.coin.bean.question.AnswerGroup"%>
+<%@page import="modula.marche.MarcheConditionRelative"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveConditions')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveConditionsTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveConditions" summary="Conditions">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Cautionnement et garanties exig&eacute;es :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(marche.getCautionnement() ) %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Modalit&eacute;s essentielles de financement et de paiement et/ou 
+					r&eacute;f&eacute;rences des dispositions applicables :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(marche.getFinancement() ) %>
+					</td>
+		</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Forme juridique que devra rev&ecirc;tir le groupement d'entrepreneur, 
+					de fournisseurs ou de prestataires de services attributaire du march&eacute;:
+					</td>
+					<td class="pave_cellule_droite">
+						<%= Outils.getStringNotNullNeant(marche.getFormeGroupement() ) %>
+					</td>
+				</tr>
+				<% 
+				if(bUseBoamp17 && (bUseFormNS || bUseFormUE))
+				{
+				%>		
+				<%= QuestionAnswer.getHTML(
+						"ExecutionMarcheSoumiseAutreConditionParticuliere", 
+						"lIdQaAutreCondition",
+						mcr.getIdQaAutreCondition(),
+						false,
+						true,
+						QuestionAnswer.FORM_TYPE_LABEL) %>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Dans l'affirmative, description de ces conditions :
+					</td>
+					<td class="pave_cellule_droite">
+						<%= Outils.getTextToHtml( mcr.getAutreCondition()) %>
+					</td>
+				</tr>
+				<%
+				} 
+				%>
+				<% 
+				if(bUseBoamp17 && (bUseFormNS || bUseFormUE))
+				{
+				%>		
+				<%= QuestionAnswer.getHTML(
+						"fondsCommunautaires", 
+						"lIdQaFondCommunautaire",
+						joueInfo.getIdQaFondCommunautaire(),
+						false,
+						true,
+						QuestionAnswer.FORM_TYPE_LABEL) %>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Dans l'affirmative, référence du ou des projet(s) et/ou programme(s) :
+					</td>
+					<td class="pave_cellule_droite">
+						<%= Outils.getTextToHtml( joueInfo.getReferenceFondCommunautaire()) %>
+					</td>
+				</tr>
+				<%
+				} 
+				%>
+				<tr>
+					<td class="pave_cellule_gauche">
+						Unité monétaire utilisée, l'euro :
+					</td>
+					<td class="pave_cellule_droite">
+			<% 
+				boolean bIsEuro = false;
+				try{
+					bIsEuro	= marche.isEuro(); 
+				}
+				catch(Exception e){}
+			%>
+			<%=	bIsEuro?"oui":"non" %>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

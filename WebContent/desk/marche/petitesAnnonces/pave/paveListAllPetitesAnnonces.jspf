@@ -1,0 +1,35 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<tr class="liste<%=j%>" 
+	onmouseover="className='liste_over'" 
+	onmouseout="className='liste<%=j%>'" 
+	>
+	<td style="text-align:left;width:15%"><%= marche.getReference() %></td>
+	<td style="text-align:left;width:15%"><%= orga .getRaisonSociale() %></td>
+	<td style="text-align:left;width:10%"><%= marche.getReferenceExterne() %></td>
+	<td style="text-align:left;width:20%"><%= marche.getObjet() %></td>
+	<td style="text-align:left;width:10%">
+		<%= (CalendarUtil.getDateCourte(tsDateAnnonceDebut)!=""&& CalendarUtil.getHeureMinuteSecLitterale(tsDateAnnonceDebut)!=""?
+		"le "+CalendarUtil.getDateCourte(tsDateAnnonceDebut)+
+		" à "+CalendarUtil.getHeureMinuteSecLitterale(tsDateAnnonceDebut):"Néant") %> 
+	</td>
+	<td style="text-align:left;width:10%">
+		<%= (CalendarUtil.getDateCourte(tsDateAnnonceFin )!=""&& CalendarUtil.getHeureMinuteSecLitterale(tsDateAnnonceFin)!=""?
+		"le "+CalendarUtil.getDateCourte(tsDateAnnonceFin)+
+		" à "+CalendarUtil.getHeureMinuteSecLitterale(tsDateAnnonceFin):"Néant") %> 
+	</td>
+<%
+	boolean bIsGrouped = false;
+	try{
+		bIsGrouped = marche.isPAGrouped();
+	}
+	catch(Exception e){}
+%>
+	<td style="text-align:left;width:5%"><%= (bIsGrouped ?"Annonce groupée":sTypeAffaire)  %></td>
+	<td style="text-align:left;width:5%"><%= (sStatut!=null)?sStatut:"Indéfini" %></td>
+	<td style="text-align:right;width:5%">
+		<a href="<%=response.encodeURL("afficherPetiteAnnonce.jsp?iIdAffaire="+marche.getIdMarche()) %>">
+			<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE %>" alt="Afficher" title="Afficher"/>
+		</a>
+		<input type="checkbox" id="PAToDelete" name="PAToDelete" value="<%=marche.getIdMarche()%>"/>
+	</td>
+</tr>

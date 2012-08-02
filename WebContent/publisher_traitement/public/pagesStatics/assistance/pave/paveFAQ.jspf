@@ -1,0 +1,37 @@
+<script type="text/javascript" >
+
+	function cacherToutesDivisions(){
+		var tab = new Array;
+<%
+	Vector vCouples = FAQ.getAllCoupleQR(sRequest);
+	for (int j=0 ; j<vCouples.size() ; j++){
+		FAQ oCouple = (FAQ) vCouples.get(j) ;
+%>
+	tab[<%=j%>]=<%=oCouple.getIdCoupleQR()%>;
+<%
+	}
+%>
+	var nb;
+	for(var i=0;i<tab.length;i++){
+		nb=tab[i];
+		cacher('div'+nb);
+	}
+	for(var i=1;i<6;i++){
+		cacher('div_question_'+i);
+	}
+}
+
+function checkQuestionReponse(){
+	if(document.formulaire2.question.value==0){
+		alert("Vous devez remplir la question");
+		return false;
+	}
+return true;
+}
+
+function cacherQuestion(){
+	for(var i=1;i<6;i++){
+		montrer_cacher('div_question_'+i);
+	}
+}
+</script>

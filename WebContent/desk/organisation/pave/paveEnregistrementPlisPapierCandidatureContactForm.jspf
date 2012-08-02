@@ -1,0 +1,79 @@
+<table id="CandidatureDatesContact">
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			Contact du candidat :
+		</td>
+		<td class="pave_cellule_droite">
+			<strong>Date:</strong>&nbsp;
+			<input type="text" name="<%= sFormPrefix %>tsDateEnveloppeAFin" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(tsDateEnveloppeAFin) %>"/>
+			
+			<strong>Heure:</strong>&nbsp;
+			<input type="text" name="<%=sFormPrefix %>tsHeureEnveloppeAFin" size="5" maxlength="5" 
+			value="<%=  CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateEnveloppeAFin ) %>" />&nbsp;
+			<%
+			String sStatutA = "";
+			String sHorsDelaisA = "";
+			if(candidature != null )
+			{
+				sPostComplement = "<strong>Pour les lots:&nbsp;</strong>";
+				
+				if(vEnveloppesALot != null)
+				{
+					for(int j=0;j<vEnveloppesALot.size();j++)
+					{
+						EnveloppeALot envALot = vEnveloppesALot.get(j);
+						MarcheLot lot = MarcheLot.getMarcheLot(envALot.getIdLot());
+						sPostComplement += "Lot n° "+lot.getNumero();
+						try
+						{
+							sStatutA = envALot.getStatutLibelleValue(EnveloppeALot.ID_STATUS_RECEVABLE);
+							if(!sStatutA.equalsIgnoreCase(""))
+								sPostComplement += "("+sStatutA+")";
+						}
+						catch(Exception e){}
+						if(j != vEnveloppesALot.size() -1) sPostComplement += ", ";
+					}
+					EnveloppeA envA = vEnveloppesA.firstElement();
+					try
+					{
+						if(envA.isHorsDelais()) sHorsDelaisA += "<span class='rouge' style='font-weight:bold'>Hors délais </span>";
+					}
+					catch(Exception e){}
+				}
+			}
+			%>
+			<%= sHorsDelaisA+(vLotsTotal.size() > 1 ? sPostComplement : sStatutA) %>&nbsp;
+			<%
+			if(vLotsTotal.size() > 1)
+			{
+				int i=0;
+				%><a style="color:red;" href="#" onclick="montrer_cacher('divisionA');">Sélectionner les lots</a>&nbsp;
+		</td> 
+	</tr>
+	<tr id="divisionA">
+		<td class="pave_cellule_gauche" style="vertical-align: top;">
+			Liste des lots pour candidat&eacute;s:
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align: top;">
+			<%@ include file="paveSelectLotsA.jspf" %>
+		</td> 
+	</tr>
+	<%
+	}
+	else if(vLotsTotal.size() == 1 && vLots.size() == 1)
+	{
+	%>
+		<input type="hidden" name="selectionLotsA" value="<%= vLots.firstElement().getIdMarcheLot() %>" /></td>
+	<%
+	}
+	else
+	{
+	%>
+	</td>
+	<%
+	}
+	%>
+</table>
+<br />

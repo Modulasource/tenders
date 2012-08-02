@@ -1,0 +1,20 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Groupe</td>
+	</tr>
+	<% hbFormulaire.bIsForm = false; %>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<% hbFormulaire.bIsForm = true; %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :",sFormPrefix+"sNom",group.getName(),"size='50'") %>
+	<% String sChecked = "checked='checked'"; %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Visibilit&eacute; :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="radio" name="<%=sFormPrefix %>sVisibilite" id="<%=sFormPrefix %>sVisibilite" value="public" <%= (sVisibilite.equalsIgnoreCase("public")?sChecked:"") + sDisabled %> />Public&nbsp;
+			<input type="radio" name="<%=sFormPrefix %>sVisibilite" id="<%=sFormPrefix %>sVisibilite"  value="private" <%= (sVisibilite.equalsIgnoreCase("private")?sChecked:"") + sDisabled %> />Priv&eacute;&nbsp;
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

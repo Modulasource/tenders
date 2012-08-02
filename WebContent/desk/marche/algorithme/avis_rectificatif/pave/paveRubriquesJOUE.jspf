@@ -1,0 +1,133 @@
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.AvisRectificatifRubrique"%>
+<%@page import="modula.marche.AvisRectificatifRubriqueJoue"%>
+<%@page import="modula.marche.AvisRectificatifRubriqueSousType"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.sql.Timestamp"%>
+<%
+	String sAvisImplique = "";
+	String sModification = "";
+	String sModifLocalisation = "";
+	
+	String sSousRubrique = "";
+	String sModifType = "";
+	String sAncienneValeur = "";
+	String sRectifRubSousType = "";
+	String sNouvelleValeur = "";
+	
+	String sDateAModifier = "";
+	String sAncienneDate = "";
+    String sAncienneHeure = "";
+	String sNouvelleDate = "";
+    String sNouvelleHeure = "";
+	
+	Vector<AvisRectificatifRubriqueJoue> vArecRubJoue = AvisRectificatifRubriqueJoue.getAllStatic();
+
+	Vector<AvisRectificatifRubrique> vArecRubrique = AvisRectificatifRubrique.getAllArecRubriqueForIdArecAndRubriqueType(iIdAvisRectificatif, AvisRectificatifRubrique.RUBRIQUE_TYPE_JOUE);
+	Vector<AvisRectificatifRubrique> vArecRubPrecision = new Vector<AvisRectificatifRubrique>();
+	if(vArecRubrique != null && vArecRubrique.size()>0) {
+		for(AvisRectificatifRubrique arecRubrique : vArecRubrique) {
+			if(arecRubrique.getRubriqueJoue().equals("rectification")
+				|| arecRubrique.getRubriqueJoue().equals("informationComplementaire")
+				|| arecRubrique.getRubriqueJoue().equals("rectifEtInfoComp")) {
+					sAvisImplique = AvisRectificatifRubriqueJoue.getAvisRectificatifByReference(arecRubrique.getRubriqueJoue()).firstElement().getLibelle();
+			}
+			if(arecRubrique.getRubriqueJoue().equals("modifInfoOriginales")
+                || arecRubrique.getRubriqueJoue().equals("pubTEDNonConforme")
+                || arecRubrique.getRubriqueJoue().equals("modifInfoOriginaleEtPubTEDNonConforme")) {
+				sModification = AvisRectificatifRubriqueJoue.getAvisRectificatifByReference(arecRubrique.getRubriqueJoue()).firstElement().getLibelle();
+            }
+			if(arecRubrique.getRubriqueJoue().equals("dansAvisOriginal")
+                || arecRubrique.getRubriqueJoue().equals("dansDossierAppelOffres")
+                || arecRubrique.getRubriqueJoue().equals("avisOriginalEtDossierAppelOffre")) {
+				sModifLocalisation = AvisRectificatifRubriqueJoue.getAvisRectificatifByReference(arecRubrique.getRubriqueJoue()).firstElement().getLibelle();
+				if(arecRubrique.getRubriqueJoue().equals("dansAvisOriginal") 
+					|| arecRubrique.getRubriqueJoue().equals("avisOriginalEtDossierAppelOffre")) {
+					vArecRubPrecision.add(arecRubrique);
+				}
+            }			
+		}
+	}
+%>
+
+<table class="pave" summary="none">
+    <tr>
+        <td class="pave_titre_gauche">Renseignements complémentaires</td>
+        <td class="pave_titre_droite">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+    </tr>
+     <tr>
+        <td class="pave_cellule_gauche">L'avis implique :</td>
+        <td class="pave_cellule_droite"> <%= sAvisImplique %></td>
+    </tr>
+    <tr>
+        <td class="pave_cellule_gauche">Information à rectifier ou à ajouter :</td> 
+        <td class="pave_cellule_droite"> <%= sModification %></td>
+    </tr>
+    <tr>
+        <td class="pave_cellule_gauche">Où se trouve l'information à rectifier ou à ajouter :</td> 
+        <td class="pave_cellule_droite"> <%= sModifLocalisation %></td>
+    </tr>
+<%
+for(AvisRectificatifRubrique arecRub : vArecRubPrecision) {
+	if(arecRub.getIdAvisRectificatifRubriqueSousType() != 0) {
+	    sDateAModifier = "";
+	    sAncienneDate = "";
+	    sNouvelleDate = "";
+		sSousRubrique = arecRub.getRubrique();
+		sAncienneValeur = arecRub.getTexteAncienneValeur();
+		sNouvelleValeur = arecRub.getTexteNouvelleValeur();
+		switch(arecRub.getIdAvisRectificatifRubriqueSousType()) {
+		   case AvisRectificatifRubriqueSousType.SOUS_TYPE_AJOUTER :
+			   sRectifRubSousType = "ajouter";
+               sModifType = "après la mention";
+			   break;
+		   case AvisRectificatifRubriqueSousType.SOUS_TYPE_SUPPRIMER :
+			   sRectifRubSousType = "supprimer";
+               sModifType = "après la mention";
+			   break;
+		   case AvisRectificatifRubriqueSousType.SOUS_TYPE_LIRE :
+			   sRectifRubSousType = "lire";
+               sModifType = "au lieu de";
+			   break;
+		}
+%>
+    <tr>
+        <td class="pave_cellule_gauche">Rubrique : <span style="font-weight:normal"><%= sSousRubrique %></span></td> 
+        <td class="pave_cellule_droite">
+            <i><%= sModifType %></i></br>
+            <%= sAncienneValeur %></br>
+            <i><%= sRectifRubSousType %></i></br>
+            <%= sNouvelleValeur %></br>
+        </td>
+    </tr>
+<%
+	} else {
+	    sSousRubrique = "";
+	    sModifType = "";
+	    sAncienneValeur = "";
+	    sRectifRubSousType = "";
+	    sNouvelleValeur = "";
+	    
+	    sSousRubrique = AvisRectificatifRubrique.getArecRubriqueDateLibelle(arecRub.getIdAvisRectificatifRubrique());
+        Timestamp tsAncienneDate = arecRub.getDateAncienneValeur();
+        Timestamp tsNouvelleDate = arecRub.getDateNouvelleValeur();
+        sAncienneDate = CalendarUtil.getDateCourte(tsAncienneDate);
+        sAncienneHeure = CalendarUtil.getHeureMinuteSecDefaultOfficial(tsAncienneDate);
+        sNouvelleDate = CalendarUtil.getDateCourte(tsNouvelleDate);
+        sNouvelleHeure = CalendarUtil.getHeureMinuteSecDefaultOfficial(tsNouvelleDate);
+%>
+    <tr>
+        <td class="pave_cellule_gauche">Date à modifier : <span style="font-weight:normal"><%= sSousRubrique %></span></td> 
+        <td class="pave_cellule_droite">
+            <i>au lieu de&nbsp;</i><%= sAncienneDate %><i>&nbsp;lire&nbsp;</i><%= sNouvelleDate %></br>
+        </td>
+    </tr>
+    
+<%
+	}
+}
+%>
+</table>

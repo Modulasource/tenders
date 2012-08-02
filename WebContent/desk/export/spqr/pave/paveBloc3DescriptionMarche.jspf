@@ -1,0 +1,191 @@
+<%
+	Node nodeTypeDescMarche = BasicDom.getChildNodeByNodeName(nodeAnn, "description" );
+	String sNatureMarcheType = "";
+	
+	try{
+		Node nodeNatureMarche = BasicDom.getChildNodeByNodeName(nodeAnn, "natureMarche" );
+		Node nodeNatureMarcheType = BasicDom.getFirstChildElementNode(nodeNatureMarche);
+		sNatureMarcheType = nodeNatureMarcheType.getNodeName();
+	} catch (Exception e) {
+		// Si cette balise n'existe pas c'est un RECTIF que l'on souhaite afficher
+		try{
+			BasicDom.getChildNodeByNodeName(nodeTypeDescMarche, "MarcheTravaux" ) ;
+			sNatureMarcheType = "Travaux";
+		}catch (Exception ee) {}
+		
+		try{
+			BasicDom.getChildNodeByNodeName(nodeTypeDescMarche, "MarcheServices" ) ;
+			sNatureMarcheType = "Services";
+		}catch (Exception ee) {}
+
+		try{
+			BasicDom.getChildNodeByNodeName(nodeTypeDescMarche, "MarcheFournitures" ) ;
+			sNatureMarcheType = "Fournitures";
+		}catch (Exception ee) {}
+	}	
+	
+	
+	boolean bNatureMarcheTypeTravaux =  false;
+	boolean bNatureMarcheTypeTravauxExecution =  false;
+	boolean bNatureMarcheTypeTravauxConceptionRealisation =  false;
+	
+	boolean bNatureMarcheTypeFournitures =  false;
+	boolean bNatureMarcheTypeFournituresAchat =  false;
+	boolean bNatureMarcheTypeFournituresLocation =  false;
+	boolean bNatureMarcheTypeFournituresCreditBail =  false;
+	boolean bNatureMarcheTypeFournituresLocationVente =  false;
+	boolean bNatureMarcheTypeServices =  false;
+	String sNatureMarcheTypeServicesLibelle = "";
+	
+	if(sNatureMarcheType.equals("Travaux"))
+	{
+		bNatureMarcheTypeTravaux = true;
+
+		Node nodeNatureMarcheTypeDetail = BasicDom.getChildNodeByNodeName(nodeTypeDescMarche , "MarcheTravaux" );
+		Node nodeNatureMarcheTypeDetail2 = BasicDom.getFirstChildElementNode(nodeNatureMarcheTypeDetail );
+		if(nodeNatureMarcheTypeDetail2.getNodeName().equals("Execution"))
+		{
+			bNatureMarcheTypeTravauxExecution = true;
+		}
+		if(nodeNatureMarcheTypeDetail2.getNodeName().equals("ConceptionRealisation"))
+		{
+			bNatureMarcheTypeTravauxConceptionRealisation = true;
+		}
+	}
+	
+	if(sNatureMarcheType.equals("Fournitures"))
+	{
+		bNatureMarcheTypeFournitures = true;
+
+		Node nodeNatureMarcheTypeFouniture = BasicDom.getChildNodeByNodeName(nodeTypeDescMarche , "MarcheFournitures" );
+		try {
+			BasicDom.getChildNodeByNodeName(nodeNatureMarcheTypeFouniture , "Achat");
+			bNatureMarcheTypeFournituresAchat = true;
+		} catch (Exception e) {}
+		
+		try {
+			BasicDom.getChildNodeByNodeName(nodeNatureMarcheTypeFouniture , "Location");
+			bNatureMarcheTypeFournituresLocation = true;
+		} catch (Exception e) {}
+		
+		try {
+			BasicDom.getChildNodeByNodeName(nodeNatureMarcheTypeFouniture , "CreditBail");
+			bNatureMarcheTypeFournituresCreditBail = true;
+		} catch (Exception e) {}
+		
+		try {
+			BasicDom.getChildNodeByNodeName(nodeNatureMarcheTypeFouniture , "LocationVente");
+			bNatureMarcheTypeFournituresLocationVente = true;
+		} catch (Exception e) {}
+	
+	}
+	if(sNatureMarcheType.equals("Services"))
+	{
+		bNatureMarcheTypeServices = true;
+		Node nodeNatureMarcheTypeServices = BasicDom.getChildNodeByNodeName(nodeTypeDescMarche , "MarcheServices" );
+		int iNatureMarcheTypeServicesLibelleId 
+			= Integer.parseInt( nodeNatureMarcheTypeServices.getTextContent() );
+			
+		sNatureMarcheTypeServicesLibelle
+			= "" + iNatureMarcheTypeServicesLibelleId
+			+ " - " + MarcheType.getLibelleDetailWithCodeType(3, iNatureMarcheTypeServicesLibelleId);
+			
+	}
+	String sCPVDesc ="";
+	
+	try{ 
+		Node nodeCPV = BasicDom.getChildNodeByNodeName(nodeTypeDescMarche , "CPV" );
+		sCPVDesc = ConstitutionFichierXMLBoamp.getNodeJOTypeObjCPVTOString(nodeCPV);
+	} catch (Exception e){}
+	
+	String sLieuExecutionAdresseVoie = "";
+	String sLieuExecutionAdresseCodePostal = "";
+	String sLieuExecutionAdresseCommune = "";
+	String sLieuLivraisonAdresseVoie = "";
+	String sLieuLivraisonAdresseCodePostal = "";
+	String sLieuLivraisonAdresseCommune = "";
+	try {
+		Node nodeLieuExecution = BasicDom.getChildNodeByNodeName(nodeTypeDescMarche, "LieuExecution" );
+		sLieuExecutionAdresseVoie 	
+			= ExportXmlOrganisation.getNodeJOTypeVoieToString(
+				BasicDom.getChildNodeByNodeName(nodeLieuExecution, "voie" ));
+		sLieuExecutionAdresseCodePostal = BasicDom.getChildNodeValueByNodeNameOptional(nodeLieuExecution, "cp");
+		sLieuExecutionAdresseCommune = BasicDom.getChildNodeValueByNodeNameOptional(nodeLieuExecution, "ville");
+	} catch (Exception e) {}
+	
+	try {
+		Node nodeLieuLivraison = BasicDom.getChildNodeByNodeName(nodeTypeDescMarche, "LieuLivraison" );
+		sLieuLivraisonAdresseVoie 
+			= ExportXmlOrganisation.getNodeJOTypeVoieToString(
+				BasicDom.getChildNodeByNodeName(nodeLieuLivraison, "voie" ));
+		sLieuLivraisonAdresseCodePostal = BasicDom.getChildNodeValueByNodeNameOptional(nodeLieuLivraison, "cp");
+		sLieuLivraisonAdresseCommune = BasicDom.getChildNodeValueByNodeNameOptional(nodeLieuLivraison, "ville");
+
+	} catch (Exception e) {}
+		
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc3')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc 3 Description du marché</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc3" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000">* Objet du marché :</font></td>
+				<td class="pave_cellule_droite">
+					<b><%= BasicDom.getChildNodeValueByNodeName(nodeTypeDescMarche, "objet" ) %></b><br /><br />
+					<img src="<%= bNatureMarcheTypeTravaux?sSrcImageChecked:sSrcImageNotChecked %>" /> <b>TRAVAUX</b>
+					<img src="<%= bNatureMarcheTypeFournitures?sSrcImageChecked:sSrcImageNotChecked %>" /> <b>FOURNITURES</b>
+					<img src="<%= bNatureMarcheTypeServices?sSrcImageChecked:sSrcImageNotChecked %>" /> <b>SERVICES</b>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Type de marché de travaux : </td>
+				<td class="pave_cellule_droite">
+					<img src="<%= bNatureMarcheTypeTravauxExecution?sSrcImageChecked:sSrcImageNotChecked  %>" /> <b>Exécution </b>
+					<img src="<%= bNatureMarcheTypeTravauxConceptionRealisation?sSrcImageChecked:sSrcImageNotChecked  %>" /> <b>Conception réalisation</b>
+				 
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Type de marché de fournitures : </td>
+				<td class="pave_cellule_droite">
+					<img src="<%= bNatureMarcheTypeFournituresAchat?sSrcImageChecked:sSrcImageNotChecked   %>" /> <b>Achat</b>
+					<img src="<%= bNatureMarcheTypeFournituresLocation?sSrcImageChecked:sSrcImageNotChecked   %>" /> <b>Location</b>
+					<img src="<%= bNatureMarcheTypeFournituresCreditBail?sSrcImageChecked:sSrcImageNotChecked   %>" /> <b>Crédit-bail</b>
+					<img src="<%= bNatureMarcheTypeFournituresLocationVente?sSrcImageChecked:sSrcImageNotChecked   %>" /> <b>Location-vente</b>
+				 
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Type de marché de services : </td>
+				<td class="pave_cellule_droite"><%= sNatureMarcheTypeServicesLibelle %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Classification CPV : </td>
+				<td class="pave_cellule_droite">
+					<%= sCPVDesc %><br />
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Lieu d'exécution : </td>
+				<td class="pave_cellule_droite"><%= sLieuExecutionAdresseVoie %>
+					<br/>
+					<b>Code postal : </b><%=sLieuExecutionAdresseCodePostal %> <b>Ville : </b><%= sLieuExecutionAdresseCommune %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Lieu de livraison : </td>
+				<td class="pave_cellule_droite"><%= sLieuLivraisonAdresseVoie %>
+					<br/>
+					<b>Code postal : </b><%=sLieuLivraisonAdresseCodePostal %> <b>Ville : </b><%= sLieuLivraisonAdresseCommune %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,58 @@
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueParametre"%>
+<%@page import="org.coin.localization.Language"%>
+<div id="search">
+
+<form action="<%= response.encodeURL(rootPath+ "desk/organisation/modifierPersonnePhysiqueParametre.jsp?sAction=store" ) %>" method="post" >
+<input type="hidden" name="iParamSize" value="<%= vParams.size() %>" />
+<input type="hidden" name="iIdPersonnePhysique" value="<%= personne.getId()  %>" />
+<input type="hidden" name="iIdOnglet" value="<%= iIdOnglet  %>" />
+
+<div class="searchTitle">
+    <div id="infosSearchLeft" style="float:left"><%= sTabParameterNameParameterList %></div>
+    <div id="infosSearchRight" style="float:right;text-align:right;">
+        <button type="submit" ><%= localizeButton.getValueSubmit() %></button>
+        <button 
+        type="button" 
+        onclick="javascript:Redirect('<%= response.encodeURL( 
+        rootPath + "desk/organisation/afficherPersonnePhysique.jsp?"
+        + "iIdPersonnePhysique=" + personne.getId() 
+        + "&amp;iIdOnglet=" + iIdOnglet
+        + "&amp;nonce=" + System.currentTimeMillis() ) %>')" 
+        ><%= localizeButton.getValueCancel() %></button>
+    </div>
+    <div style="clear:both"></div>
+</div>
+
+<table class="dataGrid fullWidth" cellspacing="1">
+ <tbody>
+     <tr class="header">
+         <td class="cell"><%= sTabParameterNameParameterName %></td>
+         <td class="cell"><%= sTabParameterNameParameterValue %></td>
+     </tr>      
+<%
+for(int i = 0;i < vParams.size() ; i++)
+{
+    int j = i % 2;
+
+    PersonnePhysiqueParametre param = vParams.get(i);
+     %>
+    <tr class="line<%=j%>"
+          onmouseover="className='liste_over'" 
+          onmouseout="className='line<%=j%>'" >
+         <td class="cell">
+             <input type="hidden" name="param_<%= i %>" value="<%= param.getId() %>" />
+             <input type="text" name="paramName_<%= i %>" value="<%= param.getName() %>" style="width:99%" />
+         </td>
+         <td class="cell">
+             <textarea rows="2" name="paramValue_<%= i %>" style="width:99%"><%= param.getValue() %></textarea>
+         </td>
+     </tr>
+<%
+}
+ %> 
+    </tbody>
+</table>
+</form>
+
+</div>

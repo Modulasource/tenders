@@ -1,0 +1,80 @@
+			<% 
+				if(!bReadOnly && commission.getNom().equals("") )
+				{
+					commission.setNom("Commission Appel d'Offres");
+				}
+			 %>
+			
+<%@page import="modula.graphic.CSS"%><table class="pave" summary="none">
+				<tr>
+					<td class="pave_titre_gauche">Commission</td>
+					<td class="pave_titre_droite"><%= commission.getNom() %>&nbsp;</td>
+				</tr>
+				<% if (bDisplayForm) { %>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Nom* :</td>
+					<td class="pave_cellule_droite">
+						<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" type="text" name="sNom" size="60" maxlength="255"
+						value="<%= commission.getNom() %>"
+						<%=bReadOnly?"readonly":"" %>  />
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Comp&eacute;tence :</td>
+					<td class="pave_cellule_droite">
+						<input type="text" name="sCompetence" size="60" maxlength="255"
+						value="<%= commission.getCompetence() %>"
+						<%=bReadOnly?"readonly":"" %>  />
+					</td>
+				</tr>
+				<input type="hidden" name="iIdOrganisation" value="<%= organisation.getIdOrganisation() %>">
+				<tr>
+					<td class="pave_cellule_gauche">Organisme passant le marché :</td>
+					<td class="pave_cellule_droite">
+						<input type="text" name="organisationRaisonSociale" size="60" maxlength="255" style="width:350px" 
+						value="<%= organisation.getRaisonSociale() %>"
+						readonly />
+					</td>
+				</tr>
+				<% } else { %>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				<tr>
+					<td class="pave_cellule_gauche">Organisme dont dépend la commission :</td>
+					<td class="pave_cellule_droite">
+						<select name="iIdOrganisation" style="width:350px"  
+						onChange="ChangeUrl(this.form, 'iIdOrganisation', 'Veuillez choisir un organisme', '<%= response.encodeURL("ajouterCommissionForm.jsp?iIdOrganisation=")%>')">
+    						<option selected='selected'>Choisissez l'organisme</option>
+    <%	
+		for (int i = 0; i < vOrganisations.size(); i++)
+		{
+			Organisation temp = (Organisation) vOrganisations.get(i);
+			if (temp.getIdOrganisationType()  == organisation.getIdOrganisationType())
+			{
+%>
+							<option value="<%= organisation.getIdOrganisation() %>" selected='selected'>
+							<%= organisation.getRaisonSociale() %>
+							</option>
+<%
+			}
+			else
+			{
+%>
+							<option value="<%= temp.getIdOrganisation() %>">
+							<%= temp.getRaisonSociale() %>
+							</option>
+<%
+			}
+		}
+%>
+                      </select>
+					</td>
+				<% } %>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>

@@ -1,0 +1,31 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Coordonnées de l'organisme</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Email :</td>
+		<td class="pave_cellule_droite"><%= organisation.getMailOrganisation() %><input type="button" value="Générer un Email" onclick="javascript:buildEmail();" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Téléphone :</td>
+		<td class="pave_cellule_droite"  ><%= organisation.getTelephone() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Fax :</td>
+		<td class="pave_cellule_droite"  ><%= organisation.getFax() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche"  >Adresse Internet :</td>
+		<td class="pave_cellule_droite"  ><%= organisation.getSiteWeb() %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

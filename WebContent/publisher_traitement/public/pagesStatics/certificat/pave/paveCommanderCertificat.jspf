@@ -1,0 +1,40 @@
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Assistance</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" cellpadding="5" >
+	<tr>
+		<td style="vertical-align:top">
+		<div style="text-align:left;padding:5px">
+		&nbsp;&nbsp;&nbsp;<font color="#ff8c00"><strong>P</strong></font>our répondre de façon électronique aux appels d'offres dématérialisés vous devez vous équiper d'un <b>certificat électronique</b> (signature) émanant d'une autorité de certification reconnue par le MINEFI (liste des autorités).
+<br /><br />En tant qu'autorité d'enregistrement, nous vous proposons d'acquérir un certificat de classe 3+ fourni sur une clé Token USB et émanant de l'autorité de certification Certeurope, agréée par le MINEFI.
+Il vous permettra d'effectuer toutes les procédures dématérialisées que propose l'Administration Française :<br />
+		<ul>
+			<li>Réponse aux appels d'offres publics sur les différentes plateformes</li>
+			<li>Déclaration de votre TVA sur Internet (TéléTVA)</li>
+			<li>Déclaration URSSAF</li>
+			<li>Déclaration ASSEDIC</li>
+			<li>Dépôt des comptes aux greffes des Tribunaux de Commerce</li>
+			<li>TéléCarteGrise, etc.</li>
+		</ul>
+		<br />
+En complément, nous proposons aux entreprises qui en font la demande un programme complet de formation à l'utilisation des certificats électroniques.
+<br /><br /><b>Pour connaître les tarifs de ces prestations, merci de contacter notre service commercial au 0810 618 868 (prix d'un appel local) ou en remplissant le formulaire ci-dessous : </b>
+<%@ include file="../../contact/pave/paveContactForm.jspf" %>
+		</div>
+		</td>
+	</tr>
+    </table>
+</div>
+</div>

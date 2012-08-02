@@ -1,0 +1,790 @@
+<%@page import="org.coin.fr.bean.MultimediaType"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.fr.bean.Multimedia"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="modula.commission.Commission"%>
+<%@page import="modula.marche.AncienAvis"%>
+<%@page import="modula.marche.MarchePieceJointe"%>
+<%@page import="modula.Validite"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.db.ConnectionManager"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="modula.configuration.ModulaConfiguration"%>
+<%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="org.coin.util.HttpUtil"%>
+<%@page import="org.coin.util.SearchEngine"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.security.PreventInjection"%>
+<%@page import="modula.marche.MarcheType"%>
+<%@page import="java.sql.SQLException"%>
+<%@page import="java.sql.ResultSet"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.marche.Marche"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+<%@page import="modula.graphic.CSS"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="mt.modula.html.HtmlAvisRectificatif"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="org.coin.fr.bean.OrganisationParametre"%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueParametre"%>
+<%@page import="org.coin.fr.bean.Departement"%>
+<%@page import="modula.marche.VeilleMarcheAbonnes"%>
+<%@page import="org.coin.util.StringUtil"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfGroupObject"%>
+<%@page import="mt.modula.affaire.personne.MarchePersonneItem"%>
+<%@page import="mt.modula.affaire.personne.MarchePersonneItemState"%>
+<%@page import="mt.modula.affaire.personne.MarchePersonneItemType"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.util.FileUtil"%>
+<%
+
+	/**
+	* Init
+	*/
+	int iMAXPConfig = Configuration.getIntValueMemory("publisher.search.engine.display.per.page.annonce", 5);
+	int iMAXP = HttpUtil.parseInt("se_iMaxElementPerPage", request, iMAXPConfig);
+	int iNumPage = HttpUtil.parseInt("numPage", request, 0);
+	int iLimitOffset = iNumPage*iMAXP;
+	String sType_avis = HttpUtil.parseString("type_avis", request, true, "tout") ; /*avis par défaut */
+	String sType_annonce = HttpUtil.parseStringBlank("type_annonce", true, request) ; 
+ 	String sIdDepartement =  HttpUtil.parseStringBlank("iIdDepartement", true, request) ;
+ 	String sIdGroupCompetence =  HttpUtil.parseStringBlank("iIdGroupCompetence", true, request) ;
+    String sSEOperatorValue = HttpUtil.parseString("sSEOperatorValue",request,"AND") ;
+
+ 	String sIdMarcheType="";
+ 	sIdMarcheType = PreventInjection.preventStore(request.getParameter("iIdMarcheType"));
+    String sIsAnnonceDemat = PreventInjection.preventStore(request.getParameter("sIsAnnonceDemat"));
+    String sIsAnnonceDce = HttpUtil.parseStringBlank("sIsAnnonceDce", true, request) ;
+    if(sIsAnnonceDemat == null) sIsAnnonceDemat = "";
+    if (sIdMarcheType == null) sIdMarcheType="";
+ 	
+ 	String tri =  HttpUtil.parseString("tri",  request, true, "marche.date_dern_modif desc") ;
+
+	String filtre="";
+	String filtreType="";
+    if (request.getParameter("filtre") !=null) filtre=PreventInjection.preventStore(request.getParameter("filtre"));
+    if (request.getParameter("filtreType") !=null) filtreType=request.getParameter("filtreType");
+    
+    if(filtre == null || filtre.equals("null"))
+    {
+        filtreType = "";
+        filtre="";
+    }
+    
+
+    
+    /**
+     * BUSINESS RULE : if search by reference then disable SE habilitation
+     * test : 38AG3973
+     */
+    if(bSearchEngineHabilitation)
+    {
+    	if(filtreType.equals("marche.reference") 
+        && filtre.length() >= Configuration.getIntValueMemory(
+    		    		"publisher.portail.annonce.searchengine.habilitation.marche.reference.min.length", 8))
+        {
+            bSearchEngineHabilitation = false;
+        }
+    }
+
+	
+	String sIdOrganisationFilter="";
+    try{
+        if(Configuration.getConfigurationValueMemory("publisher.show.unique.ap").equals("true")){
+			if(Organisation.getOrganisation(
+					Integer.parseInt(""+session.getAttribute(CSS.DESIGN_USE_ORGANISATION_ID))
+					).getIdOrganisationType() == OrganisationType.TYPE_ACHETEUR_PUBLIC )        		
+				sIdOrganisationFilter = ""+session.getAttribute(CSS.DESIGN_USE_ORGANISATION_ID);
+        }
+  	}catch(Exception e){}
+
+  	
+    try{
+    	OrganisationParametre op = OrganisationParametre.getOrganisationParametre(
+    			Integer.parseInt(""+session.getAttribute(CSS.DESIGN_USE_ORGANISATION_ID)),
+    			"publisher.show.unique.ap");
+    	
+    	if(op.getValue().equals("true"))
+    	{
+			sIdOrganisationFilter = ""+session.getAttribute(CSS.DESIGN_USE_ORGANISATION_ID);
+    	}
+    	
+  	}catch(Exception e){}
+
+  	
+	Marche itemMarche = new Marche();
+	String sRequestSelect = " SELECT DISTINCT "+ itemMarche.getSelectFieldsName("marche.") + ", marche.id_marche \n";
+	String sFromMarche = " FROM marche \n";
+	String sFrom = " , marche_statut statut"
+		       + ",  organisation, commission";
+	String sRequest =
+		" WHERE marche.id_commission = commission.id_commission \n "+
+		" AND commission.id_organisation=organisation.id_organisation \n "+
+		" AND statut.id_marche=marche.id_marche \n";
+	String sLeftJoinMarche = "";
+
+	
+	
+	/**
+	 * Marche Personne Item
+	 */
+	boolean bAddConstraintWhereClauseMarchePersonneItem  = false;
+	
+    String sIsOnlyUnreadedAnnonceChecked = HttpUtil.parseStringBlank("sIsOnlyUnreadedAnnonceChecked", request);
+    String sActionMarchePersonneItem = HttpUtil.parseStringBlank("sActionMarchePersonneItem", request);
+	if(sActionMarchePersonneItem.equals("hideAll"))
+	{
+		String  sMarchePersonneItemListMarche = HttpUtil.parseStringBlank("sMarchePersonneItemListMarche", request);
+        String  sMarchePersonneItemListMarcheAll = HttpUtil.parseStringBlank("sMarchePersonneItemListMarcheAll", request);
+		
+
+			
+		/**
+		* check duplicate in database : WHERE IN (....)
+		*/
+		
+        String[] sarrMarchePersonneItemListMarche = sMarchePersonneItemListMarche.split(",");
+        String[] sarrMarchePersonneItemListMarcheAll = sMarchePersonneItemListMarcheAll.split(",");
+		for(String sIdMarchePersonne : sarrMarchePersonneItemListMarcheAll)
+		{
+			MarchePersonneItem 	mpItem = null;
+			int iIdMarchePersonne = Integer.parseInt(sIdMarchePersonne);
+               
+			/**
+			 * Is selected ?
+			 */
+			boolean bSelectedMarchePersonne = false;
+            for(String sIdMarchePersonneSelected : sarrMarchePersonneItemListMarche)
+            {
+            	if(sIdMarchePersonneSelected.equals(sIdMarchePersonne))
+				{
+					bSelectedMarchePersonne = true;
+					break;
+				}
+            }
+			
+            if(bSelectedMarchePersonne)
+            {
+				/**
+				 * try to load it from db or create it
+				 */
+				 try{
+					mpItem = MarchePersonneItem.getMarchePersonneItem(
+							iIdMarchePersonne, 
+							sessionUser.getIdIndividual());
+					
+				 } catch (CoinDatabaseLoadException e) {
+					mpItem = new MarchePersonneItem();
+	                mpItem.setIdPersonnePhysique(sessionUser.getIdIndividual());
+	                mpItem.setIdMarche(iIdMarchePersonne);
+	                mpItem.setIdMarchePersonneItemState(MarchePersonneItemState.STATE_VALID);
+	                mpItem.setIdMarchePersonneItemType(MarchePersonneItemType.TYPE_READED);
+	                mpItem.create();
+				}
+            } else {
+            	 /**
+            	  * remove it if necessary
+            	  */
+            	 
+            	 mpItem = new MarchePersonneItem();
+            	 mpItem.remove(" WHERE id_personne_physique=" + sessionUser.getIdIndividual()
+            			+ " AND id_marche=" + iIdMarchePersonne );
+            }
+		}
+		
+		bAddConstraintWhereClauseMarchePersonneItem = true;
+		/**
+		 * force to hide readed annonces
+		 */
+		sIsOnlyUnreadedAnnonceChecked = "true";
+    }
+	
+	if(sIsOnlyUnreadedAnnonceChecked.equals("true"))
+	{
+		bAddConstraintWhereClauseMarchePersonneItem = true;
+	}
+	
+    Vector<MarchePersonneItem> vMarchePersonneItem 
+	    = MarchePersonneItem.getAllMarchePersonneItemFromIdPersonnePhysique(sessionUser.getIdIndividual());
+    
+    if(bAddConstraintWhereClauseMarchePersonneItem && vMarchePersonneItem.size() > 0)
+    {
+	    String sConstraintWhereClauseMarchePersonneItem = " AND marche.id_marche NOT IN (";
+	    int iCountFirstMarchePersonneItem = 0;
+	    for(MarchePersonneItem marchePersonneItem : vMarchePersonneItem)
+	    {
+	        sConstraintWhereClauseMarchePersonneItem += "" + marchePersonneItem.getIdMarche() ;
+            
+	        iCountFirstMarchePersonneItem++;
+	        if(iCountFirstMarchePersonneItem != vMarchePersonneItem.size()){
+	        	sConstraintWhereClauseMarchePersonneItem += ",";
+            }
+	    }
+	    sConstraintWhereClauseMarchePersonneItem += ") \n";
+	    
+	    sRequest += sConstraintWhereClauseMarchePersonneItem;
+    }    
+	
+
+    if (sIsAnnonceDemat.equalsIgnoreCase("demat"))
+    {
+        sRequest += " AND marche.id_algo_affaire_procedure <>"
+            + AffaireProcedure.AFFAIRE_PROCEDURE_PETITE_ANNONCE + " \n";
+
+        /**
+         * disable SE habilitation
+         */
+        bSearchEngineHabilitation = false;
+    }
+
+    
+    /**
+     * ENH Bug 2250
+     */
+    String sFilterBug2250 = 
+        /**
+         * tout marché saisi directement dans Modula par une collectivité et contenant
+         *   au moins une pièce jointe
+         */
+          " marche.id_algo_affaire_procedure <>" + AffaireProcedure.AFFAIRE_PROCEDURE_PETITE_ANNONCE + " \n"
+        
+        /**
+         * toute annonce transférée depuis SQL Affiches contenant une pièce jointe 
+         */
+        + " OR marche.aapc <> NULL OR marche.aapc <>\"\" "
+        
+        
+        /**
+         * si la balise <isDceVisiblePublisher>0 ou 1</ isDceVisiblePublisher > est présente 
+         * 
+         *   - si la balise est présente, et vaut 1, alors l'annonce est accessible aux
+         *   abonnés express
+         *   - si la balise est présente et vaut 0, alors l'annonce n'est pas accessible aux
+         *   abonnés express ; elle ne l'est qu'aux abonnés veille, pro ou individuels, sous
+         *   réserve de respect des critères de départements et d'activités
+         */
+        + " OR statut.dce_disponible=1 " ;
+    
+    if(sIsAnnonceDce.equals("dce")
+    // "demat" have a precedence against "dce"
+    && !sIsAnnonceDemat.equals("demat"))
+    {
+	    sRequest += 
+	             " AND ("
+	             + sFilterBug2250    
+	             + " )\n";   
+     
+        /**
+         * disable SE habilitation
+         */
+        bSearchEngineHabilitation = false;
+    }
+    
+
+         
+	/**
+	 * Group competence
+	 */
+    int iIdGroupCompetence = 0;
+    try{
+    	iIdGroupCompetence = Integer.parseInt(sIdGroupCompetence);
+    } catch (Exception e){}
+    
+	if ( iIdGroupCompetence > 0 ){
+        /* 
+         * Recherche par groupe de compétence
+         */
+       	sFrom += ", code_cpf_group_object cpf_grp";
+        sRequest += 
+               " AND cpf_grp.id_type_objet = "+ObjectType.AFFAIRE + "\n"
+               + " AND cpf_grp.id_reference_objet = marche.id_marche \n"
+               + " AND cpf_grp.id_code_cpf_group = "+iIdGroupCompetence + "\n";
+        
+    } else  if(bSearchEngineHabilitation ) {
+    	/**
+    	 * veille de marché
+    	 */
+    	CodeCpfSwitcher cpfSwitcher = new CodeCpfSwitcher(
+    	            ObjectType.PERSONNE_PHYSIQUE,
+    	            candidat.getIdPersonnePhysique());
+        
+    	if (cpfSwitcher.vGroupSelected.size() > 0){
+    		
+    		if(sIsAnnonceDce.equals("dce"))
+    		{
+                /**
+                 * dont use the filter
+                 */
+    		} else {
+    			
+                CoinDatabaseWhereClause wcCodeCpfGroupObject
+	                = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+	            for(CodeCpfGroupObject codeCpfGroupObject : cpfSwitcher.vGroupSelected)
+	            {
+	                wcCodeCpfGroupObject.add(codeCpfGroupObject .getIdOwnedObject());
+	            }
+	            sFrom += ", code_cpf_group_object cpf_grp";
+	            sRequest += 
+	                  " AND cpf_grp.id_type_objet = " + ObjectType.AFFAIRE
+	                + " AND cpf_grp.id_reference_objet = marche.id_marche \n"
+	                + " AND "+ wcCodeCpfGroupObject.generateWhereClause("cpf_grp.id_code_cpf_group") + "\n"
+	                ;
+    		}
+
+    	} else {
+    		/**
+    		 * if its not a superuser only this kind of PA are allowed :
+    		 */
+    		 if(!sessionUserHabilitation.isSuperUser())
+    		 {
+    			 sRequest += 
+    				 " AND ("
+    				 + sFilterBug2250	 
+    		         + " )\n";
+    		 }
+    	}
+    	 
+    }
+	
+	
+ 
+	
+	
+	if (!sIdDepartement.equalsIgnoreCase("")){
+		/* 
+		 * Recherche par département
+		 */
+		if ((sIdDepartement.length()<2)&&(Integer.parseInt(sIdDepartement)<10)) 
+			sIdDepartement = "0"+sIdDepartement;
+		String sCompleteCodePostal = "___";
+		if(sIdDepartement.length()==3) sCompleteCodePostal = "__";
+		sFrom += ", adresse";
+		sRequest += 
+				" AND organisation.id_adresse = adresse.id_adresse \n"+
+				" AND adresse.code_postal LIKE '"+Outils.addLikeSlashes(sIdDepartement)+sCompleteCodePostal+"' \n";
+
+	} else if(bSearchEngineHabilitation ) {
+		
+		/**
+		 * super user can see everything
+		 */
+		if(!sessionUserHabilitation.isSuperUser() && !sIsAnnonceDce.equals("dce"))
+		{	
+			Vector vDepartement = Departement.getAllStaticMemory();
+			try{
+	             Vector<PersonnePhysiqueParametre> vParams 
+	               = PersonnePhysiqueParametre.getAllFromIdPersonnePhysique(candidat.getId());
+	             
+	             Vector<Departement> vDeptSelected   
+	               = VeilleMarcheAbonnes.getAllDepartement(candidat.getId(), vParams,vDepartement);
+	              
+	
+	             /**
+	              * control habilitation veille de marchés
+	              */
+	             sFrom += ", adresse";
+	             sRequest +=  " AND organisation.id_adresse = adresse.id_adresse \n";
+	
+	             if(vDeptSelected.size()>0){
+		             sRequest +=  " AND (";
+		             int iDepartementCount = 0;
+		             for(Departement dept : vDeptSelected)
+		             {
+		            	 String sIdDepartementSelected = dept.getIdString();
+		            	 if ((sIdDepartementSelected.length()<2)&&(Integer.parseInt(sIdDepartementSelected)<10)) 
+		            		 sIdDepartementSelected = "0"+sIdDepartementSelected;
+		         		 String sCompleteCodePostal = "___";
+		         		 if(sIdDepartementSelected.length()==3) sCompleteCodePostal = "__";
+		         		
+		            	 sRequest +=  " adresse.code_postal LIKE '"+Outils.addLikeSlashes(dept.getIdString())+sCompleteCodePostal+"' \n";
+		                 iDepartementCount++;
+		                 if(iDepartementCount != vDeptSelected.size()) sRequest +=  " OR ";
+		             }   
+		             sRequest +=  " )\n";
+	             }
+	             
+	        } catch (Exception e){
+	           e.printStackTrace();
+	        }
+		}
+		
+	}
+	
+	
+	if(!sIdOrganisationFilter.equalsIgnoreCase("")){
+		/**
+		 * Filtrage pour un unique acheteur public
+		 */ 
+		sRequest +=
+				" AND organisation.id_organisation="+sIdOrganisationFilter + "\n";
+	}
+	
+	if (!sIdMarcheType.equalsIgnoreCase("")){
+		//sFrom +=  ", marche_type" ;
+		sLeftJoinMarche += " LEFT JOIN marche_type ON (marche_type.id_marche_type=marche.id_marche_type) \n";
+		sRequest += " AND marche_type.id_marche_code_type=" +sIdMarcheType+" \n";
+		//sRequest += " AND marche_type.id_marche_type=marche.id_marche_type"
+			//+ " AND marche_type.id_marche_code_type=" +sIdMarcheType+" ";
+	}
+	
+
+	/**
+	 * user filter
+	 */
+	if ((!filtre.equalsIgnoreCase(""))&&(!filtreType.equalsIgnoreCase(""))){
+
+		
+	    /**
+	     * bug #2319 
+	     */
+	    String sFiltreCleaned = Outils.cleanWordList(filtre);
+		String sLikeFilter = "";
+		String sReqMarcheWhereClause = "";
+
+        /*if(!sLeftJoinMarche.contains("marche_type") )
+		{
+			//sFrom+= ", marche_type"; 
+	        //sRequest += " AND marche_type.id_marche_type=marche.id_marche_type";
+	        
+	        sLeftJoinMarche += " LEFT JOIN marche_type ON (marche_type.id_marche_type=marche.id_marche_type)\n";
+		}*/
+		
+		if(filtreType.equalsIgnoreCase("marche.ALL_REF"))
+		{
+		
+			String[] sarrField = {
+					"marche.reference",
+					"marche.objet", 
+					"marche.designation_reduite", 
+					"marche.petite_annonce_texte_libre"};
+
+           
+            sRequest += " AND  ("
+	            + ConnectionManager.computeWhereClause(
+	            		sarrField,
+	            		sFiltreCleaned,
+	            		sSEOperatorValue
+	            		)
+	            +")\n";
+			
+		} else {
+	        String[] sarrField = {filtreType};
+	        
+	        sRequest += " AND  ("
+                + ConnectionManager.computeWhereClause(
+                        sarrField,
+                        sFiltreCleaned,
+                        sSEOperatorValue
+                        )
+                +")\n";
+	        
+	        
+	        if (filtreType.equalsIgnoreCase("marche.id_marche_type")){
+	            sRequest += 
+	              " AND LOWER(marche_type.libelle) LIKE '%"+ sFiltreCleaned + "%' \n";
+	        }
+		}
+	}
+	
+	if(filtre.length() < 3 && filtre.length() > 0 )
+	{
+		filtre = "mot de 3 lettres minimum";
+		bDisplaySearchEngine = true;
+	}
+
+	/**
+	 * AAPC
+	 */
+	if (sType_avis.equals("aapc"))
+	{
+		if(sType_annonce.equals("MG"))
+		{
+			/**
+			 * Marchés groupés
+			 */
+			 sRequest += 
+				  " AND statut.aapc_en_ligne=1 AND statut.aapc=1 \n"
+				+ " AND statut.pa_grouped=1 AND statut.publie_publisher=1 \n";
+		}
+		else
+			sRequest += " AND statut.aapc_en_ligne=1 AND statut.aapc=1 \n";
+	}
+	/**
+	 * AAPC
+	 */
+	else if (sType_avis.equals("tout_sauf_aatr"))
+	{
+		sRequest += " AND statut.aapc_en_ligne=1 AND statut.aapc=1 \n";
+	}
+	/**
+	 * AATR
+	 */
+	else if (sType_avis.equals("aa"))
+	{
+		if(sType_annonce.equals("MG"))
+		{
+			/**
+			 * Marchés groupés
+			 */
+			sRequest += " AND statut.recap_aatr<>1 AND statut.aatr_en_ligne=1 \n"
+					  + " AND statut.aatr=1 AND statut.pa_grouped=1 AND statut.publie_publisher=1 \n";
+		}
+		else
+			sRequest += " AND statut.recap_aatr<>1 AND statut.aatr_en_ligne=1 AND statut.aatr=1 \n";
+	}
+	/**
+	 * avis récapitulatif
+	 */
+	else if (sType_avis.equals("ra"))
+	{
+		sRequest += " AND statut.aatr_en_ligne=1 AND statut.recap_aatr=1 \n";
+	}
+	else if (sType_avis.equals("tout"))
+	{
+		if(sType_annonce.equals("MG"))
+			sRequest += " AND statut.pa_grouped=1 AND statut.publie_publisher=1 \n"
+			 + "AND ( (statut.aatr=1 AND statut.aatr_en_ligne=1) \n"
+					+ "OR ((statut.aapc=1 AND statut.aapc_en_ligne=1)) ) \n";
+		else
+			sRequest += " AND ( (statut.aatr=1 AND statut.aatr_en_ligne=1) \n"
+							+ " OR ((statut.aapc=1 AND statut.aapc_en_ligne=1)) ) \n";
+	}
+	/**
+	 * Avis rectificatif
+	 */
+	else if (sType_avis.equals("ar"))
+	{
+		if(sType_annonce.equals("MG"))
+			sRequest += " AND statut.pa_avis_rectificatif=1 AND statut.pa_grouped=1 AND statut.publie_publisher=1 \n"
+				+ "AND ( (statut.aatr=1 AND statut.aatr_en_ligne=1) OR ((statut.aapc=1 AND statut.aapc_en_ligne=1)) ) \n";
+		else 
+		{
+			sRequest += " AND ( (statut.aatr=1 AND statut.aatr_en_ligne=1) \n"
+							+ "OR (statut.aapc=1 AND statut.aapc_en_ligne=1) ) \n";
+			//+ " AND ( (statut.pa_avis_rectificatif=1 AND statut.publie_publisher=1)"
+			//+ " OR ( (SELECT COUNT(*) FROM avis_rectificatif rec WHERE rec.id_marche = marche.id_marche AND rec.id_avis_rectificatif_type=(IF(statut.aatr=1,"+modula.marche.AvisRectificatifType.TYPE_AATR+","+modula.marche.AvisRectificatifType.TYPE_AAPC+")) ) > 0 AND statut.publie_publisher=1) )";
+			
+			sFrom += ",avis_rectificatif rec";
+			sRequest += " AND ( (statut.pa_avis_rectificatif=1 AND statut.publie_publisher=1) \n";
+			sRequest += " OR ( (rec.id_avis_rectificatif_type=(IF(statut.aatr=1,"
+					+AvisRectificatifType.TYPE_AATR+","
+					+AvisRectificatifType.TYPE_AAPC+
+					")) ) AND statut.publie_publisher=1 AND rec.id_marche = marche.id_marche) ) \n";
+		}
+	} else if (!sType_avis.equals("")) {
+		/**
+		 * type d'avis non trouvé, on affiche tout
+		 */
+		sRequest += " AND ( (statut.aatr=1 AND statut.aatr_en_ligne=1) \n"
+			+ " OR ((statut.aapc=1 AND statut.aapc_en_ligne=1)) ) \n";
+
+	}
+	
+	Timestamp tsStartDate =   HttpUtil.parseTimestamp("se_tsStartDate", request, null) ;
+	Timestamp tsEndDate =  HttpUtil.parseTimestamp("se_tsEndDate", request, null) ;
+	String sDateFilter = "";
+	if(tsStartDate != null && tsEndDate != null)
+	{
+	 /**
+	  * BETWEEN '2007-08-15 00:00:00.0' AND '2007-08-18 23:59:59.0' 
+	  */
+	  sFrom += ",validite vali";
+      sRequest += 
+          " AND vali.id_type_objet_modula in (" 
+                  + TypeObjetModula.AFFAIRE + ","
+                  + TypeObjetModula.AAPC //+ ","
+                  //+ TypeObjetModula.AATR + ","
+                  //+ TypeObjetModula.ENVELOPPE_A + "," 
+                  //+ TypeObjetModula.ENVELOPPE_B + ","
+                  //+ TypeObjetModula.ENVELOPPE_C 
+                  + ")"
+          + " AND vali.id_reference_objet = marche.id_marche \n"
+          + " AND vali.date_debut >= '" +  CalendarUtil.getDateWithFormat(tsStartDate, "yyyy-MM-dd") + "' \n"
+          + " AND vali.date_debut <= '" +  CalendarUtil.getDateWithFormat(tsEndDate, "yyyy-MM-dd") + "' \n";
+
+
+		//sDateFilter = " AND marche.date_dern_modif  BETWEEN '" + CalendarUtil.getDateWithFormat(tsStartDate, "") 
+	   //	  +  "' AND '" + tsEndDate + "' \n";
+	} else {
+		if(tsStartDate != null )
+		{
+	        sFrom += ",validite vali";
+	        sRequest += 
+	        	" AND vali.id_type_objet_modula in (" 
+                        + TypeObjetModula.AFFAIRE+ ","
+                        + TypeObjetModula.AAPC //+ ","
+                        //+ TypeObjetModula.AATR //+ ","
+                        //+ TypeObjetModula.ENVELOPPE_A + "," 
+                        //+ TypeObjetModula.ENVELOPPE_B + ","
+                        //+ TypeObjetModula.ENVELOPPE_C 
+                        + ")"
+	        	+ " AND vali.id_reference_objet = marche.id_marche \n"
+	        	+ " AND vali.date_debut >= '" + CalendarUtil.getDateWithFormat(tsStartDate, "yyyy-MM-dd") + "' \n";
+
+
+	        
+
+	        	
+			//sDateFilter = " AND marche.date_dern_modif  > '" + tsStartDate + "' \n";
+		}
+		
+		if(tsEndDate != null )
+		{
+			
+			sFrom += ",validite vali";
+            sRequest += 
+                " AND vali.id_type_objet_modula in (" 
+                        + TypeObjetModula.AFFAIRE + ","
+                        + TypeObjetModula.AAPC //+ ","
+                        //+ TypeObjetModula.AATR //+ ","
+                        //+ TypeObjetModula.ENVELOPPE_A + "," 
+                        //+ TypeObjetModula.ENVELOPPE_B + ","
+                        //+ TypeObjetModula.ENVELOPPE_C 
+                        + ")"
+                + " AND vali.id_reference_objet = marche.id_marche \n"
+                + " AND vali.date_debut <= '" + CalendarUtil.getDateWithFormat(tsEndDate, "yyyy-MM-dd") + "' \n";
+
+
+	            
+			//sDateFilter = " AND marche.date_dern_modif  < '" + tsEndDate + "' \n";		
+		}
+		
+	}
+	
+
+	//sRequest += sDateFilter;
+	
+	String sGroupBy = " GROUP BY marche.id_marche \n";
+	String sTri = " ORDER BY "+ tri + "\n";
+	String sLimit = " LIMIT "+ iLimitOffset +", " + iMAXP + "\n" ;
+	/* ON COMPLETE LA REQUETE */
+
+
+	/* c naze ............ à revoir avec le moteur en Ajax */
+	
+	/* REQUETE */
+	String sFullQuerySql = 
+		 sRequestSelect
+	   + sFromMarche
+	   + sLeftJoinMarche
+	   + sFrom
+	   + sRequest
+       ;
+	
+	//System.out.println(sFullQuerySql);
+     
+	SearchEngine recherche = new SearchEngine(
+			sFullQuerySql 
+			  + sGroupBy
+		      + sTri 
+			  + sLimit,
+		    iMAXP)
+	{
+		public Object getObjetFromResultSet(ResultSet rs) throws SQLException{
+			Marche marche = new Marche ();
+			
+			marche.setFromResultSet(rs);
+			marche.setIdMarche(rs.getInt(marche.SELECT_FIELDS_NAME_SIZE + 1));
+			return marche;
+		}
+	};
+	
+	int numPage = HttpUtil.parseInt("numPage", request, 1);
+
+	/* /REQUETE */
+	recherche.setContext(sType_avis);
+	recherche.setContextSup(sType_annonce); 
+	recherche.setFromFormPagination(request, "");
+	recherche.iCurrentPage = numPage;
+	
+    
+ 	/* Recuperation du vecteur de marches
+	 * On ne recupere que ceux qui ont été publiés
+	 * Et dont les candidatures ne sont pas closes
+	 */
+	 
+	 Vector vRecherche = null;
+
+ 	 
+	/**
+ 	 * Permet de ne pas casser ce qui existe deja
+ 	 */
+	if(bLaunchSearch || !filtre.equals("")) { 
+		recherche.getAllResultObjectsBis();
+		recherche.loadTotalCountFromRequest(
+				sFullQuerySql , 
+				"marche",
+				"marche.id_marche",
+                true);
+		vRecherche = recherche.getAllResults();
+		bLaunchSearch = true;
+	} else {
+		/**
+		 * pas de résultat
+		 */
+		vRecherche = new Vector();
+	}
+ 	Vector vMarches = new Vector();
+
+ 	vMarches = recherche.getCurrentPage();
+ 	filtre=PreventInjection.preventLoad(filtre);
+	filtreType=PreventInjection.preventLoad(filtreType);
+	
+	
+	Vector vmtType = MarcheType.getAllStaticMemory();
+	
+	
+    Connection connSearchEngineTotal = ConnectionManager.getConnection();
+	   
+    boolean bAfficheSearchEngine = true;
+    bAfficheSearchEngine = Configuration.getConfigurationValueMemory(ModulaConfiguration.SHOW_PUBLISHER_SEARCH_ENGINE).equals("enabled")?true:false;
+
+    
+    CoinDatabaseWhereClause wcAllIdMarche = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+    CoinDatabaseWhereClause wcAllIdCommission = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+    CoinDatabaseWhereClause wcAllIdPersonnePhysique = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+
+    
+    for (int i = 0; i < vRecherche.size(); i++)  
+    {
+        Marche marche = (Marche)vRecherche.get(i);
+        wcAllIdMarche.add(marche.getIdMarche());
+        wcAllIdCommission.add(marche.getIdCommission());
+        wcAllIdPersonnePhysique.add(marche.getIdCreateur());
+    }
+   
+    /**
+     * revoir le traitement pour ne pas afficher d'Exception lorsque le moteur ne renvoit pas 
+     * de résultat, car on obtient dans la console des trucs de type :
+     *  
+     * Warning :  generateWhereClause empty revoir le traitement pour  sFieldName : 'id_commission'
+	 * 
+     *
+     */ 
+    
+ %>
+<%@include file="paveBatchAllItemAnnonce.jspf"%>
+<%
+
+  ConnectionManager.closeConnection(connSearchEngineTotal);
+
+%>
+<script type="text/javascript" > 
+
+    function getDescriptionAnnonce(handler,param){
+        function onLoad(r) {
+            $(handler).getElementsByTagName("td")[0].innerHTML = r.responseText;
+        }
+        if($(handler).getElementsByTagName("td")[0].innerHTML=='') {
+        new Ajax.Request('<%=rootPath%>publisher_traitement/public/annonce/afficherDescriptionAnnonce.jsp', {method:'post', parameters:"?nocache="+(new Date())+param, onComplete:onLoad});
+        }
+    }
+    
+</script>

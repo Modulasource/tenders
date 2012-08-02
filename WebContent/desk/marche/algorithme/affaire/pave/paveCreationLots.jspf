@@ -1,0 +1,167 @@
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.marche.MarcheLotDetail"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveCreationLot<%= lot.getNumero() %>')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveDefinitionLotsTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveCreationLot<%= lot.getNumero() %>" >
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Référence :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= lot.getReference() %>
+					</td>
+				</tr>
+			<%
+				if(bUseBoamp17 && (bUseFormNS || bUseFormUE) )
+				{
+			%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Intitulé :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= lot.getIntitule() %>
+					</td>
+				</tr>
+			<%
+				}
+			%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Description succincte :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(lot.getDesignationReduite())%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Nature ou &eacute;tendue ou quantit&eacute; :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(lot.getQuantite()) %>
+					</td>
+				</tr>
+<%
+	if(bUseBoamp17  && (bUseFormNS || bUseFormUE))
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Coût, s'il est connu :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+		
+		String sCheckedCoutEstime = "";
+
+		
+		switch (marcheLotDetail.getIdCoutEstimeType())
+		{
+		case MarcheLotDetail.VALEUR_TYPE_NEANT:
+			sCheckedCoutEstime = "Néant";
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_UNIQUE:
+			sCheckedCoutEstime = "Coût estimé (H.T.) : " + Outils.getFormatedValueNeant( marcheLotDetail.getCoutEstime()) ;
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_FOURCHETTE:
+			sCheckedCoutEstime 
+				= "Fourchette entre " + Outils.getFormatedValueNeant(marcheLotDetail.getCoutEstimeBas() )
+				+ " et " + Outils.getFormatedValueNeant(marcheLotDetail.getCoutEstimeHaut() )
+				+ " " + currency.getName();
+			break;
+		}
+
+		%>
+			<%= sCheckedCoutEstime %>
+		</td>
+	</tr>
+	<tr>
+		<%
+		
+		String sCheckedAutreDuree = "";
+		
+		switch (marcheLotDetail.getIdAutreDureeType())
+		{
+		case MarcheLotDetail.VALEUR_TYPE_NEANT:
+			sCheckedAutreDuree = "Néant";
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_UNIQUE:
+			String sDureeType = "";
+			if(!Outils.isNullOrBlank(marcheLotDetail.getAutreDureeType()) 
+			&& marcheLotDetail.getAutreDureeType().equals("mois"))
+			{
+				sDureeType = " mois ";
+			} else{
+				sDureeType = " années ";
+			}
+			
+			sCheckedAutreDuree = marcheLotDetail.getAutreDuree() + sDureeType;
+			
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_FOURCHETTE:
+			sCheckedAutreDuree = "à compter de la date de notification du marché<br/>"
+				+ " à compter du " + CalendarUtil.getDateCourte(marcheLotDetail.getAutreDureeDebut()) 
+				+ " et jusqu'au " + CalendarUtil.getDateCourte(marcheLotDetail.getAutreDureeFin());
+			break;
+		}
+
+		%>
+		<td class="pave_cellule_gauche">
+		Indications quant à une autre durée du marché ou à une autre date de 
+		commencement / d'achèvement (le cas échéant) :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= sCheckedAutreDuree %>
+		</td>
+	</tr>
+<%
+	}
+%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Date d'ex&eacute;cution du lot :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= CalendarUtil.getDateCourteNeant(lot.getDateExecution()) %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Date de livraison du lot :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= CalendarUtil.getDateCourteNeant(lot.getDateLivraison()) %>
+					</td>
+				</tr>
+<%
+	if(bUseBoamp17  && (bUseFormNS || bUseFormUE))
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Informations complémentaires sur les lots :
+		</td>
+		<td class="pave_cellule_droite"><%= 
+				Outils.getTextToHtml( marcheLotDetail.getInfoComplementaire()) %>
+		</td>
+	</tr>
+<%
+	}
+%>	
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<br />

@@ -1,0 +1,33 @@
+<%@page import="mt.modula.batch.affaire.OAS"%>
+<% 
+	OAS oas = new OAS(sCurrentSiteWeb, sBannerKeyWord); 
+	URL urlRequestTagOas = new URL( request.getRequestURL().toString());
+
+	if(oas.bUseBanner)
+	{
+		//oas.getHtmlJavascript();
+		%>
+
+
+<%@page import="java.net.URL"%>
+<%@page import="org.coin.bean.conf.Configuration"%><script type="text/javascript">
+<!--
+      // initialisation des variables OAS
+      //OAS_sitepage = 'lpauto/portail0';
+	  OAS_sitepage = '<%= urlRequestTagOas.getHost() %>/<%= sBannerKeyWord %>'
+	  OAS_listpos = '<%= Configuration.getStringValueMemory("publisher.portail.include.publicite.oas_tag", "Top,Position4,Right,Right2,Right3,Bottom1,BottomLeft,Position2")%>';
+	  
+      // récup de OAS_query avec +sieurs valeurs possibles : /Document/data/ 
+         
+      OAS_query = '';
+      
+	    //déclaration de variable
+	  	var sLayer; // pour Xiti dans le cas du frame (voir fs_master.xsl)
+
+//-->
+</script>
+
+<script type="text/javascript" src="<%= rootPath %>include/js/web66.js"></script>
+		<%
+	}
+%>

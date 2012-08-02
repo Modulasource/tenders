@@ -1,0 +1,62 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+<%@page import="org.coin.security.PreventInjection"%>
+//raison sociale
+var champRaisonSocialeAuth = "sRaisonSocialeAuth";
+var champRaisonSociale = "sRaisonSociale";
+var divRaisonSociale = "tr_infoRaisonSociale";
+function verifierRaisonSociale() 
+{
+	if(document.getElementById(champRaisonSociale).value.toLowerCase().trim() != "<%= PreventInjection.preventForJavascript(organisation.getRaisonSociale().toLowerCase().trim())  %>")
+	{
+		verifierChamp(champRaisonSociale,champRaisonSocialeAuth,divRaisonSociale,<%= 
+		    CheckAjaxVerifField.ORGANISATION_RAISON_SOCIALE %>,[{data:"iIdOrganisation",value:<%= organisation.getId() %>}],"publisher_portail");
+	}
+}
+
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+
+	<%
+	if( iIdOnglet == modula.graphic.Onglet.ONGLET_ORGANISATION_DONNEES_ADMINISTRATIVES)
+	{
+	%>
+		if (isNull(document.getElementById("sRaisonSociale").value))
+		{
+			sError += "Vous devez saisir une raison sociale.<br />";
+			bResult = false;
+		}
+		else if (document.getElementById("sRaisonSocialeAuth").value == 0
+		&& document.getElementById(champRaisonSociale).value.toLowerCase().trim() != "<%= PreventInjection.preventForJavascript(organisation.getRaisonSociale().toLowerCase().trim()) %>")
+		{
+			sError += "La raison sociale que vous avez saisie est déjà inscrite dans la base de données.\nVous ne pouvez pas poursuivre cette opération.<br />";
+			bResult = false;
+		}
+		
+		if ((document.getElementById("iIdCodeNaf").value) == 0)
+		{
+			sError += "Vous devez saisir un code Naf.<br />";
+			bResult = false;
+		}
+				
+		Visualise(document.getElementById("iIdCompetenceSelected"),document.getElementById("iIdCompetenceNewSelection"));
+		
+		if (isNull(document.getElementById("iIdCompetenceNewSelection").value))
+		{
+			sError += "Vous devez saisir au moins une compétence.<br />";
+			bResult = false;
+		}
+	<%
+	}
+	%>
+
+	document.getElementById("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}

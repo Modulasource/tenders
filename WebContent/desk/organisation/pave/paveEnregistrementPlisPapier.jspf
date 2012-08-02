@@ -1,0 +1,21 @@
+<%
+	String sTitreRetraitDCE = "Date de retrait du DCE : ";
+	String sTitreFormatDCE = "DCE Retiré au format : ";
+	String sTitreFormatCandidature = "Format du dossier de candidature : ";
+	if(!bIsContainsEnveloppeAManagement)
+	{
+		sTitreFormatCandidature = "Format de l'offre : ";
+	}
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveEnregistrementPlisTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<%@ include file="paveEnregistrementPlisPapierDCE.jspf" %>
+			<%@ include file="paveEnregistrementPlisPapierCandidature.jspf" %>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

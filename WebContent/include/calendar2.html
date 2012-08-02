@@ -1,0 +1,77 @@
+<html>
+<head>
+<style>
+<!--
+TABLE{font:8pt arial}
+A{color:#333399}
+A:hover{color:#ff6600}
+.hr{background:gray;color:white;border:1px solid black}
+.hrA{background:gray;color:white;border:1px solid black;cursor:pointer}
+.nt{position:absolute;width:19;height:19;visibility:hidden}
+.bt{position:absolute;width:19;height:19}
+.dt{position:absolute;width:19;height:19;cursor:pointer}
+.mn{position:relative;left:0;top:0;width:141;height:121}
+.mv{position:relative}
+.mh{position:relative;visibility:hidden}
+//-->
+</style>
+<script type="text/javascript" language="javascript1.2" >
+
+
+	function closeCalendar(sIdCalendar)
+	{
+		var  wp = window.parent;
+		var divParent = wp.document.getElementById(sIdCalendar);
+		
+		divParent.style.display = 'none';
+		divParent.style.visibility = "hidden";
+		
+		var divDate = wp.document.getElementById('sDate1');
+		divDate.value = "coin coin";
+		
+		
+	}
+
+</script >
+
+</head>
+<body bgcolor="white" text="black" >
+<table cellpading="0" cellspacing="1" ID="myCalendarTable" STYLE="border:2px solid black">
+	<TR>
+		<TD height="20">
+			<table cellpading="0" cellspacing="1" >
+				<TR>
+					<TD WIDTH=16 ID=PrevDiv CLASS="hr"><img ID="Prev" SRC="images/calendar/prev.gif" WIDTH=16 HEIGHT=16 onclick="PC()" ALT="Mois précédent"></TD>
+					<TD WIDTH=101 ALIGN=MIDDLE CLASS="hr"><SPAN ID=MonthTitle></SPAN>&nbsp;&nbsp;<SPAN ID=YearTitle></SPAN></TD>
+					<TD WIDTH=16 ID=NextDiv CLASS="hr"><img ID="Next" SRC="images/calendar/next.gif" WIDTH=16 HEIGHT=16 onclick="NC()" ALT="Mois suivant"></TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<table cellpading="0" >
+				<TR>
+					<TD><IMG ID=WImg WIDTH=141 HEIGHT=20 SRC="images/calendar/week1.gif"></TD>
+				</TR>
+				<TR>
+					<TD height="1" bgcolor='#b1c7b5'></TD>
+				</TR>
+				<TR>
+					<TD align="MIDDLE" id="">
+					1 2 3 4<BR />
+					5 6
+					</TD>
+				</TR>
+				<TR>
+					<TD height="1" bgcolor='#b1c7b5'></TD>
+				</TR>
+			</table>
+		</td>
+	</tr>
+	<TR>
+		<TD HEIGHT=20 ALIGN=MIDDLE><A HREF="javascript:closeCalendar('coin1')">Annuler</A></TD>
+	</TR>
+</TABLE>
+</body>
+</html>

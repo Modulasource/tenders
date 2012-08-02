@@ -1,0 +1,10 @@
+<%@ page import="modula.marche.*,org.coin.security.*,javax.naming.*,javax.mail.*,java.net.*,java.util.*,org.coin.fr.bean.*,org.coin.bean.*,modula.*,org.coin.fr.bean.mail.*, modula.candidature.*" %>
+<%
+	PersonnePhysique candidat = new PersonnePhysique();
+	Organisation organisation = new Organisation();
+	if(sessionUser.getIdIndividual() > 0)
+	{
+		candidat = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual());
+		organisation = Organisation.getOrganisation(candidat.getIdOrganisation());
+	}
+%>

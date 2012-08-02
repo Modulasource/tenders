@@ -1,0 +1,153 @@
+<%
+	String sUtilisateur = "";
+	String sReference = "";
+	String sUtilisateurUrl = "";
+	try {
+		User oUser = org.coin.bean.User.getUser(oEvenement.getIdUser() );
+		PersonnePhysique oPersonnePhysique
+			= PersonnePhysique.getPersonnePhysique( oUser.getIdIndividual() );
+		sUtilisateur = oPersonnePhysique.getPrenom() + " " + oPersonnePhysique.getNom();
+		
+		sUtilisateurUrl = 
+			"<a href='" 
+				+  response.encodeURL(rootPath 
+				+ "desk/organisation/afficherPersonnePhysique.jsp?iIdPersonnePhysique=" 
+				+ oPersonnePhysique.getIdPersonnePhysique()  ) + "' >" + sUtilisateur  + "</a>";
+
+	} catch (Exception e){}
+	
+
+	try {
+		PersonnePhysique oPersonnePhysique
+			= PersonnePhysique.getPersonnePhysique( oEvenement.getIdReferenceObjet() );
+		
+		sReference = 
+			"<a href='" 
+				+  response.encodeURL(rootPath 
+				+ "desk/organisation/afficherPersonnePhysique.jsp?iIdPersonnePhysique=" 
+				+ oPersonnePhysique.getIdPersonnePhysique()  ) + "' >" 
+				+ oPersonnePhysique.getPrenom() + " " + oPersonnePhysique.getNom()+ "</a>";
+
+	} catch (Exception e){}
+
+	
+	TypeEvenement oTypeEvenement ;
+	try {
+		oTypeEvenement = TypeEvenement.getTypeEvenementMemory(oEvenement.getIdTypeEvenement());
+		iIdTypeObjet = oTypeEvenement.getIdTypeObjet();
+	} catch (Exception e){oTypeEvenement = new TypeEvenement (); }
+ %>
+<%@page import="org.coin.bean.User"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="modula.journal.TypeEvenement"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<table class="pave" summary="none">		
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"> 
+	<input type="hidden" name="iIdEvenement" value="<%= oEvenement.getIdEvenement() %>" />
+	<input type="hidden" name="iIdReferenceObjet" value="<%= oEvenement.getIdReferenceObjet() %>" />
+			Evénement
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'objet :
+		</td>
+		<td class="pave_cellule_droite">
+			Personne Physique
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Référence :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= sReference %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Date de début de l'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="tsDateDebutEvenement" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(oEvenement.getDateDebutEvenement()) %>" />
+			<strong>Heure: </strong>&nbsp;
+			<input type="text" name="tsDateDebutEvenementHeure" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(oEvenement.getDateDebutEvenement() ) %>" />&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Date de fin de l'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="tsDateFinEvenement" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(oEvenement.getDateFinEvenement()) %>" />
+			<strong>Heure: </strong>&nbsp;
+			<input type="text" name="tsDateFinEvenementHeure" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(oEvenement.getDateFinEvenement() ) %>" />&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<select name="iIdTypeEvenement" ><%
+			Vector<modula.journal.TypeEvenement> 
+				vTypeEvenement = 
+					modula.journal.TypeEvenement.getAllTypeEvenementsFromIdTypeObjetMemory(
+							iIdTypeObjet );
+			for(int i =0; i<vTypeEvenement.size(); i ++)
+			{
+				modula.journal.TypeEvenement evt = vTypeEvenement.get(i);
+				String sSelected = "";
+				if(evt.getIdTypeEvenement() == oTypeEvenement.getIdTypeEvenement())
+				{
+					sSelected = " selected='selected' ";
+				}
+			%>				<option value="<%= evt.getIdTypeEvenement() %>" <%=  sSelected %> ><%= evt.getLibelle() %></option>
+			<%} %>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Commentaire :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea cols="80" rows="10" name="sCommentaireLibre" ><%= oEvenement.getCommentaireLibre() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Identifiant de l'utilisateur :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= sUtilisateurUrl %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Id jeton d'horodatage :
+		</td>
+		<td class="pave_cellule_droite">
+			<% 
+				if (oEvenement.getIdJetonHorodatage() < 1){
+					%>Pas de Jeton associé
+					<%
+				} else {%>
+			<%= oEvenement.getIdJetonHorodatage() %>
+				<%}%>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

@@ -1,0 +1,11 @@
+<%@page import="mt.modula.affaire.candidature.CandidatureEnveloppe"%>
+<%@page import="modula.candidature.EnveloppeALot"%>
+<%@page import="modula.Validite"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.candidature.EnveloppeC"%>
+<%@page import="modula.candidature.EnveloppeB"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.EnveloppeA"%>
+<%
+
+%>

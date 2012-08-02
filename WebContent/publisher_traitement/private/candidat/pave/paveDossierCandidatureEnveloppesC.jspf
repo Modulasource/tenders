@@ -1,0 +1,144 @@
+<%
+	if(isConstitutionEnveloppeCAutoriseeInstancie)
+	{
+		for (int i = 0; i < vEnveloppesC.size(); i++)
+		{
+			EnveloppeC enveloppe = (EnveloppeC)vEnveloppesC.get(i);
+			boolean bAfficheLot = true;
+
+			if (enveloppe.getIdLot() != 0 && ( AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure()) != AffaireProcedure.TYPE_PROCEDURE_OUVERTE))
+			{
+				MarcheLot lot = MarcheLot.getMarcheLot(enveloppe.getIdLot(),vLotsTotal);
+				
+				Vector<EnveloppeALot> vEnvALot = EnveloppeALot.getAllEnveloppeALotFromCandidatureAndLot(candidature.getIdCandidature(),enveloppe.getIdLot());
+				if(vEnvALot != null && vEnvALot.size()==1)
+				{
+					EnveloppeALot envALot = vEnvALot.firstElement();
+					bAfficheLot = envALot.isRecevable(false);
+				}
+			}
+			if(bAfficheLot)
+			{
+				/* Récupération des pièces jointes de l'enveloppe C */
+				Vector vPiecesJointes = EnveloppeCPieceJointe.getAllEnveloppeCPiecesJointesBeforeDateClotureFromEnveloppe(enveloppe.getIdEnveloppe());
+				Vector vPiecesJointesHorsDelai = EnveloppeCPieceJointe.getAllEnveloppeCPiecesJointesHorsDelaisFromEnveloppe(enveloppe.getIdEnveloppe());
+		%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.EnveloppeALot"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="modula.candidature.EnveloppeC"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.candidature.EnveloppeCPieceJointe"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.security.SecureString"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche">Liste des pièces de l'offre de prestation
+		<%
+				if (enveloppe.getIdLot() != 0 && vLotsTotal.size() > 1)
+				{
+					MarcheLot lot = MarcheLot.getMarcheLot(enveloppe.getIdLot(),vLotsTotal);
+					// marché allotit
+					out.write("pour le lot n°" + lot.getNumero());
+				}
+				else
+				{
+					out.write("&nbsp;" );
+				}
+		%>
+		</td>
+		<td class="pave_titre_droite" style="color:#ff8c00">
+		<%= enveloppe.getStatutLibelleValue(EnveloppeC.ID_STATUS_CACHETEE) %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<table class="liste" style="width:100%" summary="none">
+				<tr>
+					<th>Nom de la pièce</th>
+					<th>Date de création</th>
+					<th>Poids</th>
+					<th>Etat</th>
+									</tr>
+		<%
+				for (int j = 0; j < vPiecesJointes.size(); j++)
+				{
+					EnveloppeCPieceJointe pieceJointe = (EnveloppeCPieceJointe)vPiecesJointes.get(j);
+					candidature.setClosingCandidatureAllowedFromEnveloppeState(pieceJointe);
+		%>
+				<tr>
+					<td style="width:60%"><%= pieceJointe.getNomPieceJointe() %></td>
+					<td><%= CalendarUtil.getDateCourte(pieceJointe.getDateCreation()) %></td>
+					<td><%= Outils.getSizeInMegaBytes(pieceJointe.getTailleFichier()) %></td>
+					<td><%= pieceJointe.getFileStateName() %></td>
+				</tr>
+	<%
+				}
+		%>
+		<%
+				for (int j = 0; j < vPiecesJointesHorsDelai.size(); j++)
+				{
+					EnveloppeCPieceJointe pieceJointe = (EnveloppeCPieceJointe)vPiecesJointesHorsDelai.get(j);
+					candidature.setClosingCandidatureAllowedFromEnveloppeState(pieceJointe);
+		%>
+				<tr>
+					<td style="width:60%" class="rouge"><%= pieceJointe.getNomPieceJointe() %>&nbsp;&nbsp;<img src="<%= rootPath %>images/icones/hors_delai.gif" width="25" height="24"/>(hors delais)</td>
+					<td><%= CalendarUtil.getDateCourte(pieceJointe.getDateCreation()) %></td>
+					<td><%= Outils.getSizeInMegaBytes(pieceJointe.getTailleFichier()) %></td>
+					<td><%= pieceJointe.getFileStateName() %></td>
+				</tr>
+		<%
+				}
+		%>
+
+				<tr><td colspan="3">&nbsp;</td></tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td style="text-align:right" colspan="2">
+		&nbsp;
+		<%
+				boolean bIsEnvCDecachetees = marche.isEnveloppesCDecachetees(false);
+				boolean bIsEnvCCachetee = enveloppe.isCachetee(false);
+				boolean bIsEnvCClose = candidature.isEnveloppeCConstituee(false);
+				
+				if (isConstitutionEnveloppeCAutorisee && !bIsEnvCClose && !bIsEnvCCachetee && !bIsEnvCDecachetees)
+				{
+					bConstitutionEnveloppeCPossible = true;
+					if(!bExistEnveloppeCPJ && vPiecesJointes.size() + vPiecesJointesHorsDelai.size() > 0)
+						bExistEnveloppeCPJ = true;
+				
+		%>
+					<button type="button" name="constituerOffrePrestation" 
+					onclick="OuvrirPopup('<%= 
+						response.encodeURL("constituerOffreCForm.jsp?iIdEnveloppe=" + enveloppe.getIdEnveloppe() ) 
+						%>',700,700, 'menubar=no,scrollbars=yes,statusbar=no')" 
+						>Constituer mon offre de prestation</button>
+		<%
+				}
+					
+				if (isConstitutionEnveloppeCAutorisee && bIsEnvCClose && !bIsEnvCDecachetees) 
+				{
+		%>
+						<button type="button" 
+						onclick="if (confirm('Etes vous certain de réinitialiser votre offre de prestation? Cela détruira toutes vos pièces.')) Redirect('<%=
+						 response.encodeURL(rootPath+"publisher_traitement/private/candidat/reinitialiserCandidature.jsp?iIdEnveloppeC=" + enveloppe.getIdEnveloppe() 
+						 + "&amp;cand=" + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session) + "&action=offreC") 
+								 %>')" >Réinitialiser mon offre de prestation</button> &nbsp;
+		<%
+				}
+		%>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3">&nbsp;</td>
+			</tr>
+		</table>
+		<br />
+		<%
+			}
+		}
+	}
+%>

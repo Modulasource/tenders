@@ -1,0 +1,216 @@
+<%@page import="org.coin.ui.Border"%>
+<% 
+	if(sessionUser.isLogged) 
+	{ 
+		if(!Outils.isEmailValide(candidat.getEmail()))
+		{
+%>
+
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.util.WindowsEntities"%>
+<%@page import="org.coin.util.HTMLEntities"%><script type="text/javascript">
+function alertUpdateEmail()
+{
+	var sEmail = $("alert_sUpdateEmail").value;
+
+	if (!isMail(sEmail)){
+		alert("Adresse email invalide");
+		return;
+	}
+    $("formUpdateEmail").submit();
+}
+</script>
+
+<br/>
+
+<br/>
+<br/>
+<div style="padding:10px 25px 25px 25px">
+    <div class="roundCorners_ boardBox" >
+
+        <div class="boardContent">
+                        
+<!--             
+<div style="text-align:center; border: 1px solid #F00;height: 100px;vertical-align: middle;padding: 20px;margin 20px;font-size: 12px">
+ -->
+
+<form id="formUpdateEmail" action="<%= 
+	response.encodeURL(rootPath + "publisher_portail/private/candidat/indexCandidat.jsp"
+			) %>" >
+	<input type="hidden" name="alert_sAction" value="updateEmail" /> 
+    Veuillez saisir votre adresse email :
+    <input type="text" name="alert_sUpdateEmail" id="alert_sUpdateEmail" value="<%= candidat.getEmail() %>" size="40" />
+	<button type="button" onclick="alertUpdateEmail()" style="font-size:10px">Valider</button>
+</form>
+<br/>
+	<div style="color: #F00">
+	Attention : Tant que vous n'aurez pas saisi d'adresse email, vous ne pourrez pas télécharger 
+	les Dossiers de Consultation des Entreprises (DCE) relatifs aux marchés publiés sur le site.
+	</div>
+</div>
+<br/>
+<br/>
+</div>
+</div>
+<%  
+		}
+	}
+    else 
+    { // not logged
+	    String sMotCache = ""+session.getAttribute("sMotCache");
+	    session.removeAttribute("sMotCache");
+	    sMotCache = org.coin.security.Password.getWord();
+	    session.setAttribute("sMotCache",sMotCache);
+
+%>
+
+
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%
+
+    /**
+     * to know the design login bloc type
+     */
+	Configuration confLoginAddonHtml = null;
+	try{
+	    confLoginAddonHtml 
+	        = Configuration.getConfigurationMemory("publisher.login.addon.html", false);
+	} catch (Exception e) {
+	    //e.printStackTrace();
+	}  
+
+    Border b1 = new Border("eeeeee",7,request);
+    
+    String ua = request.getHeader("User-Agent");
+	boolean isIE = (ua != null && ua.indexOf("MSIE") != -1);
+
+	if(confLoginAddonHtml == null)
+	{
+%>
+
+
+<table width="100%" style="margin:0 auto;width:750px" > <tr><td  >
+
+	<div class="header-login"  style="text-align:center">
+<%
+	    b1.setColorBorder("aaaaaa");
+%>
+
+<% if (isIE){ %>
+<%=b1.getHTMLTop() %>
+<%}else{ %>
+<div style="padding:5px;display:inline-block;border-radius:7px;-webkit-border-radius:7px;-moz-border-radius:7px;background-color:#eee;border:1px solid #aaa">
+<%} %>	
+	
+		<div style="background-color:#eeeeee; text-align: left; border: thin;"> 
+		<table cellpadding="0" cellspacing="0" class="fullWidth">
+			<tr style="height:25px;">
+				<td style="text-align:center;">
+		            <span style="font-size:12px;font-weight: bold;">Espace Entreprise</span>
+		        </td>
+		        <td style="text-align:center;">
+		            <span style="font-size:12px;font-weight: bold;">Espace Acheteur Public</span>
+		        </td>
+		    </tr>
+		    <tr>    
+		        <td style="vertical-align: top;">
+		<%@ include file="paveHeaderLoginEnt.jspf" %> 
+			    </td>
+		        <td style="vertical-align: top;">
+		<%@ include file="paveHeaderLoginAP.jspf" %> 
+		        </td>
+		   </tr>
+		</table>
+		</div>
+		
+<% if (isIE){ %>
+<%=b1.getHTMLBottom() %>
+<%}else{ %>
+</div>
+<%} %>	
+	
+	</div> 
+	
+<% 
+	} else {
+%>
+	
+	<table cellpadding="0" cellspacing="0" class="fullWidth">
+	<tr>
+	<td width="350px">
+
+<%
+
+        out.write(
+                WindowsEntities.cleanUpWindowsEntities(
+                        HTMLEntities.unhtmlentitiesComplete(
+                        		confLoginAddonHtml.getDescription())));
+    
+
+%>  
+
+		
+	</td>
+	<td>
+	
+	<div class="header-login"  style="text-align:center">
+<%
+	    b1.setColorBorder("aaaaaa");
+%>
+	<%=b1.getHTMLTop() %>
+		<div style="background-color:#eeeeee; text-align: left; border: thin;"> 
+		<table cellpadding="0" cellspacing="0" class="fullWidth">
+			<tr style="height:25px;">
+				<td style="text-align:center;">
+		            <span style="font-size:12px;font-weight: bold;">Espace Entreprise</span>
+		        </td>
+		    </tr>
+
+		    <tr>    
+		        <td>
+		<%@ include file="paveHeaderLoginEnt.jspf" %> 
+			    </td>
+			</tr>
+		    <tr>    
+		        <td>&nbsp;
+			    </td>
+			</tr>			
+		    <tr>
+		        <td style="text-align:center;">
+		            <span style="font-size:12px;font-weight: bold;">Espace Acheteur Public</span>
+		        </td>
+		    </tr>			
+		    <tr>    
+		        <td>
+		<%@ include file="paveHeaderLoginAP.jspf" %> 
+		        </td>
+		   </tr>
+		</table>
+		</div>
+	<%=b1.getHTMLBottom() %>
+	</div> 	
+	
+	</td>
+	<tr>
+	</table>
+
+<%
+	}
+
+%>
+
+<script type="text/javascript">
+ $$(".clearFocus").each(function(item){
+    item.onfocus = function(){
+        if(this.value=="votre identifiant")
+            this.value="";
+    }
+ });
+ </script>
+
+
+</td></tr></table>
+<% } %>
+<!-- preload button images -->
+<img src="<%= rootPath+"images/but/but_login.gif" %>" style="display:none;"/>
+<img src="<%= rootPath+"images/but/but_login_hover.gif" %>" style="display:none;"/>

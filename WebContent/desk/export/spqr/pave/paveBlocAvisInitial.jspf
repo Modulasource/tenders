@@ -1,0 +1,45 @@
+<%
+	Node nodeAvisInitial = BasicDom.getChildNodeByNodeName(nodeAnn, "avisInitial");
+
+ %>
+ <table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBlocAvisInitial')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc Avis initial</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBlocAvisInitial" >
+<%
+	Node nodeAvisInit = BasicDom.getFirstChildElementNode(nodeAvisInitial );
+	while(nodeAvisInit != null)
+	{
+		nodeAvisInit = BasicDom.getFirstChildElementNode(nodeAvisInitial );
+ %>			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Type de journal : </td>
+				<td class="pave_cellule_droite"><%= nodeAvisInit.getNodeName() %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Parution : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeAvisInit, "parution")  %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Numéro de l'annonce parue : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeAvisInit, "num_ann_par") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Date publication : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeAvisInit, "datePub") %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+<%
+		nodeAvisInit = BasicDom.getNextSiblingElementNode(nodeAvisInit);
+ } %>
+		</table>
+		</td>
+	</tr>
+</table>

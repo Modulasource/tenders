@@ -1,0 +1,57 @@
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.SearchEngineArrayHeaderItem"%>
+<%
+
+
+	String sRestrictionClause = " AND id_organisation = -1 ";
+	PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual() );
+	if( !sessionUserHabilitation.isHabilitate(sPageUseCaseId ))
+	{
+		// on teste s'il a le droit de voir la sienne
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-ORG-7") )
+		{
+			sRestrictionClause = " AND ( id_organisation = " + personne.getIdOrganisation();
+		}
+		
+		// on teste s'il a le droit de voir celles qu'il a créé
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-ORG-13") )
+		{
+			sRestrictionClause += " OR id_createur = " + personne.getIdPersonnePhysique();
+		}
+		sRestrictionClause += ") ";
+	}
+	else
+	{
+		// pas de restriction
+		sRestrictionClause = "";
+	}
+
+	final int nbElements = 8;//Integer.parseInt(getServletContext().getInitParameter("nbElementsListe"));
+	SearchEngine recherche 
+			= new SearchEngine("SELECT id_organisation "
+							+ " FROM organisation "
+							+ " WHERE id_organisation_type = " + iIdOrganisationType + sRestrictionClause, nbElements);
+							
+	recherche.setParam("rechercherAPForm.jsp","raison_sociale"); 
+	recherche.setExtraParamHeaderUrl("&amp;iIdOrganisationType=" + iIdOrganisationType);
+	recherche.setFromFormPrevent(request, "");
+	
+	recherche.load();
+
+ 	Vector vRecherche = recherche.getAllResults();
+
+	recherche.addFieldName("raison_sociale" , "Raison sociale" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("mail_organisation" , "E mail" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("siret" , "Siret" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("telephone" , "Téléphone" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("pays" , "Pays" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+
+	Vector vOrganisations = recherche.getCurrentPage();
+	recherche.preventFromForm();
+	// Ajout de la raison sociale si fournie en entrée
+	if(sRaisonSociale != null)	{
+		recherche.sFieldNameFiltreValue = sRaisonSociale ;
+	}
+
+%>

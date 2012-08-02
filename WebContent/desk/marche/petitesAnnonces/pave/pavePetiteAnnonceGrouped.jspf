@@ -1,0 +1,41 @@
+<%@page import="org.coin.util.Outils"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveObjet')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePetiteAnnonceTitre %></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<table id="paveObjet" summary="La petite annonce">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Reference* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant( marche.getReference() )%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					N° d'ordre d'insertion :
+					</td>
+					<td class="pave_cellule_droite">
+					<%=Outils.getStringNotNullNeant( marche.getReferenceExterne() )%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche" style="vertical-align:middle">Pièce jointe :</td>
+					<td class="pave_cellule_droite" style="vertical-align:middle"><%= 
+						Outils.getString(marche.getNomAAPC()."Pas de pièce jointe")
+						%><img src="<%=rootPath + Icone.ICONE_PIECE_JOINTE %>" style="vertical-align:middle" /></td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>
+<br />

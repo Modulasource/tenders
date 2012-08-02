@@ -1,0 +1,51 @@
+	<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="modula.marche.MarchePublicationJoue"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.util.Vector"%>
+<tr>
+		<td class="pave_cellule_gauche">Date d'envoi de l'avis au JOUE :</td>
+		<td class="pave_cellule_droite"><%= (marche.getDateEnvoiJOUE()!=null?CalendarUtil.getDateCourte(marche.getDateEnvoiJOUE()):"Indéfinie") %></td>
+	</tr>
+<%
+	String sPublicationJOUE = "";
+	MarchePublicationJoue joue = null;
+	try{
+		joue = MarchePublicationJoue.getPublicationRelatifMarche(marche.getId());
+		if(joue == null)
+			throw new Exception("publication non existante");
+		sPublicationJOUE = PublicationType.getPublicationTypeName(joue.getIdPublicationType())
+						+ "<br/>Annonce n° "+joue.getNumero()+" du "+CalendarUtil.getDateCourte(joue.getDatePublication());
+	}
+	catch(Exception e){
+		sPublicationJOUE = "Pas d'avis au JOUE relatif au même marché";
+	}
+%>
+<tr>
+		<td class="pave_cellule_gauche">
+			Avis au JOUE relatif au m&ecirc;me march&eacute; :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= sPublicationJOUE %>
+		</td>
+	</tr>
+<%
+	String sAutresPublicationJOUE = "";
+	Vector<MarchePublicationJoue> vJOUE = MarchePublicationJoue.getAutresPublicationFromMarche(marche.getId());
+	if(vJOUE.isEmpty()){
+		sAutresPublicationJOUE = "Pas de publications antérieures";
+	}else{
+		for(MarchePublicationJoue autre : vJOUE){
+			sAutresPublicationJOUE += "Annonce n° "+autre.getNumero()+" du "+CalendarUtil.getDateCourte(autre.getDatePublication())+"<br/>";
+		}
+	}
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Autres publications antérieures : 
+		</td>
+		<td class="pave_cellule_droite">
+		<%= sAutresPublicationJOUE %>
+		</td>
+	</tr>
+	
+	

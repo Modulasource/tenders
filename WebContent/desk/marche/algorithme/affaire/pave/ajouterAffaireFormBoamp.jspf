@@ -1,0 +1,167 @@
+<%@page import="org.coin.fr.bean.export.PublicationDestinationType"%>
+<%@page import="org.coin.bean.boamp.BoampFormulaireType"%>
+<%@page import="modula.marche.MarchePassation"%>
+
+<%@page import="modula.graphic.CSS"%><script type="text/javascript">
+	function checkForm(){
+	var bResult = true;
+	var form = document.formulaire;
+	var item = form.elements["iIdOrganisation"];
+	if (isNull(item.value))
+	{
+		alert("Veuillez sélectionner l'organisme passant le marché");
+		item.focus();
+        bResult = false;
+	}
+	
+	item = form.elements["iIdCommission"];
+	if (isNull(item.value))
+	{
+		alert("Veuillez sélectionner la commission");
+		item.focus();
+        bResult = false;
+	}
+
+
+
+	if (isNull(document.getElementById('sReference').value)){
+	    showAlert("sReference", "Remplissez ce champ SVP...");
+	    bResult = false;
+	}
+
+	if (isNull(document.getElementById('sObjet').value)){
+	    showAlert("sObjet", "Remplissez ce champ SVP...");
+	    bResult = false;
+	}
+
+
+
+
+		
+
+	<%=afBlockTypeAvis.getJavascriptControlCode() %>
+
+	<%=afBlockProcedure.getJavascriptControlCode() %>
+
+	<%=afBlockPub.getJavascriptControlCode() %>
+	
+	return bResult;
+	}
+	
+	
+/******** Fonctions de raffraichissement de la liste des commissions ***********/
+function chargerCommissionSelect(sReponse){
+	var aReponseLibelle = new Array();
+	var aReponseId = new Array();
+	var aReponseObj = new Array();
+	eval(sReponse);
+	var l1 = document.getElementById("iIdCommission");
+	for (var i=0;i<aReponseId.length;i++){
+		l1.options[i] = new Option(aReponseLibelle[i], aReponseId[i],0,0);
+	}
+}
+
+function viderCommissionSelect(){
+	var l1 = document.getElementById("iIdCommission");
+   	l1.options.length = 0;
+}
+
+function getCommission(iIdOrganisation){
+	// Ajax ///
+	var HttpObj = null;
+	if (window.XMLHttpRequest) {
+		HttpObj = new XMLHttpRequest();
+	}else if (window.ActiveXObject) {
+		HttpObj = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	viderCommissionSelect();
+	
+	var sURL = "desk/GetListeForAjaxComboList";	// URL par d?faut
+	var sRootPath = "<%= rootPath %>";
+	var sSessionId = ";jsessionid=<%= session.getId() %>";
+	try{
+		// on pr?pare l'envoi avec l'url donn?e
+		var sU = "sAction="+escape("getCommission");
+		sU += "&sChamp="+escape(iIdOrganisation);
+		HttpObj.open("POST", sRootPath+sURL+sSessionId);
+
+		// fonction ex?cut?e lorsque le traitement est termin?
+		HttpObj.onreadystatechange = function(){
+			if (HttpObj.readyState == 4) {
+				var sReponse = HttpObj.responseText;
+				if (sReponse.length>0){
+					viderCommissionSelect();
+					chargerCommissionSelect(sReponse);
+				}else{
+					viderCommissionSelect();
+				}
+			}else{
+			}
+		}
+		HttpObj.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		HttpObj.send(sU);
+	} catch (e){alert("Erreur > getCommission :\n\n"+e);}
+}
+function remplirCommission(){
+	var iIdOrganisation = parseInt(document.getElementById("iIdOrganisation").value,10);
+	if (iIdOrganisation>0){
+		getCommission(iIdOrganisation);
+	}
+}
+/******** FIN Fonctions de raffraichissement de la liste des commissions ***********/
+
+/******* Fonctions de gestion du formulaire de création d'une affaire **************/
+function hideDiv(sIdDiv){
+	var div = document.getElementById(sIdDiv);
+	try{
+	  	div.style.display = "none";
+	  	div.style.visibility = "hidden";
+	}catch(exception){
+		alert("hideDiv : "+exception);
+	}
+}
+function showDiv(sIdDiv){
+	var div = document.getElementById(sIdDiv);
+	try{
+	  	div.style.display = "";
+	  	div.style.visibility = "visible";
+	}catch(exception){
+		alert("showDiv : "+exception);
+	}
+}
+function displayFields(iTypeAvis){
+	var sIdBlockPubOffi = "<%=afBlockPub.getId()%>";
+	var sIdBlockProcedure = "<%=afBlockProcedure.getId()%>";
+	var sIdCaseBOAMP = "<%=PublicationDestinationType.getPublicationDestinationTypeNameMemory(PublicationDestinationType.TYPE_BOAMP)%>";
+	var sIdCaseJOUE = "<%=PublicationDestinationType.getPublicationDestinationTypeNameMemory(PublicationDestinationType.TYPE_JOUE)%>";
+	
+
+	if (iTypeAvis==0){
+		hideDiv(sIdBlockProcedure);
+	}else{
+
+		showDiv(sIdBlockProcedure);
+		updateListPassation(true);
+	}
+}
+
+<%@ include file="paveJavascriptModePassation.jspf" %>
+
+/******* Fin Fonctions de gestion du formulaire de création d'une affaire *********/
+
+onPageLoad = function(){
+	try{
+	    Element.hide('liste_supports_pub');
+	} catch (e) {}
+		
+	displayFields(1);
+	if (window.XMLHttpRequest || window.ActiveXObject){
+		var ac = new AjaxComboList("iIdOrganisation", "getRaisonSociale");
+		ac.addActionOnChange("remplirCommission()");
+		ac.init(<%= ppUser.getIdOrganisation() %>);
+	}else{
+		alert("Attention, votre navigateur n'est pas compatible avec la technologie \"Ajax\".\nVeuillez installer un navigateur récent : www.GetFirefox.com");
+	}
+
+}
+</script>

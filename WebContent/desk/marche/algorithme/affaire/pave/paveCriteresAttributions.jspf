@@ -1,0 +1,110 @@
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="modula.marche.MarcheEnchereElectronique"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="modula.marche.MarcheCritere"%>
+<%@page import="modula.marche.CritereType"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.graphic.*"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveCritere')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveCriteresAttributionTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveCritere" summary="Critères d'attribution">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche" style="vertical-align : top;">
+					Offre économiquement la plus avantageuse en fonction :
+					</td>
+					<td class="pave_cellule_droite">
+						<table summary="none" class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>">
+<%
+Vector<MarcheCritere> vListe = MarcheCritere.getAllMarcheCritereFromMarche(marche.getIdMarche());
+
+if (vListe.size() > 0)
+{
+	MarcheCritere critere = vListe.firstElement();
+	CritereType type = CritereType.getCritereType(critere.getIdCritereType());
+%>
+							<tr>
+								<td>
+								<%= type.getName() %>
+								</td>
+							</tr>
+<%
+	switch((int)type.getId())
+	{
+		case CritereType.TYPE_PONDERE:
+		case CritereType.TYPE_LIBRE:
+%>
+							<tr>
+								<td>
+<%
+			for (int i = 0; i < vListe.size(); i++)
+			{
+				critere = vListe.get(i);
+				if(type.getId()==3)
+					out.write((i+1)+" - ");
+%>
+				<%= critere.getLibelle() %><br />
+<%
+			}
+%>
+								</td>
+							</tr>
+<%
+			break;
+	}
+}
+%>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<%
+
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE)){
+	
+		MarcheEnchereElectronique marcheEnchereElectronique =null;
+		try {
+			marcheEnchereElectronique =  MarcheEnchereElectronique.getMarcheEnchereElectroniqueFromIdMarche(marche.getId());
+		}catch (Exception e ) {
+			marcheEnchereElectronique = new MarcheEnchereElectronique();
+		}
+%>
+	<br/>
+	<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Enchère électronique</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+	<%= QuestionAnswer.getHTML(
+			"EnchereElectroniqueEffectuer", 
+			"lIdQaEnchereEffectuer",
+			marcheEnchereElectronique.getIdQaEnchereEffectuer(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_LABEL) %>
+		<tr>
+			<td class="pave_cellule_gauche" >
+			Dans l'affirmative, renseignements complémentaires sur l'enchère électronique :
+			</td>
+			<td class="pave_cellule_droite"><%= 
+				Outils.getTextToHtml( marcheEnchereElectronique.getRenseignementComplementaire()) %>
+			</td>
+		</tr>
+	</table>
+<%
+	}
+%>

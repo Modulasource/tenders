@@ -1,0 +1,90 @@
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<%@page import="mt.modula.html.HtmlAnnonce"%>
+<%@page import="mt.modula.html.HtmlAvisRectificatif"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%
+
+	Vector<AvisRectificatif> vAvisRectificatif = new Vector<AvisRectificatif>();
+	int iTypeProcedure = AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure());
+	
+	Commission commission = Commission.getCommission(marche.getIdCommission(), vCommissionTotal);
+	Organisation organisationAcheteuse = Organisation.getOrganisation(commission.getIdOrganisation() , vOrganisationTotal);
+    String sAffaireAcheteurPublic = organisationAcheteuse.getRaisonSociale();   
+
+    Vector<Multimedia> vMultimedias = 
+	    Multimedia.getAllMultimedia(
+	            MultimediaType.TYPE_LOGO, 
+	            organisationAcheteuse.getIdOrganisation(), 
+	            ObjectType.ORGANISATION,
+	            vMultimediaTotal);
+
+    CodeCpfSwitcher cpf = new CodeCpfSwitcher(ObjectType.AFFAIRE,marche.getId());
+	
+	int iIdTypeAvisRect = AvisRectificatifType.TYPE_AAPC;
+	if(marche.isAffaireAATR(false)) iIdTypeAvisRect = AvisRectificatifType.TYPE_AATR;
+	
+	if (iTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE){
+	}
+	else{
+	    vAvisRectificatif 
+	        = AvisRectificatif.getAllAvisRectificatifEnLigneWithType(
+	                marche.getIdMarche(),
+	                iIdTypeAvisRect,
+	                vAvisRectificatifTotal);
+	    
+	}
+	      
+	 String sTypePetiteAnnonce = HtmlAnnonce.getTypePetiteAnnonce(marche);
+
+
+     htmlAnnonce.updateStatut(marche,candidat, session, request, response);
+     
+     
+     String sStatut = htmlAnnonce.sHtmlStatutCandidature;
+     String sStatutDCE = htmlAnnonce.sHtmlStatutDCE;
+     String sEtape = htmlAnnonce.sEtape ;
+  
+     String sOrganisationPublication = "";
+	
+	 if (iTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE)
+	 {
+	     try{
+	         PersonnePhysique ppAffaireCreator = PersonnePhysique.getPersonnePhysique(marche.getIdCreateur());
+	         Organisation oOrganisation = Organisation.getOrganisation(ppAffaireCreator.getIdOrganisation());
+	         sOrganisationPublication = oOrganisation.getRaisonSociale();
+	     }
+	     catch(Exception e){}
+	 }   
+	    
+	
+	 String sPrintMessAvisRectificatif = HtmlAvisRectificatif.getPrintMessAvisRectificatif(
+			     marche,
+	             vAvisRectificatif,
+	             vAvisRectificatifTotal);
+
+     int iPetiteAnnonceType = HtmlAnnonce.getAnnonceType(marche, sType_annonce, sType_avis, vAvisRectificatif);
+
+     boolean bImprimer = false;
+     boolean bConsultationAAPC = true;
+     boolean bConsultationAATR = true;
+     boolean bAfficheDates = true;
+     boolean bLirePetiteAnnonce = false;
+          
+     switch (iPetiteAnnonceType)
+     {
+     case HtmlAnnonce.ANNONCE_TYPE_AAPC:
+         %><%@ include file="/publisher_traitement/public/annonce/pave/petiteAnnonceAAPC.jspf" %><%
+         break;
+
+     case HtmlAnnonce.ANNONCE_TYPE_AATR:
+         %><%@ include file="/publisher_traitement/public/annonce/pave/petiteAnnonceAATR.jspf" %><%
+         break;
+         
+     case HtmlAnnonce.ANNONCE_TYPE_RECAPITULATIF:
+     case HtmlAnnonce.ANNONCE_TYPE_GROUPED:
+         %><%@ include file="/publisher_traitement/public/annonce/pave/petiteAnnonceGrouped.jspf" %><%     
+
+         break;
+     }
+  
+%>

@@ -1,0 +1,299 @@
+<%@page import="modula.marche.Marche"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.marche.MarcheType"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="modula.TypeObjetModula"%>
+<%
+	String sMarcheSecteurActiviteId = "";
+	Vector<BoampCPFItem> vBoampCPFItems = BoampCPFItem.getAllFromTypeAndReferenceObjet(TypeObjetModula.AFFAIRE, marche.getIdMarche());
+	if(vBoampCPFItems.size() > 0) sMarcheSecteurActiviteId = ""+vBoampCPFItems.firstElement().getIdOwnedObject();
+%>
+
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePetiteAnnonceTitre %>
+			<input type="hidden" name="<%=sFormPrefix %>sDesignationReduite" value="" />
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			R&eacute;f&eacute;rence de la petite annonce* :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%=sFormPrefix %>sReference" size="100" maxlength="250" 
+		value="<%= marche.getReference() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			N° d'ordre d'insertion :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%=sFormPrefix %>sReferenceExterne" size="100" maxlength="250" 
+		value="<%= marche.getReferenceExterne() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle"> 
+			Petite annonce groupée* :
+		</td>
+<%
+	String sChecked=" checked=\"checked\"";
+%>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+			<input type="radio" name="isGrouped" value="1" <%=bIsPAGrouped?sChecked:"" %>/>Oui&nbsp;&nbsp;
+			<input type="radio" name="isGrouped" value="0" <%=!bIsPAGrouped?sChecked:"" %> />Non
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Objet du marché* :
+		</td>
+		<td class="pave_cellule_droite">
+		<textarea class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" 
+		name="<%=sFormPrefix %>sObjet"
+		cols="100"
+		rows="3" ><%= marche.getObjet() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<% 
+		String sCheckTypePetiteAnnonceAAPC = "" ;
+		String sCheckTypePetiteAnnonceAATR = "" ;
+		String sCheckTypePetiteAnnonceRA = "" ;
+	 	if ( marche.isAffaireAAPC(false)) 
+	 	{
+		 	sCheckTypePetiteAnnonceAAPC = "checked='checked'";
+		 	sCheckTypePetiteAnnonceAATR = "";
+		 	sCheckTypePetiteAnnonceRA = "";
+	 	}
+	 	if( marche.isAffaireAATR(false) )
+	 	{
+		 	sCheckTypePetiteAnnonceAAPC = "";
+		 	sCheckTypePetiteAnnonceAATR = "checked='checked'";
+		 	sCheckTypePetiteAnnonceRA = "";
+	 	}
+	 	if( marche.isRecapAATR(false) )
+	 	{
+		 	sCheckTypePetiteAnnonceAAPC = "";
+		 	sCheckTypePetiteAnnonceAATR = "";
+		 	sCheckTypePetiteAnnonceRA = "checked='checked'";
+	 	}
+		%><td class="pave_cellule_gauche" style="vertical-align:middle">
+		Type de petite annonce :
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+		<input type="radio" name="<%=sFormPrefix %>sPetiteAnnonceType" <%= sCheckTypePetiteAnnonceAAPC %>
+			  value="aapc" /> AAPC &nbsp;
+		<input type="radio" name="<%=sFormPrefix %>sPetiteAnnonceType" <%= sCheckTypePetiteAnnonceAATR %>
+			  value="aatr" /> AATR
+		<input type="radio" name="<%=sFormPrefix %>sPetiteAnnonceType" <%= sCheckTypePetiteAnnonceRA %>
+			  value="ra" /> Récapitulatif d'Attribution
+		&nbsp;&nbsp;&nbsp;<strong>Avis rectificatif : </strong>
+		<%
+			boolean bIsAvisRectifPA = false;
+			try{
+				bIsAvisRectifPA = marche.isAvisRectifPA() ;
+			}
+			catch(Exception e){}
+		%> 
+			<input type="radio" name="<%=sFormPrefix %>bIsAvisRectifPA" value="1" <%=bIsAvisRectifPA?"checked='checked'":"" %>/>Oui &nbsp;
+			<input type="radio" name="<%=sFormPrefix %>bIsAvisRectifPA" value="0" <%=!bIsAvisRectifPA?"checked='checked'":"" %>/>Non 
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:top;">
+			Edition de la petite annonce :
+		</td>
+		<td>&nbsp;</td> 
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:center"><br />
+<%
+	String sPetiteAnnonceTexteLibre = marche.getPetiteAnnonceTexteLibre();
+	sPetiteAnnonceTexteLibre = org.coin.util.Outils.replaceAll(sPetiteAnnonceTexteLibre,"?","&euro;");
+	
+%>							
+			<textarea rows="25" name="<%=sFormPrefix %>sPetiteAnnonceTexteLibre" style="width:80%"><%= sPetiteAnnonceTexteLibre%></textarea>
+ 		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">Pièce jointe :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+<% 	
+	String sNomPieceJointe = marche.getNomAAPC();
+	if(!marche.getNomAAPCOptional() .equals(""))
+	{
+%>
+			<%= marche.getNomAAPCOptional() %><br/>
+			<input type="checkbox" name="bIsDCEDisponible" <%= 
+				marche.isDCEDisponible(false)?"checked='checked'":"" 
+				%> /> est un DCE<br/>
+<%
+	}
+%>
+				
+			<button type="button" onclick="updateBeforeOpenPJ()" ><%= (sNomPieceJointe.equalsIgnoreCase("") 
+					|| sNomPieceJointe.equalsIgnoreCase(null)?
+							"Ajouter une ":"Modifier la ")
+					%> pièce jointe</button>
+
+					
+		</td>
+	</tr>
+<%
+{ // pour les variables locales
+
+	MarcheType mtType = null;
+	try{
+		mtType = MarcheType.getMarcheType(marche.getIdMarcheType());
+	}
+	catch(Exception e){}
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			Type de marché* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sIdCodeType = "";
+			String sCodeTypeLibelle = "";
+			sSelected = "";
+			if (mtType != null )
+				sIdCodeType = "";
+			if (sIdCodeType.equals(""))
+				sCodeTypeLibelle = "Choisissez le type de marché";
+			sSelected = "selected=\"selected\"";
+		%> 
+		<select name="<%=sFormPrefix %>iIdMarcheType" onChange="MarcheType_verifier('iIdMarcheType', 'idTypeDetaille', 2)" style="width:200px">
+            <option <%= sSelected %> value="<%= sIdCodeType %>">
+            <%= sCodeTypeLibelle %>
+            </option>
+        </select>&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.TYPE_MARCHE) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			Type de prestations* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sIdCodeTypeDetaille = "";
+			String sCodeTypeDetailleLibelle = "";
+			sSelected = "";
+			if (mtType != null )
+				sIdCodeType = "";
+			if (sIdCodeType.equals(""))
+				sCodeTypeDetailleLibelle = "Choisissez le type de prestations";
+			sSelected = "selected=\"selected\"";
+			
+		%>
+		<select name="<%=sFormPrefix %>idTypeDetaille" style="width:480px" >
+            <option <%= sSelected %> value="<%= sIdCodeTypeDetaille %>">
+            <%=  sCodeTypeDetailleLibelle  %>
+            </option>
+        </select>&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.OPERATION_DETAILLEE) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Mode de passation* :
+		</td>
+		<td class="pave_cellule_droite">
+			<%
+				String sValueMarchePassationId = "";
+				String sValueMarchePassationName = "Choisissez le mode de passation";
+				Vector<MarchePassation> vPassation = MarchePassation.getAllStaticMemory();
+			%>
+			<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="<%=sFormPrefix %>iIdMarchePassation" 
+				style="width:580px" >
+                <option value="<%= sValueMarchePassationId  %>" selected='selected'><%= sValueMarchePassationName  %></option>
+<%
+	for(MarchePassation mp : vPassation){
+		sValueMarchePassationId = ""+mp.getId();
+		sValueMarchePassationName = mp.getName();
+		boolean bSelected = false;
+		
+		if (sValueMarchePassationId.equalsIgnoreCase(""+marche.getPetiteAnnoncePassation()) ) bSelected = true;
+%>
+                <option value="<%= sValueMarchePassationId  %>" <%=(bSelected?" selected='selected'":"" )%>><%= sValueMarchePassationName  %></option>
+<%
+	}
+%>                
+			</select>
+		</td>
+	</tr>
+	<tr>
+        <td class="pave_cellule_gauche">
+            Secteur d'activité* :
+        </td>
+        <td class="pave_cellule_droite">
+            <%
+                String sValueSecteurActiviteId = "";
+                String sValueSecteurActiviteName = "Choisissez le secteur d'activité";
+                Vector<BoampCPF> vBoampCpf = BoampCPF.getAllStaticMemory();
+            %>
+            <select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="<%=sFormPrefix %>iIdSecteurActivite" 
+                style="width:580px" >
+                <option value="<%= sValueSecteurActiviteId  %>" selected='selected'><%= sValueSecteurActiviteName  %></option>
+<%
+    for(BoampCPF boampCpf : vBoampCpf){
+    	sValueSecteurActiviteId = ""+boampCpf.getId();
+    	sValueSecteurActiviteName = boampCpf.getName();
+        boolean bSelected = false;
+        
+        
+        
+        if (sValueSecteurActiviteId.equalsIgnoreCase(""+sMarcheSecteurActiviteId)) bSelected = true;
+%>
+                <option value="<%= sValueSecteurActiviteId  %>" <%=(bSelected?" selected='selected'":"" )%>><%= sValueSecteurActiviteName  %></option>
+<%
+    }
+%>                
+            </select>
+        </td>
+    </tr>
+	<tr>
+		<td class="pave_cellule_gauche">Supports de publication :</td>
+		<td class="pave_cellule_droite">
+			<%
+			String sCodeSupportSPQR = "";
+			Vector<Export> vExports = Export.getAllExportFromSource(marche.getIdMarche(),ObjectType.AFFAIRE);
+			for(int i=0;i<vExports.size();i++){
+				try{
+					Organisation organisationPublication = Organisation.getOrganisation(vExports.get(i).getIdObjetReferenceDestination());
+			%>
+							<%= organisationPublication.getRaisonSociale() %>
+			<%
+			sCodeSupportSPQR = org.coin.fr.bean.OrganisationParametre.getOrganisationParametreValueOptional(organisationPublication.getIdOrganisation(),"export.spqr.referenceclient");
+%>
+<%				}
+				catch(Exception e){}
+			}
+			%>
+			<%=vExports.size()<1?"Pas de supports de publication":"" %>
+			<input type="text" name="sCodeSupportSPQR" value="<%= sCodeSupportSPQR %>" />
+		</td>    
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<%
+}
+%>
+<br />	
+<%@page import="modula.graphic.CSS"%>

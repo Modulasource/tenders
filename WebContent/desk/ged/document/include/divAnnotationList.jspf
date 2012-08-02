@@ -1,0 +1,287 @@
+<%@page import="org.coin.bean.ged.*"%>
+<%@page import="org.coin.fr.bean.*"%>
+<%@page import="org.coin.db.*"%>
+<%@page import="org.coin.bean.pki.certificate.signature.*"%>
+<%@page import="org.coin.bean.pki.certificate.*"%>
+<%@page import="java.security.cert.X509Certificate"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.security.CertificateUtil"%>
+<%@page import="org.coin.bean.pki.PkiSignatureAlgorithmType"%>
+<%@page import="org.coin.util.FileUtil"%>
+<%@page import="java.io.File"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.ObjectType"%><div id="divAnnotationList" style="" >
+<%
+{
+	/**
+	 * Localization
+	 */
+	GedDocumentAnnotation annotationLoc = new GedDocumentAnnotation ();
+	annotationLoc.setAbstractBeanLocalization(sessionLanguage);
+	PkiCertificateSignature pkiCertificateSignatureLoc = new PkiCertificateSignature ();
+	pkiCertificateSignatureLoc.setAbstractBeanLocalization (sessionLanguage);
+	GedDocumentEntityType editor = new GedDocumentEntityType (GedDocumentEntityType.TYPE_EDITOR);
+	editor.setAbstractBeanLocalization(sessionLanguage);
+	GedDocumentEntityType recipient = new GedDocumentEntityType (GedDocumentEntityType.TYPE_RECIPIENT);
+	recipient.setAbstractBeanLocalization(sessionLanguage);
+	GedDocumentEntityType signer = new GedDocumentEntityType (GedDocumentEntityType.TYPE_SIGNER);
+	signer.setAbstractBeanLocalization(sessionLanguage);
+	
+%>
+
+    <div class="dataGridHolder fullWidth">
+        <table class="dataGrid fullWidth">
+        <tr class="header">
+            <td>&nbsp;</td>
+            <td><%=locTitle.getValue (33, "Date")%></td>
+            <td><%=annotationLoc.getIdGedDocumentAnnotationTypeLabel()%></td>
+            <td width="40%" ><%=annotationLoc.getAnnotationLabel()%></td>
+            <td><%=editor.getName()%></td>
+            <td><%=locTitle.getValue (68, "Destinataire(s)")%></td>
+            <td><%=locTitle.getValue (69, "Signature type")%></td>
+            <td><%=pkiCertificateSignatureLoc.getIdPkiSignatureAlgorithmTypeLabel()%></td>
+            <td><%=pkiCertificateSignatureLoc.getIdPkiCertificateLabel()%></td>
+            <td>&nbsp;</td>
+        </tr>
+<%}%>
+        <%
+
+        CoinDatabaseWhereClause wcPkiCertificateSignature = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+        for (GedDocumentAnnotation annotation : vGedDocumentAnnotation) {
+        	wcPkiCertificateSignature.add(annotation.getId());
+        }
+        
+        Vector< PkiCertificateSignature> vPkiCertificateSignatureAnnotation
+	        = PkiCertificateSignature.getAllWithWhereAndOrderByClauseStatic(
+                " WHERE id_type_object=" + ObjectType.GED_DOCUMENT_ANNOTATION
+                + " AND " + wcPkiCertificateSignature.generateWhereClause("id_reference_object"),
+                "");
+        
+        for (int i=0; i < vGedDocumentAnnotation.size(); i++) {
+            
+            boolean bVerify = false;
+            GedDocumentAnnotation annotation = vGedDocumentAnnotation.get(i);
+            PersonnePhysique personne = null;
+            try {
+                personne = PersonnePhysique.getOrLoadPersonnePhysique(
+                		annotation.getIdPersonnePhysique(), vPersonnePhysique);
+            } catch (CoinDatabaseLoadException e) {
+                personne = new PersonnePhysique();
+                personne.setPrenom("?");
+            }
+            X509Certificate certif = null;
+            
+            PkiCertificateSignature certificateSignature = null;
+            for(PkiCertificateSignature certSign : vPkiCertificateSignatureAnnotation)
+            {
+            	if(certSign.getIdReferenceObject() ==  annotation.getId())
+            	{
+            		certificateSignature = certSign;
+            		break;
+            	}
+            }
+            
+            String sIconVerification = rootPath;
+            String sIconVerificationAlt = "";
+            String sErrorMsg = "";
+            
+            if(certificateSignature == null) {
+                sIconVerification += Icone.ICONE_WARNING;
+                sIconVerificationAlt = locTitle.getValue (67, "pas de signature");
+            } else {
+                
+                try{
+                    File fileTemp = annotation.getAnnotationFileTemp();
+                    bVerify = certificateSignature.verify(fileTemp);
+                    FileUtil.deleteDirectory(fileTemp.getParent());
+                } catch (Exception ee) {
+                    sErrorMsg = ee.getMessage();
+                }
+                
+                sIconVerification += (bVerify? Icone.ICONE_SUCCES : Icone.ICONE_ERROR);
+                sIconVerificationAlt = (bVerify? locTitle.getValue (65, "signature ok") : locTitle.getValue (66, "signature erronée") + " : " + sErrorMsg);
+            }
+            
+            
+            /**
+             * Visibility part
+             */
+            String sAnnotationVisibility = "Public";
+            if(annotation.getIdGedDocumentAnnotationVisibility() == GedDocumentAnnotationVisibility.TYPE_PRIVATE)
+            {
+                
+                GedDocumentAnnotationIndividual dai = new GedDocumentAnnotationIndividual();
+                Vector< GedDocumentAnnotationIndividual> vGedDocumentAnnotationIndividual
+                    = dai.getAllWithWhereAndOrderByClause(
+                            " WHERE id_ged_document_annotation=" + annotation.getId(),
+                            "");
+
+                sAnnotationVisibility = "Privé (" + vGedDocumentAnnotationIndividual.size() +  ")";
+                
+            }
+            
+            /**
+             * Type part
+             */
+            GedDocumentAnnotationType typeAnnotation = null;
+            try{
+                typeAnnotation = GedDocumentAnnotationType.getGedDocumentAnnotationTypeMemory(annotation.getIdGedDocumentAnnotationType());     
+            } catch (CoinDatabaseLoadException e){
+                typeAnnotation = new GedDocumentAnnotationType();
+            }
+        %>
+            <tr class="liste<%=i%2%>">
+                <td>
+                    <img src="<%= sIconVerification %>"
+                         alt="<%= sIconVerificationAlt %>" 
+                         title="<%= sIconVerificationAlt %>" 
+                    />
+                </td> 
+                <td ><%= CalendarUtil.getFormatDateHeureStd( annotation.getDateCreation()) %></td> 
+                <td ><%= typeAnnotation.getName() %></td>
+                <td ><%= annotation.getAnnotation() %></td>
+                <td ><%= personne.getPrenomNom() %></td>
+                <td ><%= sAnnotationVisibility %></td>
+<% 
+            if(certificateSignature != null)
+            {
+                
+                
+                PkiCertificateSignatureType csType 
+                   = PkiCertificateSignatureType.getPkiCertificateSignatureTypeMemory(
+                           certificateSignature.getIdPkiCertificateSignatureType());
+               
+               PkiSignatureAlgorithmType saType = 
+                   PkiSignatureAlgorithmType.getPkiSignatureAlgorithmTypeMemory(
+                           certificateSignature.getIdPkiSignatureAlgorithmType());
+               
+               certif = CertificateUtil.getCertificate(certificateSignature.getCertificate());
+
+%>
+                <td><%= csType.getName() %></td>
+                <td><%= saType.getName() %></td>
+                <td style="width: 35%">
+                    <b><%=locTitle.getValue (59, "délivré à")%></b> <%=  CertificateUtil.getCertificateSubjectInfoCN(certif) %>
+                         (<%=  CertificateUtil.getCertificateSubjectInfoEmailAddress(certif)  %>)<br/>
+                    <b><%=locTitle.getValue (60, "délivré par")%></b> <%= CertificateUtil.getCertificateIssuerInfoCN(certif) %><br/>
+                    <b><%=locTitle.getValue (61, "expire le")%></b> <%= CalendarUtil.getFormatDateHeureStd(certif.getNotAfter() ) %> <br/>
+                </td>
+<%
+            
+            } else {
+%>
+                 <td ></td>
+                 <td ></td>
+                 <td ></td>
+<%  
+            }
+%>
+                <td style="width: 10%">
+
+<%
+    if(certificateSignature != null)
+    {
+    
+%>
+
+                <img style="cursor: pointer;"
+                     src="<%= rootPath + "images/icons/file_locked.png" %>"
+                     onclick="doUrl('<%= 
+                           response.encodeURL(
+                                   rootPath + "desk/PkiDownloadCertificateSignature?" 
+                                   + "sAction=getSignature"
+                                   + "&lId=" + certificateSignature.getId()
+                                   
+                           ) %>');" 
+                    alt="<%=locTitle.getValue (62, "Télécharger la signature électronique")%>" 
+                    title="<%=locTitle.getValue (62, "Télécharger la signature électronique")%>" 
+                    />
+
+                <img style="cursor: pointer;"
+                     src="<%= rootPath + "images/icons/page_white_key.png" %>"
+                     onclick="doUrl('<%= 
+                           response.encodeURL(
+                                   rootPath + "desk/PkiDownloadCertificateSignature?" 
+                                   + "sAction=getCertificate"
+                                   + "&lId=" + certificateSignature.getId()
+                                   
+                           ) %>');" 
+                    alt="<%=locTitle.getValue (63, "Télécharger le certificat")%>" 
+                    title="<%=locTitle.getValue (63, "Télécharger le certificat")%>" 
+                    />
+<%
+
+        if(certificateSignature.getIdPkiSignatureAlgorithmType() == PkiSignatureAlgorithmType.SIGNATURE_TYPE_PKCS7
+        || certificateSignature.getIdPkiSignatureAlgorithmType() == PkiSignatureAlgorithmType.SIGNATURE_TYPE_XMLDSIG
+        )
+        {
+%>
+
+                <img style="cursor: pointer;"
+                     src="<%= rootPath + "images/icons/drive_key.png" %>"
+                     onclick="doUrl('<%= 
+                           response.encodeURL(
+                                   rootPath + "desk/PkiDownloadCertificateSignature?" 
+                                   + "sAction=getSignatureAttached"
+                                   + "&lId=" + certificateSignature.getId()
+                                   + "&lIdGedDocument=" + item.getId()
+                           ) %>');" 
+                    alt="<%=locTitle.getValue (64, "Télécharger la signature attachée") %>" 
+                    title="<%=locTitle.getValue (64, "Télécharger la signature attachée") %>" 
+                    />
+<%
+    
+        }
+
+    }
+%>
+
+<%
+	if(sessionUserHabilitation.isSuperUser())
+	{
+%>
+                    <img style="cursor: pointer;"
+                         src="<%= rootPath + Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE%>"
+                         onclick="doUrl('<%= 
+                               response.encodeURL("modifyDocumentAnnotationForm.jsp?" 
+                                       + "sAction=store"
+                                       + "&lId=" + annotation.getId()
+                               ) %>');" 
+                        title="<%=localizeButton.getValueModify ()%>" 
+                        alt="<%=localizeButton.getValueModify ()%>" />
+
+                    <img style="cursor: pointer;"
+                         src="<%= rootPath + Icone.ICONE_SUPPRIMER_NEW_STYLE %>"
+                         onclick="doUrlConfirm('<%= 
+                               response.encodeURL("modifyDocumentAnnotation.jsp?" 
+                                       + "sAction=remove"
+                                       + "&lId=" + annotation.getId()
+                               ) %>','<%=locMessage.getValue (37, "Etes-vous sûr de vouloir supprimer ?") %>');" 
+                        title="<%=localizeButton.getValueDelete()%>" 
+                        alt="<%=localizeButton.getValueDelete()%>" />
+<%
+	}
+%>                        
+                </td>
+            </tr>
+        <%
+        }
+        %>
+        </table>
+    </div>
+
+<%
+	if(sessionUserHabilitation.isSuperUser())
+	{
+%>
+    <button type="button" onclick="javascript:addAnnotation();">
+            <%=locButton.getValue (21, "Add annotation")%></button>
+    <button type="button" onclick="javascript:addAnnotationClient();">
+            <%=locButton.getValue (22, "Add annotation client sign")%></button>
+    <button type="button" onclick="javascript:addAnnotationServer();">
+            <%=locButton.getValue (23, "Add annotation server sign")%></button>
+<%
+	}
+%>
+</div>

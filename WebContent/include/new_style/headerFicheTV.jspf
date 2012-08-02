@@ -1,0 +1,12 @@
+<div class="ficheTablePadding">
+<table id="ficheTable" cellspacing="0" cellpadding="0" class="fullWidth">
+	<tr>
+		<td></td>
+		<td class="imgTop"></td>
+		<td class="imgTop"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="imgCenterLeft"></td>
+		<td>
+			<div class="ficheFrame">

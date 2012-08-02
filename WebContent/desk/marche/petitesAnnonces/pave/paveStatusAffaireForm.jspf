@@ -1,0 +1,46 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sTitrePaveStatut %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%
+		for(int i=0;i<vStatus.size();i++)
+		{
+			Vector vStatut = (Vector)vStatus.get(i);
+			int iIdStatut = Integer.parseInt((String)vStatut.firstElement());
+			String sStatutLibelle = (String)vStatut.get(1);
+			int iStatutValeur = Integer.parseInt((String)vStatut.get(2));
+			
+			String sCheckOui = "";
+			String sCheckNon = "";
+			String sCheckIndefini = "";
+			
+			switch(iStatutValeur)
+			{
+				case 0:
+					sCheckNon = "checked='checked'";
+					break;
+					
+				case 1:
+					sCheckOui = "checked='checked'";
+					break;
+					
+				case 2:
+					sCheckIndefini = "checked='checked'";
+					break;
+			}
+	%>
+	<tr>
+		<td class="pave_cellule_gauche"><%= sStatutLibelle %></td>
+		<td class="pave_cellule_droite">
+			<input type="radio" name="<%= sFormPrefix %>selectStatut<%= iIdStatut %>" value="1" <%= sCheckOui %> />Oui
+			<input type="radio" name="<%= sFormPrefix %>selectStatut<%= iIdStatut %>" value="0" <%= sCheckNon %> />Non
+			<input type="radio" name="<%= sFormPrefix %>selectStatut<%= iIdStatut %>" value="2" <%= sCheckIndefini %> />Indéfini
+		</td>
+	</tr>
+	<%
+	}
+	%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

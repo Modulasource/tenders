@@ -1,0 +1,270 @@
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.AvisRectificatifRubriqueJoue"%>
+<%@page import="modula.marche.AvisRectificatifRubrique"%>
+<%@page import="modula.marche.AvisRectificatifRubriqueSousType"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="java.util.Locale"%>
+<%@page import="java.util.Calendar"%>
+<%
+	Vector<AvisRectificatifRubriqueJoue> vArecRubriqueImplique = AvisRectificatifRubriqueJoue.getAllAvisRectificatifRubriqueJoueByRubrique(AvisRectificatifRubriqueJoue.RUBRIQUE_JOUE_AVIS_IMPLIQUE);
+	Vector<AvisRectificatifRubriqueJoue> vArecRubriqueModif = AvisRectificatifRubriqueJoue.getAllAvisRectificatifRubriqueJoueByRubrique(AvisRectificatifRubriqueJoue.RUBRIQUE_JOUE_MODIFICATION);
+	Vector<AvisRectificatifRubriqueJoue> vArecRubriquelocalisation = AvisRectificatifRubriqueJoue.getAllAvisRectificatifRubriqueJoueByRubrique(AvisRectificatifRubriqueJoue.RUBRIQUE_JOUE_MODIF_LOCALISATION);
+	
+	Vector<AvisRectificatifRubrique> vArecRubrique = AvisRectificatifRubrique.getAllArecRubriqueForIdArecAndRubriqueType(iIdAvisRectificatif, AvisRectificatifRubrique.RUBRIQUE_TYPE_JOUE);
+	String[] sTabRubJoue = {"dansAvisOriginal", "avisOriginalEtDossierAppelOffre"}; 
+	Vector<AvisRectificatifRubrique> vArecRubJoue = AvisRectificatifRubrique.getAllArecRubriqueForIdArecAndRubriqueJoue(iIdAvisRectificatif, sTabRubJoue);
+	
+	String sItemCheck = "";
+%>
+<script>
+Event.observe(window, 'load', function(){
+    try{
+        $$(".rubriqueJoueSelected").each(function(item){
+            item.onclick = function(){
+                switch(this.name){
+                    case "sModifLocalisation":
+	                    if(this.value=="dansAvisOriginal" || this.value=="avisOriginalEtDossierAppelOffre") montrer('paveAjoutRubriqueJoue');
+	                    else cacher('paveAjoutRubriqueJoue');
+                    break;
+                }
+            }
+            if(item.checked) item.onclick();
+        });
+    } catch(e){}
+});
+
+var i_num_rubrique = <%= vArecRubJoue.size() %>;
+function addRubrique(sButton)
+{
+    i_num_rubrique++;
+    if(i_num_rubrique >= 50) {
+        alert("Vous ne pouvez pas effectuer plus de 50 rectifications.");
+        return false;
+    }
+    
+	if(sButton=="texte") {
+	    var sPrefix = "rubriqueTexte_"+i_num_rubrique+"_";
+        var sIdDiv = "rubrique_"+i_num_rubrique;
+	    var div = document.createElement("div");
+        div.setAttribute('id', sIdDiv);
+        div.setAttribute('style', 'margin-bottom:15px');
+        div.innerHTML = "<img src='../../../../images/delete.gif' alt='Supprimer' title='Supprimer' name='"+sPrefix+"supprimer' onclick='removeRubrique(\""+sIdDiv+"\")' />&nbsp;&nbsp;";
+	    div.innerHTML += "Rubrique : <input type='text' name='"+sPrefix+"sSousRubrique' maxlength='255' value='' />&nbsp;";
+	    div.innerHTML += "<select style='width:100px' name='"+sPrefix+"sModifType' id='"+sPrefix+"sModifType' onchange='onChangeRubrique(this,\""+sPrefix+"\")'><option value='auLieuDe'>au lieu de</option><option value='apresLaMention'>après la mention</option></select>&nbsp;";
+	   	div.innerHTML += "<textarea cols='100' rows='2'  name='"+sPrefix+"sAncienneValeur' value=''></textarea>&nbsp;";
+	   	div.innerHTML += "<select name='"+sPrefix+"sRectifRubSousType' id='"+sPrefix+"sRectifRubSousType'><option value='lire'>lire</option><option style='display:none' value='supprimer'>supprimer</option><option style='display:none' value='ajouter'>ajouter</option></select>&nbsp;";
+	  	div.innerHTML += "<textarea cols='100' rows='2' name='"+sPrefix+"sNouvelleValeur' value=''></textarea>";
+	    $("rubriqueJoue").appendChild(div);
+	} else if(sButton=="date") {
+		var sPrefix = "rubriqueDate_"+i_num_rubrique+"_";
+		var sIdDiv = "rubrique_"+i_num_rubrique;
+	    var div = document.createElement("div");
+	    div.setAttribute('id', sIdDiv);
+        div.setAttribute('style', 'margin-bottom:15px');
+        div.innerHTML = "<img src='../../../../images/delete.gif' alt='Supprimer' title='Supprimer' name='"+sPrefix+"supprimer' onclick='removeRubrique(\""+sIdDiv+"\")' />&nbsp;&nbsp;";
+	    div.innerHTML += "<select style='width:175px' name='"+sPrefix+"sDateAModifier'><option value='ReceptCandidatures'>Réception des candidatures</option><option value='ReceptionOffres'>Réception des offres</option><option value='EnvoiInvitation'>Envoi de l'invitation à présenter une offre</option><option value='RemiseCandidatures'>Remise des candidatures</option></select>&nbsp;";
+	    div.innerHTML += "au lieu de : &nbsp;<input type='text' name='"+sPrefix+"tsAncienneDate' id='"+sPrefix+"tsAncienneDate' size='12' maxlength='10' value='' class='dataType-date' />&nbsp;";
+	    div.innerHTML += "à &nbsp;<input type='text' name='"+sPrefix+"sAncienneHeure' size='5' maxlength='5' value='' />&nbsp;";
+	    div.innerHTML += "lire : &nbsp;<input type='text' name='"+sPrefix+"tsNouvelleDate' id='"+sPrefix+"tsNouvelleDate' size='12' maxlength='10' value='' class='dataType-date' />&nbsp;";
+	    div.innerHTML += "à &nbsp;<input type='text' name='"+sPrefix+"sNouvelleHeure' size='5' maxlength='5' value='' />";
+	    $("rubriqueJoue").appendChild(div);
+
+	    enableDateField($(sPrefix+"tsAncienneDate"));
+        enableDateField($(sPrefix+"tsNouvelleDate"));
+	}	
+}
+
+function onChangeRubrique(item, sPrefix) {
+	var selectItem = sPrefix+"sRectifRubSousType";
+	if(item.value == "auLieuDe") {
+        $(selectItem).options[0].show();
+	    $(selectItem).options[1].hide();
+        $(selectItem).options[2].hide();        
+        $(selectItem).value = "lire";
+	} else if(item.value == "apresLaMention") {
+        $(selectItem).options[0].hide();
+        $(selectItem).options[1].show();
+        $(selectItem).options[2].show();
+        $(selectItem).value = "supprimer";
+	}
+}
+
+function removeRubrique(sPrefix) {
+	var divRubJoue = document.getElementById('rubriqueJoue');
+	var divRubrique = document.getElementById(sPrefix);
+
+	divRubJoue.removeChild(divRubrique);
+	i_num_rubrique--;
+}
+</script>
+<table class="pave" summary="none">
+    <tr>
+        <td class="pave_titre_gauche">Renseignements complémentaires</td>
+        <td class="pave_titre_droite">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+        <td class="pave_cellule_gauche">L'avis implique :</td>
+        <td class="pave_cellule_droite">
+<%
+for(AvisRectificatifRubriqueJoue arrj : vArecRubriqueImplique) {
+	if(vArecRubrique != null && vArecRubrique.size() > 0) {
+        sItemCheck = "";
+		for(AvisRectificatifRubrique arecRubrique : vArecRubrique) {
+			if(arecRubrique.getRubriqueJoue().equals(arrj.getReference())) sItemCheck = "checked='checked'";
+		}
+	}
+%>
+            <input type="radio" name="<%= arrj.getRubriqueJoue() %>" value="<%= arrj.getReference() %>" class="rubriqueJoueSelected" <%= sItemCheck %>/> <%= arrj.getLibelle() %><br/>
+<%
+}
+%>
+        </td>
+    </tr>
+    <tr>
+        <td class="pave_cellule_gauche">Information à rectifier ou à ajouter :</td>   
+        <td class="pave_cellule_droite">
+<%
+for(AvisRectificatifRubriqueJoue arrj : vArecRubriqueModif) {  
+    if(vArecRubrique != null && vArecRubrique.size() > 0) {
+    	sItemCheck = "";
+        for(AvisRectificatifRubrique arecRubrique : vArecRubrique) {
+            if(arecRubrique.getRubriqueJoue().equals(arrj.getReference())) sItemCheck = "checked='checked'";
+        }
+    }  
+%>
+            <input type="radio" name="<%= arrj.getRubriqueJoue() %>" value="<%= arrj.getReference() %>" class="rubriqueJoueSelected" <%= sItemCheck %>/> <%= arrj.getLibelle() %><br/>
+<%
+}
+%>
+        </td>      
+    </tr>
+    <tr>
+        <td class="pave_cellule_gauche">Où se trouve l'information à rectifier ou à ajouter :</td>   
+        <td class="pave_cellule_droite">
+<%
+for(AvisRectificatifRubriqueJoue arrj : vArecRubriquelocalisation) { 
+	String sOnclick = "";   
+    if(vArecRubrique != null && vArecRubrique.size() > 0) {
+    	sItemCheck = "";
+        for(AvisRectificatifRubrique arecRubrique : vArecRubrique) {
+            if(arecRubrique.getRubriqueJoue().equals(arrj.getReference())) sItemCheck = "checked='checked'";
+        }
+    }
+%>
+            <input type="radio" name="<%= arrj.getRubriqueJoue() %>" value="<%= arrj.getReference() %>" class="rubriqueJoueSelected" <%= sItemCheck %>/> <%= arrj.getLibelle() %><br/>
+<%
+}
+%>
+        </td>      
+    </tr>
+    <tr id="paveAjoutRubriqueJoue" style="display:none">
+        <td class="pave_cellule_gauche">
+			<button type="button" onclick="addRubrique('texte')">Ajouter rubrique texte</button>
+			<button type="button" onclick="addRubrique('date')">Ajouter rubrique Date</button>  
+		</td>
+        <td class="pave_cellule_droite">
+            <div id="rubriqueJoue">
+<%
+if(vArecRubJoue !=null && vArecRubJoue.size() > 0) {
+	int iNumRub = 1;
+	String sPrefix = "";
+	String sIdDiv = "";
+	String sAuLieuDeSelected = "";
+    String sApresMentionSelected = "";
+	String sLireSelected = "";
+	String sSupprimerSelected = "";
+	String sAjouterSelected = "";
+	String sRecepCandidSelected = "";
+	String sRecepOffresSelected = "";
+	String sEnvoiInvitSelected = "";
+	String sRemiseCandidSelected = "";
+    for(AvisRectificatifRubrique arecRub : vArecRubJoue) {
+    	sIdDiv = "rubrique_"+iNumRub;
+    	if(arecRub.getIdAvisRectificatifRubriqueSousType() == 0) {
+            sPrefix = "rubriqueDate_"+iNumRub+"_";
+            Timestamp tsAncienneDate = arecRub.getDateAncienneValeur();
+            Timestamp tsNouvelleDate = arecRub.getDateNouvelleValeur();
+    		String sAncienneDate = CalendarUtil.getDateCourte(tsAncienneDate);
+    		String sAncienneHeure = CalendarUtil.getHeureMinuteSec(tsAncienneDate);
+            String sNouvelleDate = CalendarUtil.getDateCourte(tsNouvelleDate);
+            String sNouvelleHeure = CalendarUtil.getHeureMinuteSec(tsNouvelleDate); 
+            String sSousRubrique = arecRub.getRubrique();
+            if(sSousRubrique.equals("ReceptCandidatures")) {
+            	sRecepCandidSelected = "selected";
+            	sRecepOffresSelected = "";
+            	sEnvoiInvitSelected = "";
+            	sRemiseCandidSelected = "";
+            } else if(sSousRubrique.equals("ReceptionOffres")) {
+                sRecepCandidSelected = "";
+                sRecepOffresSelected = "selected";
+                sEnvoiInvitSelected = "";
+                sRemiseCandidSelected = "";
+            } else if(sSousRubrique.equals("EnvoiInvitation")) {
+                sRecepCandidSelected = "";
+                sRecepOffresSelected = "";
+                sEnvoiInvitSelected = "selected";
+                sRemiseCandidSelected = "";
+            } else if(sSousRubrique.equals("RemiseCandidatures")) {
+                sRecepCandidSelected = "";
+                sRecepOffresSelected = "";
+                sEnvoiInvitSelected = "";
+                sRemiseCandidSelected = "selected";
+            }
+%>
+            <div id="<%= sIdDiv %>" style="margin-bottom:15px" >
+            <img src="../../../../images/delete.gif" alt="Supprimer" title="Supprimer" name="<%=sPrefix %>supprimer" onclick="removeRubrique('<%=sIdDiv %>')" />&nbsp;&nbsp;
+            <select style="width:175px" name="<%=sPrefix %>sDateAModifier"><option value="ReceptCandidatures" <%= sRecepCandidSelected %> >Réception des candidatures</option><option value="ReceptionOffres" <%= sRecepOffresSelected %> >Réception des offres</option><option value="EnvoiInvitation" <%= sEnvoiInvitSelected %> >Envoi de l'invitation à présenter une offre</option><option value="RemiseCandidatures" <%= sRemiseCandidSelected %>>Remise des candidatures</option></select>&nbsp;
+            au lieu de : &nbsp;<input type="text" name="<%=sPrefix %>tsAncienneDate" id="<%=sPrefix %>tsAncienneDate" size="12" maxlength="10" value="<%= sAncienneDate %>" class="dataType-date" />&nbsp;
+            à &nbsp;<input type="text" name="<%=sPrefix %>sAncienneHeure" size="5" maxlength="5" value="<%= sAncienneHeure %>" />&nbsp;
+            lire : &nbsp;<input type="text" name="<%=sPrefix %>tsNouvelleDate" id="<%=sPrefix %>tsNouvelleDate" size="12" maxlength="10" value="<%= sNouvelleDate %>" class="dataType-date" />&nbsp;
+            à &nbsp;<input type="text" name="<%=sPrefix %>sNouvelleHeure" size="5" maxlength="5" value="<%= sNouvelleHeure %>" />&nbsp;
+            </div>
+<%
+    	} else {
+            sPrefix = "rubriqueTexte_"+iNumRub+"_";
+            switch(arecRub.getIdAvisRectificatifRubriqueSousType()) {
+	            case AvisRectificatifRubriqueSousType.SOUS_TYPE_AJOUTER :
+	            	sAjouterSelected = "selected";
+	            	sApresMentionSelected = "selected";
+	            	sAuLieuDeSelected = "";
+	                sLireSelected = "style='display:none'";
+	                sSupprimerSelected = "";
+	            	break;
+	            case AvisRectificatifRubriqueSousType.SOUS_TYPE_SUPPRIMER :
+	            	sSupprimerSelected = "selected";
+	                sApresMentionSelected = "selected";
+                    sAuLieuDeSelected = "";
+                    sLireSelected = "style='display:none'";
+                    sAjouterSelected = "";
+	                break;
+	            case AvisRectificatifRubriqueSousType.SOUS_TYPE_LIRE :
+	            	sLireSelected = "selected";
+                    sAuLieuDeSelected = "selected";
+                    sApresMentionSelected = "";
+                    sSupprimerSelected = "style='display:none'";
+                    sAjouterSelected = "style='display:none'";
+                    break;
+            }
+%>
+            <div id="<%=sIdDiv %>" style="margin-bottom:15px" >
+            <img src="../../../../images/delete.gif" alt="Supprimer" title="Supprimer" name="<%=sPrefix %>supprimer" onclick="removeRubrique('<%=sIdDiv %>')" />&nbsp;&nbsp;
+    		Rubrique : <input type="text" name="<%=sPrefix %>sSousRubrique" maxlength="255" value="<%= arecRub.getRubrique() %>" />&nbsp;
+    		<select style="width:100px" name="<%=sPrefix %>sModifType" id="<%=sPrefix %>sModifType" onchange="onChangeRubrique(this,'<%=sPrefix %>')"><option value="auLieuDe" <%= sAuLieuDeSelected %> >au lieu de</option><option value="apresLaMention" <%= sApresMentionSelected %> >après la mention</option></select>&nbsp;
+            <textarea cols="100" rows="2"  name="<%=sPrefix %>sAncienneValeur" ><%= arecRub.getTexteAncienneValeur() %></textarea>&nbsp;
+            <select name="<%=sPrefix %>sRectifRubSousType" id="<%=sPrefix %>sRectifRubSousType"><option value="lire" <%= sLireSelected %> >lire</option><option value="supprimer" <%= sSupprimerSelected %> >supprimer</option><option value="ajouter" <%= sAjouterSelected %> >ajouter</option></select>&nbsp;
+            <textarea cols="100" rows="2" name="<%=sPrefix %>sNouvelleValeur" ><%= arecRub.getTexteNouvelleValeur() %></textarea>
+            </div>
+<%
+    	}
+    	iNumRub++;
+    }
+}
+%>            
+            </div>
+        </td>   
+    </tr>
+</table>

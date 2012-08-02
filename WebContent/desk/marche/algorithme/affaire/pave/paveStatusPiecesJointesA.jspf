@@ -1,0 +1,136 @@
+<%
+	Vector vEnveloppeAPJ 
+	= EnveloppeAPieceJointe.getAllEnveloppeAPiecesJointesFromEnveloppe(oEnveloppeA.getIdEnveloppe());
+
+if(vEnveloppeAPJ != null)
+{
+	if(vEnveloppeAPJ.size() > 0)
+	{
+	%>
+<%@page import="modula.candidature.EnveloppeAPieceJointe"%>
+<%@page import="java.io.ByteArrayInputStream"%>
+<%@page import="org.coin.security.token.Crypto"%>
+<%@page import="org.coin.security.token.CertificateFile"%>
+<%@page import="java.security.cert.CertificateException"%>
+<%@page import="java.security.cert.X509Certificate"%>
+<%@page import="java.security.cert.CertificateFactory"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="org.coin.security.CertificateUtil"%>
+<table class="pave" >
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Liste des pièces jointes de l'enveloppe A (id=<%= 
+				oEnveloppeA.getIdEnveloppe() %>)</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<table class="liste" >
+				<tr>
+					<th>Nom</th>		
+					<th>Taille</th>
+					<th>Statut</th>
+					<th>Signature fichier chiffré</th>	
+					<th>Signature fichier clair</th>	
+					<th>Certificat</th>
+					<th>Action</th>
+				</tr>
+	<%
+	for(int iEnvAPJ=0;iEnvAPJ<vEnveloppeAPJ.size();iEnvAPJ++)
+	{
+		EnveloppeAPieceJointe envAPJ = (EnveloppeAPieceJointe)vEnveloppeAPJ.get(iEnvAPJ);
+		String sNomCertificat = "";
+		
+		if(envAPJ.getCertificatPublic() != null)
+		{
+		    sNomCertificat = CertificateUtil.getCertificateFilename(envAPJ.getCertificatPublic());
+		}
+		%>
+		<tr>
+			<%
+			String sURLAPJ = "desk/DownloadFileDesk?"
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request,
+							envAPJ.getIdEnveloppePieceJointe()  , 
+							TypeObjetModula.ENVELOPPE_A);
+					
+			sURLAPJ = response.encodeURL(rootPath+ sURLAPJ);
+			%>
+			<td style="vertical-align: top;">
+				<a style="font-size: 9px" href="<%= sURLAPJ %> ">
+				<%= envAPJ.getNomPieceJointe() %>
+				</a>
+			</td>
+			<td><%= envAPJ.getFileSizeInMegaBytes() %></td>
+			<td style="vertical-align: top;"><%= envAPJ.getFileStateName() %></td>
+			<%
+			String sURLA = "desk/DownloadFileDesk?" 
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request,
+							envAPJ.getIdEnveloppePieceJointe() , 
+							TypeObjetModula.ENVELOPPE_A_PJ)
+					+"&amp;sTypeSignature=chiffre";
+					
+			sURLA = response.encodeURL(rootPath+ sURLA);
+			%>
+			<td style="vertical-align: top;">
+				<a style="font-size: 9px" href="<%= sURLA %>">
+				<%= envAPJ.getNomPieceJointe()+".sign" %>
+				</a>
+			</td>
+			<%
+			String sURLABis = "desk/DownloadFileDesk?"
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request,
+							envAPJ.getIdEnveloppePieceJointe() , 
+							TypeObjetModula.ENVELOPPE_A_PJ)
+					+"&amp;sTypeSignature=clair";
+					
+			sURLABis = response.encodeURL(rootPath+ sURLABis);
+			%>
+			<td style="vertical-align: top;">
+				<a style="font-size: 9px" href="<%= sURLABis %>">
+				<%= envAPJ.getNomPieceJointe()+".sign" %>
+				</a>
+			</td>
+			<td style="vertical-align: top;">
+			<%
+			
+			String sURLCertificate = "";
+			if(sNomCertificat.compareTo("") != 0)
+			{
+				sURLCertificate = "desk/DownloadFileDesk?"
+						+ DownloadFile.getSecureTransactionStringFullJspPage(
+								request,
+								envAPJ.getIdEnveloppePieceJointe() , 
+								TypeObjetModula.ENVELOPPE_A_PJ_CERT);
+				
+				sURLCertificate = response.encodeURL(rootPath+ sURLCertificate);
+			%>
+				<a style="font-size: 9px" href="<%= sURLCertificate %>">
+				<%= sNomCertificat %>
+				</a>
+			<%
+			}
+			%>
+			</td>
+			<td style="vertical-align: top;">
+			<input type="button" value="tester le fichier" 
+			onclick="OuvrirPopup('<%= response.encodeURL("testerPieceJointe.jsp?iIdPieceJointe="
+					+envAPJ.getIdEnveloppePieceJointe() 
+					+"&iIdTypeObjetModula="+ TypeObjetModula.ENVELOPPE_A )
+					%>',200,200,'menubar=no,scrollbars=yes,statusbar=no')" />
+			</td>
+		</tr>
+		<%
+		}
+		%>
+		</table>
+		</td>
+		</tr>
+	</table>
+	<br />
+	<%
+	}
+}
+%>

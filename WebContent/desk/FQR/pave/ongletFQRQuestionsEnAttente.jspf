@@ -1,0 +1,216 @@
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="modula.fqr.FQRCoupleQR"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.fqr.FQR"%>
+<%@page import="org.coin.util.HttpUtil"%>
+<%@page import="mt.modula.affaire.fqr.MarcheFqr"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.fqr.FQRTypeQuestion"%>
+<%
+	int lIdMarcheFqr = HttpUtil.parseInt("lIdMarcheFqr" , request, 0);
+
+	if(lIdMarcheFqr > 0) {
+		MarcheFqr marcheFqr = MarcheFqr.getMarcheFqr(lIdMarcheFqr);
+        MarcheFqrStatut marcheFqrStatut = null;
+        MarcheFqrType marcheFqrType = null;
+        try{
+        	marcheFqrStatut = MarcheFqrStatut.getMarcheFqrStatutMemory(marcheFqr.getIdMarcheFqrStatut());
+        } catch (CoinDatabaseLoadException e){ 
+        	marcheFqrStatut = new MarcheFqrStatut();
+        }
+        try{
+        	marcheFqrType = MarcheFqrType.getMarcheFqrTypeMemory(marcheFqr.getIdMarcheFqrType());
+        } catch (CoinDatabaseLoadException e){ 
+        	marcheFqrType = new MarcheFqrType();
+
+        }
+        
+        if(marcheFqr.getReponse() == null) marcheFqr.setReponse("");
+
+%>
+   
+<%@page import="mt.modula.affaire.fqr.MarcheFqrStatut"%>
+<%@page import="mt.modula.affaire.fqr.MarcheFqrType"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+<%@page import="mt.modula.bean.mail.MailMarcheFqr"%>
+<form action="<%= response.encodeURL("modifierMarcheFqr.jsp") %>" >
+	<input type="hidden" name="lIdMarcheFqr" value="<%= lIdMarcheFqr %>" />
+    <input type="hidden" name="iIdAffaire" value="<%= marche.getId() %>" />
+    <input type="hidden" name="sAction" value="respond" />
+
+		<table class="pave" >
+		    <tr>
+		        <td class="pave_titre_gauche" colspan="2">
+	    	           Question en attente 
+		        </td>
+		    </tr>
+            <tr>
+                 <td class="pave_cellule_gauche">
+                       Statut :
+                 </td>
+                 <td class="pave_cellule_droit">
+                        <%= marcheFqrStatut.getName() %>
+                 </td>
+            </tr>
+            <tr>
+                 <td class="pave_cellule_gauche">
+                       Type :
+                 </td>
+                 <td class="pave_cellule_droit">
+                        <%= marcheFqrType.getName() %>
+                 </td>
+            </tr>
+	        <tr>
+	             <td class="pave_cellule_gauche">
+	                   Titre : 
+	             </td>
+	             <td class="pave_cellule_droit">
+                       <%= marcheFqr.getTitre() %>
+ 	             </td>
+	        </tr>
+	        <tr>
+	             <td class="pave_cellule_gauche">
+	                   Question : 
+	             </td>
+	             <td class="pave_cellule_droit">
+                       <%= Outils.replaceNltoBr(marcheFqr.getQuestion() ) %>
+	             </td>
+	        </tr>
+	        <tr>
+	             <td class="pave_cellule_gauche">
+	                   Réponse : 
+	             </td>
+	             <td class="pave_cellule_droit">
+	                <textarea rows="5" cols="80" name="sReponse"><%= 
+	                	marcheFqr.getReponse()  %></textarea>
+	             </td>
+	        </tr>
+            <tr>
+                 <td class="pave_cellule_gauche">
+                       Destinataires : 
+                 </td>
+                 <td class="pave_cellule_droit">
+<%
+	Vector<Candidature> vCand = Candidature.getAllCandidatureFromMarche(marche.getIdMarche());
+	Vector<PersonnePhysique> vPersonnePhysique = MailMarcheFqr.getAllPersonnePhysiqueFromCandidature(vCand);
+	
+	for(Candidature cand : vCand){
+		PersonnePhysique personneDest 
+		  = PersonnePhysique.getPersonnePhysique(cand.getIdPersonnePhysique(), vPersonnePhysique) ;
+		%><%= personneDest.getEmail() %> , <%
+	}
+%>
+                 </td>
+            </tr>
+	
+	    </table>
+
+<button type="submit">Valider</button>
+
+<button type="button"
+        onclick="doUrl('<%= 
+            response.encodeURL(
+                rootPath 
+                + "desk/FQR/modifierMarcheFqr.jsp"
+                + "?iIdAffaire=" + marche.getIdMarche()
+                + "&lIdMarcheFqr=" + marcheFqr.getId()
+                + "&sAction=refuse"
+            ) %>');"
+        >Refuser</button>
+
+<button type="button"
+        onclick="doUrl('<%= 
+        	response.encodeURL(
+	        	rootPath 
+	            + "desk/FQR/afficherFQR.jsp"
+	            + "?iIdAffaire=" + marche.getIdMarche()
+            ) %>');"
+        >Annuler</button>
+
+
+    </form>
+<%		
+		
+	} else {
+%>
+
+
+
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche">
+			Liste de questions en attente
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table class="liste" >
+				<tr>
+					<th style="text-align:left">Titre de la question</th>
+                    <th style="text-align:left">Type</th>
+                    <th style="text-align:left">Candidat</th>
+					<th style="text-align:left">Organisme</th>
+					<th style="text-align:right">&nbsp;</th>
+				</tr>
+				
+	<%
+	    Vector<MarcheFqr> vMarcheFqr = MarcheFqr.getAllMarcheFqrFromMarche(marche.getIdMarche());
+		    
+	    for(int j = 0 ; j < vMarcheFqr.size(); j++)
+	    {	
+	    	MarcheFqr marcheFqr = vMarcheFqr.get(j);
+	    	if(marcheFqr.getIdMarcheFqrStatut() != MarcheFqrStatut.STATUT_A_VALIDER) continue;
+	            
+	            
+	        PersonnePhysique pers = PersonnePhysique.getPersonnePhysique(marcheFqr.getIdPersonnePhysique());
+			Organisation org = Organisation.getOrganisation(pers.getIdOrganisation());
+			MarcheFqrType marcheFqrType = null;
+	        try{
+	            marcheFqrType = MarcheFqrType.getMarcheFqrTypeMemory(marcheFqr.getIdMarcheFqrType());
+	        } catch (CoinDatabaseLoadException e){ 
+	            marcheFqrType = new MarcheFqrType();
+	            marcheFqrType.setLibelle("? = " + marcheFqr.getIdMarcheFqrType());
+	        }
+	%>
+				<tr class="liste<%=j%2%>" 
+					onmouseover="className='liste_over'" 
+					onmouseout="className='liste<%=j%2%>'" 
+	                style="cursor: pointer;"
+					onclick="javascript:doUrl('<%= 
+					response.encodeURL(rootPath 
+							+ "desk/FQR/afficherFQR.jsp"
+							+ "?lIdMarcheFqr="+marcheFqr.getId()
+							+ "&iIdAffaire=" + marche.getIdMarche()
+						) 
+							%>')" >
+					<td><%= marcheFqr.getTitre() %>&nbsp;</td>
+                    <td><%= marcheFqrType.getName() %>&nbsp;</td>
+                    <td><%= pers.getPrenomNom() %>&nbsp;</td>
+					<td><%= org.getRaisonSociale() %>&nbsp;</td>
+					<td style="text-align:right">
+                        <img src="<%=rootPath+ Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE
+                        %>"  alt="Voir la question" title="Voir la question" />
+                    </td>
+				</tr>
+	<%
+		}
+	%>
+<%
+		if(vMarcheFqr.size() == 0){
+%>
+	<tr><td colspan="4">&nbsp;</td></tr>
+	<tr><td colspan="4">Pas de question à valider</td></tr>
+	<tr><td colspan="4">&nbsp;</td></tr>
+<%
+		}
+	}
+%>
+			</table>
+		</td>
+	</tr>
+</table>
+<br />

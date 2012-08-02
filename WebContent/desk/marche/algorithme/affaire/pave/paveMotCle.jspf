@@ -1,0 +1,16 @@
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.autoform.component.AutoFormCptDoubleLabel"%>
+<%@page import="org.coin.autoform.component.AutoFormCptBlock"%>
+<%@page import="org.coin.bean.boamp.BoampMotCleItem"%>
+<%@page import="org.coin.bean.boamp.BoampMotCle"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.autoform.component.AutoFormCptDoubleMultiSelect"%>
+<%
+	AutoFormCptBlock afBlockMotCle = new AutoFormCptBlock("Liste des mots Clefs pour l'indexation au BOAMP", "block_motcle");
+	AutoFormCptDoubleLabel afMotCle = new AutoFormCptDoubleLabel(
+			"Liste des mots Clefs", "", "");
+	Vector<BoampMotCleItem> vMotsMarche = BoampMotCleItem.getAllFromTypeAndReferenceObjet(ObjectType.AFFAIRE,marche.getIdMarche());
+	afMotCle.setBeans((Vector)BoampMotCleItem.toBoampMotCleVector(vMotsMarche));
+	afBlockMotCle.addComponent(afMotCle);
+%>
+<%= afBlockMotCle.getHTML() %>

@@ -1,0 +1,217 @@
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="mt.modula.site.ModulaDematSiteNational"%>
+<script type="text/javascript" src="<%= rootPath %>publisher_portail/public/pagesStatics/assistance/checkContactForm.js?__##" ></script>
+<script type="text/javascript">
+function onSubmitContact(){
+	return checkForm();
+}
+</script>
+<%
+
+	String sHotLineNumberPave = "08 92 23 02 41";
+	try {
+		sHotLineNumberPave = Configuration.getConfigurationValueMemory("publisher.portail.hotline.number");
+	} catch (Exception e) { }
+
+	String sHotLinePrice = "0,34&euro; /min";
+	try {
+		sHotLinePrice = Configuration.getConfigurationValueMemory("publisher.portail.hotline.price");
+		sHotLinePrice = Outils.replaceAll(sHotLinePrice, "&amp;" , "&");
+	} catch (Exception e) {}
+
+	
+if(!ModulaDematSiteNational.isSite())
+{	
+%>
+
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Hotline</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" >
+
+         <tr>
+            <td style="text-align:right; width:20%" >
+                 <img alt="formation" src="<%= rootPath %>images/icons/36x36/hotline.png" />
+            </td>
+             <td style="vertical-align:middle;" >
+                <span style="font-style:12px;font-weight:bold;" >
+                    &nbsp;&nbsp;&nbsp;Notre service d'assistance téléphonique est à votre disposition pour répondre à 
+                    toutes les questions techniques que vous pourriez vous poser sur 
+                    le fonctionnement de la plate-forme.<br /><br />
+					&nbsp;&nbsp;&nbsp;Laissez vous guider par notre Hotline utilisateurs : <br />
+					<div style="font-size:12px;color:#99151C"><strong>
+					&nbsp;&nbsp;&nbsp;<%= sHotLineNumberPave %></strong></div> 
+					&nbsp;&nbsp;&nbsp;<%= sHotLinePrice %>&nbsp;&nbsp;
+                
+                </span>
+            </td>
+         </tr>         
+         
+ 	</table>
+ </div>
+ </div>
+
+<%
+} else {
+%>
+ <div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Hotline</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" >
+         <tr>
+            <td style="text-align:right; width:20%" >
+                 <img alt="formation" src="<%= rootPath %>images/icons/36x36/hotline.png" />
+            </td>
+             <td style="vertical-align:middle;" >
+                <span style="font-style:12px;font-weight:bold;" >
+                    &nbsp;Notre service commercial se tient à votre disposition pour vous présenter l'ensemble de nos prestarions
+                    &nbsp;(démonstation du logiciel, présentation de notre catalogue de formations) 
+                    <br /><br />
+					&nbsp;STUDIO MATAMORE - 28, rue des Pommiers 93500 PANTIN <br />
+				</span>
+				<span style="font-style:12px;" >	
+					&nbsp;Téléphone : +33 1 49 46 94 16 - Télécopie : + 33 1 55 93 15 60 - Courriel : commercial@matamore.com<br/> 
+					&nbsp;Site Internet :<a href="http://www.matamore.com" target="_blank"> www.matamore.com</a>
+                </span>
+            </td>
+         </tr>         
+         
+ 	</table>
+ </div>
+ </div>
+ </div>
+ <div class="post" align="center">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="post-title-alt">
+                Nous contacter
+            </td>
+            <td class="right">
+                <strong style="color:#B00"> </strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+ <div class="post-footer post-block" style="margin-top:0">
+ <table class="fullWidth" >
+   <tr>
+    <td>
+    <form action="<%= rootPath %>publisher_portail/public/pagesStatics/assistance/contact.jsp?__##" name="formulaire" onsubmit="javascript:return onSubmitContact()">
+	<table style="width:60%">
+		<tr><td colspan="2"> </td></tr>
+		<tr>
+			<td>Raison Sociale* :</td>
+			<td>
+				<input type="text" name="raison_sociale" id="raison_sociale" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td>Qualité* :</td>
+			<td>
+				<select name="civilite">
+					<option value="Mademoiselle">Mademoiselle</option>
+					<option value="Madame">Madame</option>
+					<option value="Monsieur">Monsieur</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Nom* :</td>
+			<td>
+				<input type="text" name="nom" id="nom" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td>Prénom* :</td>
+			<td>
+				<input type="text" name="prenom" id="prenom" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td>Téléphone* :</td>
+			<td>
+				<input type="text" name="tel" id="tel" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td>Email* :</td>
+			<td>
+				<input type="text" name="email" id="email" value="" />
+			</td>
+		</tr>
+		<tr><td colspan="2"> </td></tr>
+		<tr>
+			<td>
+				<input type="checkbox" name="contact" id="contact" value="1" /> 
+			</td>
+			<td>
+				Je souhaite être contacté pour connaître les conditions tarifaires
+				 d'accès au portail et bénéficier d'une présentation fonctionnelle complète.
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="checkbox" name="offreEssai" id="offreEssai" value="1" /> 
+			</td>
+			<td>
+				Je suis intéressé par une offre à l'essai.
+			</td>
+		</tr>
+
+		<tr><td colspan="2"> </td></tr>
+		
+		<tr>
+			<td colspan="2" style="text-align:center">
+				<input type="submit" value="Envoyer" />
+			</td>
+		</tr>
+		<tr><td colspan="2"> </td></tr>
+	</table>
+</form>
+    </td>
+   
+  </tr>
+</table>
+</div>
+</div>
+<% 
+}
+%>
+<script>
+var message = "[message]";
+if(isNotNull(message)){
+    Element.hide("trContent");
+    $("message").innerHTML = message;
+    Element.show("trMessage");
+}else{
+    Element.show("trContent");
+    $("message").innerHTML = "";
+    Element.hide("trMessage");
+}
+</script>

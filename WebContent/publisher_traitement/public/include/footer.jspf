@@ -1,0 +1,150 @@
+<%@page import="org.coin.fr.bean.OrganisationParametre"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="org.coin.util.WindowsEntities"%>
+<%@page import="org.coin.util.HTMLEntities"%>
+<%
+boolean showCreditsEditeur = true;
+try {
+	showCreditsEditeur = Configuration.isTrueMemory("publisher.portail.show.credit", true);
+} catch(Exception e){}
+
+%>
+<div class="footer" style="background-image:none">
+	<br/>
+    <a class="footerLink" href="<%=response.encodeURL(rootPath+"publisher_portail/public/pagesStatics/infoslegales.jsp") %>" id="button_cgu" >Conditions générales d'utilisation</a>
+                <script type="text/javascript"> 
+                /*
+                    Event.observe(window, "load", function() {
+                    
+                        $('button_cgu').onclick = function() 
+                        {
+                    
+                           
+                           if(sUserAgent == "ie6" || <%= 
+					    	   Configuration.isTrueMemory("publisher.display.annonce.detail.force.popup", false) %>)
+                           {
+                               OuvrirPopup("<%= 
+                            	  response.encodeURL(rootPath 
+                            			   + "publisher_portail/public/pagesStatics/infoslegales.jsp")
+                            	%>",800,650,"menubar=no,scrollbars=yes,statusbar=no");
+                              return ;
+                           }
+                           
+                            var doc;
+                            
+                            if(parent.document == document)
+                            {
+                              doc = document;
+                            } else {
+                               try{
+                                   doc.createElement("div");
+                                   doc = parent.document;
+                               } catch (e) {}
+                               doc = document;
+                            }
+                           
+                            
+                           
+                            var popupDiv = doc.createElement("div");
+                            popupDiv.style.position = "relative";
+                            popupDiv.style.backgroundColor = "#EFF5FF";
+                            popupDiv.style.padding = "0 7px 0 7px";
+
+                            var img = doc.createElement("img");
+                            img.style.position = "absolute";
+                            img.style.top = "3px";
+                            img.style.right = "3px";
+                            img.style.cursor = "pointer";
+                            img.src = "<%=rootPath%>images/icons/close.gif";
+                            img.onclick = function(){
+                                try {new parent.Control.Modal.close();}
+                                catch(e) { Control.Modal.close();}
+                            }
+
+                            popupDiv.appendChild(img);
+                            
+                            
+                            var divHeader = doc.createElement("div");
+                            divHeader.style.textAlign = "center";
+                            divHeader.style.lineHeight = "28px";
+                            divHeader.innerHTML = 'C G U';
+                            divHeader.style.height = "28px";
+                            
+                            var divIframe = doc.createElement("div");
+                            divIframe.style.border = "1px solid #888";
+                            divIframe.style.backgroundColor = "#AAA";
+                            
+                            var iframe = doc.createElement("iframe");
+                            iframe.name = "offerPopup";
+                            iframe.id = "offerPopup";
+                            iframe.src = "<%=  response.encodeURL(rootPath + "publisher_portail/public/pagesStatics/infoslegales.jsp") %>";
+                            iframe.style.width = "100%";
+                            iframe.style.height = "430px";
+                            iframe.style.border = 0;
+                            iframe.style.margin = 0;
+                            iframe.align = "top";
+                            iframe.frameBorder = "0";
+                            iframe.border = "1";
+                            divIframe.appendChild(iframe);
+                                                        
+                            var divFooter = doc.createElement("div");
+                            divFooter.style.textAlign = "center";
+                            divFooter.style.lineHeight = "6px";                            
+                            divFooter.style.height = "6px";
+                            
+                            popupDiv.appendChild(divHeader);
+                            popupDiv.appendChild(divIframe);
+                            popupDiv.appendChild(divFooter);
+
+                            var modal ;
+                           try{ 
+                               modal = new parent.Control.Modal(false,{width: 700, contents: popupDiv});
+                           } catch(e) {
+                               modal = new Control.Modal(false,{width: 700, contents: popupDiv});
+                           }
+                           modal.container.insert(popupDiv);
+                           modal.open();
+                        }
+                        
+                    });
+                    */
+                </script>
+
+
+	<% if (showCreditsEditeur){ %>
+    &nbsp;<span style="color:#888"> | </span>&nbsp; 
+    <a class="footerLink" href="http://www.modula-demat.com" target="_blank">Crédits</a>
+    &nbsp;<span style="color:#888"> | </span>&nbsp;
+    Editeur : <a class="footerLink" href="http://www.matamore.com" target="_blank" title="Matamore Web Solutions, Dématérialisation, Formation professionnelle, Marchés publics, Parapheur Electronique, Ressources Humaines, Développement spécifique">Matamore Web Solutions</a>
+    <%} %>
+    
+         
+<%
+    try{
+        Configuration confAnalytics 
+	        = Configuration.getConfigurationMemory("publisher.footer.addon.html", false);
+        
+        out.write(
+                WindowsEntities.cleanUpWindowsEntities(
+                        HTMLEntities.unhtmlentitiesComplete(
+                                confAnalytics.getDescription())).replace("{ROOT_PATH}", rootPath));
+    } catch (Exception e) {
+        //e.printStackTrace();
+    }
+
+%>    
+    
+</div>
+<%
+	try{
+	    Configuration confAnalytics = Configuration.getConfigurationMemory("publisher.trafic.analyser.hit.javascript", false);
+	    
+	    out.write(
+	    		WindowsEntities.cleanUpWindowsEntities(
+	    				HTMLEntities.unhtmlentitiesComplete(
+	    						confAnalytics.getDescription())));
+	} catch (Exception e) {
+		//e.printStackTrace();
+	}
+
+%>

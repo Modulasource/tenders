@@ -1,0 +1,100 @@
+	<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="org.coin.bean.ObjectType"%>
+
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="modula.graphic.CSS"%><%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<script type="text/javascript" >
+function synchronizeCPF(){
+	var bRestrict = $('bSynchroCPF').checked;
+	if(bRestrict){
+		var listGroupCPF = $('iIdGroupCompetenceSelection');
+		mt.html.setSuperCombo(listGroupCPF);
+		var arrGroup = [];
+		for (var z=0; z<listGroupCPF.options.length; z++) {
+			arrGroup.push(listGroupCPF.options[z].value);
+		}
+
+		var listCPF = $('iIdCompetenceSelection');
+		mt.html.setSuperCombo(listCPF);
+		var arr = [];
+		for (var z=0; z<listCPF.options.length; z++) {
+			arr.push(listCPF.options[z].value);
+		}
+	
+		CodeCpfSwitcher.getJSONArrayCPFFromGroupList(
+						Object.toJSON(arrGroup),
+						Object.toJSON(arr),
+						function (s) {
+							$('iIdCompetence').populate(s.evalJSON());
+						});
+	}else{
+		var listCPF = $('iIdCompetenceSelection');
+		mt.html.setSuperCombo(listCPF);
+		var arr = [];
+		for (var z=0; z<listCPF.options.length; z++) {
+			arr.push(listCPF.options[z].value);
+		}
+	
+		CodeCpfSwitcher.getJSONArrayCPFFromCPFList(
+						Object.toJSON(arr),
+						function (s) {
+							$('iIdCompetence').populate(s.evalJSON());
+						});
+	}
+}
+Event.observe(window, 'load', function(){
+	synchronizeCPF();
+	$('bSynchroCPF').onclick = function(){synchronizeCPF();}
+});
+</script>
+<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" colspan="2"><%= sPaveClassificationGroupProduitsTitre %></td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="font-weight:normal" colspan="2">
+				<table style="text-align:left" >
+					<tr>
+						<td style="width:45%;text-align:right">
+							<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="iIdGroupCompetence" id="iIdGroupCompetence" size="10" style="width:350px;" multiple="multiple">
+			                </select>
+			                <script>
+			                var select = $("iIdGroupCompetence");
+			                mt.html.setSuperCombo(select);
+			                select.populate(<%= cpfSwitcher.getGroupCPFList() %>);
+			                </script>
+						</td>
+
+	<%
+		String sActionSynchroCPF = "synchronizeCPF();";
+	%>						
+						
+						<td style="width:10%;text-align:center">
+							<a id="remove_GroupCPF" href="javascript:DeplacerTous(document.formulaire.iIdGroupCompetenceSelection,document.formulaire.iIdGroupCompetence);<%= sActionSynchroCPF %>" >
+								<img src="<%= rootPath + modula.graphic.Icone.ICONE_GAUCHE%>"  
+								alt="Enlever" /></a>
+							<a id="add_GroupCPF" href="javascript:DeplacerTous(document.formulaire.iIdGroupCompetence,document.formulaire.iIdGroupCompetenceSelection);<%= sActionSynchroCPF %>" >
+								<img src="<%= rootPath + modula.graphic.Icone.ICONE_DROITE%>"  
+								alt="Ajouter" /></a> 
+						</td>
+						<td style="width:45%">
+							<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="iIdGroupCompetenceSelection" id="iIdGroupCompetenceSelection" size="10" style="width:350px;" multiple="multiple" >
+		                    </select>
+		                    <script>
+                            var select = $("iIdGroupCompetenceSelection");
+                            mt.html.setSuperCombo(select);
+                            select.populate(<%= cpfSwitcher.getGroupCPFSelectedList() %>);
+                            </script>
+							<input type="hidden" name="iIdGroupCompetenceSelectionListe" />
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>			
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>

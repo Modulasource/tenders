@@ -1,0 +1,30 @@
+<% 
+
+	boolean bUseBanner = false;
+
+	try {
+		String sAddBanner = Configuration.getConfigurationValueMemory("publisher.portail.addBanner");
+		if(sAddBanner.equals("true"))
+		{
+			bUseBanner  = true;
+		}
+	} catch (Exception e) {}
+
+	if(bUseBanner)
+	{
+%>
+<!------ OAS SETUP begin ------>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<script language="JavaScript">
+//configuration
+OAS_url = 'http://memorix.sdv.fr/RealMedia/ads/';
+OAS_sitepage = '<%= sCurrentSiteWeb.split("//")[1] %>/<%= sBannerKeyWord %>'
+//OAS_listpos = 'Position2,Right1,BottomLeft';
+OAS_listpos = 'Middle1,Position4,Top,Position2,Right1,BottomLeft';
+OAS_query = '?';
+//end of configuration
+</script>
+<%@include file="publicite/oas_tag.jspf" %>
+<% 
+	}
+%>

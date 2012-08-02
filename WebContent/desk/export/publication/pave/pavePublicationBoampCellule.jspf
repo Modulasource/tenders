@@ -1,0 +1,102 @@
+<%
+	String sPublicationTypeName = "inconnu !";
+	String sPublicationEtatName = "inconnu !";
+	String sPublicationFormat = "inconnu !";
+	try {
+		sPublicationTypeName = PublicationType.getPublicationTypeName(publi.getIdPublicationType());
+	}catch (Exception e){}
+	try {
+		sPublicationEtatName = PublicationEtat.getPublicationEtatName(publi.getIdPublicationEtat());
+	}catch (Exception e){}
+
+	
+	try {
+		if(publi.isFormatPapier()) sPublicationFormat = "Papier";
+	}catch (Exception e){}
+	try {
+		if(publi.isFormatWebService()) 	sPublicationFormat = "Web Service";
+	}catch (Exception e){}
+
+
+%>	
+<tr>
+	<td class="pave_cellule_gauche" style="vertical-align:middle">Publication de l'AAPC au BOAMP :</td>
+	<td class="pave_cellule_droite" style="vertical-align:middle">
+	<table>
+	  <tr>
+	    <td width="40%" ><%= sPublicationTypeName  %></td>
+	    <td width="20%" class="pave_cellule_gauche">Etat : </td>
+	    <td width="40%" ><%= sPublicationEtatName  %>
+	    <a href="" >
+		  <img src="<%=rootPath + modula.graphic.Icone.ICONE_SUPPRIMER %>" 
+		  	height="16" style="vertical-align:middle"
+		  	onclick="confirmAndRemove('<%= response.encodeURL( 
+			rootPath + "desk/export/publication/modifierPublicationBoamp.jsp?"
+			+"sAction=remove&amp;iIdPublicationBoamp=" + publi.getIdPublicationBoamp()
+			+"&amp;sUrlRedirect=" 
+			+ rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?"
+			+ "iIdAffaire="	+ marche.getIdMarche() 
+			+ "%26iIdOnglet=" + modula.graphic.Onglet.ONGLET_AFFAIRE_PLANNING)  %>');"
+		  	/> 
+		</a>
+		</td>
+	  </tr>
+	</table>		
+		
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Référence : </td>
+	<td class="pave_cellule_droite">
+	<table >
+	  <tr>
+	    <td width="40%" ><%= publi.getReferenceExterne() %></td>
+	    <td width="20%" class="pave_cellule_gauche">Type de journal : </td>
+	    <td width="40%" ><%= publi.getTypeJournal() %></td>
+	  </tr>
+	</table>
+	</td>
+</tr>
+
+<tr>
+	<td class="pave_cellule_gauche">Parution : </td>
+	<td class="pave_cellule_droite">
+	<table >
+	  <tr>
+	    <td width="40%"  ><%= publi.getNumeroParution() %></td>
+	    <td width="20%" class="pave_cellule_gauche">Annonce : </td>
+	    <td width="40%" ><%= publi.getNumeroAnnonce() %></td>
+	  </tr>
+	</table>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date d'envoi : </td>
+	<td class="pave_cellule_droite">
+	<table >
+	  <tr>
+	    <td width="40%"  ><%= CalendarUtil.getDateFormattee(publi.getDateEnvoi()) %></td>
+	    <td width="20%" class="pave_cellule_gauche"><i>(Date d'envoi effective : </i></td>
+	    <td width="40%" ><i><%= CalendarUtil.getDateFormattee(publi.getDateEnvoiEffective()) %>)</i></td>
+	  </tr>
+	</table>
+		
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date de publication : </td>
+	<td class="pave_cellule_droite">
+	<table>
+	  <tr>
+	    <td width="40%"  ><%= CalendarUtil.getDateFormattee(publi.getDatePublication()) %></td>
+	    <td width="20%" class="pave_cellule_gauche">Format : </td>
+	    <td width="40%" ><%= sPublicationFormat %></td>
+	  </tr>
+	</table>
+	</td>
+</tr>
+<tr>
+	<td colspan="2">&nbsp;</td>
+</tr>
+		
+		

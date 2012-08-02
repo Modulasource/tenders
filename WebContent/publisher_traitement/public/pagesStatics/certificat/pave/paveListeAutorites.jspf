@@ -1,0 +1,33 @@
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt"><%=sTitle %></strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" cellpadding="5" >
+    	<tr>
+		<td style="vertical-align:top">
+		<div style="text-align:left;padding:5px">
+		Pour répondre à un marché public depuis ce site, vous devez disposer 
+		d'un certificat électronique reconnu par le Ministère de l'économie et des
+		finances.
+		<br /><br />
+		La liste des autorités de certification agréées pour remettre ce type de
+		certificats est disponibles à la l'adresse suivante:
+		<br />
+		<a href="http://www.entreprises.minefi.gouv.fr/certificats/" target="_blank">http://www.entreprises.minefi.gouv.fr/certificats/</a>
+		</div>
+		</td>
+	</tr>
+    </table>
+</div>
+</div>

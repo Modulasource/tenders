@@ -1,0 +1,19 @@
+<table summary="none">
+	<tr>
+		<td colspan="2" class="mention">Gestion du DCE</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= sTitreFormatDCE %>
+		</td>
+		<td class="pave_cellule_droite">
+			<select name="formatDCE" onChange="afficherDCE();">
+				<option value="0" <%= bIsDCEIndefini?"selected='selected'":"" %> >Attribuer un format</option>
+				<option value="1" <%= (!bIsDCEPapier && !bIsDCEIndefini)?"selected='selected'":"" %>>électronique</option>
+				<option value="2" <%= (bIsDCEPapier && !bIsDCEIndefini)?"selected='selected'":"" %> >papier</option>
+			</select>
+		</td> 
+	</tr>
+</table>
+<%@ include file="paveEnregistrementPlisPapierDCEDatesForm.jspf" %>
+<%@ include file="paveEnregistrementPlisPapierDCEDates.jspf" %>

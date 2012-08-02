@@ -1,0 +1,92 @@
+<%
+	/*
+	 *	Objets nécessaires :
+	 *		Marche marche;
+	 *
+	 */
+	 
+	 Vector vLangues = Langue.getAllLangue();
+	 Vector vLanguesMarche = Langue.getAllLangueFromMarche(marche.getIdMarche());
+%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.Langue"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveLangueTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2" style="font-weight:bold">
+		Langues pouvant être utilisées dans l'offre ou la candidature autres que la langue française :
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<select name="<%=sFormPrefix %>languesInitiales" size="10" style="width:250px">
+<%
+for (int i = 0; i < vLangues.size(); i++)
+{
+	Langue langue = (Langue)vLangues.get(i);
+	%><option value="<%= langue.getId() %>"><%= langue.getName() %></option>
+<%
+}
+%>
+			</select>
+		</td>
+		<td>
+			<table summary="Sélection des langues autorisées">
+				<tr>
+					<td style="width:100px;text-align:center">
+						<a href="javascript:DeplacerTous(document.formulaire.languesFinales,document.formulaire.languesInitiales)" >
+							<img src="<%= rootPath + modula.graphic.Icone.ICONE_GAUCHE%>"  alt="Enlever une pi&egrave;ce" />
+						</a>
+						<a href="javascript:DeplacerTous(document.formulaire.languesInitiales,document.formulaire.languesFinales)" >
+							<img src="<%= rootPath + modula.graphic.Icone.ICONE_DROITE%>"  alt="Ajouter une pi&agrave;ce" />
+						</a>  
+					</td>
+					<td align="left">
+						<select name="languesFinales" size="10" style="width:250px">
+<%
+	for (int i = 0; i < vLanguesMarche.size(); i++)
+	{
+		Langue langueMarche = (Langue)vLanguesMarche.get(i);
+%>							<option value="<%=langueMarche.getId()%>"><%= langueMarche.getName()%></option>
+<%
+	}
+%>
+						</select>
+						<input type="hidden" name="languesHidden" value="" />
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Langue(s) autre(s):
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="sLangueAutre" size="80" maxlength="250" 
+		value="<%= marche.getLangueAutre() %>" /><br />
+		Les autres langues doivent être rédigées en toutes lettres et séparées par des virgules.
+		</td>
+	</tr>
+	
+<%
+if(bUseFormMAPA)
+{
+%>	
+	<%= QuestionAnswer.getHTML(
+			"EnveloppeLangueFrancaise", 
+			"lIdQaEnveloppeLangueFrancaise",
+			mcr.getIdQaEnveloppeLangueFrancaise(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_CHECKBOX) %>
+			
+<%
+}
+%>			
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

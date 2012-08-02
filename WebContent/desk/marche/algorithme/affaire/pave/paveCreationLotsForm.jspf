@@ -1,0 +1,263 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		String sPaveDefinitionLotsTitre;
+	*		Marche marche;
+	*/
+	
+
+	
+%>
+<%@page import="modula.marche.MarcheLotDetail"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.util.Outils"%>
+
+<%@page import="modula.graphic.CSS"%><script type="text/javascript">
+<!--
+
+function onchangeManualNumerotation()
+{
+	if($("<%=sFormPrefix%>bManualNumeration").checked)
+	{
+		Element.show("divManualNumeration");
+	} else
+	{
+		Element.hide("divManualNumeration");
+	}	
+}
+//-->
+</script>
+<table class="pave"  >
+	<tr>
+		<td class="pave_titre_gauche"><%= sPaveDefinitionLotsTitre %></td>
+		<td class="pave_titre_droite">&nbsp;
+	<input type="hidden" value="<%= lot.getIdMarcheLot() %>" name="<%=sFormPrefix %>iIdMarcheLot" />
+			<span <%= (sAction.equals("store") || sAction.equals("create"))?"":"style='display: none;'" %> >
+
+	<input type="checkbox" name="<%=sFormPrefix 
+		%>bManualNumeration" id="<%=sFormPrefix 
+		%>bManualNumeration" onchange="javascript:onchangeManualNumerotation()" />Numérotation manuelle
+	
+			</span>
+
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<div id="divManualNumeration" style="display: none;">
+
+<table width="100%" >
+	<tr>
+		<td class="pave_cellule_gauche">Numérotation manuelle :</td>
+		<td class="pave_cellule_droite">&nbsp;
+					<input type="input" value="<%= lot.getNumero() 
+					%>" name="<%=sFormPrefix %>iNumero" size="4"/> 
+Attention pour la numéroration manuelle, c'est un nombre qui est attendu (Pas de lettre, ni de tiret, etc.). 
+De plus, vous devez vérifier que vous n'avez pas la même numérotation pour deux lots différents<br/>
+
+		</td>
+	</tr>
+</table>
+
+			</div>
+		</td>
+	</tr>
+
+	<tr>
+		<td class="pave_cellule_gauche">
+		Référence :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%=sFormPrefix %>sReference" id="<%=sFormPrefix %>sReference" size="50" maxlength="250" 
+		value="<%= lot.getReference() %>"/>
+		</td>
+	</tr>
+<%
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE) )
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Intitulé :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%=sFormPrefix %>sIntitule" size="50" maxlength="250" 
+		value="<%= lot.getIntitule() %>"/>
+		</td>
+	</tr>
+<%
+	}
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Description succincte* :
+		</td>
+		<td class="pave_cellule_droite">
+		<textarea  class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" type="text" name="<%=sFormPrefix %>sDesignationReduite" id="<%=sFormPrefix %>sDesignationReduite"  cols="80" rows="4" 
+		maxlength="250" ><%= lot.getDesignationReduite() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Nature ou étendue ou quantité :
+		</td>
+		<td class="pave_cellule_droite">
+		<textarea name="<%=sFormPrefix %>sQuantite" cols="80" rows="4" ><%= 
+			lot.getQuantite() %></textarea>
+		</td>
+	</tr>
+<%
+	if(bUseBoamp17  && (bUseFormNS || bUseFormUE))
+	{
+%>
+	<tr>
+		<%
+		
+		String sCheckedCoutEstimeNeant = "";
+		String sCheckedCoutEstimeUnique = "";
+		String sCheckedCoutEstimeFourchette = "";
+
+		
+		switch (marcheLotDetail.getIdCoutEstimeType())
+		{
+		case MarcheLotDetail.VALEUR_TYPE_NEANT:
+			sCheckedCoutEstimeNeant = "checked='checked'";
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_UNIQUE:
+			sCheckedCoutEstimeUnique= "checked='checked'";
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_FOURCHETTE:
+			sCheckedCoutEstimeFourchette= "checked='checked'";
+			break;
+		}
+		%>
+		<td class="pave_cellule_gauche">
+		Coût, s'il est connu :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="radio" name="radioCoutEstimee" value="<%= 
+				MarcheLotDetail.VALEUR_TYPE_NEANT %>" <%= sCheckedCoutEstimeNeant %> /> Néant<br/>
+				
+			<input type="radio" name="radioCoutEstimee" value="<%= 
+				MarcheLotDetail.VALEUR_TYPE_UNIQUE %>" <%= sCheckedCoutEstimeUnique %> /> Coût estimé (H.T.) : 
+				<input type="text" size="10" maxlength="20" 
+					name="dCoutEstime" value="<%= Outils.getUsFormatedValueNeant(marcheLotDetail.getCoutEstime()) %>" /><br/>
+					
+			<input type="radio" name="radioCoutEstimee" value="<%= 
+				MarcheLotDetail.VALEUR_TYPE_FOURCHETTE %>" <%= sCheckedCoutEstimeFourchette %>/> Fourchette entre 
+				<input type="text" size="10" maxlength="20" 
+					name="dCoutEstimeBas" value="<%= Outils.getUsFormatedValueNeant(marcheLotDetail.getCoutEstimeBas()) %>" /> et 
+				<input type="text" size="10" maxlength="20" 
+					name="dCoutEstimeHaut" value="<%= Outils.getUsFormatedValueNeant(marcheLotDetail.getCoutEstimeHaut()) %>" /><br/>
+			Monnaie : <strong><%= currency.getAllInHtmlSelect("sIdCurrencyCoutEstime") %></strong>
+		</td>
+	</tr>
+	<tr>
+		<%
+		
+		String sCheckedAutreDureeNeant = "";
+		String sCheckedAutreDureeUnique = "";
+		String sCheckedAutreDureeFourchette = "";
+
+		
+		switch (marcheLotDetail.getIdAutreDureeType())
+		{
+		case MarcheLotDetail.VALEUR_TYPE_NEANT:
+			sCheckedAutreDureeNeant = "checked='checked'";
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_UNIQUE:
+			sCheckedAutreDureeUnique= "checked='checked'";
+			break;
+		case MarcheLotDetail.VALEUR_TYPE_FOURCHETTE:
+			sCheckedAutreDureeFourchette= "checked='checked'";
+			break;
+		}
+
+		%>
+		<td class="pave_cellule_gauche">
+		Indications quant à une autre durée du marché ou à une autre date de 
+		commencement / d'achèvement (le cas échéant) :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="radio" name="radioAutreDuree" value="<%= 
+				MarcheLotDetail.VALEUR_TYPE_NEANT %>" <%= sCheckedAutreDureeNeant %> /> Néant <br/>
+				
+		<input type="radio" name="radioAutreDuree" value="<%= 
+				MarcheLotDetail.VALEUR_TYPE_UNIQUE %>" <%= sCheckedAutreDureeUnique %> /> 
+				<input type="text" size="10" maxlength="20" 
+					name="lAutreDuree" value="<%= marcheLotDetail.getAutreDuree() %>" />
+		<%
+		String sDureeTypeMoisSelected = "";
+		String sDureeTypeAnneeSelected = "";
+		if(!Outils.isNullOrBlank(marcheLotDetail.getAutreDureeType()) 
+		&& marcheLotDetail.getAutreDureeType().equals("mois"))
+		{
+			sDureeTypeMoisSelected = " selected='selected' ";
+			sDureeTypeAnneeSelected = " ";
+		} else{
+			sDureeTypeMoisSelected = " ";
+			sDureeTypeAnneeSelected = " selected='selected' ";
+		}
+		
+		%>
+		<select name="sAutreDureeType" >
+			<option value="mois" <%= sDureeTypeMoisSelected %> >mois</option>
+			<option value="annee" <%= sDureeTypeAnneeSelected %> >année(s)</option>
+		</select>
+		<br/>
+		
+		<input type="radio" name="radioAutreDuree" value="<%= 
+				MarcheLotDetail.VALEUR_TYPE_FOURCHETTE %>" <%= sCheckedAutreDureeFourchette %> /> 
+			à compter de la date de notification du marché<br/>
+			à compter du <input type="text" size="15" maxlength="10" class="dataType-date" 
+					name="tsAutreDureeDebut" value="<%= 
+						CalendarUtil.getDateCourte(marcheLotDetail.getAutreDureeDebut()) %>" /> 
+				et jusqu'au <input type="text" size="15" maxlength="10" class="dataType-date" 
+					name="tsAutreDureeFin" value="<%= 
+						CalendarUtil.getDateCourte(marcheLotDetail.getAutreDureeFin()) %>" /> 
+		</td>
+	</tr>
+<%
+	}
+%>
+	<tr>
+		<td colspan="2">
+			<strong>Date d'exécution du lot :</strong>&nbsp;
+			<input type="text" name="<%=sFormPrefix 
+			%>tsDateExecution" id="<%=sFormPrefix %>tsDateExecution" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(lot.getDateExecution()) %>" />
+			&nbsp;
+			<strong>Date de livraison du lot :</strong>&nbsp;
+			<input type="text" name="<%=sFormPrefix 
+				%>tsDateLivraison"  id="<%=sFormPrefix %>tsDateLivraison" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(lot.getDateLivraison()) %>" />
+<i>(ces dates ne peuvent pas être renseignées pour le Formulaire JOUE 1)</i>
+		</td>
+	</tr>
+<%
+	if(bUseBoamp17  && (bUseFormNS || bUseFormUE))
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Informations complémentaires sur les lots :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea rows="5" cols="80" name="sInfoComplementaire" ><%= 
+				marcheLotDetail.getInfoComplementaire() %></textarea>
+		</td>
+	</tr>
+<%
+	}
+%>	
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

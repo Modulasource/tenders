@@ -1,0 +1,26 @@
+<table class="pave" >
+	<tr onclick="montrer_cacher('pavePublicationsOfficielles')">
+		<td class="pave_titre_gauche" colspan="2">Publications officielles</td>
+	</tr>
+<%
+//	if(bIsContainsAAPCPublicity){
+%>
+	<tr>
+		<td>
+			<table id="pavePublicationsOfficielles" >
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<%@ include file="pavePublicationBoamp.jspf" %>
+				<%@ include file="pavePublicationJoue.jspf" %>		
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<%
+//	}
+%>
+</table>
+	

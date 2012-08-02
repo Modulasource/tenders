@@ -1,0 +1,83 @@
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<table class="pave" summary="none">
+	<tr >
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePersonneTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="<%= sFormPrefix %>pavePersonne" summary="Personne physique">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche"><%= sTitrePersonne %> :</td>
+					<td class="pave_cellule_droite">
+					<a href="<%= response.encodeURL(
+						rootPath 
+						+ "desk/organisation/afficherPersonnePhysique.jsp?"
+						+ "iIdPersonnePhysique=" + personne.getIdPersonnePhysique() ) %>" >
+					<%= sNomPRM %> 
+					</a>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+						Organisme :
+					</td>
+					<td class="pave_cellule_droite">
+						<%= (Organisation.getOrganisation(personne.getIdOrganisation())).getRaisonSociale() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Adresse :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= adresse.getAllAdresseString("<br />")%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">T&eacute;l&eacute;phone :</td>
+					<td class="pave_cellule_droite">
+						<%=sTelPRM%>
+						&nbsp;&nbsp;&nbsp;<span style="font-weight:bold">Poste :</span>
+						<%=sPostePRM%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Fax :</td>
+					<td class="pave_cellule_droite">
+						<%=sFaxPRM%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Courrier &eacute;lectronique :</td>
+					<td class="pave_cellule_droite">
+						<%=sEmailPRM%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Adresse Internet (URL) du pouvoir adjudicateur :</td>
+					<td class="pave_cellule_droite">
+						<%= sSiteWebPRM %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Adresse Internet (URL) du profil d'acheteur :</td>
+					<td class="pave_cellule_droite">
+						<%= sSiteWebPRM2 %>
+					</td>
+				</tr>
+				<%
+				if(bUseBoamp17){
+					AutoFormCptDoubleLabel afLabel = QuestionAnswer.getAutoFormCptDoubleLabelWithKeyword("agitPourAutreCompte","",sIdQaAdjudicateur);
+				%>
+				<%= afLabel.getHTML() %>
+				<%
+				}
+				%>
+				<tr><td colspan="2">&nbsp;</td></tr>
+			</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,48 @@
+<%
+	String sReferenceAnnonceur 
+		= TypeObjetModula.getIdObjetReferenceName(
+				annonce.getIdTypeObjet(), 
+				annonce.getIdReferenceObjet());
+
+%><table class="pave">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Coordonnées de l'organisme</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Annonceur :</td>
+		<td class="pave_cellule_droite">
+			<%= sReferenceAnnonceur %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Référence externe :</td>
+		<td class="pave_cellule_droite">
+			<%= annonce.getReferenceExterne() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Type : </td>
+		<td class="pave_cellule_droite">
+			<%= org.coin.fr.bean.annonce.AnnonceType.getAnnonceTypeNameOptional(annonce.getIdAnnonceType() ) %>		
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Etat : </td>
+		<td class="pave_cellule_droite">
+			<%= org.coin.fr.bean.annonce.AnnonceEtat.getAnnonceEtatNameOptional(annonce.getIdAnnonceEtat() ) %>		
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Libellé * :</td>
+		<td class="pave_cellule_droite"  >
+			<%= annonce.getLibelle() %>
+		</td>
+	</tr>
+ 	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

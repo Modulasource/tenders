@@ -1,0 +1,83 @@
+<%@page import="org.coin.fr.bean.PersonnePhysiqueCivilite"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%
+	String sPersonneCivilite = "";
+	try{sPersonneCivilite = personne.getCivilite();}
+	catch(Exception e){}
+%>
+
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sBlocNamePersonnePhysique %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%if(dih.bGroupPersoData){%><%= hbFormulaire.getHtmlTr(sOrganisationTypeName
+				+" :","<a href='"+response.encodeURL(
+						rootPath+"desk/organisation/afficherOrganisation.jsp?iIdOrganisation="
+								+organisation.getId())+"'>"+organisation.getRaisonSociale()+"</a>") %><% }%>
+	<%= hbFormulaire.getHtmlTrInput(personne.getIdPersonnePhysiqueCiviliteLabel() + "* :","",sPersonneCivilite,"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getPrenomLabel() + " :","",personne.getPrenom(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getNomLabel() + " :","",personne.getNom(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getInitialsLabel() + " :","",(personne.getInitials()==null?"":personne.getInitials()),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getFonctionLabel() + " :","",personne.getFonction(),"") %>
+	<%if(bDisplayNationality){%>
+		<%= hbFormulaire.getHtmlTrInput(personne.getIdNationaliteLabel() + " :","",nationalite.getName(),"") %>
+	<%}%>
+	<%= hbFormulaire.getHtmlTrInput(personne.getEmailLabel() + "* :","",personne.getEmail(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getTelLabel() + " :","",personne.getTel(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getPosteLabel() + " :","",personne.getPoste(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getFaxLabel() + " :","",personne.getFax(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getTelPortableLabel() + " :","",personne.getTelPortable(),"") %>
+    <%= hbFormulaire.getHtmlTrInput(personne.getSiteWebLabel() + " :","",personne.getSiteWeb(),"") %>
+    <%= hbFormulaire.getHtmlTrInput(personne.getReferenceExterneLabel() + " :","", Outils.getString(personne.getReferenceExterne(), localizeButton.getValueUndefined()) ) %>
+
+<%
+	if(dih.bDisplayOwner) 
+	{
+		ObjectType ot = null;
+		String sObjectNameOwner = "";
+		try{
+			ot = ObjectType.getObjectTypeMemory(
+					personne.getIdObjectTypeOwner() ) ;
+			
+			
+			sObjectNameOwner  = ObjectType.getIdObjetReferenceName(
+					personne.getIdObjectTypeOwner(),
+					personne.getIdObjectReferenceOwner() );
+			
+			
+		} catch (CoinDatabaseLoadException e) {
+			ot = new ObjectType();
+		}
+			
+
+			
+%>
+	<tr>
+		<td class="pave_cellule_gauche" ><%= locTitle.getValue(35,"Appartient à (owner)") %> :</td>
+		<td class="pave_cellule_droite" >
+			<%= ot.getName() + " : " + sObjectNameOwner  %>
+		</td>
+	</tr>
+
+<%
+		try {
+			PersonnePhysique creator =  PersonnePhysique.getPersonnePhysique( organisation.getIdCreateur());
+			creator.setAbstractBeanLocalization(sessionLanguage);
+%>	
+	<tr>
+		<td class="pave_cellule_gauche" ><%= organisation.getIdCreateurLabel () %> :</td>
+		<td class="pave_cellule_droite" >
+			<%= creator .getName() %>
+		</td>
+	</tr>
+<%		
+		} catch (Exception e) {}
+	}
+%>
+
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

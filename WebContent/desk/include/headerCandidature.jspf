@@ -1,0 +1,116 @@
+<%@ page import="modula.graphic.*" %>
+<%@page import="modula.marche.AvisAttribution"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.util.treeview.TreeviewTest"%>
+<%@page import="modula.algorithme.PhaseEtapes"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="modula.algorithme.PhaseProcedure"%>
+<%@page import="modula.algorithme.Phase"%>
+<%@page import="modula.algorithme.Etape"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarcheSynchroMarco"%>
+<%@page import="modula.commission.Commission"%>
+<%
+String sTargetURLAffaire ="";
+
+{
+	boolean bIsMarco = false;
+	if(marche.getIdMarcheSynchro()==MarcheSynchro.MARCO)
+		bIsMarco = true;
+	
+	boolean bAffaireValidee = false;
+	try{bAffaireValidee = marche.isAffaireValidee();}
+	catch(Exception e){}
+	
+	boolean bIsAAPC = marche.isAffaireAAPC(false);
+	
+	boolean bIsAATR = marche.isAffaireAATR(false);
+
+	boolean bAffairePublieePublisher = false;
+	try{bAffairePublieePublisher = marche.isAffairePublieeSurPublisher();}
+	catch(Exception e){}
+	
+	boolean bIsCandidatureCloses = false;
+	try{bIsCandidatureCloses = marche.isCandidaturesCloses();}
+	catch(Exception e){}
+
+	boolean bDCEModifieApresPublication = false;
+	try{bDCEModifieApresPublication = marche.isDCEModifieApresPublication();}
+	catch(Exception e){}
+
+	boolean bCandidatsPrevenusModificationDCE = true;
+	try{bCandidatsPrevenusModificationDCE = marche.isCandidatsPrevenusModificationDCE();}
+	catch(Exception e){}
+	
+	boolean bIsDCEDisponible = false;
+	try{bIsDCEDisponible = marche.isDCEDisponible();}
+	catch(Exception e){}
+	
+	boolean bIsArchivee = false;
+	try{bIsArchivee = marche.isAffaireArchivee();}
+	catch(Exception e){}
+	
+	boolean bAffaireEnCoursDeRectification = false;
+	try	{bAffaireEnCoursDeRectification = marche.isAffaireEnCoursDeRectification();}
+	catch(Exception e){}
+	
+	boolean bAffaireAnnulee = marche.isAffaireAnnulee(false);
+	
+	boolean bIsAvisAttributionPubliePublisher = false;
+	if(bIsAATR)
+	{
+		try
+		{
+			modula.marche.AvisAttribution attrib = modula.marche.AvisAttribution.getAvisAttributionFromMarche(marche.getIdMarche());
+			bIsAvisAttributionPubliePublisher = attrib.isAATRPublieSurPublisher();
+			bAffaireEnCoursDeRectification = attrib.isAATREnCoursDeRectification();
+		}
+		catch(Exception e){}
+	}
+	
+	Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+	String sExtraParam = " class='opacity75' ";
+	String sExtraParamOnMouseOver= " this.className='opacity100' ";
+	String sExtraParamOnMouseOut= " this.className='opacity75' ";
+
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-41") )
+	{
+		sTargetURLAffaire = "afficherAffaire.jsp?iIdAffaire=" + marche.getIdMarche()+"&amp;iIdOnglet=0";
+		if(marche.isAffaireAATR(false))
+		{
+			sTargetURLAffaire = "afficherAttribution.jsp?iIdAffaire=" + marche.getIdMarche()+"&amp;iIdOnglet=0";
+		}
+		sTargetURLAffaire=
+			rootPath + "desk/marche/algorithme/affaire/"
+			+ sTargetURLAffaire;
+		
+		vBarBoutons.add( new BarBouton(18,
+				"Retour à l'affaire",
+				response.encodeURL(sTargetURLAffaire),
+				rootPath+"images/icons/36x36/affair.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				true) );
+	}
+	
+
+%>
+<%@page import="modula.marche.MarcheSynchro"%>
+<a name="ancreHP">&nbsp;</a>
+<div id="menuBorderAffaire" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+	<div class="fullWidth">
+		<%
+		out.write( BarBouton.getAllButtonHtmlDesk(vBarBoutons));
+		%>
+	</div>
+</div>
+<script>
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+	menuBorder.render($('menuBorderAffaire'));
+});
+</script>
+<%
+} 
+%>

@@ -1,0 +1,47 @@
+<%
+	Node nodeProcedure =  BasicDom.getChildNodeByNodeName(nodeAnn, "procedure" );
+	String sProcedureType 
+		= BasicDom.getFirstChildElementNode(nodeProcedure).getNodeName();
+	
+ 	boolean bDelaiUrgence = false ;
+	String sDelaiUrgence = "";
+	try {
+		Node nodeDelaiUrgence = BasicDom.getChildNodeByNodeName(nodeAnn, "DelaiUrgence");
+		bDelaiUrgence = true;
+		sDelaiUrgence = nodeDelaiUrgence.getTextContent();
+	} catch (Exception e) {}
+
+ 	boolean bAvisPour12Mois = false ;
+	try {
+		Node nodeDelaiUrgence = BasicDom.getChildNodeByNodeName(nodeAnn, "avis12mois");
+		bAvisPour12Mois = true;
+	} catch (Exception e) {}
+
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc1')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc 1 Mode de passation</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc1" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">&nbsp;</td>
+				<td class="pave_cellule_droite"><b><%= sTypeFluxXML  %></b>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000">* Procédure :</font></td>
+				<td class="pave_cellule_droite">
+					<b><%= sProcedureType  %></b><br /><br />
+					<img src="<%= bDelaiUrgence?sSrcImageChecked:sSrcImageNotChecked %>" /> <b>Délai d'urgence :</b><br />
+					<%= sDelaiUrgence  %>	<br /><br />
+					<img src="<%= bAvisPour12Mois?sSrcImageChecked:sSrcImageNotChecked %>" /> <b>Avis pour douze mois</b> (art.40-VIII du code des marchés publics) <br />
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>	

@@ -1,0 +1,48 @@
+<%@page import="org.coin.fr.bean.Pays"%>
+
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveAdresseTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;
+		<input type="hidden" name="<%=sFormPrefix %>iIdAdresse" value="<%= adresse.getIdAdresse() %>" /> 
+	</td></tr>
+	<%= hbFormulaire.getHtmlTrInput(adresse.getAdresseLigne1Label() + " :",sFormPrefix+"sAdresseLigne1",adresse.getAdresseLigne1(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(adresse.getAdresseLigne2Label() + " :",sFormPrefix+"sAdresseLigne2",adresse.getAdresseLigne2(),"") %>
+	<tr>
+		<td class="pave_cellule_gauche" >&nbsp;
+		
+		</td>
+		<td class="pave_cellule_droite" >
+		<%= adresse.getVoieNumeroLabelShort() %> <input type="text"  id="<%=sFormPrefix %>sVoieNumero" name="<%=sFormPrefix %>sVoieNumero" size="5" maxlength="10" 
+		value="<%= adresse.getVoieNumero() %>" />
+		<%= adresse.getVoieTypeLabelShort() %> <input type="text" id="<%=sFormPrefix %>sVoieType" name="<%=sFormPrefix %>sVoieType" size="8" maxlength="40" 
+		value="<%= adresse.getVoieType() %>" />
+		<%= adresse.getVoieNomLabelShort() %> <input type="text" id="<%=sFormPrefix %>sVoieNom" name="<%=sFormPrefix %>sVoieNom" size="23" maxlength="40" 
+		value="<%= adresse.getVoieNom() %>" />
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput(adresse.getAdresseLigne3Label() + " :",sFormPrefix+"sAdresseLigne3",adresse.getAdresseLigne3(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(adresse.getBoitePostaleLabel() + " :",sFormPrefix+"sBoitePostale",adresse.getBoitePostale(),"") %>
+	<tr>
+		<td class="pave_cellule_gauche" ><%= adresse.getCodePostalLabel() %> :</td>
+		<td class="pave_cellule_droite" >
+		<input type="text" name="<%=sFormPrefix %>sCodePostal" id="<%=sFormPrefix %>sCodePostal" size="6" maxlength="5" 
+		value="<%= adresse.getCodePostal() %>" />
+		<span id="<%= sFormPrefix + "spanTownAndZipCodeSync" %>"></span>
+		<%= adresse.getCommuneLabel()  %> :
+		<input type="text" name="<%=sFormPrefix %>sCommune" id="<%=sFormPrefix %>sCommune"  size="19" maxlength="30" 
+		value="<%= adresse.getCommune() %>" />
+		<%= adresse.getCedexLabel()  %> :
+		<input type="text" name="<%=sFormPrefix %>sCedex" id="<%=sFormPrefix %>sCedex" size="6" maxlength="5" 
+		value="<%= adresse.getCedex() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" ><%= adresse.getIdPaysLabel() %> :</td>
+		<td class="pave_cellule_droite" >
+		<%= pays.getAllInHtmlSelect(sFormPrefix+"sIdPays") %>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

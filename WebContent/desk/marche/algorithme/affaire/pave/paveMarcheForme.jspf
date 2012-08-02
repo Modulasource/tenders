@@ -1,0 +1,25 @@
+<table class="pave" >
+	<tr onclick="montrer_cacher('paveForme')">
+		<td class="pave_titre_gauche" colspan="2">Forme du marché</td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveForme"  summary="procédure">
+				<tr>
+					<td class="pave_cellule_gauche">
+					Forme du march&eacute; :
+					</td>
+					<td class="pave_cellule_droite">
+<%	
+	MarcheForme forme = MarcheForme.getMarcheForme(marche.getIdMarcheForme());
+%>
+						<%= forme.getName() %>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

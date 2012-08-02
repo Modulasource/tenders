@@ -1,0 +1,23 @@
+<%
+	String sPaveProcedureTitre = "Procédure";
+	sFormPrefix = "";
+
+	//if(sessionUserHabilitation.isSuperUser())
+    if(true && !bIsRectification)
+	{
+		%><%@ include file="paveProcedureForm.jspf" %>
+		<%
+	} else {
+		%><%@ include file="paveProcedure.jspf" %><%
+	}
+%>
+<br/>
+<%@ include file="paveMarcheFormeForm.jspf" %>
+<%@page import="java.util.Vector"%>
+<br />
+<%
+	sFormPrefix = "";
+	String sPaveCriteresAttributionTitre = "Critères d'attribution";
+	Vector vCritereTypes = CritereType.getAllCritereType();
+%>
+<%@ include file="paveCriteresAttributionsForm.jspf" %>

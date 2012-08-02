@@ -1,0 +1,37 @@
+<%@ include file="pavePublication.jspf" %>
+<%@page import="org.coin.util.Outils"%>
+<tr>
+			<td class="pave_cellule_gauche">id pub boamp : </td>
+			<td class="pave_cellule_droite"><%= publi.getIdPublicationBoamp() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Type de journal : </td>
+			<td class="pave_cellule_droite"><%= publi.getTypeJournal() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Nom du fichier : </td>
+			<td class="pave_cellule_droite"><%= publi.getNomFichier() %></td>
+		</tr>
+		<tr  >
+			<td class="pave_cellule_gauche" >
+					<a href="javascript:montrer_cacher('xmlGenerated')">+ Flux XML ... </a>
+			</td>
+			<td class="pave_cellule_droite" >&nbsp;</td> 
+		</tr>
+		<tr id="xmlGenerated" style="display : none;">
+			<td class="pave_cellule_gauche" >
+				&nbsp;
+			</td>
+			<td class="pave_cellule_droite" ><%= sXmlSend %></td> 
+		</tr>
+
+		<tr>
+			<td class="pave_cellule_gauche">Accusé de réception : </td>
+			<td class="pave_cellule_droite"><%= Outils.convertXmlToHtmlOptional(publi.getArXml()) %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">&nbsp;</td>
+			<td class="pave_cellule_droite"></td>
+		</tr>
+
+		

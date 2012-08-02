@@ -1,0 +1,152 @@
+<%
+	
+	MarcheAccordCadre marcheAccordCadre = null;
+	try {
+		marcheAccordCadre = MarcheAccordCadre.getMarcheAccordCadreFromMarche(marche.getId()); 
+	} catch (Exception e) {
+		marcheAccordCadre = new MarcheAccordCadre();
+	}
+	
+	String sAccordCadreNombreOperateurSelected_0 = "";
+	String sAccordCadreNombreOperateurSelected_1 = "";
+	String sAccordCadreNombreOperateurSelected_n = "";
+	boolean bDisplayNbOperateurs = false;
+	boolean bDisplayAccordCadre = false;
+	
+	switch ((int)marcheAccordCadre.getNombreOperateur()) {
+	case 0 : 
+		sAccordCadreNombreOperateurSelected_0 = " checked='checked' ";
+		break;
+	case 1 : 
+		sAccordCadreNombreOperateurSelected_1 = " checked='checked' ";
+		bDisplayAccordCadre = true;
+		break;
+	default: 
+		sAccordCadreNombreOperateurSelected_n = " checked='checked' ";
+		bDisplayNbOperateurs = true;
+		bDisplayAccordCadre = true;
+		break;
+	
+	}
+	String sAccordCadreNombreOperateur = "";
+	String sAccordCadreNombreOperateurMax = "";
+	
+	if(marcheAccordCadre.getNombreOperateur() != 0)
+		sAccordCadreNombreOperateur = "" + marcheAccordCadre.getNombreOperateur();
+	
+	if(marcheAccordCadre.getNombreOperateurMaximal() != 0)
+		sAccordCadreNombreOperateurMax = "" + marcheAccordCadre.getNombreOperateurMaximal();
+	
+
+	Currency currency = null;
+	try {
+		currency = Currency.getCurrency(marcheAccordCadre.getIdCurrency());
+	} catch (Exception e) {
+		currency = new Currency ("EUR");
+	}
+	
+	
+%>
+<%@page import="modula.marche.MarcheAccordCadre"%>
+<%@page import="org.coin.bean.accountancy.Currency"%>
+<%@page import="org.coin.util.Outils"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Accord cadre</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2"><i>Informations sur l'accord-cadre : (le cas échéant)</i></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Nombre d'opérateurs :
+		</td>
+		<td class="pave_cellule_droite">
+			<input disabled="disabled" type="radio" 
+				name="radioAccordCadreNbOperateur" 
+				value="<%= sAccordCadreNombreOperateur %>" <%= sAccordCadreNombreOperateurSelected_0 %>
+				/>pas d'accord cadre <br/>
+			<input disabled="disabled" type="radio" 
+				name="radioAccordCadreNbOperateur" 
+				value="<%= sAccordCadreNombreOperateur %>" <%= sAccordCadreNombreOperateurSelected_1 %>
+				/>accord-cadre avec un seul opérateur <br/>
+			<input disabled="disabled" type="radio" 
+				name="radioAccordCadreNbOperateur" 
+				value="<%= sAccordCadreNombreOperateur %>" <%= sAccordCadreNombreOperateurSelected_n %>
+				/>accord-cadre avec plusieurs opérateurs <br/>
+	<%	if(bDisplayNbOperateurs) { %>
+			Nombre <%= sAccordCadreNombreOperateur %> ou, le cas échéant, 
+			nombre maximal <%= sAccordCadreNombreOperateurMax %> de participants à l'accord-cadre envisagé.
+	<%	} %>
+		</td>
+	</tr>
+
+<%	if(bDisplayAccordCadre) { %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Durée de l'accord-cadre : 
+		</td>
+		<td class="pave_cellule_droite"><%= marcheAccordCadre.getDuree() %>
+		<%
+		if(!Outils.isNullOrBlank(marcheAccordCadre.getDureeType()) 
+		&& marcheAccordCadre.getDureeType().equals("mois"))
+		{
+			%>mois<%
+		} else{
+			%>année(s)<%
+		}
+		%>
+		</td>
+	</tr>
+	
+	<tr>
+		<td class="pave_cellule_gauche">
+	 	Justification d'un accord-cadre dont la durée dépasse quatre ans :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= Outils.getTextToHtml( marcheAccordCadre.getJustification()) %>
+		</td>
+	</tr>
+	
+	<tr>
+		<td class="pave_cellule_gauche">
+			Estimation de la valeur totale des acquisitions pour l'ensemble de la durée de 
+			l'accord-cadre : (le cas échéant, en chiffres uniquement)
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+		if (marcheAccordCadre.getValeurEstimee()>0)
+		{
+		%>
+			Valeur estimée (H.T.) : <%= Outils.getFormatedValueNeant(marcheAccordCadre.getValeurEstimee()) %> 
+			<%= currency.getName() %>
+		<%
+		}
+		else
+		{
+			if (marcheAccordCadre.getValeurEstimeeBasse()>0)
+			{
+			%>
+				Fouchette (H.T.): entre <%=  Outils.getFormatedValueNeant(marcheAccordCadre.getValeurEstimeeBasse()) %> 
+				et <%= Outils.getFormatedValueNeant(marcheAccordCadre.getValeurEstimeeHaute()) %>
+				<%= currency.getName() %>
+			<%
+			}
+		}
+		%>
+		</td>
+	</tr>
+	
+	<tr>
+		<td class="pave_cellule_gauche">
+	 	Fréquence et valeur des marchés à attribuer (si elles sont connues) 
+	 	</td>
+		<td class="pave_cellule_droite">
+		<%= Outils.getTextToHtml( marcheAccordCadre.getFrequenceValeur()) %>
+		</td>
+	</tr>
+
+<% } %>	
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

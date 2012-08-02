@@ -1,0 +1,22 @@
+<%@page import="mt.modula.batch.affaire.Xiti"%>
+<script type="text/javascript">
+<%
+	//Xiti xiti = new Xiti("");
+%>
+<!--
+xtnv = document; //parent.document or top.document or document 
+xtsd = "http://logi5";
+xtsite = "<%=xiti.sCodeClientXiti%>";
+xtn2 = ""; // level 2 site 
+xtpage = ""; //page name (with the use of :: to create chapters)
+xtdi = ""; //implication degree
+//-->
+</script>
+<script type="text/javascript" src="<%=rootPath %>include/xiti/xt_core_laprovence.js"></script>
+<noscript>
+<img width="1" height="1" alt=""
+src="http://logc1.xiti.com/hit.xiti?s=<%=xiti.sCodeClientXiti%>&s2=&p=&di=&" > </noscript>
+<!-- 
+<img width="1" height="1" alt=""
+src="http://logi5.xiti.com/hit.xiti?s=<%=xiti.sCodeClientXiti%>&s2=&p=&di=&" > </noscript>
+ -->

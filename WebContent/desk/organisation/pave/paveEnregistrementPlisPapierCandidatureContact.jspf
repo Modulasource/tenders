@@ -1,0 +1,49 @@
+<table id="CandidatureDatesWithoutEnveloppeAManagement">
+	<tr>
+		<td class="pave_cellule_gauche">
+			Contact du candidat :
+		</td>
+		<td class="pave_cellule_droite">
+			<%if(tsDateEnveloppeAFin != null){ %>
+			<strong>le</strong>&nbsp;
+			<%= CalendarUtil.getDateCourte(tsDateEnveloppeAFin) %>&nbsp;
+			<strong>&agrave;</strong>&nbsp;
+			<%= CalendarUtil.getHeureMinuteSecLitterale(tsDateEnveloppeAFin)%>&nbsp;
+			<%
+			String sStatut = "";
+			String sHorsDelais = "";
+			if(candidature != null )
+			{
+				sPostComplement = "<strong>Pour les lots:&nbsp;</strong>";
+				
+				if(vEnveloppesALot != null)
+				{
+					for(int j=0;j<vEnveloppesALot.size();j++)
+					{
+						EnveloppeALot envALot = vEnveloppesALot.get(j);
+						MarcheLot lot = MarcheLot.getMarcheLot(envALot.getIdLot());
+						sPostComplement += "Lot n° "+lot.getNumero();
+						try
+						{
+							sStatut = envALot.getStatutLibelleValue(EnveloppeALot.ID_STATUS_RECEVABLE);
+							if(!sStatut.equalsIgnoreCase(""))
+								sPostComplement += "("+sStatut+")";
+						}
+						catch(Exception e){}
+						if(j != vEnveloppesALot.size() -1) sPostComplement += ", ";
+					}
+					EnveloppeA envA = vEnveloppesA.firstElement();
+					try
+					{
+						if(envA.isHorsDelais()) sHorsDelais += "<span class='rouge' style='font-weight:bold'>Hors délais</span>";
+					}
+					catch(Exception e){}
+				}
+			}
+			%>
+			<%= sHorsDelais+(vLotsTotal.size() > 1 ? sPostComplement : sStatut) %>&nbsp;
+			<%}else{ %>Indéfini<%} %>
+		</td> 
+	</tr>
+</table>
+<br />

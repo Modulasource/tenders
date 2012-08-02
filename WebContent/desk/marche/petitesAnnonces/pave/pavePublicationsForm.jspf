@@ -1,0 +1,63 @@
+<%
+	Vector<Validite> vValiditeAnnonce = Validite.getAllValiditeAffaireFromAffaire(iIdAffaire);
+	Validite oValiditeAnnonce = null;
+	Timestamp tsDateAnnonceDebut = null;
+	Timestamp tsDateAnnonceFin = null;
+	sFormPrefix = "";
+	if(vValiditeAnnonce != null)
+	{
+		if(vValiditeAnnonce.size() == 1) 
+		{
+			oValiditeAnnonce = vValiditeAnnonce.firstElement();
+			tsDateAnnonceDebut = oValiditeAnnonce.getDateDebut();
+			tsDateAnnonceFin = oValiditeAnnonce.getDateFin();
+		}
+	}
+	if (tsDateAnnonceDebut == null )
+	{
+		tsDateAnnonceDebut = new Timestamp(System.currentTimeMillis() );
+	}
+
+	if (tsDateAnnonceFin == null )
+	{
+		tsDateAnnonceFin = new Timestamp(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 15 );
+	}
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePublicationsTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td style="vertical-align:middle">
+			<strong>&nbsp;Date de mise en ligne* :</strong>
+			<input type="text" name="<%=sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(tsDateAnnonceDebut) %>" />
+			<strong>Heure :</strong>&nbsp;
+			<input type="text" name="<%=sFormPrefix %>tsHeureValiditeDebut" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateAnnonceDebut)%>" />&nbsp; 
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.DATE_MISE_EN_LIGNE) %>
+		</td>
+		<td>
+			<strong>Date limite d'affichage* :</strong>
+			<input type="text" name="<%= sFormPrefix %>tsDateValiditeFin" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(tsDateAnnonceFin) %>" />
+			
+			<strong>Heure: </strong>&nbsp;
+			<input type="text" name="<%=sFormPrefix %>tsHeureValiditeFin" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateAnnonceFin ) %>" />&nbsp;
+			
+			<input type="hidden" name="<%=sFormPrefix %>iIdReferenceObjet" value="<%= iIdAffaire %>" />
+			<input type="hidden" name="<%=sFormPrefix %>iIdTypeObjetModula" value="<%= ObjectType.AFFAIRE %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

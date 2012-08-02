@@ -1,0 +1,41 @@
+<%
+	String sReferenceAnnonceur 
+		= TypeObjetModula.getIdObjetReferenceName(
+				annonce.getIdTypeObjet(), 
+				annonce.getIdReferenceObjet());
+
+%><table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Coordonnées de l'organisme</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;
+			<input type="hidden" name="iIdTypeObjet" value="<%= annonce.getIdTypeObjet()  %>" />
+			<input type="hidden" name="iIdReferenceObjet" value="<%= annonce.getIdReferenceObjet() %>" />
+			<input type="hidden" name="iIdAnnonceEtat" value="<%= annonce.getIdAnnonceEtat() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Référence annonceur :</td>
+		<td class="pave_cellule_droite">
+			<%= sReferenceAnnonceur %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Référence externe :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="sReferenceExterne" size="60" maxlength="255"  
+			value="<%= annonce.getReferenceExterne() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Libellé * :</td>
+		<td class="pave_cellule_droite"  >
+			<input type="text" name="sLibelle" size="60" maxlength="255" 
+			value="<%= annonce.getLibelle() %>" />
+		</td>
+	</tr>
+ 	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

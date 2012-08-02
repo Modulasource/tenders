@@ -1,0 +1,6 @@
+		<%@ include file="pavePublication.jspf" %>
+		<tr>
+			<td class="pave_cellule_gauche">id pub joue : </td>
+			<td class="pave_cellule_droite"><%= publi.getIdPublicationJoue() %></td>
+		</tr>
+		

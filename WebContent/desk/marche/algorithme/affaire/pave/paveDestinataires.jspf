@@ -1,0 +1,81 @@
+<%
+	if(!bReadOnly)
+	{
+ %>
+<a href="javascript:OuvrirPopup('<%=
+		 response.encodeURL("selectionnerOrganisation.jsp?sAction=mailing&amp;iIdMailing="
+			 	+ iIdMailing ) %>',770,550,'menubar=no,scrollbars=yes,statusbar=no');">Ajouter une organisation destinataire</a><br />
+<br />
+<%	} %>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="5">Destinataires</td>
+	</tr>
+	<tr>
+		<td >&nbsp;</td>
+	</tr>
+	<%
+	for(int j= 0; j < vOrganisationsSelected.size() ; j++)
+	{
+		Organisation organisation = vOrganisationsSelected.get(j);
+	
+		Vector<MailingDestinataire> vMailingDestinatairePersonnesPhysiqueSelected 
+			= MailingDestinataire.getAllForPersonnePhysiqueSelected(iIdMailing, organisation.getIdOrganisation());
+		
+		MailingDestinataire mdOrganisation 
+			= MailingDestinataire.getOrganisationSelected(iIdMailing, organisation.getIdOrganisation());
+		String sEmail = organisation.getMailOrganisation();
+		
+		if ( mdOrganisation == null)
+		{
+			sEmail = "[pas d'envoi programmé sur l'email de l'organisation]";
+		}
+	 %>
+	<tr>
+		<td width="1%" >-</td>
+		<td width="1%" style="text-align:left" >.</td>
+		<td width="40%" style="text-align:left"  >
+		<%
+	if(!bReadOnly)
+	{
+ 	%>
+		<a href="javascript:OuvrirPopup('<%=
+			 response.encodeURL("modifierDestinatairesFromOrganisationForm.jsp?iIdMailing="
+			 	+ iIdMailing + "&amp;iIdOrganisation=" + organisation.getIdOrganisation() ) 
+			%>',770,550,'menubar=no,scrollbars=yes,statusbar=no')" ><%= organisation.getRaisonSociale() %></a>
+	<%
+	} 
+	else
+	{
+		%><%= organisation.getRaisonSociale() %>
+	<%
+	}
+	%>
+	</td>
+		<td width="30%" style="text-align:left" ><%= sEmail %></td>
+		<td width="60%" >&nbsp;</td>
+	</tr>
+	<%
+		for(int i= 0; i < vMailingDestinatairePersonnesPhysiqueSelected.size() ; i++)
+		{
+			MailingDestinataire md = vMailingDestinatairePersonnesPhysiqueSelected.get(i);
+			PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(md.getIdObjetReference()) ;
+		
+	 %>
+	<tr>
+		<td >&nbsp;</td>
+		<td style="text-align:left" >.</td>
+		<td style="text-align:left" ><%= personne.getPrenom() + " " + personne.getNom() %></td>
+		<td style="text-align:left" ><%= personne.getEmail() %></td>
+		<td >&nbsp;</td>
+	</tr>
+	<%
+		}
+	 %>
+	<tr>
+		<td >&nbsp;</td>
+	</tr>
+	<%
+	}
+	 %>
+</table>

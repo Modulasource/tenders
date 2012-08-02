@@ -1,0 +1,111 @@
+<%
+	boolean isConstitutionEnveloppeAAutoriseeInstancie = true;
+	boolean isConstitutionEnveloppeAAutorisee = false;
+	try	{isConstitutionEnveloppeAAutorisee = candidature.isConstitutionEnveloppeAAutorisee() ;}
+	catch (Exception e){isConstitutionEnveloppeAAutoriseeInstancie = false;}
+	
+	boolean isConstitutionEnveloppeBAutorisee = false;
+	boolean isConstitutionEnveloppeBAutoriseeInstancie = true;
+	try	{isConstitutionEnveloppeBAutorisee = candidature.isConstitutionEnveloppeBAutorisee() ;}
+	catch (Exception e)	{isConstitutionEnveloppeBAutoriseeInstancie = false;}
+	
+	boolean isConstitutionEnveloppeCAutorisee = false;
+	boolean isConstitutionEnveloppeCAutoriseeInstancie = true;
+	try	{isConstitutionEnveloppeCAutorisee = candidature.isConstitutionEnveloppeCAutorisee() ;}
+	catch (Exception e)	{isConstitutionEnveloppeCAutoriseeInstancie = false;}
+	
+	boolean isValide = candidature.isValide(true) ;
+
+
+if(!bIsCandidaturePapier)
+{
+	if(isValide)
+	{
+		if(isConstitutionEnveloppeAAutoriseeInstancie 
+		|| isConstitutionEnveloppeBAutoriseeInstancie 
+		|| isConstitutionEnveloppeCAutoriseeInstancie)
+		{
+			%>
+	
+<%@page import="modula.marche.InfosBullesConstant"%><br />
+	<div class="titre_page">Votre dossier</div>
+	<div style="clear:both"></div>
+	<br />
+			<%
+				boolean bConstitutionEnveloppeAPossible = false;
+				boolean bExistEnveloppeAPJ = false;
+				boolean bConstitutionEnveloppeBPossible = false;
+				boolean bExistEnveloppeBPJ = false;
+				boolean bConstitutionEnveloppeCPossible = false;
+				boolean bExistEnveloppeCPJ = false;
+			%>
+	<%@ include file="paveDossierCandidatureEnveloppeA.jspf" %>
+	<br />
+	<% if(bIsContainsEnveloppeCManagement){ %>
+	<%@ include file="paveDossierCandidatureEnveloppesC.jspf" %>
+	<br />
+	<% } %>
+	<%@ include file="paveDossierCandidatureEnveloppesB.jspf" %>
+	<br />
+			<%
+			if( (bConstitutionEnveloppeAPossible && !bConstitutionEnveloppeBPossible && ( (bIsContainsEnveloppeCManagement && !bConstitutionEnveloppeCPossible) || !bIsContainsEnveloppeCManagement) && bExistEnveloppeAPJ)
+			  ||(!bConstitutionEnveloppeAPossible && bConstitutionEnveloppeBPossible && ( (bIsContainsEnveloppeCManagement && bConstitutionEnveloppeCPossible && bExistEnveloppeCPJ) || !bIsContainsEnveloppeCManagement) && bExistEnveloppeBPJ)
+			  ||(!bConstitutionEnveloppeAPossible && bConstitutionEnveloppeBPossible && ( (bIsContainsEnveloppeCManagement && !bConstitutionEnveloppeCPossible) || !bIsContainsEnveloppeCManagement) && bExistEnveloppeBPJ)
+			  ||(bConstitutionEnveloppeAPossible && bConstitutionEnveloppeBPossible && ( (bIsContainsEnveloppeCManagement && bConstitutionEnveloppeCPossible && bExistEnveloppeCPJ) || !bIsContainsEnveloppeCManagement) && bExistEnveloppeAPJ && bExistEnveloppeBPJ) )
+			{
+				String sDisableClosingCandidature="";
+				String sDisableClosingCandidatureMessage="";
+				if(!candidature.isClosingCandidatureAllowed())
+				{
+					sDisableClosingCandidature = " disabled='disabled' ";
+					sDisableClosingCandidatureMessage = "Au moins un des fichiers est corrompu, vous ne pouvez pas cacheter l'enveloppe.";
+				}
+				%>
+	<div style="text-align:center">
+		<button type="button" <%= sDisableClosingCandidature %>
+			onclick="Redirect('<%= response.encodeURL(rootPath + "publisher_traitement/private/candidat/fermerDossier.jsp?cand="+SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session)) %>')" 
+			style="color:#CC0000" >
+            <img src="<%= rootPath %>images/icons/lock.gif" 
+                alt="Cacheter" style="vertical-align:middle;margin-right: 5px;" />CACHETER LE DOSSIER</button>&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.FORMAT) %>
+		<%= sDisableClosingCandidatureMessage %>
+	</div>
+				<%
+			}
+		}
+		else
+		{
+			%>
+	<br />
+	<div class="titre_page">Votre dossier</div>
+	<div style="clear:both"></div>
+	<br />
+	<div style="text-align:center">
+		Votre demande de candidature est en cours de traitement par la plateforme de gestion de marchés de l'acheteur public. Ce processus peut durer jusqu'à une minute. Veuillez alors réactualiser la page en cliquant sur le bouton "réactualiser la page" ci-dessous.
+		<br /><br /><a href="<%= response.encodeURL(rootPath + sPublisherPath + "/private/candidat/consulterDossier.jsp?iIdOnglet=2&cand=" + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session)) %>">réactualiser la page</a>
+	</div>
+			<%
+		}
+	}
+	else
+	{
+	%>
+	<br />
+	<div class="titre_page">Votre dossier</div>
+	<div style="clear:both"></div>
+	<br />
+	<div style="text-align:center">Le Dossier de candidature à été considéré comme invalide.</div>
+	<%
+	}
+}
+else
+{
+%>
+	<br />
+	<div class="titre_page">Votre dossier</div>
+	<div style="clear:both"></div>
+	<br />
+	<div style="text-align:center">Le Dossier de candidature à été constitué au format papier.</div>
+<%
+}
+%>

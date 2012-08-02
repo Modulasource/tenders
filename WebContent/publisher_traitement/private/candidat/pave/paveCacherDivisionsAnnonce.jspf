@@ -1,0 +1,35 @@
+
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<script type="text/javascript">
+function onAfterPageLoading(){
+	<%
+	if (iIdOnglet == 0){
+%>
+		cacher('libelle_detaille1');
+<%
+		Vector<AvisRectificatif> vAvisRectificatif = AvisRectificatif.getAllAvisRectificatifPubliesPublisher(marche.getIdMarche());
+		for(int i = 0;i<vAvisRectificatif.size();i++){
+			AvisRectificatif avis = vAvisRectificatif.get(i);
+%>
+			cacher('avis_rectificatif1-<%=avis.getIdAvisRectificatif()%>');				
+<%
+		}
+	}
+	if(iIdOnglet == Onglet.ONGLET_CANDIDATURE)
+	{
+%>
+		cacher('divisionA');
+<%
+		if(bAppletMode) {
+%>
+		try{displayEnveloppePJ();} catch (e) {}
+        try{displayEnveloppePJToUpload();} catch (e) {}
+<%
+		}
+	}
+%>
+}
+
+</script>

@@ -1,0 +1,38 @@
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt"><%=sTitle %></strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" cellpadding="5" >
+		<tr>
+			<td style="vertical-align:top">
+			<div style="text-align:left;padding:5px">
+			&nbsp;&nbsp;&nbsp;<font color="#ff8c00"><strong>P</strong></font>our déposer vos offres au format numérique sur la plateforme, vous devez installer les certificats suivants :<br /><br />
+	
+	
+			<strong>Certificat du serveur</strong><br />
+	<br />
+			&nbsp;&nbsp;&nbsp; <img src="<%= rootPath %>images/icones/certificat.gif" /> <a href="<%= rootPath %>include/certificat/prod.modula-demat.com.crt" >Serveur</a><br />
+	
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+			</div>
+			</td>
+		</tr>
+	</table>
+</div>
+</div>

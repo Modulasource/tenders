@@ -1,0 +1,69 @@
+<% 
+	boolean bIsCandidatsPrevenusLotInfructueux = lot.isCandidatsPrevenusLotInfructueux(false);
+	boolean bIsPublicationsPrevenusLotInfructueux = lot.isPublicationsPrevenusLotInfructueux(false);
+	boolean bIsLotInfructueux = lot.isInfructueux(false);
+
+	Vector<Candidature> vOffres 
+		= Candidature.getAllCandidaturesFromLotAndValidite(lot.getIdMarcheLot(),lot.getIdValiditeEnveloppeBCourante());
+%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="java.util.Vector"%>
+<br />
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sLibelleOnglet %> infructueux</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td> 
+	</tr>
+	<tr>
+		<td colspan="2">
+			<div class="mention">
+				Ce <%= sLibelleOnglet %> a été déclaré infructueux<%=
+					(bIsCandidatsPrevenusLotInfructueux || vOffres.size()==0)
+					?".":", vous devez donc en informer les candidats." %>
+			</div>		
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td> 
+	</tr>
+	<%
+	if(vOffres.size()>0)
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Candidats prévenus :
+		</td>
+		<td class="pave_cellule_droite">
+<%
+	if(!bIsCandidatsPrevenusLotInfructueux){
+%>
+			&nbsp;<img src="<%=rootPath + Icone.ICONE_WARNING %>" />&nbsp;
+			<button type="button" 
+			onclick="openModal('<%= 
+				response.encodeURL(rootPath+"desk/marche/algorithme/proposition/gestion/prevenirCandidatsLotInfructueuxForm.jsp?iIdLot="
+					+lot.getIdMarcheLot()+"&iIdAffaire="+iIdAffaire) 
+					%>','Prévenir les candidats')" >Prévenir les candidats</button>
+<%
+	 }
+	 else{
+%>
+			&nbsp;<img src="<%=rootPath + Icone.ICONE_SUCCES %>" />&nbsp;
+<%
+	}
+%>
+
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+<%
+}
+%>
+</table>
+

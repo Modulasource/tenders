@@ -1,0 +1,84 @@
+<%@page import="org.coin.util.*"%>
+<%@page import="org.coin.fr.bean.*"%>
+<%@page import="modula.marche.*"%>
+<%@page import="org.coin.localization.Language"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sBlocNameAdministativeData  %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getRaisonSocialeLabel() + " :","",organisation.getRaisonSociale(),true) %>
+<% 
+	String sSiretToPrint = organisation.getSiretValueDisplay(adresse.getIdPays());
+	
+	String sCategorieJuridiqueName 
+		= CategorieJuridique
+			.getCategorieJuridiqueNameOptional(organisation.getIdCategorieJuridique());
+	
+	String sCodeNafName 
+		= CodeNaf.getCodeNafEtLibelleOptional(organisation.getIdCodeNaf());
+	
+	String sOrganisationTvaIntra = localizeButton.getValueUndefined();
+	
+	String sOrganisationClasseProfit = OrganisationClasseProfit.getOrganisationClasseProfitName(organisation.getIdOrganisationClasseProfit());
+	
+	if(!Outils.isNullOrBlank( organisation.getTvaIntra()))
+	{
+		sOrganisationTvaIntra = organisation.getTvaIntra();
+	}
+%>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getSiretLabel() + " :","",!Outils.isNullOrOnlyBlank(sSiretToPrint)?sSiretToPrint:localizeButton.getValueUndefined(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getTvaIntraLabel() + " :","",sOrganisationTvaIntra ,"") %>
+<%
+	if(!doh.bHideDetailedData){ 
+%>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getIdCategorieJuridiqueLabel() + " :","", !sCategorieJuridiqueName.equalsIgnoreCase("")?sCategorieJuridiqueName:localizeButton.getValueUndefined(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getIdCodeNafLabel() + " :","",!sCodeNafName.equalsIgnoreCase("")?sCodeNafName:localizeButton.getValueUndefined(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getIdOrganisationTypeLabel() + " * :","",OrganisationType.getOrganisationTypeName( organisation.getIdOrganisationType() ),"") %>
+<%
+	}
+
+	if(organisation.getIdOrganisationType() == OrganisationType.TYPE_ACHETEUR_PUBLIC) {
+		String sTypeAcheteurPublic = "";
+		try{sTypeAcheteurPublic = TypeAcheteurPublic.getTypeAcheteurPublicName(
+				organisation.getIdTypeAcheteurPublic() );}
+		catch(Exception e ){sTypeAcheteurPublic = "";}
+%>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getIdTypeAcheteurPublicLabel() 
+			+ "* :","",!sTypeAcheteurPublic.equalsIgnoreCase("")
+			?sTypeAcheteurPublic:localizeButton.getValueUndefined()) %>
+<%
+	}
+	
+	if (organisation.getIdOrganisationType() == OrganisationType.TYPE_PUBLICATION)
+	{ 
+	%>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getIdOrganisationModelePDFLabel() 
+			+ " :","",OrganisationModelePDF.getOrganisationModelePDFName(
+					organisation.getIdOrganisationModelePDF() ),"") %>
+	<%
+	}
+	
+	if (organisation.getIdOrganisationType() == OrganisationType.TYPE_CANDIDAT){
+		if (vCompetencesOrganisation.size()>0)
+		{
+%>
+		<tr>
+			<td class="pave_cellule_gauche" style="vertical-align:top"><%= sLabelNameOrganizationSkill %> :</td>
+			<td class="pave_cellule_droite">
+			<%
+			for (int i=0; i < vCompetencesOrganisation.size(); i++)
+			{
+			%>
+				<%=vCompetencesOrganisation.get(i).getName()%><br />
+			<%
+			}
+			%>		
+			</td>
+		</tr>
+<%
+		}
+	}
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

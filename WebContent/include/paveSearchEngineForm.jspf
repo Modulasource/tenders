@@ -1,0 +1,39 @@
+<%@page import="org.coin.util.SearchEngine"%>
+<div style="position:relative">
+	<div class="searchBlock">
+		<div style="padding:2px">
+			<form action="<%=  response.encodeURL(recherche.sUrlTarget + "?" + recherche.getExtraParamHeaderUrl() ) 
+			%>" method="post" id="formSearchEngine" name="formSearchEngine" >
+			<table class="formLayout">
+				<tr>
+					<td class="label"><%= SearchEngine.getLocalizedLabel(SearchEngine.LABEL_SEARCH,sessionLanguage.getId()) %> :</td>
+					<td class="value"><%= recherche.getComboFields() %></td>
+					<td class="label"><%= SearchEngine.getLocalizedLabel(SearchEngine.LABEL_CONTAINS,sessionLanguage.getId()) %> : </td>
+					<td class="value"><input type="text" name="filtre" value="<%=recherche.sFieldNameFiltreValue%>" size="50" /></td>
+				</tr>
+				<tr><td>&nbsp;</td><td>
+					<button onclick="$('formSearchEngine').submit();" style="right:4px;bottom:4px" id="searchButton"><%= SearchEngine.getLocalizedLabel(SearchEngine.LABEL_SEARCH_BUT,sessionLanguage.getId()) %></button>
+				</td></tr>
+			</table>
+			<table><%= recherche.getAdvancedFunction(session) %></table>
+			</form>
+		</div>
+	</div>
+</div>
+<br/>
+<div id="search_dg_pagination" style="margin-top:10px" class="center">
+<%
+if (recherche.iCurrentPage > 1) {
+%> <a href="<%=response.encodeURL(recherche.getUrlPrevPage() )%>"><%= 
+	SearchEngine.getLocalizedLabel(SearchEngine.LABEL_PREV,sessionLanguage.getId()) %></a>&nbsp; <%
+ }
+ %> <%= SearchEngine.getLocalizedLabel(SearchEngine.LABEL_PAGE,sessionLanguage.getId(),"page") %> <%=
+	 recherche.iCurrentPage%> <%=
+		 SearchEngine.getLocalizedLabel(SearchEngine.LABEL_PAGINATE_BETWEEN,sessionLanguage.getId()) %> <%=
+			 recherche.getMaxPage()%> <%
+ if (recherche.iCurrentPage < recherche.getMaxPage()) {
+ %> &nbsp;<a href="<%=response.encodeURL(recherche.getUrlNextPage())%>"><%= 
+	 SearchEngine.getLocalizedLabel(SearchEngine.LABEL_NEXT,sessionLanguage.getId()) %></a> <%
+ }
+ %>
+</div>

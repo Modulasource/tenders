@@ -1,0 +1,41 @@
+<%
+
+	if(exportModeWS != null)
+	{
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveExportMode')" >
+		<td class="pave_titre_gauche" colspan="2">Transfert Mode Web Service</td>
+	</tr>
+	<tr>
+		<td>
+		<table id="paveExportMode" summary="Mode de tranfert">
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">URL :</td>
+				<td class="pave_cellule_droite"><%= exportModeWS.getUrlDestination() %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Nom d'utilisateur :</td>
+				<td class="pave_cellule_droite"><%= exportModeWS.getUsername() %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Mot de passe :</td>
+				<td class="pave_cellule_droite">*********</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Email :</td>
+				<td class="pave_cellule_droite">
+					<%= exportModeWS.getEmail() %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>
+<% }
+%>
+<br />

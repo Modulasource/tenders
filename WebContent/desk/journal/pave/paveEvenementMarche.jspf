@@ -1,0 +1,147 @@
+<%
+	String sUtilisateur = "";
+	int iIdIndividual = -1;
+	try {
+		org.coin.bean.User oUser = org.coin.bean.User.getUser(oEvenement.getIdUser() );
+		org.coin.fr.bean.PersonnePhysique oPers = org.coin.fr.bean.PersonnePhysique.getPersonnePhysique( oUser.getIdIndividual() );
+		sUtilisateur = oPers.getPrenom() + " " + oPers.getNom();
+		iIdIndividual = oPers.getIdPersonnePhysique();
+	}catch (Exception e) {
+		sUtilisateur = "utilisateur non trouvé ! id=" +oEvenement.getIdUser() ;
+	}	
+	TypeEvenement oTypeEvenement ;
+	try {
+		oTypeEvenement = TypeEvenement.getTypeEvenementMemory(oEvenement.getIdTypeEvenement());
+	} catch (Exception e){oTypeEvenement = new TypeEvenement (); }
+
+	
+	EvenementSeverite severite = new EvenementSeverite();
+	String sException = "";
+	
+	if(sessionUserHabilitation.isSuperUser())
+	{
+		try {
+			severite = EvenementSeverite.getEvenementSeveriteMemory(oEvenement.getIdEvenementSeverite());
+		} catch (Exception e) {
+			severite = EvenementSeverite.getEvenementSeveriteMemory(EvenementSeverite.TYPE_INFO);
+		}
+		sException = oEvenement.getException()==null?"":oEvenement.getException() ;
+		sException = Outils.replaceNltoBr(sException);
+	}
+
+%>
+<%@page import="modula.journal.EvenementSeverite"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<table class="pave" summary="none">		
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"> 
+	<input type="hidden" name="iIdEvenement" value="<%= oEvenement.getIdEvenement() %>" />
+	<input type="hidden" name="sType" value="<%= sType %>" />
+			Evénement
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'objet :
+		</td>
+		<td class="pave_cellule_droite">
+			<% 
+			String sTypeObjet = "";
+			try{
+				sTypeObjet = ObjectType.getObjectTypeMemory(oTypeEvenement.getIdTypeObjet()).getName();
+			}catch(Exception e){sTypeObjet = "";} %>
+			<%=sTypeObjet %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Référence :
+		</td>
+		<td class="pave_cellule_droite">
+			<a href="<%= response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?iIdAffaire="+ oMarche.getIdMarche()) %>"><%= oMarche.getReference() %></a>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Date de création de l'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oEvenement.getDateCreationEvenement() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oTypeEvenement.getLibelle() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Commentaire :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oEvenement.getCommentaireLibre() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Identifiant de l'utilisateur :
+		</td>
+		<td class="pave_cellule_droite">
+			<a href="<%= response.encodeURL(
+					rootPath + "desk/organisation/afficherPersonnePhysique.jsp?iIdPersonnePhysique="+ iIdIndividual  ) %>" ><%= sUtilisateur %></a>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Cas d'utilisation associé :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= "[" + oTypeEvenement.getIdUseCase() + "] "+ org.coin.bean.UseCase.getUseCaseNameMemory(oTypeEvenement.getIdUseCase()) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Id jeton d'horodatage :
+		</td>
+		<td class="pave_cellule_droite">
+			<% 
+				if (oEvenement.getIdJetonHorodatage() < 1){
+					%>Pas de Jeton associé<%
+				} else {%>
+			<%= oEvenement.getIdJetonHorodatage() %>
+				<%}%>
+		</td>
+	</tr>
+<%
+	if(sessionUserHabilitation.isSuperUser())
+	{
+%>	<tr>
+		<td class="pave_cellule_gauche">
+			Sévérité :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= severite.getName() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Exception :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= sException %>
+		</td>
+	</tr>
+<%
+	}
+%>	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

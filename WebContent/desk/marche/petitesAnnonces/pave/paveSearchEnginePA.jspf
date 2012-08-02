@@ -1,0 +1,113 @@
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.SearchEngineArrayHeaderItem"%>
+<%@page import="modula.marche.Marche"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="mt.modula.searchengine.SearchEnginePADesk"%>
+<%
+	final int nbElements = 10;//Integer.parseInt(getServletContext().getInitParameter("nbElementsListe"));
+	Marche marcheTemp = new Marche ();
+
+
+ 	// pour vérouiller la recherche
+	String sConstraint = " AND com.id_organisation = -1 ";
+	PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual() );
+	
+	if(sessionUserHabilitation.isHabilitate("IHM-DESK-PA-1"))
+	{
+		// Pas de restriction
+		sConstraint = "";
+	}
+	else
+	{
+		String sConstraintTemp = null;
+		if(sessionUserHabilitation.isHabilitate("IHM-DESK-PA-12"))
+		{
+			// afficher ses petites annonces
+			sConstraintTemp = " mar.id_createur = " + personne.getIdPersonnePhysique();
+		}
+
+		if(sessionUserHabilitation.isHabilitate("IHM-DESK-PA-13"))
+		{
+			if(sConstraintTemp != null)
+				sConstraintTemp += " OR ";
+			else sConstraintTemp = "";
+			
+			// afficher les petites annonces de son organisation
+			sConstraintTemp += " com.id_organisation = " + personne.getIdOrganisation();
+		}
+		
+		if(sConstraintTemp != null)
+			sConstraint = " AND (" + sConstraintTemp + ")";
+		
+	}	
+	
+	String sTypeAffaire = "";
+	String sStatut = request.getParameter("sStatut");
+	// pour le sTitle
+	String sStatutLibelle = "";
+	if(sStatut == null)
+	{
+		sStatut = "a_moderer";
+		sStatutLibelle = " à modérer";
+	}
+	
+	String sTypeAnnonce = request.getParameter("sTypeAnnonce");
+	if(sTypeAnnonce == null)
+	{
+		sTypeAnnonce = "toutes";
+	}
+	
+	
+	//String sSelect = marcheTemp.getSelectAllPetiteAnnonceFromMarcheCommissionAndStatut(sStatut)
+	String sSelect = marcheTemp.getSelectAllPetiteAnnonceFromMarcheCommissionOrganisationAndStatut(sStatut)
+			+ sConstraint;
+	
+	/*System.out.println("\n\nSELECT\n" +
+			sSelect + "\n");
+	*/
+	out.write("<!-- " + sSelect + " -->");
+	
+	
+	
+	SearchEnginePADesk recherche 
+		= new SearchEnginePADesk(
+				sSelect,
+				nbElements);
+
+	
+
+
+
+	recherche.sStatut =sStatut;
+	recherche.sTypeAnnonce = sTypeAnnonce;
+	
+	recherche.setParam("afficherToutesPetitesAnnonces.jsp","reference"); 
+	recherche.setFromFormPrevent(request, "");
+	
+	//recherche.load();
+ 	recherche.getAllResultObjects();
+	
+	Vector vRecherche = recherche.getAllResults(); 
+ 
+	recherche.addFieldName("reference" , "Référence" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+    recherche.addFieldName("orga.raison_sociale" , "Raison sociale" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+    recherche.addFieldName("mar.reference_externe" , "Ref. ext." , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("objet" , "Objet de la petite annonce" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("tsDateMiseEnLigne" , "En ligne", SearchEngineArrayHeaderItem.FIELD_TYPE_DATETIME);
+	recherche.addFieldName("tsDateMiseEnLigne" , "Clôture", SearchEngineArrayHeaderItem.FIELD_TYPE_DATETIME);
+	recherche.addFieldName("sType" , "Type", SearchEngineArrayHeaderItem.FIELD_TYPE_NONE);
+	recherche.addFieldName("sStatut" , "Statut", SearchEngineArrayHeaderItem.FIELD_TYPE_NONE);
+
+	int iIdMarche = -1;
+
+	recherche.sPaveHeaderLibelle = "Liste des petites annonces";
+	recherche.sPaveHeader0OccurenceLibelle = "pas de petite annonce";
+	recherche.sPaveHeader1OccurenceLibelle = "1 petite annonce";
+	recherche.sPaveHeaderNOccurenceLibelle = " petites annonces";
+	recherche.setExtraParamHeaderUrl("&amp;sStatut=" + sStatut);
+	
+	//recherche.computeAfterTreatment(vMarchesFiltres );
+	Vector vMarches = recherche.getCurrentPage();
+	sTitle += sStatutLibelle;
+	recherche.preventFromForm();
+%>

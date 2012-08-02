@@ -1,0 +1,92 @@
+<%@page import="org.coin.fr.bean.export.PublicationDestinationType"%>
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%
+	String sTypeObjetSourceName = "inconnu !";
+	String sObjetReferenceSourceName = "inconnu !";
+
+	try {
+		sTypeObjetSourceName  = modula.TypeObjetModula.getTypeObjetModulaName(publi.getIdTypeObjet());
+		
+		sObjetReferenceSourceName = 
+			modula.TypeObjetModula.getIdObjetReferenceName(
+				publi.getIdTypeObjet(), 
+				publi.getIdReferenceObjet());
+		
+	}catch (Exception e){}
+	
+	String sPublicationTypeName = "inconnu !";
+	String sPublicationEtatName = "inconnu !";
+	String sPublicationDestinationTypeName = "inconnu !";
+	try {
+		sPublicationTypeName = PublicationType.getPublicationTypeName(publi.getIdPublicationType());
+	}catch (Exception e){}
+	
+	try {
+		sPublicationEtatName = PublicationEtat.getPublicationEtatName(publi.getIdPublicationEtat());
+	}catch (Exception e){}
+	try {
+		sPublicationDestinationTypeName = PublicationDestinationType.getPublicationDestinationTypeNameMemory(publi.getIdPublicationDestinationType());
+	}catch (Exception e){}
+
+%>		
+<tr>
+			<td class="pave_cellule_gauche">id pub :</td>
+			<td class="pave_cellule_droite"><%= publi.getIdPublication() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Type d'objet :</td>
+			<td class="pave_cellule_droite"><%=  sTypeObjetSourceName %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Référence de l'objet :</td>
+			<td class="pave_cellule_droite"><%= sObjetReferenceSourceName %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">id export :</td>
+			<td class="pave_cellule_droite"><%= publi.getIdExport() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Type :</td>
+			<td class="pave_cellule_droite"><%= sPublicationTypeName %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Etat :</td>
+			<td class="pave_cellule_droite"><%= sPublicationEtatName %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Type destination :</td>
+			<td class="pave_cellule_droite"><%= sPublicationDestinationTypeName  %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Référence externe :</td>
+			<td class="pave_cellule_droite"><%= publi.getReferenceExterne() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Numéro de parution : </td>
+			<td class="pave_cellule_droite"><%= publi.getNumeroParution() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Numéro d'annonce : </td>
+			<td class="pave_cellule_droite"><%= publi.getNumeroAnnonce() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date d'envoi : </td>
+			<td class="pave_cellule_droite"><%= publi.getDateEnvoi() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date d'envoi effective : </td>
+			<td class="pave_cellule_droite"><%= publi.getDateEnvoiEffective() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date de publication : </td>
+			<td class="pave_cellule_droite"><%= publi.getDatePublication() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date de création : </td>
+			<td class="pave_cellule_droite"><%= publi.getDateCreation() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date modification : </td>
+			<td class="pave_cellule_droite"><%= publi.getDateModification() %></td>
+		</tr>

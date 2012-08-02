@@ -1,0 +1,138 @@
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.EnveloppeA"%>
+<%@page import="modula.candidature.EnveloppeALot"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche"><%= sTitre %></td>
+		<td class="pave_titre_droite"><%= vCandidatures.size() %> 
+		candidat<%= (vCandidatures.size() > 1 ? "s" : "") %></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<table class="liste" summary="none">
+				<tr>
+					<th>Soumissionnaire</th>
+					<th>Organisation</th>
+					<th>Statut candidature</th>
+					<th>Format</th>
+					<th>&nbsp;</th>
+					<th>&nbsp;</th>
+				</tr>
+				<%
+					iNbCandidatures = vCandidatures.size();
+					for (int i = 0; i < vCandidatures.size(); i++)
+					{
+						/* Candidature courante */
+						Candidature candidature = vCandidatures.get(i);
+						Organisation organisationCDT = Organisation.getOrganisation(candidature.getIdOrganisation());
+						PersonnePhysique candidat = PersonnePhysique.getPersonnePhysique(candidature.getIdPersonnePhysique());
+						Vector<EnveloppeA> vEnveloppeA = EnveloppeA.getAllEnveloppeAFromCandidature(candidature.getIdCandidature());
+						EnveloppeALot envALot = EnveloppeALot.getEnveloppeALotFromEnveloppeAAndLot(vEnveloppeA.firstElement().getIdEnveloppe(),lot.getIdMarcheLot());
+						EnveloppeA envA = null;
+						
+						boolean bHorsDelais = false;
+						if(vEnveloppeA != null)
+						{
+							envA = vEnveloppeA.firstElement();
+							bHorsDelais = envA.isHorsDelais(false);
+						}
+						
+						boolean bIsCandidaturePapier = false;
+						if (candidature != null)
+						{	
+							bIsCandidaturePapier = candidature.isCandidaturePapier(false);
+						}
+						
+						String sCandidat = candidat.getCivilitePrenomNom() ;
+						
+						if(bIsAnonyme)
+							sCandidat = "-";
+						
+						String sNomOrganisation = organisationCDT.getRaisonSociale();
+						if(bIsAnonyme)
+							sNomOrganisation = "Candidature ORG"+organisationCDT.getId();
+
+						int j = i % 2;
+						%>
+							<tr class="liste<%=j%>" onmouseover="className='liste_over'" onmouseout="className='liste<%=j%>'">
+								<td>
+								<%= sCandidat %>
+								</td>
+								<td>
+								<%= sNomOrganisation %>
+								</td>
+								<%
+								String sDelais = "";
+								if(bHorsDelais) sDelais = "<span class=\"rouge\">&nbsp;(Hors Delais)</span>";
+								%>
+								<td>
+								<%
+								String sStatut = "";
+								switch(iStatut)
+								{
+									case Candidature.ID_STATUS_VALIDE:
+										sStatut = candidature.getStatutLibelleValue(iStatut) + sDelais;
+										break;
+									
+									case EnveloppeALot.ID_STATUS_RECEVABLE:
+										if(envALot != null)
+											sStatut = envALot.getStatutLibelleValue(iStatut) + sDelais;
+										break;
+										
+									case EnveloppeALot.ID_STATUS_ADMIS_DIALOGUE:
+										if(envALot != null)
+											sStatut = envALot.getStatutLibelleValue(iStatut) + sDelais;
+										break;
+								}
+								%>
+								<%= sStatut %>
+								</td>
+								<td>
+								<%
+								String sFormat = "Electronique";
+								String sTitreBouton = "Voir le contenu";
+								if(bIsCandidaturePapier)
+								{
+									sFormat = "Papier";
+								}
+								%>
+								<%= sFormat %>
+								</td>
+								<td>
+								<%
+								if(bAfficherBoutonContenu)
+								{
+								%>
+								<button type="button" name="ouvrirEnveloppe" 
+								onclick="OuvrirPopup('<%= response.encodeURL("ouvrirEnveloppeA.jsp?iIdLot="+lot.getIdMarcheLot()+"&amp;iIdCandidature="+candidature.getIdCandidature() +"&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes+"&amp;iIdAffaire"+iIdAffaire+"&amp;sRedirectURL="+sURL )%>',700,500,'menubar=no,scrollbars=yes,statusbar=no')">
+								<%= sTitreBouton %>
+								</button>
+								<%
+								}
+								%>
+								</td>
+								<td>
+								<%
+								if(bAfficherBoutonCommentaire)
+								{
+								%>
+								<a href="javascript:OuvrirPopup('<%= response.encodeURL("modifierCommentaireEnveloppeAForm.jsp?iIdLot="+lot.getIdMarcheLot()+"&amp;iIdCandidature="+candidature.getIdCandidature()+"&amp;iIdAffaire"+iIdAffaire+"&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes+"&amp;sRedirectURL="+sURL )%>',700,500,'menubar=no,scrollbars=yes,statusbar=no')">
+								<img src="<%=rootPath+"images/icones/post_it.gif"%>" alt="Commentaire" title="Commentaire" height="21"  style="vertical-align:middle" />
+								</a>
+								<%
+								}
+								else out.write("&nbsp;");
+								%>
+								</td>
+							</tr>
+						<%
+							}
+						%>
+			</table>
+		</td>
+	</tr>
+</table>
+<br />

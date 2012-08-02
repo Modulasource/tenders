@@ -1,0 +1,73 @@
+<%
+	Node nodeRenseignements = BasicDom.getChildNodeByNodeName(nodeAnn, "renseignements");
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc14')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 14 Autres renseignements</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc14" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche"> Numéro de référence attribué au marché par la personne publique : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeRenseignements,"idMarche") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Définition des études à effectuer par les candidats lors d'un concours, d'un marché de conception-réalisation ou d'un dialogue compétitif : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeRenseignements,"etudes") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Récompenses et jury : </td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<%
+				Node nodeRecompenses = null;
+				try {
+					nodeRecompenses = BasicDom.getChildNodeByNodeName(nodeRenseignements, "recompenses");
+				}catch (Exception e) {}
+				
+			 %>
+			<tr>
+				<td class="pave_cellule_gauche">Nombre et valeur des primes qui seront attribuées : (le cas échéant)) </td>
+				<td class="pave_cellule_droite"><%= nodeRecompenses!=null?BasicDom.getChildNodeValueByNodeNameOptional(nodeRecompenses,"primes"):"" %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Détail des paiements à verser à tous les participants : (le cas échéant))</td>
+				<td class="pave_cellule_droite"><%= nodeRecompenses!=null?BasicDom.getChildNodeValueByNodeNameOptional(nodeRecompenses,"paiements"):"" %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Le marché de services qui fera suite à ce concours devra-t-il être attribué au lauréat ou à l'un des lauréats du concours ?  </td>
+				<td class="pave_cellule_droite">
+				<%= nodeRecompenses!=null?BasicDom.getFirstChildElementNode(
+							BasicDom.getChildNodeByNodeName(
+								nodeRecompenses,"marcheAttrAuLaureat"))
+									.getNodeName():"" %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Conditions de remise des offres ou des candidatures : </td>
+				<td class="pave_cellule_droite">Correspond à la balise &lt;conditionsRemise&gt;, non traité par Modula, voir avec Leila
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Conditions et mode de paiement pour obtenir les documents : </td>
+				<td class="pave_cellule_droite">Correspond à la balise &lt;conditionsModePaiement&gt;, non traité par Modula, voir avec Leila
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Renseignements complémentaires : </td>
+				<td class="pave_cellule_droite">Correspond à la balise &lt;rensgComplt&gt;, non traité par Modula, voir avec Leila
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

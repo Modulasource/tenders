@@ -1,0 +1,97 @@
+<%
+	Node nodeOrganisme =  BasicDom.getChildNodeByNodeName(nodeAnn, "organisme" );
+	Node nodeCorrespondantPRM =  BasicDom.getChildNodeByNodeName(nodeOrganisme, "correspondantPRM" );
+	Node nodeDeptPublication=  BasicDom.getChildNodeByNodeName(nodeAnn, "deptPublication" );
+	String sCorrespondantPRM = ExportXmlOrganisation.getNodeJOTypePersToString(nodeCorrespondantPRM);
+ 	String sTypeAcheteurPublic = 
+ 		TypeAcheteurPublic
+ 			.getTypeAcheteurPublicName(
+ 				Integer.parseInt( 
+ 					BasicDom.getChildNodeValueByNodeName(nodeOrganisme,"ClassificationOrganisme")));
+ 	
+ 	
+	String sAcheteurPublic
+		= BasicDom.getChildNodeValueByNodeName(nodeOrganisme , "AcheteurPublic");
+
+	Node nodeOrganismeAdresse =  BasicDom.getChildNodeByNodeName(nodeOrganisme, "adr" );
+	String sOrganismeAdresseVoie 
+		= ExportXmlOrganisation.getNodeJOTypeVoieToString(
+			BasicDom.getChildNodeByNodeName(nodeOrganismeAdresse, "voie" ));
+
+	Node nodeOrganismeCoord =  BasicDom.getChildNodeByNodeName(nodeOrganisme, "coord" );
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc2')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc 2 Identification de l'organisme qui passe le marché</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc2" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Type d'organisme : </td>
+				<td class="pave_cellule_droite"><%= sTypeAcheteurPublic %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000">* Pouvoir adjudicateur : </font></td>
+				<td class="pave_cellule_droite"><%= sCorrespondantPRM  %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000">* Nom de l'organisme : </font></td>
+				<td class="pave_cellule_droite"><%= sAcheteurPublic %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000">* Adresse : </font></td>
+				<td class="pave_cellule_droite"><%= sOrganismeAdresseVoie %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000">* Code Postal : </font></td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeOrganismeAdresse, "cp" ) %>
+				<font color="#FF0000">* Ville : </font><%= BasicDom.getChildNodeValueByNodeName(nodeOrganismeAdresse, "ville" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Pays (autre que la France) : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeOrganismeAdresse, "pays" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Téléphone : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeOrganismeCoord , "tel" )  %> 
+				<b>Poste :</b><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeOrganismeCoord , "poste" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Télécopieur : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeOrganismeCoord , "fax" )  %> 
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Courrier électronique (courriel) : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeOrganismeCoord , "mel" ) %> 
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Adresse internet (U.R.L.) : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeOrganismeCoord , "url" ) %> 
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><font color="#FF0000">* Département sous lequel votre annonce sera publiée au B.O.A.M.P : </font></td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeName(nodeDeptPublication,"deptPub") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Département(s) sous le(s)quel(s) un rappel de votre annonce sera publié au B.O.A.M.P. : </td>
+				<td class="pave_cellule_droite"><%= "Non traité par Modula" %> 
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

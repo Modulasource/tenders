@@ -1,0 +1,52 @@
+
+<%@page import="org.coin.bean.geo.Town"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.db.ConnectionManager"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="org.coin.bean.geo.util.GeoCenter"%>
+<%@page import="org.coin.bean.geo.util.GeoMap"%>
+<%
+	GeoCenter geoCenter = new GeoCenter();
+	double dLongitude = adresse.getLongitude();
+	double dLatitude = adresse.getLatitude();
+	
+	if(bUseGeoloc )
+	{
+		
+		Connection connGeo = ConnectionManager.getConnection();
+		String[] sarrZipCode = new String[] {adresse.getCodePostal()};
+		
+		Vector<Town> vTown 
+			= Town.getAllTownFromZipCodeAndCountry(adresse.getIdPays(), sarrZipCode, true, false, connGeo);
+		
+	
+		/** 
+		 * if the geo data are empty we try to take 
+		 * them from the town db table
+		 */
+		if(dLatitude == 0 && dLongitude == 0)
+		{
+			String sZipCodeToFind = adresse.getCodePostal().trim();
+			Town town = GeoCenter.getTown(adresse.getIdPays(), adresse.getCommune(), sZipCodeToFind, vTown, connGeo);
+			
+			if(town != null){
+				dLatitude = town.getLatitude() ;
+				dLongitude = town.getLongitude();
+			}
+		}
+		ConnectionManager.closeConnection(connGeo);
+
+		
+		geoCenter.addPoint(dLongitude, dLatitude);
+		geoCenter.computeCenter();
+	
+	
+		GeoMap geoMap = new GeoMap();
+		geoMap.bUseGoogleMaps = false;
+		geoMap.bUseOpenStreetMap = true;
+		geoMap.bUseOpenLayerMap = false;
+		geoMap.bUseProjection = true;
+	%><%@ include file="/include/geo/headerGeoBloc.jspf" %><%
+	}
+
+%>

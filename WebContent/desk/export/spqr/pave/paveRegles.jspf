@@ -1,0 +1,92 @@
+
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveRegles')" >
+		<td class="pave_titre_gauche" >Description des règles</td>
+	</tr>
+	<tr>
+		<td>
+		<table  class="liste" id="paveRegles">
+			<tr>
+				<th>Num err</th>
+				<th>Message d'erreur Boamp-Web</th>
+				<th>Commentaire</th>
+				<th>Bloquant</th>
+				<th>NUM Element XML (Xpath)</th>
+			</tr>
+			<tr class="liste0">
+				<td>408</td>
+				<td>La date prévue pour l'envoi de l'invitation à présenter une offre est interdite 
+				dans le mode de passation choisi.</td>
+				<td>En Appel d'offres ouvert, concours ouvert et Dialogue compétitif</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/EnvoiInvitation</td>
+			</tr>
+			<tr class="liste1">
+				<td>409</td>
+				<td>La date limite de réception des candidatures est interdite dans le mode de passation choisi.</td>
+				<td>En Appel d'offres ouvert et concours ouvert</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/ReceptCandidatures</td>
+			</tr>
+			<tr class="liste0">
+				<td>410</td>
+				<td>La date prévue pour l'envoi de l'invitation doit être postérieure à la date limite de réception des candidatures.</td>
+				<td>En Appel d'offres restreint et concours restreint</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/EnvoiInvitation<br />
+					/jo:ListeAnnonces/ann/delais/ReceptCandidatures</td>
+			</tr>
+			<tr class="liste1">
+				<td>411</td>
+				<td>La date limite de réception des offres doit être postérieure à la date limite de réception des candidatures.</td>
+				<td>Tout sauf Appel d'offres ouvert et Concours ouvert</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/ReceptionOffres<br />
+					/jo:ListeAnnonces/ann/delais/ReceptCandidatures</td>
+			</tr>
+			<tr class="liste0">
+				<td>412</td>
+				<td>La date limite de réception des candidatures doit être postérieure d'au moins 15 jours à la date d'envoi à la publication.</td>
+				<td>En Appel d'offres restreint, concours restreint et en Marché négocié</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/ReceptCandidatures</td>
+			</tr>
+			<tr class="liste1">
+				<td>413</td>
+				<td>La date limite de réception des offres doit être postérieure d'au moins 15 jours à la date d'envoi à la publication.</td>
+				<td>En Appel d'offres ouvert, Appel d'offres restreint, Concours ouvert, Concours restreint et maché négocié</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/ReceptionOffres</td>
+			</tr>
+			<tr class="liste0">
+				<td>414</td>
+				<td>La date prévue pour l'envoi de l'invitation doit être postérieure d'au moins 15 jours à la date d'envoi à la publication.</td>
+				<td>En Appel d'offres restreint et concours restreint</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/EnvoiInvitation</td>
+			</tr>
+			<tr class="liste1">
+				<td>415</td>
+				<td>La date limite de réception des candidatures doit être postérieure d'au moins 37 jours à la date d'envoi à la publication en dialogue compétitif.</td>
+				<td>En dialogue compétitif</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/ReceptCandidatures</td>
+			</tr>
+			<tr class="liste0">
+				<td>431</td>
+				<td>La date limite de réception des candidatures doit être postérieure à la date d'envoi du présent avis.</td>
+				<td>En Procédure adaptée et mode de passation Autres</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/ReceptCandidatures</td>
+			</tr>
+			<tr class="liste0">
+				<td>432</td>
+				<td>La date limite de réception des offres doit être postérieure à la date d'envoi du présent avis..</td>
+				<td>En Procédure adaptée et mode de passation Autres</td>
+				<td>OUI</td>
+				<td>/jo:ListeAnnonces/ann/delais/ReceptionOffres</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+</table>		

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="urn:pdftoolkit" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="urn:pdftoolkit" xmlns:intf="urn:pdftoolkit" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema targetNamespace="urn:pdftoolkit" xmlns="http://www.w3.org/2001/XMLSchema">
+   <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+   <complexType name="FileSoap">
+    <sequence>
+     <element name="content" nillable="true" type="soapenc:base64Binary"/>
+     <element name="name" nillable="true" type="soapenc:string"/>
+     <element name="size" type="xsd:int"/>
+    </sequence>
+   </complexType>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="storeFileResponse">
+
+      <wsdl:part name="storeFileReturn" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="storeFileRequest">
+
+      <wsdl:part name="doc" type="impl:FileSoap"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="storeFileStringRequest">
+
+      <wsdl:part name="docName" type="soapenc:string"/>
+
+      <wsdl:part name="doc" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:message name="storeFileStringResponse">
+
+      <wsdl:part name="storeFileStringReturn" type="soapenc:string"/>
+
+   </wsdl:message>
+
+   <wsdl:portType name="ArchiveService">
+
+      <wsdl:operation name="storeFile" parameterOrder="doc">
+
+         <wsdl:input message="impl:storeFileRequest" name="storeFileRequest"/>
+
+         <wsdl:output message="impl:storeFileResponse" name="storeFileResponse"/>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="storeFileString" parameterOrder="docName doc">
+
+         <wsdl:input message="impl:storeFileStringRequest" name="storeFileStringRequest"/>
+
+         <wsdl:output message="impl:storeFileStringResponse" name="storeFileStringResponse"/>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="pdftoolkitSoapBinding" type="impl:ArchiveService">
+
+      <wsdlsoap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="storeFile">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="storeFileRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:pdftoolkit" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="storeFileResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:pdftoolkit" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="storeFileString">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="storeFileStringRequest">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:pdftoolkit" use="encoded"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="storeFileStringResponse">
+
+            <wsdlsoap:body encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:pdftoolkit" use="encoded"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="ArchiveServiceService">
+
+      <wsdl:port binding="impl:pdftoolkitSoapBinding" name="pdftoolkit">
+
+         <wsdlsoap:address location="http://localhost:8080/modula_test/services/pdftoolkit"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

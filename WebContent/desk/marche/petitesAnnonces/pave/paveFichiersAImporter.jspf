@@ -1,0 +1,38 @@
+<%@page import="modula.graphic.Icone"%>
+<tr class="liste<%=i%2%>" 
+	onmouseover="className='liste_over'" 
+	onmouseout="className='liste<%=i%2%>'" >
+	<!-- onclick="Redirect('<%= response.encodeRedirectURL(sUrlAfficherFichier) %>')" --> 
+	
+	<td width="30%" align="left"><%= sFileName + sErrorParsing %></td>
+	<td align="left" width="30%"><%= "à voir" %></td>
+	<td align="left" width="30%"><%= vPetitesAnnonces.size() %></td>
+	<td align="right" width="10%">  
+<%					
+if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonImporterFichier))
+{
+%>
+	<a href='<%= response.encodeURL(sUrlAfficherFichier)%>' >
+		<img width="21" height="21" 
+			src="<%= rootPath + modula.graphic.Icone.ICONE_CONTINUER_PROCEDURE%>" 
+			alt="Continuer la proc&eacute;dure" title="Continuer la proc&eacute;dure d'import" 
+			onmouseover="this.src='<%= rootPath + modula.graphic.Icone.ICONE_CONTINUER_PROCEDURE_OVER %>'" 
+			onmouseout="this.src='<%= rootPath + modula.graphic.Icone.ICONE_CONTINUER_PROCEDURE%>'" />
+	</a>
+<%		
+}			
+if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonSupprimerFichier))
+{
+%>
+	<a href='<%= response.encodeURL(sUrlSupprimerFichier )
+		%>' onclick="if(!confirm('Etes vous certain de vouloir supprimer ce flux XML ?')) return false; else return true;">
+		<img width="21" height="21" 
+			src="<%= rootPath + Icone.ICONE_SUPPRIMER %>" 
+			 
+			alt="Supprimer le fichier" title="Supprimer le fichier"/>
+	</a>
+<%
+}
+%>
+	</td>
+</tr>

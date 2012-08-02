@@ -1,0 +1,5 @@
+		<%@ include file="pavePublicationForm.jspf" %>
+		<tr>
+			<td class="pave_cellule_gauche">id pub joue : </td>
+			<td class="pave_cellule_droite"><input type="text" name="iIdPublicationJoue" value="<%= publi.getIdPublicationJoue() %>" /></td>
+		</tr>	

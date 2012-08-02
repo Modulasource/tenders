@@ -1,0 +1,35 @@
+<script type="text/javascript" src="<%= rootPath %>dwr/interface/Town.js" ></script>
+<script type="text/javascript">
+
+function getTownListFromZipCode(
+		sIdCountry,
+		sZipCode,
+		selectIdTown,
+		sOldValueZipCode)
+{
+	if(sZipCode.length > 4 )
+	{
+		var jsonZipCode = {};
+		jsonZipCode.sZipCode = sZipCode;
+
+		Town.getJSONStringAllTownFromZipCodeAndCountryJSONObject(
+				sIdCountry,
+				Object.toJSON(jsonZipCode),
+				function(s){
+					var towns = s.evalJSON();
+					selectIdTown.length=0;
+					selectIdTown.add(new Option("Choose town",""),null);
+					
+					towns.each( function (town, index) {
+						//var opt = new Option(town.sName,town.lId);
+						var opt = new Option(town.sName,town.sName);
+						selectIdTown.add(opt,null);
+					});
+
+					/** show it if necessary */
+					Element.show(selectIdTown);
+				}
+		);
+	}
+}
+</script>

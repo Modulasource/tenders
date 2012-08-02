@@ -1,0 +1,28 @@
+<%
+	Node nodeDuree = BasicDom.getChildNodeByNodeName(nodeAnn, "duree" );
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc6')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 6 Durée du marché ou délai d'exécution</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc6" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Date prévisionnelle de début des prestations (fournitures/services) : </td>
+				<td class="pave_cellule_droite">
+				<%= BasicDom.getChildNodeValueByNodeNameOptional(nodeDuree , "dateDebutPrestation" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Date prévisionnelle de commencement des travaux : </td>
+				<td class="pave_cellule_droite">
+				<%= BasicDom.getChildNodeValueByNodeNameOptional(nodeDuree , "dateDebutTravaux" ) %>
+				</td>
+			</tr>
+			<tr><td colspan="2">A FINIR Pour la balise 'duree' !!!</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,215 @@
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.boamp.*"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="modula.marche.VeilleMarcheAbonnes"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.util.Outils"%>
+
+<%@page import="org.coin.fr.bean.PersonnePhysiqueParametre"%><%@page import="org.coin.fr.bean.Departement"%>
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Sélection des mots clés</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+      <table class="fullWidth">
+		<tr>
+			<td style="width:30%;font-weight:bold">Mots clés : </td>
+			<td><%= Outils.getStringNotNullNeant(veilleMarcheAbonnes.getKeyWord()) %></td>
+		</tr>
+		<tr>
+			<td style="width:30%;font-style:italic">
+			les mots clés doivent être séparés par des espaces et contenir au moins 5 caractères
+			</td>
+			<td><input disabled="disabled" name="typeKeyWord" id="typeKeyWordAll" value="and" <%= sTypeKeyword.equalsIgnoreCase("and")?"checked=\"checked\"":"" %> type="radio"> Rechercher tous les termes
+			<br/><input disabled="disabled" name="typeKeyWord" id="typeKeyWordAny" value="or" <%= sTypeKeyword.equalsIgnoreCase("or")?"checked=\"checked\"":"" %> type="radio"> Rechercher n'importe lequel de ces termes</td>
+		</tr>
+    </table>
+  </div>
+  <br/>
+
+<% if(cpfSwitcher.isUseCPFGroup()){ %>
+<div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Sélection du ou des groupes de secteurs d'activité</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+    <tr>
+<%
+	if (cpfSwitcher.vGroupSelected.size()>0){
+%>
+		<td style="width:30%;vertical-align:top" class="pave_cellule_gauche">
+			Groupes de secteurs d'activité : 
+		</td>
+		<td class="pave_cellule_droite" >
+		<div id="cpfGroupSelectedItems"></div>
+		<script>
+		var jsonCpfSelectedItems = <%= cpfSwitcher.getGroupCPFSelectedList() %>;
+		jsonCpfSelectedItems.each(function(cpf){
+		  $("cpfGroupSelectedItems").innerHTML += cpf.value+"<br/>";
+		});
+		</script>
+		</td>
+<%
+	}
+	else{
+%>
+		<td colspan="2" style="vertical-align:center">
+			<img src="<%=rootPath+Icone.ICONE_WARNING %>" alt="" style="vertical-align:middle" />
+			<span class="rouge">Vous n'avez choisi aucun groupe de secteurs d'activité</span>
+		</td>
+<%		
+	}
+%>
+		</tr>
+	</table>
+	</div>
+	
+    <br />
+<% } %>
+   <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Sélection du ou des secteurs d'activité</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+    <tr>
+<%
+	if (cpfSwitcher.vCPFSelected.size()>0){
+%>
+		<td style="width:30%;vertical-align:top" class="pave_cellule_gauche">
+			Secteurs d'activité : 
+		</td>
+		<td class="pave_cellule_droite" >
+		<div id="cpfSelectedItems"></div>
+		<script>
+		var jsonCpfSelectedItems = <%= cpfSwitcher.getBoampCPFSelectedList() %>;
+		jsonCpfSelectedItems.each(function(cpf){
+		  $("cpfSelectedItems").innerHTML += cpf.value+"<br/>";
+		});
+		</script>
+		</td>
+<%
+	}
+	else{
+%>
+		<td colspan="2" style="vertical-align:center">
+			<img src="<%=rootPath+Icone.ICONE_WARNING %>" alt="" style="vertical-align:middle" />
+			<span class="rouge">Vous n'avez choisi aucun secteur d'activité</span>
+		</td>
+<%		
+	}
+%>
+		</tr>
+	</table>
+	</div>
+	
+    <br />
+   <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Sélection du ou des départements</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+    <tr>
+<%
+    if (vDeptSelected.size()>0){
+%>
+        <td style="width:30%;vertical-align:top" class="pave_cellule_gauche">
+            Départements : 
+        </td>
+        <td class="pave_cellule_droite" >
+        <% for(Departement dept : vDeptSelected){ %>
+        <%= dept.getIdString()+". "+dept.getName() %><br/>
+        <%} %>
+        </td>
+<%
+    }
+    else{
+%>
+        <td colspan="2" style="vertical-align:center">
+            <img src="<%=rootPath+Icone.ICONE_WARNING %>" alt="" style="vertical-align:middle" />
+            <span class="rouge">Vous n'avez choisi aucun département</span>
+        </td>
+<%      
+    }
+%>
+        </tr>
+    </table>
+    </div>
+    
+    <br />
+
+   <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Acceptation de l'alerte</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+  	<div>
+  		<%if(bVeilleMarche){%>
+		<img src="<%=rootPath+Icone.ICONE_SUCCES %>" alt="" style="vertical-align:middle" />
+		Vous êtes abonné à la veille de marchés.
+		<%}else{%>
+		<img src="<%=rootPath+Icone.ICONE_WARNING %>" alt="" style="vertical-align:middle" />
+		<span class="rouge">Vous n'êtes pas encore abonné à la veille de marchés</span>
+		<%}%>
+	</div>
+	<div style="float:left;margin-left:32px;">
+		<span style="text-decoration:underline">Adresses mails où sera envoyée la veille de marchés</span> :&nbsp;
+	</div>
+   	<div style="float:left">
+   	   adresse principale : <%= candidat.getEmail() %> <br/>
+   	<% for(String sMail : sMailList){%>
+		<%= sMail %><br/>
+	<%} %>
+	</div>
+	<div style="clear:both"></div>
+	</div>
+</div>

@@ -1,0 +1,576 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.configuration.ModulaConfiguration"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.Validite"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.graphic.*"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveDelaisValiditeTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveDelaisValidite" >
+<%
+	int iIdTypeProcedure = AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure());
+	
+	String sTitreValiditeEnveloppeA = "";
+	String sTitreValiditePaveA = "";
+	String sTitreValiditeEnveloppeB = "";
+	String sTitreValiditePaveB = "";
+	int iShowPeriodesB = 0;
+	int iShowRowB = 0;
+	boolean bInvitationOffre = false;
+
+	Vector<Validite> vValiditesAAPC = Validite.getAllValiditeAAPCFromAffaire(iIdAffaire);
+	Validite oValiditeAAPC = null;
+	Timestamp tsDateAAPCDebut = null;
+	if(vValiditesAAPC != null)
+	{
+		if(vValiditesAAPC.size() == 1) 
+		{
+			oValiditeAAPC = vValiditesAAPC.firstElement();
+			tsDateAAPCDebut = oValiditeAAPC.getDateDebut();
+		}
+	}
+	
+	switch(iIdTypeProcedure)
+	{
+		case AffaireProcedure.TYPE_PROCEDURE_OUVERTE:
+			sTitreValiditeEnveloppeA = "Réception des offres* :";
+			sTitreValiditePaveA = "Période de remise des offres";
+			iShowPeriodesB = 0;
+			break;
+			
+		case AffaireProcedure.TYPE_PROCEDURE_RESTREINTE:
+			sTitreValiditeEnveloppeA = "Réception des candidatures* :";
+			sTitreValiditePaveA = "Période de remise des candidatures";
+			iShowPeriodesB = 1;
+			sTitreValiditeEnveloppeB = "Réception des offres*:";
+			sTitreValiditePaveB = "Période de remise des offres";
+			bInvitationOffre = true;
+			break;
+			
+		case AffaireProcedure.TYPE_PROCEDURE_NEGOCIE:
+			sTitreValiditeEnveloppeA = "Réception des candidatures* :";
+			sTitreValiditePaveA = "Période de remise des candidatures";
+			iShowPeriodesB = 2;
+			sTitreValiditeEnveloppeB = "Réception des offres*:";
+			sTitreValiditePaveB = "Périodes de remise des offres";
+			bInvitationOffre = true;
+			break;	
+	}
+	
+	if(bIsForcedNegociationManagement) 
+	{
+		bInvitationOffre = true;
+		iShowPeriodesB = 2;
+		sTitreValiditeEnveloppeB = "Réception des offres*:";
+		/** si on force les négociation et qu'on est en procédure ouverte on affiche pas la premiere */
+		if(iIdTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_OUVERTE)
+			iShowRowB = 1;
+	}
+	if(!bIsLinkedPublicityAndCandidature){
+		sTitreValiditePaveA = "Dates et Délais";
+		sTitreValiditeEnveloppeA = "Date prévue (si elle est connue) pour le lancement des procédures de passation";
+	}
+	
+%>
+	<tr>
+		<td colspan="2" align="left">
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.DATE_RECEPTION) %>
+		</td>
+	</tr>
+				<%
+				if(bIsContainsEnveloppeAManagement || (!bIsContainsEnveloppeAManagement 
+				&& iIdTypeProcedure==AffaireProcedure.TYPE_PROCEDURE_OUVERTE))
+				{
+				%>
+				<tr>
+					<td colspan="2">
+					<p class="mention"><%= sTitreValiditePaveA %></p>
+					</td>
+				</tr>
+				<%
+					Validite oValiditeEnveloppeA = null;
+					Timestamp tsDateValiditeADebut = null;
+					Timestamp tsDateValiditeAFin = null;
+					sFormPrefix = "enveloppe_a_";
+					
+					Vector<Validite> vValiditeEnveloppeA = Validite.getAllValiditeEnveloppeAFromAffaire(iIdAffaire);
+					
+					if(vValiditeEnveloppeA == null)
+					{
+						vValiditeEnveloppeA = new Vector<Validite>();
+					}
+					if(vValiditeEnveloppeA.size() == 0)
+					{
+						Validite oValidite = new Validite();
+						oValidite.setIdReferenceObjet(iIdAffaire);
+						oValidite.setIdTypeObjetModula(TypeObjetModula.ENVELOPPE_A);
+						oValidite.create();
+						vValiditeEnveloppeA.add(oValidite);
+					}
+					
+					if(vValiditeEnveloppeA.size() == 1)
+					{
+						oValiditeEnveloppeA = vValiditeEnveloppeA.firstElement();
+						tsDateValiditeADebut = oValiditeEnveloppeA.getDateDebut();
+						tsDateValiditeAFin = oValiditeEnveloppeA.getDateFin();
+					}
+				%>
+							<tr>
+								<td class="pave_cellule_gauche">
+									<%= sTitreValiditeEnveloppeA %>
+								</td>
+								<td class="pave_cellule_droite">
+								<%
+								if(!bIsContainsAAPCPublicity || !bIsLinkedPublicityAndCandidature)
+								{
+								%>
+									<strong>Du</strong>&nbsp;
+									<input type="text" name="<%= sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+										class="dataType-date <%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull"
+										value="<%= CalendarUtil.getDateCourte(tsDateValiditeADebut) %>" />
+									
+									<strong>Heure:</strong>&nbsp;
+									<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull dataType-hour-minute" type="text" name="<%=sFormPrefix %>tsHeureValiditeDebut" size="5" maxlength="5" 
+									value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateValiditeADebut )%>" />&nbsp;
+									<br/>
+								<%
+								}
+								%>
+									<strong><%= (bIsContainsAAPCPublicity && bIsLinkedPublicityAndCandidature)?"Date limite:":"Au" %></strong>&nbsp;
+									<input type="text" name="<%= sFormPrefix %>tsDateValiditeFin" size="15" maxlength="10" 
+											class="dataType-date <%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull"
+											value="<%= CalendarUtil.getDateCourte(tsDateValiditeAFin) %>" />
+									
+									<strong>Heure:</strong>&nbsp;
+									<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull dataType-hour-minute" type="text" name="<%=sFormPrefix %>tsHeureValiditeFin" size="5" maxlength="5" 
+									value="<%=CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateValiditeAFin )%>" />&nbsp;
+									
+									<input type="hidden" name="<%= sFormPrefix %>iIdReferenceObjet" value="<%= iIdAffaire %>" />
+									<input type="hidden" name="<%= sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.ENVELOPPE_A %>" />&nbsp;
+									<%if(iIdTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_OUVERTE){%>
+										<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.DELAIS_PROCEDURES	) %>
+									<%} %>
+								</td> 
+							</tr>
+					<%
+					}
+					if(iShowPeriodesB != 0)
+					{
+					%>
+					<tr>
+						<td colspan="2">
+						<p class="mention"><%= sTitreValiditePaveB %></p>
+						</td>
+					</tr>
+					<%
+						Vector<Validite> vValiditeEnveloppeB = Validite.getAllValiditeEnveloppeBFromAffaire(iIdAffaire);
+						Validite oValiditeEnveloppeB = null;
+						Timestamp tsDateValiditeBDebut = null;
+						Timestamp tsDateValiditeBFin = null;
+						Timestamp tsDateInvitation = null;
+						Validite oValiditeInvitationOffre = null;
+						Vector<Validite> vValiditesInvitationOffre = null;
+%><input type="hidden" name="iIndex" value="<%=vValiditeEnveloppeB.size()%>"/><%
+						
+						if(vValiditeEnveloppeB == null)
+						{
+							vValiditeEnveloppeB = new Vector<Validite>();
+						}
+						if(vValiditeEnveloppeB.size() == 0)
+						{
+							Validite oValidite = new Validite();
+							oValidite.setIdReferenceObjet(iIdAffaire);
+							oValidite.setIdTypeObjetModula(TypeObjetModula.ENVELOPPE_B);
+							oValidite.create();
+							vValiditeEnveloppeB.add(oValidite);
+						}
+						for(int i = iShowRowB ; i < vValiditeEnveloppeB.size() ; i++)
+						{
+							oValiditeEnveloppeB = vValiditeEnveloppeB.get(i);
+							tsDateValiditeBDebut = oValiditeEnveloppeB.getDateDebut();
+							tsDateValiditeBFin = oValiditeEnveloppeB.getDateFin();
+							
+							int iIdValiditeEnveloppeB = oValiditeEnveloppeB.getIdValidite();
+							vValiditesInvitationOffre = Validite.getAllValiditeInvitationOffreFromValiditeOffre(iIdValiditeEnveloppeB);
+							
+							if(vValiditesInvitationOffre == null)
+							{
+								vValiditesInvitationOffre = new Vector<Validite>();
+							}
+							if(vValiditesInvitationOffre.size() == 0)
+							{
+								Validite oValidite = new Validite();
+								oValidite.setIdReferenceObjet(oValiditeEnveloppeB.getIdValidite());
+								oValidite.setIdTypeObjetModula(TypeObjetModula.INVITATION_OFFRE);
+								oValidite.create();
+								vValiditesInvitationOffre.add(oValidite);
+							}
+							
+							if(bInvitationOffre)
+							{
+							oValiditeInvitationOffre = vValiditesInvitationOffre.firstElement();
+							tsDateInvitation = oValiditeInvitationOffre.getDateDebut();
+							}
+							
+							sFormPrefix = "enveloppe_b_"+i+"_";
+							%>
+								<tr>
+									<td class="pave_cellule_gauche" style="vertical-align : top;">
+									<%
+									String sPreComplement = "";
+									if(iShowPeriodesB == 2)
+									{
+										sPreComplement = Outils.sConverionEntierLiterralFeminin[i] + " ";
+									}
+									%>
+									<%= sPreComplement + sTitreValiditeEnveloppeB %>
+									</td>
+									<td class="pave_cellule_droite">
+										<strong>Du</strong>&nbsp;
+										<input type="text" name="<%= sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+											class="dataType-date"
+											value="<%= CalendarUtil.getDateCourte(tsDateValiditeBDebut) %>" />
+										
+										<strong>Heure:</strong>&nbsp;
+										<input type="text" name="<%=sFormPrefix %>tsHeureValiditeDebut" size="5" maxlength="5" 
+										class="dataType-hour-minute"
+										value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateValiditeBDebut )%>" />&nbsp;
+										
+										<strong>Au</strong>&nbsp;
+										<input type="text" name="<%= sFormPrefix %>tsDateValiditeFin" size="15" maxlength="10" 
+											class="dataType-date"
+											value="<%= CalendarUtil.getDateCourte(tsDateValiditeBFin) %>" />
+										
+										<strong>Heure: </strong>&nbsp;
+										<input type="text" name="<%=sFormPrefix %>tsHeureValiditeFin" size="5" maxlength="5" 
+										class="dataType-hour-minute"
+										value="<%=CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateValiditeBFin)%>" />&nbsp;
+										
+										<input type="hidden" name="<%= sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.ENVELOPPE_B %>" />
+										<input type="hidden" name="<%= sFormPrefix %>iIdReferenceObjet" value="<%= iIdAffaire %>" />&nbsp;
+										<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.DELAIS_PROCEDURES	) %>
+										<%
+										if(bInvitationOffre)
+										{
+										sFormPrefix = "invitation_b_"+i+"_";
+										%>
+											<br /><br />
+											<strong>Date prévue pour l'envoi de l'invitation à présenter une offre :</strong>&nbsp;
+											<input type="text" name="<%=sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+													class="dataType-date"
+													value="<%= CalendarUtil.getDateCourte(tsDateInvitation)%>" />
+											<input type="hidden" name="<%= sFormPrefix %>tsHeureValiditeDebut" value="00:00" />
+											<input type="hidden" name="<%= sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.INVITATION_OFFRE %>" />
+											<input type="hidden" name="<%= sFormPrefix %>iIdReferenceObjet" value="<%= iIdValiditeEnveloppeB %>" /><br/>
+                                            <i>Attention dans le cas d'une parution au JOUE et d'une procédure restreinte ou négociée et d'un dialogue compétitif 
+                                            c'est cette date qui sera publiée et non la date de réception des offres</i>
+										<%
+										}
+										%>
+									</td> 
+								</tr>
+								<%
+						}
+					}
+					if(iShowPeriodesB == 2)
+					{
+						sFormPrefix = "enveloppe_b_supp_";
+						%>
+						<tr>
+							<td class="pave_cellule_gauche" style="vertical-align : top;">&nbsp;</td>
+							<td class="pave_cellule_droite">
+								<button type="button" onclick="montrer_cacher('periodeOffresSupp')" >Ajouter une période de relance des offres</button>
+							</td>
+						</tr>
+						<tr id="periodeOffresSupp">
+						<td id="periodeOffresSupp" class="pave_cellule_gauche" style="vertical-align : top;">&nbsp;</td>
+							<td style="text-align:left;" class="pave_cellule_droite" id="periodeOffresSupp">
+								<strong>Du</strong>&nbsp;
+								<input type="text" name="<%= sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+										class="dataType-date"
+										value="" />
+								
+								<strong>Heure:</strong>&nbsp;
+								<input type="text" name="<%=sFormPrefix %>tsHeureValiditeDebut" size="5" maxlength="5" 
+								class="dataType-hour-minute"
+								value="17:00" />&nbsp;
+								
+								<strong>Au</strong>&nbsp;
+								<input type="text" name="<%= sFormPrefix %>tsDateValiditeFin" size="15" maxlength="10" 
+										class="dataType-date"
+										value="" />
+								
+								<strong>Heure: </strong>&nbsp;
+								<input type="text" name="<%=sFormPrefix %>tsHeureValiditeFin" size="5" maxlength="5" 
+								class="dataType-hour-minute"
+								value="17:00" />&nbsp;
+								
+								<input type="hidden" name="<%= sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.ENVELOPPE_B %>" />
+								<input type="hidden" name="<%= sFormPrefix %>iIdReferenceObjet" value="<%= iIdAffaire %>" />
+								
+								<%
+								if(bInvitationOffre)
+								{
+									sFormPrefix = "invitation_b_supp_";
+								%>
+									<br /><br />
+									<strong>Date prévue pour l'envoi de l'invitation à présenter une offre :</strong>&nbsp;
+
+									<input type="text" name="<%=sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+										class="dataType-date"
+										/>
+									<input type="hidden" name="<%= sFormPrefix %>tsHeureValiditeDebut" value="00:00" />
+									<input type="hidden" name="<%= sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.INVITATION_OFFRE %>" />
+								<%
+								}
+								%>
+							</td>
+						</tr>
+						<%
+					}	
+					%>				
+	<tr>
+			<td colspan="2">&nbsp;</td>
+	</tr>
+<!-- fin de la gestion des candidature -->
+	<tr>
+			<td colspan="2">&nbsp;</td>
+	</tr>
+	<%
+	sFormPrefix = "";
+	if(bIsContainsCandidatureManagement)
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Délai de mesure d'urgence* :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=
+				sFormPrefix %>iDelaiUrgence" class="dataType-integer dataType-notNull <%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" size="3" maxlength="3" value="<%=
+					((marche.getDelaiUrgence()==0)?
+						Integer.parseInt(
+							Configuration.getConfigurationValueMemory(
+								ModulaConfiguration.MODULA_MARCHE_DELAI_URGENCE_DEFAUT))
+						:marche.getDelaiUrgence()) %>"/>Heures
+		</td>
+	</tr>
+	<%
+	}
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Délai minimum de validité des offres :
+		</td>
+		<td class="pave_cellule_droite">
+<%
+	String sCheckedDelai = "";
+	String sDelaiValiditeMois = "";
+	String sCheckedDelaiValiditeMois = "";
+	String sDelaiValiditeJours = "";
+	String sCheckedDelaiValiditeNeant = "";
+	String sCheckedDelaiValiditeJours = "";
+	if (!marche.getDelaiValidite().equalsIgnoreCase("")){
+		String sDelaiValidite = marche.getDelaiValidite();
+		sCheckedDelai = "checked='checked'";
+		if(sDelaiValidite.endsWith(" Mois")){
+			sDelaiValiditeMois = sDelaiValidite.substring(0,sDelaiValidite.length()-5);
+			sCheckedDelaiValiditeMois = sCheckedDelai;
+		}
+		else if(sDelaiValidite.endsWith(" Jours")){
+			sDelaiValiditeJours = sDelaiValidite.substring(0,sDelaiValidite.length()-6);
+			sCheckedDelaiValiditeJours = sCheckedDelai;
+		}
+	}
+	
+	if (marche.getDateDelaiValidite() == null  && marche.getDelaiValidite().equalsIgnoreCase("") )
+	{
+		sCheckedDelaiValiditeNeant = "checked='checked'";
+	}
+	
+%>
+		<input type="radio" name="<%= sFormPrefix %>selectDelais" value="0" <%= sCheckedDelaiValiditeNeant %>/> Néant<br/>
+		<input type="radio" name="<%= sFormPrefix %>selectDelais" value="1" <%= sCheckedDelaiValiditeJours %>/>&nbsp;
+		pendant <input type="text" class="dataType-integer" name="<%=sFormPrefix %>sDelaiValiditeJours" size="4" maxlength="4" 
+		value="<%= sDelaiValiditeJours %>"/> Jours
+		<br/>
+		<input type="radio" name="<%= sFormPrefix %>selectDelais" value="2" <%= sCheckedDelaiValiditeMois %>/>&nbsp;
+		pendant <input type="text" class="dataType-integer" name="<%=sFormPrefix %>sDelaiValiditeMois" size="3" maxlength="3" 
+		value="<%= sDelaiValiditeMois %>"/> Mois
+		&nbsp;<br />
+		<i>à compter de la date limite de remise des offres.</i>
+		<br />
+<%
+	sCheckedDelai = "";
+	if (marche.getDateDelaiValidite() != null)
+		sCheckedDelai = "checked='checked'";
+%>
+		<input type="radio" name="<%= sFormPrefix %>selectDelais" value="3" <%= sCheckedDelai %>/>&nbsp;
+		jusqu'au <input type="text" name="<%=sFormPrefix %>tsDateDelaiValidite" size="15" maxlength="10" 
+					class="dataType-date"
+					value="<%= CalendarUtil.getDateCourte(marche.getDateDelaiValidite()) %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Dur&eacute;e du march&eacute; ou d&eacute;lai d'ex&eacute;cution :
+		</td>
+		<td class="pave_cellule_droite">
+<%
+	String sCheckedDuree = "";
+	String sDelaiMois = "";
+	String sCheckedDureeMois = "";
+	String sDelaiJours = "";
+	String sCheckedDureeNeant="";
+	String sCheckedDureeJours = "";
+	if (!marche.getDelaiExecution().equalsIgnoreCase("")){
+		String sDelai = marche.getDelaiExecution();
+		sCheckedDuree = "checked='checked'";
+		if(sDelai.endsWith(" Mois")){
+			sDelaiMois = sDelai.substring(0,sDelai.length()-5);
+			sCheckedDureeMois = sCheckedDuree;
+		}
+		else if(sDelai.endsWith(" Jours")){
+			sDelaiJours = sDelai.substring(0,sDelai.length()-6);
+			sCheckedDureeJours = sCheckedDuree;
+		}
+	}
+	if (marche.getDateDebutExecution() == null  && marche.getDelaiExecution().equalsIgnoreCase("") )
+	{
+		sCheckedDureeNeant = "checked='checked'";
+	}
+%>
+		<input type="radio" name="<%= sFormPrefix %>selectDuree" value="0" <%= sCheckedDureeNeant %>/> Néant<br/>
+		<input type="radio" name="<%= sFormPrefix %>selectDuree" value="1" <%= sCheckedDureeJours %>/>&nbsp;
+		pendant <input type="text" class="dataType-integer" name="<%=sFormPrefix %>sDelaiExecutionJours" size="4" maxlength="4" 
+		value="<%= sDelaiJours %>"/> Jours
+		<br/>
+		<input type="radio" name="<%= sFormPrefix %>selectDuree" value="3" <%= sCheckedDureeMois %>/>&nbsp;
+		pendant <input type="text" class="dataType-integer" name="<%=sFormPrefix %>sDelaiExecutionMois" size="3" maxlength="3" 
+		value="<%= sDelaiMois %>"/> Mois
+		&nbsp;<br />
+		<i>à compter de la date de notification du marché.</i>
+		<br />
+<%
+	sCheckedDuree = "";
+	if (marche.getDateDebutExecution() != null)
+		sCheckedDuree = "checked='checked'";
+%>
+		<input type="radio" name="<%= sFormPrefix %>selectDuree" value="2" <%= sCheckedDuree %>/>&nbsp;
+		&agrave; compter du 
+		<input type="text" name="<%=sFormPrefix %>tsDateDebutExecution" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(marche.getDateDebutExecution()) %>" />
+		jusqu'au <input type="text" name="<%=sFormPrefix %>tsDateFinExecution" size="15" maxlength="10" 
+					class="dataType-date"
+					value="<%= CalendarUtil.getDateCourte(marche.getDateFinExecution()) %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Date prévisionnelle de début des prestations (services et fournitures) :<br/>
+        <i>Ne peut pas être renseigné pour le formulaire JOUE 2</i>
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			/*
+			String sCheckedDateDebutPrestation = "";
+			String sDateDebutPrestationPrevisionelle = "";
+		
+			if ( (marche.getDateDebutPrestationPrevisionelle() != null )
+			&& (!marche.getDateDebutPrestationPrevisionelle().equalsIgnoreCase("")))
+				sCheckedDateDebutPrestation = "checked='checked'";
+			
+			if(marche.getDateDebutPrestationPrevisionelle() != null)
+			{
+				sDateDebutPrestationPrevisionelle = marche.getDateDebutPrestationPrevisionelle();
+			}
+			*/
+			
+			/*
+			<input type="radio" name="<%= sFormPrefix selectDateDebutPrestation" value="1" <%= sCheckedDateDebutPrestation />&nbsp;
+			dans environ <input type="text" name="<%=sFormPrefix sDateDebutPrestation" size="50" maxlength="50" 
+			value="<%= sDateDebutPrestationPrevisionelle  "/>
+			&nbsp;<br />
+			<i>(Ex: 60 jours ou 15 mois) à compter de la date de notification du marché.</i>
+			<br />
+			*/
+		%>
+		
+		<%
+			/*
+			sCheckedDateDebutPrestation = "";
+			if (marche.getDateDebutPrestation() != null)
+				sCheckedDateDebutPrestation = "checked='checked'";
+			*/
+			/*
+			<input type="radio" name="<%= sFormPrefix selectDateDebutPrestation" value="2" <%= sCheckedDateDebutPrestation />&nbsp;
+			*/
+		%>
+		&agrave; compter du <input type="text" name="<%=sFormPrefix %>tsDateDebutPrestation" size="15" maxlength="10" 
+					class="dataType-date"
+					value="<%= CalendarUtil.getDateCourte(marche.getDateDebutPrestation()) %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Date prévisionnelle de commencement des travaux :<br/>
+        <i>Ne peut pas être renseigné pour le formulaire JOUE 2</i>
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			/*
+			String sCheckedDateDebutTravaux = "";
+			String sDateDebutTravauxPrevisionelle = "";
+			if ((marche.getDateDebutTravauxPrevisionelle() != null)
+			&& (!marche.getDateDebutTravauxPrevisionelle().equalsIgnoreCase("")))
+				sCheckedDateDebutTravaux = "checked='checked'";
+			if(marche.getDateDebutTravauxPrevisionelle() != null)
+			{
+				sDateDebutTravauxPrevisionelle = marche.getDateDebutTravauxPrevisionelle() ;
+			}
+			*/
+			/*
+			<input type="radio" name="<%= sFormPrefix selectDateDebutTravaux" value="1" <%= sCheckedDateDebutTravaux />&nbsp;
+			dans environ <input type="text" name="<%=sFormPrefix sDateDebutTravaux" size="50" maxlength="50" 
+			value="<%= sDateDebutTravauxPrevisionelle "/>
+			&nbsp;<br />
+			<i>(Ex: 60 jours ou 15 mois) à compter de la date de notification du marché.</i>
+			<br />
+			*/
+		%>
+		
+		<%
+			/*
+			sCheckedDateDebutTravaux = "";
+			if (marche.getDateDebutTravaux() != null)
+				sCheckedDateDebutTravaux = "checked='checked'";
+			*/
+			/*
+			<input type="radio" name="<%= sFormPrefix selectDateDebutTravaux" value="2" <%= sCheckedDateDebutTravaux />&nbsp;
+			*/
+		%>
+		à compter du <input type="text" name="<%=sFormPrefix %>tsDateDebutTravaux" size="15" maxlength="10" 
+				class="dataType-date"
+				value="<%= CalendarUtil.getDateCourte(marche.getDateDebutTravaux()) %>" />
+		</td>
+	</tr>
+	</table>
+	</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table><br />

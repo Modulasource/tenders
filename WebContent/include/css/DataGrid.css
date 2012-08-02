@@ -1,0 +1,39 @@
+.bsDg_table {
+	behavior:url(/include/css/scrollTable.htc) ;
+	tableLayout: fixed;
+	font-family: verdana;
+	font-size:   12px;
+}
+.bsDb_tr_header {
+  background-color: #639ACE;
+  color: white;
+	font-weight: bold;
+}
+.bsDb_td_header {
+  border: 1px ridge;
+}
+.bsDb_td_header_sort {
+  border: 1px groove;
+  border-right:1px solid white;
+}
+.bsDg_tr_row_zebra_0 {
+	background-color: #DEDFDE;
+	font-size:   110px;
+}
+.bsDg_tr_row_zebraover_0 {
+	background-color: white;
+}
+.bsDg_td_row_zebra_0 {
+	font-size:   10px;
+}
+.bsDg_tr_row_zebra_1 {
+	background-color: #EFEFEF;
+	font-size:   10px;
+}
+.bsDg_tr_row_zebraover_1 {
+	background-color: white;
+}
+.bsDg_td_row_zebra_1 {
+	font-size:   10px;
+}
+

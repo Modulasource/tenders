@@ -1,0 +1,53 @@
+			<table class="pave" >
+				<tr>
+					<td class="pave_titre_gauche" colspan="2">Informations du membre</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Commission :</td>
+					<td class="pave_cellule_droite">
+						<%= Commission.getNomCommission(membre.getIdCommission()) %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Personne :</td>
+					<td class="pave_cellule_droite">
+					<%= personne.getPrenomNom() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">R&ocirc;le du membre :</td>
+					<td class="pave_cellule_droite">
+					<%= MembreRole.getMembreRoleName(membre.getIdMembreRole()) %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Qualification :</td>
+					<td class="pave_cellule_droite"><%= membre.getQualification() %></td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Qualit&eacute; :</td>
+					<td class="pave_cellule_droite"><%= membre.getQualite() %></td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Apellation :</td>
+					<td class="pave_cellule_droite"><%= membre.getAppellation() %></td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Profil :</td>
+					<td class="pave_cellule_droite">
+					<%= membre.getProfil() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Type de membre :</td>
+					<td class="pave_cellule_droite">
+					<%= membre.getMembreType() %>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>

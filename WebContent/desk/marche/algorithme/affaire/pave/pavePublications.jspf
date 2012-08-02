@@ -1,0 +1,154 @@
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%
+if(bIsContainsCandidatureManagement || bIsContainsAAPCPublicity)
+{
+%>
+
+<%@page import="java.util.Vector"%>
+<%@page import="modula.Validite"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.util.Outils"%><table class="pave" >
+	<tr onclick="montrer_cacher('pavePublicationPublisher')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePublicationsTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="pavePublicationPublisher" summary="Publications">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<%
+				if(bIsContainsAAPCPublicity)
+				{
+				%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Date de mise en ligne sur le site Internet* :
+					</td>
+					<td class="pave_cellule_droite">
+						<%
+							Vector<Validite> vValiditesAAPC = Validite.getAllValiditeAAPCFromAffaire(iIdAffaire);
+							Validite oValiditeAAPC = null;
+							Timestamp tsDateAAPCDebut = null;
+							Timestamp tsDateAAPCFin = null;
+							if(vValiditesAAPC != null)
+							{
+								if(vValiditesAAPC.size() == 1) 
+								{
+									oValiditeAAPC = vValiditesAAPC.firstElement();
+									tsDateAAPCDebut = oValiditeAAPC.getDateDebut();
+									tsDateAAPCFin = oValiditeAAPC.getDateFin();
+								}
+							}
+						%>
+						<%= !bIsLinkedPublicityAndCandidature?"<strong>Du </strong>":"" %>
+						<%= CalendarUtil.getDateCourte(tsDateAAPCDebut) %>&nbsp;
+						<strong>à</strong>&nbsp;
+						<%= CalendarUtil.getHeureMinuteSecLitterale(tsDateAAPCDebut) %>&nbsp;
+						<% if(!bIsLinkedPublicityAndCandidature){ %>
+						<br/><strong>Au</strong>
+						<%= CalendarUtil.getDateCourte(tsDateAAPCFin) %>&nbsp;
+						<strong>à</strong>&nbsp;
+						<%= CalendarUtil.getHeureMinuteSecLitterale(tsDateAAPCFin) %>&nbsp;
+						<%} %>
+					</td>
+				</tr>
+				<%
+				}
+				else
+				{
+				%>
+				<tr><td class="mention" colspan="2">Ces informations ne seront accessibles seulement par les candidats séléctionnés pour repondre au marché.</td></tr>
+				<tr><td colspan="2">&nbsp;</td></tr>
+				<%
+				}
+				%>
+				<tr>
+					<td class="pave_cellule_gauche">
+						<div style="display:none">
+							Complément d'annonce :
+						</div>
+					</td>
+					<td class="pave_cellule_droite">
+						<div style="display:none">
+							<%
+							String sDesc = "";
+							try {
+								sDesc = marche.getPetiteAnnonceTexteLibre();
+								sDesc = Outils.replaceAll(sDesc,"¤","&euro;");
+								sDesc = Outils.replaceAll(sDesc,"?","'");
+								sDesc = sDesc.replaceAll("<br>", "<br/>\n") ;
+							} catch (Exception e) {}
+							%>
+							<%= !sDesc.equals("")?sDesc:"Pas de complément d'annonce" %>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Edition de l' AAPC * :
+					</td>
+					<td class="pave_cellule_droite">
+					<%
+						boolean bAAPCAutomatique = marche.isAAPCAutomatique(false);
+						String sEditionPDF = "";
+						
+						if(bAAPCAutomatique) sEditionPDF="Format automatique généré en PDF";
+						else sEditionPDF="Format Libre";
+					%>
+						<%= sEditionPDF %>
+					</td>
+				</tr>
+				<% if(!bAAPCAutomatique){%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					AAPC au format libre séléctionné :
+					</td>
+					<td class="pave_cellule_droite">
+						<% 	
+						String sNomAAPCLibre = marche.getNomAAPC();
+						if (sNomAAPCLibre != null && !sNomAAPCLibre.equals("") )
+						{	
+							String sURLAAPC = "desk/DownloadFileDesk?"
+									+ DownloadFile.getSecureTransactionStringFullJspPage(
+											request, 
+											marche.getIdMarche(), 
+											TypeObjetModula.AAPC);
+							
+							sURLAAPC = response.encodeURL(rootPath+ sURLAAPC);
+							%>
+							<a href='<%= sURLAAPC %>'>
+							<%= sNomAAPCLibre %>
+							</a>
+							<%
+						}
+						else
+						{
+							%><p style='color:red' >pas de document associé</p><%
+						}
+						 %>
+					</td>
+				</tr>
+				<%} %>		
+			<!--  	<tr>
+					<td class="pave_cellule_gauche">
+					Temps accordé pour le double envoi* :
+					</td>
+					<td class="pave_cellule_droite">
+						<%= ""+marche.getTimingDoubleEnvoi() %> heures
+						<input type="hidden" name="iIdAffaire" value="<%= iIdAffaire %>" />
+					</td>
+				</tr> -->
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+
+<%
+}
+%>

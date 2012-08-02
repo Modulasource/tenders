@@ -1,0 +1,564 @@
+<%@page import="modula.marche.AvisRectificatif"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="modula.marche.AvisAttribution"%>
+<%@page import="org.coin.fr.bean.export.PublicationBoamp"%>
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="modula.marche.joue.MarcheJoueFormulaire"%>
+<%@page import="org.coin.db.CoinDatabaseHtmlTraitment"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="modula.marche.joue.JoueFormulaire"%>
+
+<%@page import="org.coin.fr.bean.export.Publication"%>
+<%
+	Vector vJoueFormulaire = JoueFormulaire.getAllStatic();
+	Vector vMarcheJoueFormulaire = MarcheJoueFormulaire.getAllFromIdMarche(marche.getId());
+	long iIdPublicationTypeFormJoue = 0;
+	boolean bIsFormTroisSelected = false;
+	if(vMarcheJoueFormulaire != null && vMarcheJoueFormulaire.size() > 0) {
+		MarcheJoueFormulaire joueForm = (MarcheJoueFormulaire)vMarcheJoueFormulaire.firstElement();
+		iIdPublicationTypeFormJoue = joueForm.getIdJoueFormulaire();
+		if(iIdPublicationTypeFormJoue == 3) bIsFormTroisSelected = true;
+	}
+%>
+<script type="text/javascript">
+<!--
+
+function confirmAndSendAvis(sUrl)
+{
+	return confirmAndSend("Etes vous sûr de vouloir envoyez cet avis au BOAMP ?",sUrl);
+}
+
+//-->
+</script>
+
+<table class="pave" summary="none">
+	<tr><td class="pave_titre_gauche">Sélectionner le type d'action</td></tr>
+	<tr><td>&nbsp;</td></tr>
+	<tr>
+		<td style="text-align:center">
+			<table align="center" style="width:auto">
+				<tr>
+<%
+
+
+	if(sessionUserHabilitation.isSuperUser())
+	{
+%>
+					<td style="width:200px;vertical-align:top" >
+						Super utilisateur 
+						<button type="button" class="disableOnClick" 
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+								+ "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Envoyer l'AAPC PROD</button>
+						<br/>
+						<button type="button" class="disableOnClick" 
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;bIsPublicationTest=true"
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Envoyer l'AAPC TEST</button>
+						<br/>
+						<button type="button" class="disableOnClick" 
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;bTestXmlGeneration=true"
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Tester l'AAPC PROD (sans envoi)</button>
+					</td>
+<%	
+	} 
+
+
+	/**
+	 * AAPC, ne peut s'afficher que si une publication de test a été créée et publiée
+	 */
+	Vector<PublicationBoamp> vPublicationBoampAapcTest 
+ 		= PublicationBoamp.getAllPublicationBoampWithTestAapcFromAffaire(marche.getIdMarche());
+
+	boolean bAllowSendAapc = false;
+	if(vPublicationBoampAapcTest.size() > 0)
+	{
+		PublicationBoamp publicationBoampAapcTest = vPublicationBoampAapcTest.get(0);
+		if(publicationBoampAapcTest.getIdPublicationEtat() == PublicationEtat.ETAT_ENCOURS_PUBLICATION
+		|| publicationBoampAapcTest.getIdPublicationEtat() == PublicationEtat.ETAT_ENCOURS_VALIDATION_EDITORIALE
+		|| publicationBoampAapcTest.getIdPublicationEtat() == PublicationEtat.ETAT_PUBLIEE
+		)
+		{
+			bAllowSendAapc = true;
+		}
+		else{
+%>
+			<td style="width:200px;vertical-align:top" >
+				<img height="30" src="<%= 
+					rootPath + "images/icones/AAPC_export.gif" 
+					%>"  title="Export AAPC" alt="Export AAPC" 
+					 />
+				<br/>Vous devez attendre que le test <br/>de conformité se soit déroulé <br/>
+				avec succès pour pouvoir envoyer l'AAPC au BOAMP
+			</td>
+<% 	
+			
+		}
+	}
+	
+	/**
+	 * AAPC, ne doit plus s'afficher quand l'avis a déja été envoyé
+	 */
+	Vector<PublicationBoamp> vPublicationBoampAapcWithoutTest 
+ 		= PublicationBoamp.getAllPublicationBoampWithoutTestFromAffaire(
+ 				marche.getIdMarche(),
+ 				PublicationType.TYPE_AAPC);
+
+	if(vPublicationBoampAapcWithoutTest.size() > 0)
+	{
+		bAllowSendAapc = false;
+		bBOAMPPoursuivreProcedure = true;
+
+%>
+					<td style="width:200px;vertical-align:top" >
+						<img height="30" src="<%= 
+							rootPath + "images/icones/AAPC_export.gif" 
+							%>"  title="Export AAPC" alt="Export AAPC" 
+							 />
+						<br/>L'AAPC a été <br/>envoyé au BOAMP
+					</td>
+<% 
+	}	 
+	 
+	/**
+	* Affichage de l'AAPC
+	*/
+	if (bAllowSendAapc )
+	{
+%>
+					<td style="width:200px;vertical-align:top" >
+
+						<img height="30" src="<%= rootPath + "images/icones/AAPC_export.gif" %>"  title="Export AAPC" alt="Export AAPC" 
+							 onmouseover="this.src='<%= rootPath + "images/icones/AAPC_export_over.gif" %>'" 
+							 onmouseout="this.src='<%= rootPath + "images/icones/AAPC_export.gif" %>'" 
+							 onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" 
+								 />
+
+
+						<br />Envoi de l'AAPC
+					</td>
+<%
+	}
+
+/**
+ * Avis rectificatif d'AAPC
+ */
+
+Vector<AvisRectificatif> vAvisAAPC 
+	= AvisRectificatif
+		.getAllAvisRectificatifWithType(
+			marche.getIdMarche(),
+			modula.marche.AvisRectificatifType.TYPE_AAPC);
+
+Vector<PublicationBoamp> vPublicationBoampArecWithoutTest 
+= PublicationBoamp.getAllPublicationBoampWithoutTestFromAffaire(
+        marche.getIdMarche(),
+        PublicationType.TYPE_AVIS_RECTIFICATIF_DE_AAPC);
+
+boolean bAllowSendArec = true;
+if(vPublicationBoampArecWithoutTest.size() > 0
+	&& vAvisAAPC.size() == vPublicationBoampArecWithoutTest.size()) bAllowSendArec = false;
+
+for(int k=0; k < vAvisAAPC.size(); k++)
+{
+	AvisRectificatif avis = vAvisAAPC.get(k);
+	
+	
+	if(sessionUserHabilitation.isSuperUser())
+	{
+%>
+					<td style="width:200px;vertical-align:top" >
+						Super utilisateur 
+						<button type="button" class="disableOnClick" 
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AVIS_RECTIFICATIF_DE_AAPC
+								+ "&amp;iIdAvisRectificatif=" + avis.getIdAvisRectificatif()
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis()) 
+								%>')" >Envoyer AREC <br/> de l'AAPC</button>
+					</td>
+<%    	
+    } 
+	
+    if(!bAllowSendArec) 
+    {
+%>
+                    <td style="width:200px;vertical-align:top" >
+                        <img height="30" src="<%= 
+                            rootPath + "images/icones/AREC_export.gif" 
+                            %>"  title="Export AAPC" alt="Export AAPC" 
+                             />
+                        <br/>L'AREC n°<%= (k+1) %> a été <br/>envoyé au BOAMP
+                    </td>
+<%
+    } else if(k < vAvisAAPC.size()-1) {
+%>
+			    	<td style="width:200px;vertical-align:top" >
+				        <img height="30" src="<%= 
+				            rootPath + "images/icones/AREC_export.gif" 
+				            %>"  title="Export AAPC" alt="Export AAPC" 
+				             />
+				        <br/>L'AREC n°<%= (k+1) %> a été <br/>envoyé au BOAMP
+	                </td>
+<%
+    } else {
+%>
+					<td style="width:200px;vertical-align:top" >
+						<img height="30" src="<%= rootPath + "images/icones/AREC_export.gif" %>"  
+						         title="Export AREC" alt="Export AREC" 
+								 onmouseover="this.src='<%= rootPath + "images/icones/AREC_export_over.gif" %>'" 
+								 onmouseout="this.src='<%= rootPath + "images/icones/AREC_export.gif" %>'" 
+								 	onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								 		rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+										+ "iIdAffaire=" + marche.getIdMarche() 
+										+ "&amp;iIdExport=" + exportAff.getIdExport()
+										+ "&amp;iIdOnglet=" + iIdOnglet
+										+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AVIS_RECTIFICATIF_DE_AAPC
+										+ "&amp;iIdAvisRectificatif=" + avis.getIdAvisRectificatif()
+										+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+										+ "&amp;sUrlTraitement="+sUrlTraitement
+		                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+										+ "&amp;nonce=" + System.currentTimeMillis()) 
+										 %>');"  />
+						<br />Envoi de l'avis rectificatif n°<%= (k+1) %> de l'AAPC
+					</td>
+					
+<%
+    }
+}
+
+/**
+ * Avis d'attribution
+ */
+
+try {
+	AvisAttribution aatr = AvisAttribution.getAvisAttributionFromMarche(marche.getIdMarche()) ;
+
+
+	int iTypePublicationMustBePublish = PublicationType.TYPE_AAPC;
+	
+	Vector<PublicationBoamp> vPublicationBoampValides = null;
+	try{
+		vPublicationBoampValides 
+		= PublicationBoamp.getAllPublicationBoampFromAffaireAndEtatAndType(
+				marche.getIdMarche(),
+				PublicationEtat.ETAT_PUBLIEE,
+				iTypePublicationMustBePublish);
+		
+	}catch(Exception e){
+		vPublicationBoampValides = new Vector<PublicationBoamp>();
+	}
+	if (vPublicationBoampValides.size() == 0) {
+		/**
+		 * Modula ne connait pas l'AAPC rattaché à l'AATR et de ce fait, il n'est pas possible
+		 * de créer le flux XML complet car il va manquer les infos suivantes :
+		 * 	 
+	     * <A>
+	     *   <parution>20030008</parution>		(Numéro de parution par exemple : 2003012 est le numéro 12 de l'année 2003
+	     *   <num_ann_par>125</num_ann_par>		(numéro de l'annonce dans la parution)
+	     *   <datePub>2003-05-10</datePub>		(Date de publication)
+	     * </A>
+		 *
+		 * Il est nécessaire d'afficher un bouton pour la création d'une publication BOAMP relative à l'AAPC publié 
+		 * qui n'est pas dématérialisé sur sur la plateforme Modula. 	 
+		 */
+		%>
+		<td style="width:200px;vertical-align:top" >
+			pour envoyer l'AATR il faut reseigner l'AAPC dans l'onglet <a href="<%= 
+			response.encodeURL( 
+				rootPath + "desk/marche/algorithme/affaire/afficherAttribution.jsp?iIdAffaire=" 
+						+ marche.getId() + "&iIdOnglet=5" )
+				%>">Renseignements Publication</a>
+		</td>
+
+<%	
+	}
+	
+	if(sessionUserHabilitation.isSuperUser())
+	{
+		%>
+					<td style="width:200px;vertical-align:top" >
+						Super utilisateur 
+						<button type="button" class="disableOnClick" 
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AATR
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Envoyer l'AATR (PROD)</button>
+						<br/>
+						<button type="button" class="disableOnClick" 
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AATR
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;bIsPublicationTest=true"
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Envoyer l'AATR (TEST)</button>
+					</td>
+
+<%	
+	}
+%>
+<%  
+    if(!bIsFormTroisSelected) {
+%>
+					<td style="width:200px;vertical-align:top" >
+						<img height="30" src="<%= rootPath + "images/icones/AATR_export.gif" %>"  title="Export AATR" alt="Export AATR" 
+								 onmouseover="this.src='<%= rootPath + "images/icones/AATR_export_over.gif" %>'" 
+								 onmouseout="this.src='<%= rootPath + "images/icones/AATR_export.gif" %>'" 
+								 onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdOnglet=" + iIdOnglet 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AATR
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis() 
+								) %>');" />
+						<br />Envoi de l'AATR
+					</td>
+<%  
+    }      
+%>
+<%	
+} catch (Exception e) {}
+
+
+/**
+ * Avis rectificatif d'attribution
+ */
+
+Vector<AvisRectificatif> vAvisAATR 
+	= AvisRectificatif
+		.getAllAvisRectificatifWithType(
+			marche.getIdMarche(),
+			modula.marche.AvisRectificatifType.TYPE_AATR);
+			
+for(int k=0; k < vAvisAATR.size(); k++)
+{
+	AvisRectificatif avis = vAvisAATR.get(k);
+%>
+					<td style="width:200px;vertical-align:top" >
+						<img height="30" src="<%= rootPath + "images/icones/AREC_export.gif" %>"  title="Export AREC" alt="Export AREC" 
+								 onmouseover="this.src='<%= rootPath + "images/icones/AREC_export_over.gif" %>'" 
+								 onmouseout="this.src='<%= rootPath + "images/icones/AREC_export.gif" %>'" 
+								 onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/afficherXmlGenereBoampPourAvisRecificatifDeAATR.jsp?" 
+								+ "iIdAvisRectificatif=" + avis.getIdAvisRectificatif() 
+								+ "&amp;iIdOnglet=" + iIdOnglet 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								) %>');" />
+						<br />Envoi de l'avis rectificatif n°<%= (k+1) %> de l'AATR
+					</td>
+<%		
+} 
+
+
+if(vMarcheJoueFormulaire.size() >0)
+{
+%>
+					<td style="width:200px;vertical-align:top" >
+<%
+}
+
+for(int k=0; k < vMarcheJoueFormulaire.size(); k++)
+{
+	MarcheJoueFormulaire marcheJoueFormulaire = (MarcheJoueFormulaire)vMarcheJoueFormulaire.get(k);
+	JoueFormulaire joueFormulaire 
+		= (JoueFormulaire)CoinDatabaseAbstractBean
+			.getCoinDatabaseAbstractBeanFromId(
+					marcheJoueFormulaire.getIdJoueFormulaire(),
+					vJoueFormulaire);
+	
+	String sDisabled = "";
+	
+	for(PublicationBoamp publiBoamp : vPublications) {
+		if(!publiBoamp.isStatutPublicationTest(false)) {
+	        Publication publi = Publication.getPublication(publiBoamp.getIdPublication());
+	        int iIdPublicationType = publi.getIdPublicationType();
+	        int iIdPublicationEtat = publi.getIdPublicationEtat();
+	        
+	        if(iIdPublicationType == (joueFormulaire.getId()+1000)) {
+	        	if(iIdPublicationEtat == PublicationEtat.ETAT_A_ENVOYER
+		            || iIdPublicationEtat == PublicationEtat.ETAT_ENVOI_ACCEPTE
+		            || iIdPublicationEtat == PublicationEtat.ETAT_ENCOURS_VALIDATION_EDITORIALE
+		            || iIdPublicationEtat == PublicationEtat.ETAT_ENCOURS_PUBLICATION
+		            || iIdPublicationEtat == PublicationEtat.ETAT_PUBLIEE)
+	        	{
+	        		sDisabled = "disabled='disabled'";
+	        	}
+	        }
+		}		
+	}
+
+	if(sessionUserHabilitation.isSuperUser())
+    {
+%>
+                        <button type="button" class="disableOnClick" 
+                            onclick="confirmAndSendAvis('<%= response.encodeURL( 
+                                rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+                                + "iIdAffaire=" + marche.getIdMarche() 
+                                + "&amp;iIdExport=" + exportAff.getIdExport()
+                                + "&amp;iIdOnglet=" + iIdOnglet
+                                + "&amp;iIdPublicationType=" + PublicationType.TYPE_JOUE_FORM
+                                + "&amp;iIdFormulaireJoue=" + joueFormulaire.getId()
+                                + "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+                                + "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+                                + "&amp;bIsPublicationTest=true"
+                                + "&amp;nonce=" + System.currentTimeMillis()) %>')" >Envoyer Formulaire <%= joueFormulaire.getId() %><br/> du JOUE (TEST)</button>
+<%	
+    }
+	
+	{
+		%>
+						<button type="button" class="disableOnClick" <%= sDisabled %>
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_JOUE_FORM
+								+ "&amp;iIdFormulaireJoue=" + joueFormulaire.getId()
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+								+ "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Envoyer Formulaire <%= joueFormulaire.getId() %><br/> du JOUE</button>
+	
+	<%	
+	}
+} 
+
+
+if(vMarcheJoueFormulaire.size()>0)
+{
+%>						</td>
+<%
+}
+
+
+
+/**
+ * Avis d'annulation
+ */
+if(marche.isAffaireAnnulee(false))
+{
+	if(sessionUserHabilitation.isSuperUser())
+	{
+		%>
+					<td style="width:200px;vertical-align:top" >
+						Super utilisateur 
+						<button type="button" class="disableOnClick" 
+							onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AVIS_ANNULATION
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>')" >Envoyer l'ANNUL</button>
+					</td>
+
+<%	
+	}	
+	
+%>
+					
+					<td style="width:200px;vertical-align:top" >
+						<img height="30" src="<%= rootPath + "images/icones/ANUL_export.gif" %>"  title="Export ANUL" alt="Export ANUL" 
+								 onmouseover="this.src='<%= rootPath + "images/icones/ANUL_export_over.gif" %>'" 
+								 onmouseout="this.src='<%= rootPath + "images/icones/ANUL_export.gif" %>'"
+								 onclick="confirmAndSendAvis('<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/ajouterPublicationBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;iIdOnglet=" + iIdOnglet
+								+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AVIS_ANNULATION
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+                                + "&amp;iIdNextPhaseEtapes="+iIdNextPhaseEtapes
+								+ "&amp;nonce=" + System.currentTimeMillis()) %>');"
+								  />
+						<br />Envoi de l'avis d'annulation
+					</td>
+<%
+	}
+%>					
+					<td style="width:200px;vertical-align:top" >
+						<a href="<%= response.encodeURL( 
+								rootPath + "desk/export/boamp/afficherSuiviBoamp.jsp?" 
+								+ "iIdAffaire=" + marche.getIdMarche() 
+								+ "&amp;iIdOnglet=" + iIdOnglet 
+								+ "&amp;sUrlTraitement="+sUrlTraitement
+								+ "&amp;iIdExport=" + exportAff.getIdExport()
+								+ "&amp;sIsProcedureLineaire="+sIsProcedureLineaire
+								) %>" >
+								<img height="30" src="<%= rootPath + "images/icones/BOAMP_suivi.gif" %>"  title="Suivi BOAMP" alt="Suivi BOAMP" 
+								 onmouseover="this.src='<%= rootPath + "images/icones/BOAMP_suivi_over.gif" %>'" 
+								 onmouseout="this.src='<%= rootPath + "images/icones/BOAMP_suivi.gif" %>'" 
+								 />
+						</a><br />Suivi de la publication
+					</td>
+					
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr><td>&nbsp;</td></tr>
+</table>

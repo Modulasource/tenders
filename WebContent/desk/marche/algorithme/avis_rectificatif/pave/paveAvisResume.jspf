@@ -1,0 +1,126 @@
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.joue.MarcheJoueFormulaire"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%
+	boolean bExistInitialJouePub = false;
+	boolean bIsJoueFormSelected = false;
+	try {
+	    Vector<MarcheJoueFormulaire> vMjfSelected = MarcheJoueFormulaire.getAllFromIdMarche(marche.getIdMarche());
+	    if(vMjfSelected.firstElement().getIdJoueFormulaire() == 2) {
+	    	bExistInitialJouePub = true;
+	    	if(bCreationArec) bIsJoueFormSelected = true;
+	    } else if(vMjfSelected.firstElement().getIdJoueFormulaire() == 14) {
+	    	bExistInitialJouePub = true;
+	    	bIsJoueFormSelected = true;
+	    }
+	} catch(Exception e) {}
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Avis rectificatif</td>
+		<td class="pave_titre_droite">
+		<%= AvisRectificatifType.getAvisRectificatifTypeName(avis.getIdAvisRectificatifType() ) %><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Affaire : </td>
+		<td class="pave_cellule_droite"><%= marche.getReference() %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Date de création : </td>
+		<td class="pave_cellule_droite"><%= CalendarUtil.getDateFormattee( avis.getDateCreation()) %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Publication : </td>
+		<td class="pave_cellule_droite"><strong>Du</strong> <%= CalendarUtil.getDateFormattee(validite.getDateDebut()) %> <strong>au</strong> <%= CalendarUtil.getDateFormattee(validite.getDateFin()) %></td>
+	</tr>
+<%
+	if(avis.getDescriptionType().equalsIgnoreCase("texte_libre")){
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align : top" >Objet du rectificatif : </td>
+		<td class="pave_cellule_droite"><%= Outils.replaceAll( Outils.getStringNotNullNeant(avis.getDescription()) , "\n" , "<br />")%></td>
+	</tr>
+<%
+	}
+	else
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">Pièce jointe : </td>
+		<td class="pave_cellule_droite">
+		<% 
+		if (avis.getPieceJointeNom() != null && !avis.getPieceJointeNom().equalsIgnoreCase("")){ 
+			String sUrlAvisRect = "desk/DownloadFileDesk?"
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request,
+							avis.getIdAvisRectificatif() , 
+							TypeObjetModula.AVIS_RECTIFICATIF);
+					
+			sUrlAvisRect = response.encodeURL(rootPath+ sUrlAvisRect);
+		%>
+			<a href="<%= sUrlAvisRect %>" ><%= avis.getPieceJointeNom() %>
+				<img src="<%=rootPath + modula.graphic.Icone.getIconeFromFileName(avis.getPieceJointeNom())
+				%>"  style="vertical-align:middle"/>
+			</a>
+		<%
+			}
+			else{
+				out.write("Pas de pièce jointe chargée");
+			}
+		%>
+		</td>
+	</tr>
+<%
+	}
+
+	AncienAvis ancienAvis = null;
+	String sUrlAncienAvis = null;
+	try
+	{
+		ancienAvis = AncienAvis.getAncienAvisFromAvisRectificatif(avis.getIdAvisRectificatif());	
+		sUrlAncienAvis = "desk/DownloadFileDesk?"
+				+ DownloadFile.getSecureTransactionStringFullJspPage(
+						request,
+						ancienAvis.getIdAncienAvis() , 
+						TypeObjetModula.ANCIEN_AVIS);
+				
+		sUrlAncienAvis = response.encodeURL(rootPath+ sUrlAncienAvis);
+	}
+	catch(Exception e){}
+	
+	if(sUrlAncienAvis != null)
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle" >Ancien <%= sTypeAvis %> : </td>
+		<td class="pave_cellule_droite"><a href="<%= sUrlAncienAvis %>" ><%= 
+			ancienAvis.getAncienAvisFilename() %>
+				<img src="<%=rootPath + modula.graphic.Icone.getIconeFromFileName(ancienAvis.getAncienAvisFilename()) %>"  style="vertical-align:middle"/>
+		</a></td>
+	</tr>
+	<%} %>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+<%
+if(bExistInitialJouePub) {
+%>
+    <tr>
+        <td class="pave_cellule_gauche">
+           L'avis initial a été sujet à une publication JOUE (formulaire 2).<br/> 
+           L'avis rectificatif sera donc également soumis à un envoi JOUE (formulaire 14).
+        </td>
+        <td class="pave_cellule_droite">
+            <input type="checkbox" name="bSendArecToJoue" value="bSendArecToJoue" <%= (bIsJoueFormSelected)?"checked":"" %> disabled>&nbsp;<i>Vous pouvez décocher la case si vous ne souhaitez pas envoyer l'avis rectificatif au JOUE.</i></input>
+        </td>
+    </tr>
+<%
+}
+%>
+</table>

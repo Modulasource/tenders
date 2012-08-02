@@ -1,0 +1,148 @@
+<%@page import="modula.marche.MarcheProcedure"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<% if(bUseBoamp17){
+	afBlockTypeAvis = new AutoFormCptBlock("Type d'avis", "block_type_avis");
+	
+	String sTypeAvis = "";
+	try{sTypeAvis = BoampFormulaireType.getBoampFormulaireTypeMemory(marProc.getIdBoampFormulaireType()).getLibelle();}
+	catch(Exception e){sTypeAvis = "Aucun Formulaire";};
+	AutoFormCptDoubleLabel afLabelAvis 
+		= new AutoFormCptDoubleLabel("Type d'avis",
+		"", 
+		sTypeAvis);
+
+	afBlockTypeAvis.addComponent(afLabelAvis);
+%>
+<%= afBlockTypeAvis.getHTML() %>
+<%@page import="org.coin.fr.bean.export.PublicationDestinationType"%>
+<%@page import="org.coin.autoform.component.AutoFormCptDoubleLabel"%>
+<%@page import="org.coin.bean.boamp.BoampFormulaireType"%>
+<%@page import="org.coin.autoform.component.AutoFormCptBlock"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="modula.marche.MarcheForme"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.ArticleLoi"%>
+<%@page import="modula.algorithme.AffaireProcedureType"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+
+<%@page import="org.coin.autoform.component.AutoFormCptSelect"%>
+<%@page import="org.coin.bean.question.Answer"%><br/>
+<%} %>
+<table class="pave" >
+	<tr onclick="montrer_cacher('paveProcedure')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveProcedureTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveProcedure" >
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Mode de passation* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%
+						String sPassation = "";
+						String sGlobalPassation = "";
+						try
+						{
+							int iIdMarchePassation = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure()).getIdMarchePassation();
+							MarchePassation mp = MarchePassation.getMarchePassationMemory(iIdMarchePassation);
+							sGlobalPassation = mp.getLibelleGlobal();
+							sPassation = mp.getLibelle();
+						}
+						catch(Exception e){}
+					%>
+				    <%= (!sGlobalPassation.equalsIgnoreCase("") && !sGlobalPassation.equalsIgnoreCase(sPassation)?sGlobalPassation+" : ":"")+sPassation %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Niveau de traitement* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%
+						String sNiveau = "";
+						try
+						{
+							int iIdAlgoAffaireProcedureType = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure()).getIdType();
+							sNiveau = AffaireProcedureType.getAffaireProcedureTypeNameMemory(iIdAlgoAffaireProcedureType);
+						}
+						catch(Exception e){}
+					%>
+				    <%= sNiveau %>
+					</td>
+				</tr>
+<%
+	//AutoFormCptSelect afProcedureSimpleEnveloppe;
+
+	if(afProcedureSimpleEnveloppe != null)
+	{
+		String sValueIdQuestionAnswerPSE = afProcedureSimpleEnveloppe.getSelect().getInitValue();
+		try{
+			QuestionAnswer qaProcedureSimpleEnveloppe 
+			 = QuestionAnswer.getQuestionAnswerMemory(
+					 Integer.parseInt(sValueIdQuestionAnswerPSE));
+			
+			String sValueNameQuestionAnswerPSE =  qaProcedureSimpleEnveloppe.getName();
+			if(sValueNameQuestionAnswerPSE.equals(""))
+			{
+				sValueNameQuestionAnswerPSE = "Indéfinie";
+			}
+%>
+                <tr>
+                    <td class="pave_cellule_gauche">
+                   Procédure simple enveloppe  :
+                    </td>
+                    <td class="pave_cellule_droite">
+                        <%= sValueNameQuestionAnswerPSE %>
+                    </td>
+                </tr>
+<%
+        } catch (Exception e) {
+        	//e.printStackTrace();
+        }
+	}
+%>
+                <tr>
+					<td class="pave_cellule_gauche">
+					Articles du CMP :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+try{
+	Vector<ArticleLoi> vArticles = ArticleLoi.getArticleLoiPourIdMarche(marche.getIdMarche());
+	for (int i = 0; i < vArticles.size(); i++)
+	{
+		ArticleLoi article = vArticles.get(i);
+	%>
+			<%= article.getLibelle()%><br />
+	<%
+	}
+}catch(Exception e){}
+%>
+					</td>
+				</tr>
+				<%
+				if(bUseBoamp17){
+				AutoFormCptDoubleLabel afLabel = QuestionAnswer.getAutoFormCptDoubleLabelWithKeyword("AvisImplique","AvisImplique",marProc.getIdQaAvisImplique());
+				%>
+				<%= afLabel.getHTML() %>
+				<%
+				afLabel = QuestionAnswer.getAutoFormCptDoubleLabelWithKeyword("AMP","AMP",marProc.getIdQaAccordOmc());
+				%>
+				<%= afLabel.getHTML() %>
+				<%
+				afLabel = QuestionAnswer.getAutoFormCptDoubleLabelWithKeyword("avisCorrespond","avisCorrespond",marProc.getIdQaAvisCorrespondance());
+				%>
+				<%= afLabel.getHTML() %>
+				<%
+				}
+				%>
+				</table>
+		</td>
+	</tr>
+</table>
+<br />

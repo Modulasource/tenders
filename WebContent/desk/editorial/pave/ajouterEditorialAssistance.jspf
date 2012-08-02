@@ -1,0 +1,37 @@
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+
+	if (isNull(document.getElementById("sNom").value))
+	{
+		sError += "Vous devez saisir un nom de contenu.<br />";
+		bResult = false;
+	}
+	if (isNull(document.getElementById("sContenu").value))
+	{
+		sError += "Vous devez saisir un contenu.<br />";
+		bResult = false;
+	}
+	if (isNull(document.getElementById("iIdEditorialAssistanceType").value)
+	|| document.getElementById("iIdEditorialAssistanceType").value <= 0)
+	{
+		sError += "Vous devez séléctionner un type de contenu.<br />";
+		bResult = false;
+	}
+	if (isNull(document.getElementById("iIdEditorialAssistanceGroup").value)
+	|| document.getElementById("iIdEditorialAssistanceGroup").value <= 0)
+	{
+		sError += "Vous devez séléctionner un groupe.<br />";
+		bResult = false;
+	}
+
+	document.getElementById("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}

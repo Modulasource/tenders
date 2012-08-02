@@ -1,0 +1,36 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Visibilit&eacute; du Contenu</td>
+	</tr>
+	<%
+	String sVisibilite = "Privé";
+	Vector<EditorialAssistanceLibrary> vLib = EditorialAssistanceLibrary.getAllEditorialAssistanceLibraryFromEditorialAssistance((int)edit.getId());
+	for(int i=0;i<vLib.size();i++)
+	{
+		EditorialAssistanceLibrary lib = vLib.get(i);
+		String sTypeObjet = "";
+		String sNomObjet = "";
+		if(lib.getIdTypeObjet() == ObjectType.ORGANISATION)
+		{
+			sTypeObjet = "Organisation :";
+			Organisation org = Organisation.getOrganisation(lib.getIdReferenceObjet());
+			sNomObjet = "<a href=\""+response.encodeURL(rootPath+"desk/organisation/afficherOrganisation.jsp?iIdOrganisation="+org.getId()+"&amp;iIdOnglet="+Onglet.ONGLET_ORGANISATION_AR)+"\">"+ org.getName()+"</a>";
+		}
+		if(lib.getIdTypeObjet() == ObjectType.PERSONNE_PHYSIQUE)
+		{
+			sTypeObjet = "Personne :";
+			PersonnePhysique pers = PersonnePhysique.getPersonnePhysique(lib.getIdReferenceObjet());
+			sNomObjet = "<a href=\""+response.encodeURL(rootPath+"desk/organisation/afficherPersonnePhysique.jsp?iIdPersonnePhysique="+pers.getId()+"&amp;iIdOnglet="+Onglet.ONGLET_PERSONNE_PHYSIQUE_AR)+"\">"+ pers.getName()+"</a>";
+		}
+		if(lib.getIdTypeObjet() == ObjectType.SYSTEME)
+		{
+			sVisibilite = "Public";
+		}
+		%>
+		<%= hbFormulaire.getHtmlTrInput(sTypeObjet,"",sNomObjet,"") %>
+		<%
+	}
+	%>
+	<%= hbFormulaire.getHtmlTrInput("Visibilité globale :","",sVisibilite,"") %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

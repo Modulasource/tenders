@@ -1,0 +1,52 @@
+           
+<%@page import="org.coin.security.SecureString"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+
+<div class="post-header post-block center" style="margin-left:0;">
+<img class="middle" src="<%=rootPath %>images/icons/zoom.gif" />&nbsp;&nbsp;<a id="marche_<%=
+    marche.getId() %>" href="javascript:void(0)" class="middle">Détail de l'annonce</a>
+
+<script type="text/javascript"> 
+Event.observe(window, "load", function() 
+{
+
+        $('marche_<%=marche.getId()%>').onclick = function() 
+	    {
+<%
+	if(sessionUser.isLogged
+	&& !Outils.isEmailValide(candidat.getEmail()))
+	{
+%>
+		if(true)
+		{
+			alert("Vous devez avoir une adresse email valide pour continuer");
+			return;
+		}
+<%	
+	}
+
+	{
+		String sUrlIframeAnnonce =    response.encodeURL(rootPath 
+	        	+ "publisher_portail/public/annonce/afficherAnnonce.jsp?a="
+		        + SecureString.getSessionSecureString(
+     	    	   Long.toString(marche.getId()), session)) ;
+		
+		String sTitlelIframeAnnonce = 
+			"Petite annonce référence "
+	        + Outils.replaceAll( marche.getReference(), "'", "''");
+%>
+
+                           
+			openAnnounceModalOrPopup(
+					"<%= sTitlelIframeAnnonce%>",
+                    "<%= sUrlIframeAnnonce %>");
+
+                            
+		}// function onclick
+}); // End Event.observe()
+ <%
+ 	}
+ %>                   
+                </script>
+            </div>

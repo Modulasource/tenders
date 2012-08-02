@@ -1,0 +1,77 @@
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.html.HtmlBeanInput"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="org.coin.localization.Language"%>
+<tr class="liste<%=j%>"> 
+	<td style="width:10%"><%= "Désactivée" %></td>
+	<td style="width:10%"><%= jobDetail.getName() %></td>
+	<td style="width:20%"><%= HtmlBeanInput.getHtmlInput("sJobArg0",sCronExp,10,hbFormulaire.bIsForm) %></td>
+	<td style="width:20%"><%= HtmlBeanInput.getHtmlInput("sJobArg1",jobDetail.getDescription(),20,hbFormulaire.bIsForm) %></td>
+	<td style="width:20%">
+	<%
+	for(int k=0;k<tabKey.length;k++)
+	{
+		%><strong><%= tabKey[k] %></strong> : <%
+		if(tabKey[k].equalsIgnoreCase("iIdExport"))
+		{
+			Vector vExports = Export.getAllExport();
+		%>
+		<%= CoinDatabaseAbstractBeanHtmlUtil
+			.getHtmlSelect(
+					"sJobArg"+(k+2), 
+					1,
+					(Vector<CoinDatabaseAbstractBean>)vExports , 
+					Long.parseLong(map.get(tabKey[k]).toString()), 
+					"",
+					false,
+					false) %>
+		<%
+		}
+	    else if(tabKey[k].equalsIgnoreCase("iIdLanguage"))
+        {
+            Vector vLang = Language.getAllStaticMemory();
+        %>
+        <%= CoinDatabaseAbstractBeanHtmlUtil
+            .getHtmlSelect(
+                    "sJobArg"+(k+2), 
+                    1,
+                    (Vector<CoinDatabaseAbstractBean>)vLang , 
+                    Long.parseLong(map.get(tabKey[k]).toString()), 
+                    "",
+                    false,
+                    false) %>
+        <%
+        }
+	    
+		
+		else
+		{
+		%>
+		<%= HtmlBeanInput
+			.getHtmlInput(
+					"sJobArg"+(k+2),
+					map.get(tabKey[k]).toString(),
+					20,
+					hbFormulaire.bIsForm) %><br/>
+		<%
+		}
+		%><br/>
+		<%
+	}
+	%>
+	</td>
+	<td style="text-align:right;width:5%">
+	&nbsp;
+	</td>
+	<td style="text-align:right;width:5%">
+	&nbsp;
+	</td>
+	<td style="text-align:right;width:5%">
+		<input type="hidden" name="sJobClass" value="<%= jobDetail.getJobClass().getName() %>" />
+		<a class="image" href="javascript:document.formcreate<%= i %>.submit();">
+		<img src="<%=rootPath+"images/icones/flag_green.gif"%>" alt="activer" title="activer"/>
+		</a>
+	</td>
+</tr>

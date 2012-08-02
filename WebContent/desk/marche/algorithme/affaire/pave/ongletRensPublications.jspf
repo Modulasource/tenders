@@ -1,0 +1,149 @@
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Publications</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<%
+		Vector<Validite> vValiditesAATR = Validite.getAllValiditeAATRFromAffaire(iIdAffaire);
+		Validite oValiditeAATR = null;
+		Timestamp tsDateAATRDebut = null;
+		Timestamp tsDateAATRFin = null;
+		if(vValiditesAATR != null)
+		{
+			if(vValiditesAATR.size() == 1) 
+			{
+				oValiditeAATR = vValiditesAATR.firstElement();
+				tsDateAATRDebut = oValiditeAATR.getDateDebut();
+				tsDateAATRFin = oValiditeAATR.getDateFin();
+			}
+		}
+		long iDureePublication = CalendarUtil.getDifferenceBetweenTimestamps(tsDateAATRDebut,tsDateAATRFin);
+		iDureePublication = iDureePublication/(60*24);
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Date d'envoi du présent avis à la publication* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= CalendarUtil.getDateCourte(tsDateAATRDebut) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Durée de publication du présent avis* :
+		<a href='javascript:OuvrirPopup("<%=response.encodeURL(rootPath+"include/avertissementUtilisateur.jsp?id="+InfosBullesConstant.DUREE_PUBLICATION_AATR )%>",400,250,"menubar=no,scrollbars=yes,statusbar=no")'>
+		<img src="<%=rootPath+modula.graphic.Icone.ICONE_AU%>" alt="Avertissement utilisateur" title="Avertissement utilisateur" width="21" height="21"  style="vertical-align:middle" />
+		</a>
+		</td>
+		<td class="pave_cellule_droite">
+		<%= (iDureePublication == 0) ? 15 : iDureePublication %>&nbsp;jours
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<div style="display:none">
+				Complément d'annonces :
+			</div>
+		</td>
+		<td class="pave_cellule_droite">
+			<div style="display:none">
+				<%String sPetiteAnnonceTexteLibre= avisAttribution.getPetiteAnnonceTexteLibre();%>
+				<%= !sPetiteAnnonceTexteLibre.equalsIgnoreCase("")?sPetiteAnnonceTexteLibre :"Pas de complément d'annonce" %>
+			</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Edition de l' AATR * :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sEditionPDF = "";
+			if(bAATRAutomatique) sEditionPDF = "Format automatique généré en PDF";
+			else sEditionPDF="Format Libre";
+		%>
+			<%= sEditionPDF %>
+		</td>
+	</tr>
+	<% if(!bAATRAutomatique){%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		AATR au format libre séléctionné :
+		</td>
+		<td class="pave_cellule_droite">
+			<% 	
+			String sNomAATRLibre = avisAttribution.getNomAATR();
+			if (sNomAATRLibre != null && !sNomAATRLibre.equals("")  )
+			{	
+				String sURLAATR = "desk/DownloadFileDesk?"
+						+ DownloadFile.getSecureTransactionStringFullJspPage(
+								request, 
+								avisAttribution.getIdAvisAttribution() , 
+								TypeObjetModula.AATR );
+;
+				sURLAATR = response.encodeURL(rootPath+ sURLAATR);
+				%>
+				<a href='<%= sURLAATR %>'>
+				<%= sNomAATRLibre %>
+				</a>
+				<%
+			}
+			else
+			{
+				%><p style='color:red' >pas de document associé</p><%
+			}
+			 %>
+		</td>
+	</tr>
+	<%} %>		
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br/>
+
+<%
+	/**
+	 * permet de savoir si l'affaire a commencé sur un AAPC ou un AATR
+	 */
+	if(bStartWithAATR)
+	{
+%>
+	<jsp:include page='<%= Theme.getDeskTemplateFilePath("/desk/marche/algorithme/affaire/pave/paveChoixPublicationOfficielleForm.jsp",request)%>' flush="false">
+	<jsp:param name="lIdMarche" value="<%= marche.getId() %>" />
+	</jsp:include> 
+<%
+	}
+%>
+
+<br/>
+<%@ include file="ongletRensPublicationsCommon.jspf" %>
+<% 
+if(exportBoamp != null)
+{
+%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Publication relative envoyée au BOAMP : AAPC </td>
+	</tr>
+	<tr><td colspan="2"></td></tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Identifiant de l'annonce IdWeb * :
+		</td>
+		<td class="pave_cellule_droite" ><%= 
+			avisInitial.getReferenceExterne() %></td>
+	</tr>
+	</table>
+<%
+} 
+%>
+
+

@@ -1,0 +1,41 @@
+	
+<%@page import="org.coin.bean.UseCase"%>
+
+<%@page import="org.coin.bean.Habilitation"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%><table class="pave" summary="none">
+		<tr onClick="montrer_cacher('trCU')">
+			<td class="pave_titre_gauche"><%= locBloc.getValue(3,"Cas d'Utilisation consolidés") %></td>
+			<td class="pave_titre_droite" ><%=vUseCasesRole.size() %> Cas</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+			<table id="trCU">
+<%
+for(Habilitation hab : vHabCU){
+	
+		UseCase usecase = (UseCase)CoinDatabaseAbstractBean.getCoinDatabaseAbstractBeanFromIdString(hab.getIdUseCase(),vUseCasesRole);
+		usecase.setAbstractBeanLocalization(sessionLanguage);
+		%>
+		<tr>
+		  <td class="pave_cellule_gauche"><%=usecase.getIdString() %></td>
+		  <td class="pave_cellule_droite" style="width:400px;"><%= usecase.getName() %></td>
+		  <td style="font-style:italic;width:200px;"><input type="hidden" 
+	                name="manageable_<%= hab.getId() %>" 
+	                id="manageable_<%= hab.getId() %>" 
+	                onclick=""
+	                value="<%= hab.isManageable()?1:0 %>"
+	                class="dataType-checkbox2"/>
+	      &nbsp;is manageable
+		  </td>
+		</tr>
+	<%
+}
+	%>
+	</table>
+		</td>
+		</tr>
+		
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+	</table>

@@ -1,0 +1,20 @@
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Compétences</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="font-weight:normal; align:left">
+		<%
+		Vector<BoampCPF> vCompetences = BoampCPF.getAllStaticMemory();
+
+		org.coin.bean.html.HtmlBeanDoubleList dlCompetences = new org.coin.bean.html.HtmlBeanDoubleList("iIdCompetence",rootPath,10);
+		dlCompetences.vBeanListAll = vCompetences;
+		dlCompetences.vBeanListSelected = vCompetencesOrganisation;
+		%>
+		<%= dlCompetences.getHtmlDoubleList() %>
+	  </td>
+	</tr>
+</table>
+<br />

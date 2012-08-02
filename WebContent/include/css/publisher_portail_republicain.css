@@ -1,0 +1,11 @@
+
+/*****************************************************************/
+.bandeau { 
+	height: 100px; 
+	vertical-align:top;
+	text-align:right;
+	width: 100%;
+	border : 1px solid #999;
+	background:transparent url(../../images/bandeaux/bandeau_grand_est.jpg) no-repeat top left;
+}
+

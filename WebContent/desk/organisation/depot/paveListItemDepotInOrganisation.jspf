@@ -1,0 +1,12 @@
+<%@page import="modula.graphic.Icone"%>
+<tr class="line<%=j %>" > 
+	<td class="cell" style="width:25%"><%= depot.getName()%></td>
+	<td class="cell" style="width:20%"><%= depot.getPhone() %></td>
+	<td class="cell" style="width:25%"><%= adresseDepot.getAllAdresseString("<br/>") %></td>
+	<td class="cell" style="width:25%"><a href="mailto:<%= depot.getEmail() %>" target="_blank"><%= depot.getEmail() %></a></td>
+	<td class="cell" style="text-align:right;width:5%">
+		<a href="<%= response.encodeURL(rootPath +"desk/organisation/depot/displayOrganisationDepot.jsp?lIdOrganisationDepot="+ depot.getId()+"&lIdOrganisation="+iIdOrganisation) %>">
+			<img src="<%=rootPath+Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE %>" alt="<%= localizeButton.getValueDisplay() %>" title="<%= localizeButton.getValueDisplay() %>"/>
+		 </a>
+	</td>
+</tr>

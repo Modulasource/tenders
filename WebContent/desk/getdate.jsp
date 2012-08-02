@@ -1,0 +1,1 @@
+<%@ page import="org.coin.util.CalendarUtil,org.coin.util.Outils" %>date=<%=Outils.encodeURL(CalendarUtil.getDateDuJourFormatteeForHorloge())%>

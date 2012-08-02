@@ -1,0 +1,49 @@
+<%
+if(bUseGeoloc )
+{
+	if(sessionUserHabilitation.isSuperUser() )
+	{
+%>
+
+<script type="text/javascript">
+function Map_initMarkers()
+{    
+layerMarkers = new OpenLayers.Layer.Markers("Markers");
+g_map.addLayer(layerMarkers);
+
+var size = new OpenLayers.Size(24,24);
+var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+var icon = null;
+var marker = null;
+
+icon = new OpenLayers.Icon('<%= rootPath + "images/treeview/icons/personne_bleu.gif"%>',size, offset);
+var lonLat = new OpenLayers.LonLat(<%= dLongitude %>, <%= dLatitude %>);
+
+// for open street Map use a specific projection
+lonLat = Map_getLonLatProjected(lonLat );
+
+marker = new OpenLayers.Marker(lonLat,icon);
+layerMarkers.addMarker(marker);
+
+var lonLatCenter = new OpenLayers.LonLat(<%= geoCenter.dLonCenter  %>, <%= geoCenter.dLatCenter %>);
+// for open street Map use a specific projection
+lonLatCenter = Map_getLonLatProjected(lonLatCenter );
+g_map.setCenter(lonLatCenter, <%= geoCenter.iZoom %>);
+
+g_map.addControl(new OpenLayers.Control.LayerSwitcher());
+}
+
+Event.observe(window, "load", function() {
+Map_initMaps();
+Map_initMarkers();
+});
+
+</script>
+Longitude : <%= adresse.getLongitude() %>
+Latidude : <%= adresse.getLatitude() %>
+
+<%
+	}
+}
+
+%>

@@ -1,0 +1,12 @@
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Commission</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Commision :","sCommission","Commission Appel d'Offres","size='70'",true) %>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

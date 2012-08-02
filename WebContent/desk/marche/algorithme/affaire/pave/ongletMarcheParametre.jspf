@@ -1,0 +1,59 @@
+<div style="text-align:right" >
+	<input type="button" onclick="Redirect('<%= 
+		response.encodeURL(
+			rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?"
+			+ "iIdAffaire=" + marche.getIdMarche() 
+			+ "&amp;iIdOnglet=" + Onglet.ONGLET_AFFAIRE_PARAMETRES 
+			+ "&amp;sActionParam=store" 
+			+ "&amp;nonce=" + System.currentTimeMillis() ) 
+	%>')" value="Modifier les paramètres" />
+	
+	<input type="button" onclick="Redirect('<%= 
+		response.encodeURL(
+			rootPath + "desk/marche/algorithme/affaire/modifierMarcheParametre.jsp?"
+			+ "iIdAffaire=" + marche.getIdMarche() 
+			+ "&amp;sAction=create" 
+			+ "&amp;nonce=" + System.currentTimeMillis() ) 
+	%>')" value="Ajouter un paramètre" />
+</div>
+<br />
+<table class="pave" >
+	<tr>
+		<td>
+			<table  class="liste" >
+				<tr>
+					<th>Nom</th>
+					<th>Valeur</th>
+					<th>&nbsp;</th>
+				</tr>
+			
+			<%
+		
+		for(int i = 0;i < vParams.size() ; i++)
+		{
+			int j = i % 2;
+	
+			MarcheParametre param = vParams.get(i);
+			String sUrlSupprimer 
+				= rootPath + "desk/marche/algorithme/affaire/modifierMarcheParametre.jsp?"
+				+ "sAction=remove&amp;iIdMarcheParametre=" + param.getIdMarcheParametre() ;
+			 %>
+				<tr class="liste<%=j%>" 
+					 onmouseover="className='liste_over'" 
+					 onmouseout="className='liste<%=j%>'" 
+					 > 
+					<td><%= param.getName() %></td>
+					<td><%= param.getValue() %></td>
+					<td style="text-align:right">
+						<a href="<%= response.encodeURL(sUrlSupprimer) %>" >
+						<img src="<%=rootPath + modula.graphic.Icone.ICONE_SUPPRIMER %>" alt="Supprimer" title="Supprimer"/> 
+						</a>
+					</td>		
+				</tr>
+		<%
+		}
+		 %>	
+			</table>
+		</td>
+	</tr>
+</table>

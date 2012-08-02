@@ -1,0 +1,44 @@
+<%@page import="org.coin.localization.LocalizationConstant"%>
+<%@page import="org.coin.localization.Localize"%>
+<%
+	Localize locTitle = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_HABILITATION_PAGE_TITLE);
+
+	Localize locMessage = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_HABILITATION_PAGE_MESSAGE);
+
+	Localize locTab = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_HABILITATION_PAGE_TAB);
+	
+    Localize locBloc = new Localize(
+            sessionLanguage.getId(),
+            LocalizationConstant.CAPTION_CATEGORY_HABILITATION_PAGE_BLOC);
+
+	Localize locHabilitationButton = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_HABILITATION_PAGE_BUTTON);
+	
+	Localize locAddressBookTabs = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_TAB);
+
+ 	Localize locAddressBookBloc = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_BLOC);
+
+ 	Localize locAddressBookTitle = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_TITLE);
+
+	Localize locAddressBookMessage = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_MESSAGE);
+
+	Localize locAddressBookButton = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_BUTTON);
+
+%>

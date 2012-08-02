@@ -1,0 +1,434 @@
+
+
+
+
+
+
+
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+
+<head>
+<META HTTP-EQUIV="Expires" CONTENT="-1"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<TITLE>Création d'un appel d'offre</TITLE>
+<script src="/modula/desk/include/verification.js" type="text/javascript"></script>
+<script type="text/javascript">
+function ChangeUrl(formulaire, champFormulaire, message, redirection)
+{
+	var champ = formulaire.elements[champFormulaire];
+		
+	if (champ.selectedIndex != 0)
+	{
+	
+		var url =  redirection + champ.options[champ.selectedIndex].value;
+		
+		window.top.main.location.href = url ;
+ 	}
+	else 
+	{
+		if (message != null)
+			alert(message);
+	}
+}
+</SCRIPT>
+<style type="text/css">
+<!--
+@import url("../include/css/desk.css");
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="20" topmargin="20" marginwidth="20" marginheight="20">
+<form name="validerPDT" method="post" action="validerMarche.jsp" enctype="multipart/form-data" >
+<div style="text-align:center; width : 99%;">
+	<div class="titre"> VALIDATION DU MARCHE PAR LE PRESIDENT</div>
+	<br />
+	<!-- Rappel infos administratives -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris"> Organisation responsable du march&eacute;</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Organisation :</strong>
+					</td>
+					<td style="text-align : left;">
+					 Communauté de Communes de Cattenom et Environs
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right; vertical-align : top;">
+					<strong>Adresse administrative :</strong>
+					</td>
+					<td style="text-align : left; ">
+					13, rue des Châteaux<br />
+					<br />
+					<br />
+					57570 CATTENOM<br />
+					France
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Rappel infos administratives -->
+	<br />
+	<!-- Partie recapitulative Etape 1 -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">Renseignements du march&eacute;</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Numero de l'affaire :</strong>
+					</td>
+					<td style="text-align : left;">
+					lnvsdnsn
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Secr&eacute;taire charg&eacute; du march&eacute; :</strong>
+					</td>
+					<td style="text-align : left;">
+					 Pierre JACQUES	
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Lieu d'ex&eacute;cution du march&eacute; :</strong>
+					</td>
+					<td style="text-align : left;">
+					lndslknvsnfb
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right; vertical-align : top;">
+					<strong>Adresse technique :</strong>
+					</td>
+					<td style="text-align : left;">
+					13, rue des Châteaux <br />
+  <br />
+  <br />
+ 57570 CATTENOM <br />
+ France
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Correspondant technique :</strong>
+					</td>
+					<td style="text-align : left;">
+					JACOB Paul
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Objet du march&eacute; :</strong>
+					</td>
+					<td style="text-align : left;">
+					dfvsdvsdgvsd
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Type de marché :</strong>
+					</td>
+					<td style="text-align : left;">
+					Fournitures
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Type de prestations :</strong>
+					</td>
+					<td style="text-align : left;">
+					Location
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Nature :</strong>
+					</td>
+					<td style="text-align : left;">
+					Alloti
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Forme :</strong>
+					</td>
+					<td style="text-align : left;">
+					Fractionné à tranches conditionnelles
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Mode de passation :</strong>
+					</td>
+					<td style="text-align : left;">
+					Concours restreint
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Phase de candidature :</strong>
+					</td>
+					<td style="text-align : left;">
+					Candidature
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right; vertical-align : top;">
+					<strong>Articles de loi :</strong>
+					</td>
+					<td style="text-align : left;">
+
+					Articles 38 et 70<br />
+
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Variantes :</strong>
+					</td>
+					<td style="text-align : left;">
+					Sans Variante
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>D&eacute;signation r&eacute;duite :</strong>
+					</td>
+					<td style="text-align : left;">
+					sdfsdfsdfssdjbsvb
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Description d&eacute;taill&eacute;e :</strong>
+					</td>
+					<td style="text-align : left;">
+					lnsdvkjnfbjkdnfbvjk
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Liste des pi&egrave;ces demand&eacute;es au candidat :</strong>
+					</td>
+					<td style="text-align : left;">
+					2
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Nombre minimum de candidats :</strong>
+					</td>
+					<td style="text-align : left;">
+					1
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Nombre maximum de candidats :</strong>
+					</td>
+					<td style="text-align : left;">
+					2147483647
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Date et heure limite de r&eacute;ception des candidatures:</strong>
+					</td>
+					<td style="text-align : left;">
+					21 juil. 2004 00:00:00
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Date et heure de cl&ocirc;ture du march&eacute;:</strong>
+					</td>
+					<td style="text-align : left;">
+					29 juil. 2004 00:00:00
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" style="text-align : center">
+						<input type="button" name="modifierEtape1" value="Modifier" />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Partie recapitulative Etape 1 -->
+	<br />
+	<!-- Partie recapitulative Etape 2 -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">D&eacute;tail des lots du march&eacute;</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td style="width : 50% ; text-align : center;" colspan="2">
+					<strong>Lot 1</strong>
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>D&eacute;signation r&eacute;duite :</strong>
+					</td>
+					<td style="text-align : left;">
+					scsfcsvsdv	
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Description d&eacute;taill&eacute;e du lot :</strong>
+					</td>
+					<td style="text-align : left;">
+					sklvhslfdbvsknb
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>R&eacute;f&eacute;rences demand&eacute;es au candidat :</strong>
+					</td>
+					<td style="text-align : left;">
+					lknslkvnflknbslknblk
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" style="text-align : center">
+						<input type="button" name="modifierEtape2" value="Modifier" />
+					</td>
+				</tr>
+			</table>
+		</div>
+
+	</div>
+	<!-- /Partie recapitulative Etape 2 -->
+	<br />
+	<!-- Partie recapitulative Etape 3 -->
+
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">Pi&egrave;ces jointes au march&eacute;</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>RC - Règlement de consultation :</strong>
+					</td>
+					<td style="text-align : left;">
+					dt346.exe
+					</td>
+				</tr>
+
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>CCAP - Cahier des Clauses Administratives Particulières :</strong>
+					</td>
+					<td style="text-align : left;">
+					exos_apache.pdf
+					</td>
+				</tr>
+
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>CCTP - Cahier des Clause Techniques Particulières :</strong>
+					</td>
+					<td style="text-align : left;">
+					pmstudio.cfg
+					</td>
+				</tr>
+
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>BP - Bordereau de Prix :</strong>
+					</td>
+					<td style="text-align : left;">
+					3DSMAX6FRARegInfo.html
+					</td>
+				</tr>
+
+				<tr>
+					<td colspan="2" style="text-align : center">
+						<input type="button" name="modifierEtape3" value="Modifier" />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Partie recapitulative Etape 3 -->
+	<br />
+	<!-- Validation du marche par le secretaire -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">Validation du march&eacute; par le pr&eacute;sident</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td>
+					Attention, la validation de cette derni&egrave;re &eacute;tape va inscrire
+					d&eacute;finitivement votre march&eacute; dans la base Modula D&eacute;mat&eacute;rialisation.
+					<br />
+					En tant que pr&eacute;sident de votre commission, vous allez pouvoir publi&eacute; votre march&eacute; d&eacute;mat&eacute;rialis&eacute; sur
+					le support &eacute;lectronique et les autres supports que l'administrateur
+					du syst&egrave;me aura param&eacute;tr&eacute;.
+					<br />
+					N'oubliez pas d'ins&eacute;rer votre cl&eacute; USB cod&eacute;e...
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align : center">
+						<input type="button" name="imprimer" value="Imprimer votre dossier" />
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align : center">
+						<input type="submit" name="valider" value="Publier le dossier" />
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Validation du marche par le secretaire -->
+</div>
+</form>
+</body>
+
+</html>

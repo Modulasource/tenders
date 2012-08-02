@@ -1,0 +1,269 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*	String sPaveNomenclatureTitre;
+	*	Vector vCpvPrincipaux;
+	*	Vector vCpvSupplementaire;
+	*/
+{
+	Vector vCpvDescripteur;
+	Vector vCpvSupplementaire;
+
+	Vector vCpvPrincipaux = MarcheCPVObjet.getAllMarcheCPVObjetFromMarche(marche.getIdMarche());
+	
+%>
+<%@page import="modula.marche.cpv.CPVDescripteurSupplementaire"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<script type="text/javascript">
+<!--
+
+function prepareCPVButton()
+{
+var item = "";
+<%
+	for(int i =0 ; i < 4; i++)
+	{
+%>
+		item = new AjaxComboList("sIdDescripteurPrincipal<%=i%>", "getCPVDescripteurPrincipal");
+		item.bShowId = "true";
+<% 
+		String[] arrsIdDescripteurSupp = new String [3];
+		for(int j = 0; j < arrsIdDescripteurSupp.length; j++)
+		{
+			String sChampName = sFormPrefix + "iIdDescripteurSupp" + i + "_" + j ;
+			%>
+			item = new AjaxComboList("<%= sChampName %>", "getCPVDescripteurSupplementaire");
+			item.bShowId = "true";
+	<% 
+			
+		}
+
+	}
+%>
+}
+//-->
+</script>
+
+<%@page import="modula.marche.geo.MarcheCodeNuts"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.geo.CodeNuts"%>
+<%@page import="modula.marche.MarcheCPVObjet"%>
+<%@page import="modula.marche.cpv.CPVDescripteur"%>
+<script type="text/javascript">
+<!--
+
+function getCodeNutsList(code)
+{
+	var value = code.value;
+	$("sIdCodeNutsLabel").innerHTML = "";
+	var t = $('sIdCodeNutsList');
+	t.innerHTML = "Taper les deux premières lettres du code NUTS pour faire appaître la liste";
+	
+	if(value.length < 2)
+	{
+		return ;
+	}
+	CodeNuts.getJSONArrayStringFromCodeNuts(
+		value,
+		function (s) {
+			var obj = s.evalJSON();
+			var t = $('sIdCodeNutsList');
+			var divList = document.createElement("div");
+			if(0 == obj.length ) 
+			{
+				t.innerHTML =  "Code inconnu !";
+				return;
+			}
+			for(i = 0; i < obj.length ; i++)
+			{
+				codenuts = obj[i];
+				var divCodeNuts = document.createElement("div");
+				divCodeNuts.innerHTML = codenuts.sId + " - " + codenuts.sFullname;
+				divCodeNuts.setAttribute("sid", codenuts.sId);
+				divCodeNuts.setAttribute("sfullname", codenuts.sFullname);
+				divCodeNuts.style.cursor = "pointer";
+				divCodeNuts.onmouseover = function() {
+					this.style.backgroundColor = "#FFF";
+				}
+				divCodeNuts.onmouseout = function() {
+					this.style.backgroundColor = "#EFF5FF";
+				}
+				divCodeNuts.onclick = function(){
+					code.value = this.getAttribute("sid");
+					$("sIdCodeNutsLabel").innerHTML = "<strong>" + this.getAttribute("sfullname") + "</strong>";
+					divList.innerHTML = "Sélection effectuée";
+				}
+				divList.appendChild(divCodeNuts);
+			}
+			t.innerHTML= "";
+			t.appendChild(divList);
+		}
+		);
+	
+}
+
+//-->
+</script>
+<table class="pave">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveNomenclatureTitre %></td> 
+	</tr>
+<%
+	if(bUseBoamp17)
+	{
+		MarcheCodeNuts marcheCodeNuts = null;
+		String sCodeNuts = "";
+		try {
+			marcheCodeNuts = MarcheCodeNuts.getMarcheCodeNutsFromIdMarche(marche.getId());
+			CodeNuts codeNuts = CodeNuts.getCodeNuts(marcheCodeNuts.getIdCodeNuts());
+			sCodeNuts = codeNuts.getName();
+		}catch (Exception e) {}
+		
+%>	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Code Nuts : </td>
+		
+		<td class="pave_cellule_droite" > 
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td style="vertical-align:top;width:175px">
+				<input type="text" 
+					name="sIdCodeNuts" 
+					value="<%= sCodeNuts %>" 
+					onkeyup="javascript:getCodeNutsList(this);" 
+					maxlength="6" />
+					<span id="sIdCodeNutsLabel" ></span>
+				</td>
+				<td style="vertical-align:top;width:195px" >
+				<div id="sIdCodeNutsList" 
+					style="height:80px;overflow:auto;border:1px solid #36C;background:#EFF5FF;padding:2px" >
+					Taper les deux premières lettres du code NUTS pour faire appaître la liste
+				</div>
+				</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+		<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+<%
+	} 
+%>	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2"><b>Codes CPV</b></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	
+<%
+	int iCPVExist = 0;
+	for(int i =0 ; i < 4; i++)
+	{
+		String sIdDescripteurPrincipal = "";
+		String[] arrsIdDescripteurSupp = new String [3];
+		arrsIdDescripteurSupp[0] = "";
+		arrsIdDescripteurSupp[1] = "";
+		arrsIdDescripteurSupp[2] = "";
+		try {
+			MarcheCPVObjet cpvPrincipal = (MarcheCPVObjet)vCpvPrincipaux.get(i);
+			vCpvDescripteur = CPVDescripteur.getAllCPVDescripteur(cpvPrincipal.getIdMarcheCpvObjet());
+			if (vCpvDescripteur.size() > 0)
+			{
+				CPVDescripteur cpvDescripteur = (CPVDescripteur)vCpvDescripteur.get(0);
+				sIdDescripteurPrincipal = cpvDescripteur.getIdCpvPrincipal();
+				iCPVExist++;
+				vCpvSupplementaire = 
+					CPVDescripteurSupplementaire.
+						getAllCPVDescripteurSupplementaireFromDescripteur(
+							cpvDescripteur.getIdCpvDescripteur());
+				
+				for(int j = 0; j < vCpvSupplementaire.size(); j++)
+				{
+					CPVDescripteurSupplementaire cpvSupp 
+						= (CPVDescripteurSupplementaire)vCpvSupplementaire.get(j);
+					arrsIdDescripteurSupp[j] = cpvSupp.getName();
+				}
+				
+			}
+		}catch (Exception e) {}
+		
+		String sHRefPrincipal = "javascript:OuvrirPopup(\"" 
+			+ response.encodeURL(
+				rootPath + "desk/marche/rechercherCPV.jsp?sFrame=main"
+				+ "&amp;champ=formulaire." + sFormPrefix + "sIdDescripteurPrincipal" + i )
+			+ "\",800,600,\"menubar=no,scrollbars=yes,statusbar=no\");";
+			
+			
+	%>
+	<tr id="<%=sFormPrefix %>objetSupp<%= i %>" style="<%= (i>0 && sIdDescripteurPrincipal.equalsIgnoreCase(""))?"display:none":"" %>">
+		<td style="vertical-align:top;width:20%;font-weight:bold;text-align:right">
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CPV) %>
+			&nbsp;
+			Objet <%= i==0?"principal":"complémentaire" %> :
+		</td>
+		<td style="width:80%">
+			<table >
+				<tr>
+					<td style="width:25%;text-align:center">Descripteur principal</td>
+					<td style="width:25%;text-align:center">Descripteur supplémentaire</td>
+					<td style="width:25%;text-align:center">Descripteur supplémentaire</td>
+					<td style="width:25%;text-align:center">Descripteur supplémentaire</td>
+				</tr>
+				<tr>
+					<td style="text-align:center">
+					<button type="button" id="AJCL_but_sIdDescripteurPrincipal<%= i %>" 
+					 ><%= sIdDescripteurPrincipal==""?"Choisissez":sIdDescripteurPrincipal %></button>
+						<input 
+							type="hidden" 
+							name="<%=sFormPrefix + "sIdDescripteurPrincipal" + i %>" 
+							id="<%=sFormPrefix + "sIdDescripteurPrincipal" + i %>" 
+							value="<%= sIdDescripteurPrincipal %>" 
+							 />
+					</td>
+		<%
+		for(int j = 0; j < arrsIdDescripteurSupp.length; j++)
+		{	
+			String sChampName = sFormPrefix + "iIdDescripteurSupp" + i + "_" + j ;
+		 %>
+				<td style="text-align:center">
+					<button type="button" id="AJCL_but_<%= sChampName %>" 
+					 ><%= arrsIdDescripteurSupp[j]==""?"Choisissez":arrsIdDescripteurSupp[j] %></button>
+						<input 
+							type="hidden" 
+							id="<%= sChampName %>" 
+							name="<%= sChampName %>" 
+							value="<%= arrsIdDescripteurSupp[j] %>" 
+							/>
+					</td>
+		<%}
+		 %>			
+				</tr>
+			</table>
+		</td>
+	</tr>
+<%	}	
+
+ %>	<tr>
+		<td colspan="2" style="text-align:left">
+		<div id="<%=sFormPrefix %>ajouterCPV"><br />&nbsp;&nbsp;&nbsp;
+			<a href="javascript:ajouterDiv('<%=sFormPrefix %>',<%= iCPVExist %>);">
+				<img src="<%=rootPath + modula.graphic.Icone.ICONE_PLUS %>" style="vertical-align:middle" alt="Ajouter un objet supplémentaire"/>
+					Ajouter un objet supplémentaire
+			</a>
+		</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+			Les listes de codes suivants proviennent du site http://simap.eu.int
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+<%
+}
+%>
+</table>

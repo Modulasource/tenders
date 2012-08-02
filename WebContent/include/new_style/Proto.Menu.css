@@ -1,0 +1,133 @@
+/* GENERAL STYLES */
+
+div.menu {
+	position: absolute;
+	top: 0;
+	left: 0;
+	font-family: verdana;
+}
+div.menu a {
+	display: block;
+	text-decoration: none;
+	cursor: default;
+	outline: none;
+	font-size: 11px;
+}
+div.menu .separator {
+	height: 1px;
+	padding: 0;
+	overflow: hidden;
+}
+
+
+/* FIREFOX STYLES */
+
+.menu.firefox {
+	width: 10em;
+	height:auto;
+	background: #F4F5EB;
+	border-top: 1px solid #ddd;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #666;
+	border-bottom: 1px solid #666;
+	padding: 5px;
+	font-family: inherit;
+}
+.menu.firefox a {
+	color: #555;
+	padding: 2px 5px;
+	border:none;
+	cursor: pointer;
+	font-size: 11px;
+}
+.menu.firefox a:hover {
+	background: #006;
+	color: #fff;
+	text-decoration: none;
+}
+.menu.firefox a.disabled {
+	color: #bbb;
+}
+.menu.firefox a.disabled:hover {
+	background: #F4F5EB;
+	color: #bbb;
+}
+.menu.firefox .separator {
+	border-bottom: 1px solid #fff;
+	background: #999;
+	margin: 4px 4px;
+}
+
+
+/* GOOGLE STYLES */
+
+.menu.google {
+	width: 10.5em;
+	height:auto;
+	background: #fff;
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-bottom: 1px solid #676767;
+	border-right: 1px solid #676767;
+}
+.menu.google a {
+	color: #00c;
+	text-decoration: none;
+	padding: 2px 5px;
+	cursor: pointer;
+	font-size: 12px;
+}
+.menu.google a:hover {
+	background: #D3E3FE;
+}
+.menu.google a.disabled {
+	color: #bbb;
+}
+.menu.google a.disabled:hover {
+	background: #fff;
+	color: #bbb;
+}
+.menu.google .separator {
+	background: #ccc;
+}
+
+/* DESKTOP STYLES */
+div.menu.desktop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	font-family: inherit;
+}
+.menu.desktop {
+	padding:5px;
+	width: 120px;
+	height:auto;
+	background: #8A6D7C;
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-bottom: 1px solid #676767;
+	border-right: 1px solid #676767;
+}
+.menu.desktop a {
+	color: #FFFFFF;
+	text-decoration: none;
+	padding: 2px 5px;
+	cursor: pointer;
+	font-size: 10px;
+}
+.menu.desktop a:hover {
+	background: #cdc0c7;
+	text-decoration: none;
+}
+.menu.desktop a.disabled {
+	color: #bbb;
+	text-decoration: none;
+}
+.menu.desktop a.disabled:hover {
+	background: #fff;
+	color: #bbb;
+	text-decoration: none;
+}
+.menu.desktop .separator {
+	background: #ccc;
+}

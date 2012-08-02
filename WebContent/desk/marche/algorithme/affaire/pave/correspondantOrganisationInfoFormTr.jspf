@@ -1,0 +1,35 @@
+	<tr>
+		<td class="pave_cellule_gauche">Nom de l'organisation : <br/>
+                <i>(doit comporter au moins 3 caractères)</i></td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>sNom" value="<%=correspondantOrganisationInfo.getNom() %>" size="60" maxlength="60"/>
+		</td>
+	</tr>
+	<%@ include file="adresseFormTr.jspf" %>
+	<tr>
+		<td class="pave_cellule_gauche">Téléphone :</td>
+		<td class="pave_cellule_droite">
+		
+			<input type="text" name="<%=sFormPrefix%>sTelephone" value="<%=correspondantOrganisationInfo.getTelephone() %>" size="20" maxlength="10"/>
+			&nbsp;&nbsp;&nbsp;<span style="font-weight:bold">Poste :</span>
+			<input type="text" name="<%=sFormPrefix%>sPoste" value="<%=correspondantOrganisationInfo.getPoste()%>" size="4" maxlength="3"/>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Fax :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>sFax" value="<%=correspondantOrganisationInfo.getFax()%>" size="20" maxlength="10"/>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Courrier électronique :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>sEmail" value="<%=correspondantOrganisationInfo.getEmail()%>" style="width:250px" maxlength="90" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Adresse Internet (URL) :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>sSiteWeb" value="<%= correspondantOrganisationInfo.getSiteWeb()%>" style="width:250px" />
+		</td>
+	</tr>

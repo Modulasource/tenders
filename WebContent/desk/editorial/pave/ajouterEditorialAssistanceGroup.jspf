@@ -1,0 +1,20 @@
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+
+	if (isNull(document.getElementById("sNom").value))
+	{
+		sError += "Vous devez saisir un nom de groupe.<br />";
+		bResult = false;
+	}
+
+	document.getElementById("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}

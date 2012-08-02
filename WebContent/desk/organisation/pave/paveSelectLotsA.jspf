@@ -1,0 +1,52 @@
+<table summary="none">
+<tr>
+	<td colspan="2" style="text-align: left;">
+		<a href="javascript:selectAll('document.formulaire.selectionA')">Sélectionner tous les lots</a> / 
+		<a href="javascript:unselectAll('document.formulaire.selectionA')">Désélectionner tous les lots</a> 
+	</td>
+</tr>
+<tr>
+	<td colspan="2" style="text-align: left;">
+		<%
+			for(int z = 0 ; z < vLotsTotal.size();z++)
+			{
+				MarcheLot lot = vLotsTotal.get(z);
+				String sDisabled = "";
+				if(!MarcheLot.isLotExistInVector(lot.getIdMarcheLot(),vLots))
+					sDisabled = "disabled='disabled'";
+				if(z==0)
+				{%>
+				<div class="colonne" style="width:<%=Math.round(100/iNbCols)%>%">
+				<%
+				}
+				else if((z%iNbElts)==0)
+				{%>
+				</div>
+				<div class="colonne" style="width:<%=Math.round(100/iNbCols)%>%">
+				<%}%>
+				<%
+				String sChecked="";
+				if(vEnveloppesALot != null)
+				{
+					for(int y=0;y<vEnveloppesALot.size();y++)
+					{
+						EnveloppeALot envALot = vEnveloppesALot.get(y);
+						if(envALot.getIdLot() == lot.getIdMarcheLot())
+						{
+							sChecked = "checked";
+							break;
+						} 
+					}
+				}
+				%>
+				<input <%= sDisabled %> type="checkbox" name="selectionA" value="<%= lot.getIdMarcheLot() %>" <%= sChecked %> />
+				&nbsp;Lot n° <%= lot.getNumero() %>
+				<br /><br />
+		<%
+			}
+		%>			
+			</div>
+			<input type="hidden" name="selectionLotsA" />
+		</td>
+</tr>
+</table>

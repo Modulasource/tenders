@@ -1,0 +1,168 @@
+<%
+	/* 
+	*	Nécessite les objets suivants :
+	*		String sPaveAcheteurPublicTitre;
+	*		String sFormPrefix;
+	*		PersonnePhysique ppPRM;
+	*		Organisation organisation;
+	*		Vector vPersonnes;
+	*		String sRedirection;		
+	*		boolean bReadOnly;
+	*		Adresse adresse;
+	*		Pays pays;
+	*		String sPage;
+	*/
+%>
+<%@page import="modula.graphic.*"%>
+<%
+	sFormPrefix = "PRM_"; 
+	sPage = "afficherAttribution.jsp?iIdAffaire="+marche.getIdMarche()+"&amp;iIdOnglet="+Onglet.ONGLET_ATTRIBUTION_ORGANISME+"&amp;sAction=store&amp;bShowForm=true";
+	sRedirection = sPage;
+	if (iTypeAcheteurPublic != -1)
+		sRedirection += "&amp;iTypeAcheteurPublic=" + iTypeAcheteurPublic;
+	sRedirection += "&amp;iIdPRM=";
+%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.Correspondant"%>
+<%@page import="org.coin.fr.bean.CorrespondantInfo"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveAcheteurPublicTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Sélection de la personne physique dans la liste* :
+		</td>
+		<td class="pave_cellule_droite">
+			<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" id="iIdPRM" name="iIdPRM" 
+				onchange="DWR_updateCorrespondant('iIdPRM', '<%= sFormPrefix %>')"
+				>
+				 <option value="0">Veuillez choisir une personne</option>
+<%
+	PersonnePhysique ppSelected = null;
+	for (int i = 0; i < vPersonnes.size(); i++)
+	{
+		/* Récupération de la personne physique courante */
+		PersonnePhysique ppPersonneCourante = (PersonnePhysique)vPersonnes.get(i);
+		String selected = "";
+
+		if (ppPersonneCourante.getIdPersonnePhysique() == iIdPRM){
+			selected = "selected='selected'";
+			ppSelected = ppPersonneCourante;
+		}
+%>
+				<option value="<%= ppPersonneCourante.getIdPersonnePhysique() %>" <%= selected %>>
+				<%= ppPersonneCourante.getCivilitePrenomNom() %>
+				</option>
+<%
+	}
+	Vector<Correspondant> vCorrespondantPRM = Correspondant.getAllCorrespondantFromTypeAndReferenceObjetAndPersonneWithFonction(ObjectType.AFFAIRE,marche.getIdMarche(),iIdPRM,PersonnePhysiqueFonction.PRM);
+	Correspondant oCorrespondantPRM = null;
+	CorrespondantInfo oCorrespondantPRMInfo = null;
+	String sNomPRM = "";
+	String sTelPRM = "";
+	String sPostePRM = "";
+	String sFaxPRM = "";
+	String sEmailPRM = "";
+	String sSiteWebPRM = "";
+	String sIdQaAdjudicateur = "";
+	if (iIdPRM!=-1){
+		if(vCorrespondantPRM.size() == 1){
+			oCorrespondantPRM = vCorrespondantPRM.firstElement();
+			try{
+				oCorrespondantPRMInfo = CorrespondantInfo.getAllFromCorrespondant(oCorrespondantPRM.getIdCorrespondant()).firstElement();
+				sNomPRM = oCorrespondantPRMInfo.getName();
+				sTelPRM = oCorrespondantPRMInfo.getTelephone();
+				sPostePRM = oCorrespondantPRMInfo.getPoste()!=null?oCorrespondantPRMInfo.getPoste():"";
+				sFaxPRM = oCorrespondantPRMInfo.getFax();
+				sEmailPRM = oCorrespondantPRMInfo.getEmail();
+				sSiteWebPRM = oCorrespondantPRMInfo.getSiteWeb()!=null?oCorrespondantPRMInfo.getSiteWeb():"";
+				sIdQaAdjudicateur = oCorrespondantPRMInfo.getIdQaAdjudicateur()+"";
+			}catch(Exception e){
+				sNomPRM = ppSelected.getCivilitePrenomNom();
+				sTelPRM = ppSelected.getTel();
+				sPostePRM = ppSelected.getPoste()!=null?ppSelected.getPoste():"";
+				sFaxPRM = ppSelected.getFax();
+				sEmailPRM = ppSelected.getEmail();
+				sSiteWebPRM = ppSelected.getSiteWeb()!=null?ppSelected.getSiteWeb():"";
+			}
+		}
+		else{
+			sNomPRM = ppSelected.getCivilitePrenomNom();
+			sTelPRM = ppSelected.getTel();
+			sPostePRM = ppSelected.getPoste()!=null?ppSelected.getPoste():"";
+			sFaxPRM = ppSelected.getFax();
+			sEmailPRM = ppSelected.getEmail();
+			sSiteWebPRM = ppSelected.getSiteWeb()!=null?ppSelected.getSiteWeb():"";
+		}
+	}
+%>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Pouvoir adjudicateur * :</td>
+		<td class="pave_cellule_droite">
+			<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" type="text" name="<%=sFormPrefix%>nom" value="<%=sNomPRM %>" style="width:250px" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Organisme :
+		</td>
+		<td class="pave_cellule_droite">
+		<span id="<%= sFormPrefix %>OrganisationRaisonSociale" >
+			<%= oOrganisation.getRaisonSociale() %>
+		</span>
+		</td>
+	</tr>
+	<%@ include file="paveAdresseStatiqueWithSpan.jspf" %>
+	<tr>
+		<td class="pave_cellule_gauche">T&eacute;l&eacute;phone :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>tel" value="<%=sTelPRM%>" size="20" maxlength="10"/>
+			&nbsp;&nbsp;&nbsp;<span style="font-weight:bold">Poste :</span>
+			<input type="text" name="<%=sFormPrefix%>poste" value="<%=sPostePRM%>" size="4" maxlength="3"/>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Fax :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>fax" value="<%=sFaxPRM%>" size="20" maxlength="10"/>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Courrier &eacute;lectronique :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>email" value="<%=sEmailPRM%>" style="width:250px" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Adresse Internet (URL) :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix%>site_web" value="<%= sSiteWebPRM %>" style="width:250px" />
+		</td>
+	</tr>
+	<%
+	if(bUseBoamp17){	
+		AutoFormCptSelect afAvisImplique = QuestionAnswer.getAutoformCptSelectWithKeyword(
+					"agitPourAutreCompte", sFormPrefix+"iIdQaAdjudicateur", sIdQaAdjudicateur, false);
+	%>
+	<%= afAvisImplique.getHTML() %>
+	<%
+	}
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" class="mention">
+		Vous devez spécifier ici la personne resonsable du marché seule habilitée à décacheter les candidatures en vue de la préparation de la C.A.O.
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

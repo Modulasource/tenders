@@ -1,0 +1,76 @@
+<%@page import="org.coin.fr.bean.export.ExportModeEmailDestinatairePieceJointe"%>
+<%@page import="org.coin.fr.bean.export.ExportModeEmailDestinataire"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.export.ExportModeEmailPieceJointeType"%>
+<table class="pave" summary="Transfert Mode Email">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Les destinataires</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+<%
+Vector<ExportModeEmailPieceJointeType> vPieceJointeType 
+	=ExportModeEmailPieceJointeType.getAllExportModeEmailPieceJointeType();
+
+for(int i=0;i<vDestinataires.size();i++)
+{
+	ExportModeEmailDestinataire destinataire = (ExportModeEmailDestinataire)vDestinataires.get(i); 
+ %>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= destinataire.getEmailDestinataire() %></td>
+		<td class="pave_cellule_droite" style="vertical-align:top;">
+			<table summary="none">
+				<tr>
+					<td><%= destinataire.getTypeDestinataire() %>
+		<strong>Pièces Jointes : </strong>
+<%
+	Vector<ExportModeEmailDestinatairePieceJointe> 
+		vPieceJointesDestinataire = 
+			ExportModeEmailDestinatairePieceJointe
+				.getAllDestinatairesPieceJointeFromDestinataire(
+						destinataire.getIdExportModeEmailDestinataire()) ;
+
+	for(int j=0;j<vPieceJointeType.size();j++){
+		ExportModeEmailPieceJointeType pieceJointe = vPieceJointeType.get(j);
+		String sChecked = "";
+		for(int k=0;k<vPieceJointesDestinataire.size();k++)
+		{
+			ExportModeEmailDestinatairePieceJointe pieceJointeDestinataire = vPieceJointesDestinataire.get(k);
+			if(pieceJointe.getId() == pieceJointeDestinataire.getIdExportModeEmailPieceJointeType())
+				sChecked="checked=\"checked\"";
+		}
+%>
+				<input disabled="disabled" type="checkbox" value="<%=pieceJointe.getId()
+				%>" name="pieceJointe<%=i%>" <%=sChecked %> />&nbsp;<%=pieceJointe.getName() %>
+<%			
+	}
+%>		
+
+					</td>
+					<td style="text-align:right">
+						<button type="button" onclick="Redirect('<%=
+							response.encodeURL( 
+								 "modifierExportModeEmailDestinataire.jsp?sAction=remove"
+								+"&amp;iIdExportModeEmailDestinataire="
+									+ destinataire.getIdExportModeEmailDestinataire()
+								+ "&amp;sUrlRedirect=" + sUrlRedirect) %>')" >Supprimer</button>
+				
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<% }%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align:center">
+			<button type="button" onclick="Redirect('<%=
+				response.encodeURL( 
+					 "modifierExportModeEmailDestinataire.jsp?sAction=create"
+					+ "&amp;iIdExport=" + export.getIdExport()
+					+ "&amp;sUrlRedirect=" + sUrlRedirect)  %>')" >Ajouter Destinataire</button>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

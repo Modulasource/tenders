@@ -1,0 +1,28 @@
+<%@page import="modula.configuration.ModulaConfiguration"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<br />
+<br />
+<br />
+<div class="footer">
+.: 
+<span class="orange">Version : v<%= 
+	Configuration.getConfigurationValueMemory(
+			ModulaConfiguration.MODULA_VERSION) %></span>
+&nbsp;-&nbsp;
+<span class="orange">DB Version : v<%= 
+	Configuration.getConfigurationValueMemory(
+			ModulaConfiguration.MODULA_DB_VERSION) %></span>
+&nbsp;
+<%
+	boolean bDisplayCopyright = Configuration.isTrueMemory("design.desk.botton.display.copyright", true);
+
+	if(bDisplayCopyright )
+	{
+%>
+-&nbsp;
+<a href="http://www.matamore.com" target="_blank">Copyright Matamore Software</a>
+ &copy;  
+ <%	} %>
+ - <a href="<%=response.encodeURL("CGU.jsp")%>">Mentions légales</a> 
+ - <a href="<%=response.encodeURL("#ancreHP")%>">Haut de page</a> :.
+</div>

@@ -1,0 +1,91 @@
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Fichier</td>
+	</tr>
+	<%
+ 	bIsFormTemp = hbFormulaire.bIsForm ;
+ 	hbFormulaire.bIsForm = false;
+
+	String sURL = "desk/DownloadFileDesk?" 
+			+ DownloadFile.getSecureTransactionStringFullJspPage(
+					request, 
+					doc.getId(), 
+					TypeObjetModula.DOCUMENT );
+			
+	sURL = response.encodeURL(rootPath+ sURL);
+	String sModifierFichier = "<input type=\"button\" value=\"modifier le fichier\" onclick=\"OuvrirPopup('"+response.encodeURL("uploadFichierForm.jsp?iIdDocument="+iIdDocument+"&amp;iIdOnglet="+iIdOnglet)+"',400,200,'menubar=no,scrollbars=yes,statusbar=no')\" />";
+ 	if(!sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonModifierDocument))
+ 	{
+ 		sModifierFichier = "";
+ 	}
+	%>
+	<%= hbFormulaire.getHtmlTrInput("Fichier :","","<a href=\""+sURL+"\"><strong>"+doc.getFileName()+"</strong></a>&nbsp;&nbsp;"+sModifierFichier) %>
+	<%
+	if(doc.getIdDocumentType() != DocumentType.TYPE_GENERE
+	&& doc.getIdDocumentType() != DocumentType.TYPE_BALISE)
+	{
+		String sBalise = "";
+		String sURLBalise = "";
+		try
+		{
+			Document docBalise = Document.getDocumentBaliseFromDocument((int)doc.getId());
+			sBalise = docBalise.getName();
+			sURLBalise = "desk/DownloadFileDesk?"
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request, 
+							docBalise.getId(),
+							TypeObjetModula.DOCUMENT );
+			sURLBalise = response.encodeURL(rootPath+ sURLBalise);
+			
+			String sURLSupprimer = "desk/document/modifierDocument.jsp?sAction=removeFromDocument&amp;iIdDocument="+docBalise.getId()+"&amp;iIdOnglet="+iIdOnglet+"&amp;iIdDocumentRedirect="+doc.getId();
+			sURLSupprimer = response.encodeURL(rootPath+ sURLSupprimer);
+			String sSupprimer = "<a href=\"javascript:if(confirm('Etes-vous sûr de vouloir supprimer ce document?')){Redirect('"+sURLSupprimer+"');}\">"
+		 				+"<img src=\""+rootPath + modula.graphic.Icone.ICONE_SUPPRIMER+"\" title=\"Supprimer le document\" alt=\"Supprimer le document\" style=\"width:16px;vertical-align:bottom;\" /></a>";
+		 				
+		 	String sDocumentBalise = "<input type=\"button\" value=\"modifier le fichier\" onclick=\"OuvrirPopup('"+response.encodeURL("uploadFichierForm.jsp?sAction=store&amp;iIdDocument="+docBalise.getId()+"&amp;iIdOnglet="+iIdOnglet+"&amp;iIdDocumentRedirect="+doc.getId())+"',400,200,'menubar=no,scrollbars=yes,statusbar=no')\" />";
+		 	
+		 	if(!sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonAjouterDocumentBalise)
+		 	|| !sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonModifierDocument))
+		 	{
+		 		sDocumentBalise = "";
+		 		sSupprimer = "";
+		 	}
+			%>
+			<%= hbFormulaire.getHtmlTrInput(
+					"Document balisé associé : ",
+					"",
+					"<a href=\""+sURLBalise+"\"><strong>"
+					+docBalise.getFileName()+"</strong></a>&nbsp;&nbsp;"
+					+sDocumentBalise+"&nbsp;&nbsp;"+sSupprimer) %>
+			<%
+		}
+		catch(Exception e)
+		{
+			String sSelectionFichierBalise = "<input type=\"button\" value=\"séléctionner un fichier\" onclick=\"OuvrirPopup('"+response.encodeURL("uploadFichierForm.jsp?sAction=create&amp;iIdDocumentType="+DocumentType.TYPE_BALISE+"&amp;iIdDocument="+doc.getId()+"&amp;iIdOnglet="+iIdOnglet)+"',400,200,'menubar=no,scrollbars=yes,statusbar=no')\" />";
+		 	if(!sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonAjouterDocumentBalise)
+		 	|| !sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonModifierDocument))
+		 	{
+		 		sSelectionFichierBalise = "";
+		 	}
+			%>
+			<%= hbFormulaire.getHtmlTrInput("Document balisé associé : ","","pas de document&nbsp;"+sSelectionFichierBalise) %>
+			<%
+		}
+	}
+
+	hbFormulaire.bIsForm = bIsFormTemp;
+	%>
+	<%= hbFormulaire.getHtmlTrInput("Content-Type :","sContentType",doc.getContentType(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Servlet de génération :","sGenerateServletURL",doc.getGenerateServletURL(),"") %>
+<% 
+	hbFormulaire.bIsForm = false;
+%>
+	<%= hbFormulaire.getHtmlTrInput("Signature initiale :","","","") %>
+	<%= hbFormulaire.getHtmlTrInput("Signature finale :","","","") %>
+<%
+	hbFormulaire.bIsForm = bIsFormTemp;
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

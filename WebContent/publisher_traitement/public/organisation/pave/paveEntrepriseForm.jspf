@@ -1,0 +1,54 @@
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.*"%>
+	
+<%@page import="org.coin.bean.html.HtmlBeanDoubleList"%><tr><td colspan="2">&nbsp;</td></tr>
+	<tr id="tr_infoRaisonSociale" style="display: none; visibility: hidden;">
+		<td class="pave_cellule_droite" colspan="2">
+			<div class="rouge" style="text-align:left">
+			Attention, la raison sociale saisie ci-dessous est déjà enregistrée dans la base de données.
+			Il est possible que vous soyez déjà inscrit.
+			</div>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Raison sociale :","sRaisonSociale",
+			organisation.getRaisonSociale(),"onBlur=\"verifierRaisonSociale();\" onKeyUp=\"verifierRaisonSociale();\"") %>
+	<input type="hidden" name="sRaisonSocialeAuth" id="sRaisonSocialeAuth" value="" />
+	<input type="hidden" name="iIdOrganisationType" id="iIdOrganisationType" value="<%= OrganisationType.TYPE_CANDIDAT %>" />
+<%
+	sFormPrefix = "organisation_adresse_";
+	Adresse adresse = new Adresse();
+    Pays pays = new Pays();
+%>
+<%@ include file="/publisher_traitement/private/organisation/pave/paveAdresseTableForm.jspf" %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Compétence(s) : </td>
+		<td class="pave_cellule_droite">
+		<%
+		HtmlBeanDoubleList dlCompetences = new HtmlBeanDoubleList("iIdCompetence",rootPath,10);
+		dlCompetences.vBeanListAll = vCompetences;
+		dlCompetences.vBeanListSelected = vCompetencesOrganisation;
+		dlCompetences.sClass = "";
+		%>
+		<%= dlCompetences.getHtmlDoubleList() %>
+	  	</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Code Naf (ou APE) : </td>
+		<td class="pave_cellule_droite">
+		<select name="iIdCodeNaf" id="iIdCodeNaf" size="12" style="width: 550px"  >
+			<%
+			for(CodeNaf codeNaf : vCodeNaf )
+			{
+			%><option value="<%= codeNaf.getIdCodeNaf() %>" ><%= codeNaf.getCodeNafEtLibelle() %></option>
+			<%	
+			}
+			%>
+		</select>
+		<td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>

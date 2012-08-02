@@ -1,0 +1,26 @@
+<%
+	
+	if(!sPageAttendue.equals(sSesionAction ) )
+	{
+	
+		sMessTitle = "Problème lors de l'inscription de l'entreprise";
+		sMess = "La session a été interrompue, veuillez vous réinscrire."
+			+ "<br /><br />"
+			+ "<a href='"+ response.encodeURL(rootPath + sPublisherPath )+"'>Retour &agrave; l'accueil</a>";
+		sUrlIcone = modula.graphic.Icone.ICONE_ERROR;	
+
+		session.setAttribute("sessionPageTitre", sTitle);
+		session.setAttribute("sessionMessageTitre", sMessTitle);
+		session.setAttribute("sessionMessageLibelle", sMess);
+		session.setAttribute("sessionMessageUrlIcone", sUrlIcone);
+		session.setAttribute("sessionAction", "");
+
+		try {
+			response.sendRedirect( response.encodeURL(rootPath + "include/afficherMessagePublisher.jsp")  );		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return;
+	}
+%>

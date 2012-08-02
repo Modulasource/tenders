@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr" >
+<head>
+<%= GoogleChromeFrame.getHtmlMetaTag() %>
+<%@page import="org.coin.util.useragent.GoogleChromeFrame"%>
+<%@page buffer="100kb" %> 
+<%@page import="mt.website.WebsiteTree"%>
+<%@page import="mt.website.WebsiteTreeRoot"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="modula.graphic.*"%>
+<%@page import="org.coin.localization.*"%>
+<%@page import="java.util.Enumeration"%>
+<%@page import="org.coin.util.JavascriptVersion"%>
+<%@page import="org.json.JSONArray"%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueParametre"%>
+<%@page import="org.coin.util.Outils"%>
+<%
+	String rootPath = request.getContextPath() +"/";
+	boolean bShowPageTitle = true;
+	
+	LocalizeButton localizeButton = null;
+	try {
+		localizeButton = new LocalizeButton(request);
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+	//JSONArray localizeJSONMatrix = Localize.getJSONMatrixStatic();
+	//dir="rtl" pour l'arabe
+	
+	String sMetaDataKeywords = "modula, dématérialisation, logiciel, progiciel, marchés publics, appels d'offre, avis d'appel public à concurrence, AAPC, avis d'attribution, AATR, annonces légales, journal annonces légales, démat, acheteur public, infrastructure à clé publique, interfaçage marco agysoft, logiciels de gestion des marchés publics, portail de dématérialisation, plate-forme de dématérialisation, procédures formalisées, mapa, procédures adaptées, e-administration, publication marché";
+	sMetaDataKeywords = Configuration.getConfigurationDescriptionMemory("design.desk.html.metadata.keywords",sMetaDataKeywords, false);
+
+	String sMetaDataDescription = "solution globale, logiciel de dématérialisation de marchés et des achats publics. Service de dématérialisation des marchés publics fourni aux acheteurs publics, collectivités teriitoriales et entreprises publiques, conformément à l'article 56 du code des marchés publics. Progiciel interfaçable avec les logiciels de gestion de marchés publics et fourni à la presse quotidienne régionale.";
+	sMetaDataDescription = Configuration.getConfigurationDescriptionMemory("design.desk.html.metadata.description",sMetaDataDescription, false);
+
+	String sMetaDataTitle = "D&eacute;mat&eacute;rialisation de march&eacute;s publics";
+	sMetaDataTitle = Configuration.getConfigurationDescriptionMemory("design.desk.html.metadata.title",sMetaDataTitle, false);
+	
+	
+%>
+
+
+
+<%@include file="beanSessionUser.jspf" %>
+
+<meta name="keywords" content="<%= sMetaDataKeywords %>" />
+<meta name="description" content="<%= sMetaDataDescription %>"/>
+<meta name="robots" content="index, follow" />
+<meta name="rating" content="General" />
+<meta name="distribution" content="Global" />
+<meta name="revisit-after" content="5 days" />
+<meta name="author" content="Studio Matamore" />
+<meta name="copyright" content="Studio Matamore" />
+<meta name="copyright" content="MT Software" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<title><%= Theme.getDeskTitle() %></title>
+<link rel="stylesheet" type="text/css" href="<%=rootPath%>include/new_style/<%= Theme.getDeskCSS() %>.css?v=<%= JavascriptVersion.DESK_CSS %>" media="screen" />
+<link rel="SHORTCUT ICON" href="<%= rootPath %>include/<%= Theme.getShortcutIcon() %>" />
+<script type="text/javascript">
+	var rootPath = "<%= rootPath %>";
+	var webService_url = rootPath+"WebServiceAjax";
+	var debugMode = <%=Configuration.isEnabledMemory("debug.session")%>;
+	var enableDeskTabs = <%=DeskUI.useTabs(request)%>;
+	var enableDeskContextMenu = <%=DeskUI.useContextMenu(request)%>;
+	var enableDeskTabsSave = <%=DeskUI.useTabsSave(request)%>;
+
+    
+	function closeModalAndRedirect(url){
+	    closeModalAndRedirectWithTime(url, 2000);
+	}
+		
+	function closeModalAndRedirectWithTime(url, time){
+	    Redirect(url);
+	    setTimeout(function(){
+	        try {new parent.Control.Modal.close();}
+	        catch(e) { Control.Modal.close();}
+	    }, 2000);  
+	}
+
+	function closeModalAndRedirectTabActive(url){
+		closeModalAndRedirectTabActiveWithTime(url, 2000);
+	}
+		
+	function closeModalAndRedirectTabActiveWithTime(url, time){
+	    parent.redirectParentTabActive(url);
+	    setTimeout(function(){
+	        try {new parent.Control.Modal.close();}
+	        catch(e) { Control.Modal.close();}
+	    }, time);  
+	}
+</script>
+<script type="text/javascript" src="<%=rootPath%>include/screenDimension.js"></script>
+<script type="text/javascript" src="<%=rootPath%>include/popup.js"></script>
+<script type="text/javascript" src="<%=rootPath%>include/redirection.js"></script>
+<script type="text/javascript" src="<%=rootPath%>include/cacherDivision.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/prototype.js?v=<%= JavascriptVersion.PROTOTYPE_JS %>"></script>
+<!-- <script type="text/javascript" src="<%= rootPath %>include/js/prototype_update_helper.js"></script> -->
+<script type="text/javascript" src="<%=rootPath %>include/js/shadedborder.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/fastinit.js"></script>
+<jsp:include page="/include/js/localization/localization.jsp" flush="false">
+<jsp:param name="iIdLang" value="<%= sessionLanguage.getId() %>" />
+</jsp:include>
+<script type="text/javascript" src="<%=rootPath %>include/js/run.js?v=<%= JavascriptVersion.RUN_JS %>"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/scriptaculous/scriptaculous.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/dragdrop.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/livepipe.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/window.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/js/mt.component.js?v=<%= JavascriptVersion.MT_COMPONENT_JS %>"></script>
+<link rel="stylesheet" href="<%=rootPath %>include/new_style/Proto.Menu.css" type="text/css" media="screen" />
+<script type="text/javascript" src="<%=rootPath %>include/js/Proto.Menu.js"></script>
+<script type="text/javascript" src="<%=rootPath %>dwr/engine.js"></script>
+<script type="text/javascript" src="<%=rootPath %>dwr/util.js"></script>
+<script type="text/javascript" src="<%= rootPath %>dwr/interface/GetListeForAjaxComboList.js" ></script>
+<!--Pour IE6--->
+<!--[if lte IE 6]>
+<link rel="stylesheet" type="text/css" href="<%=rootPath%>include/new_style/deskIE6.css" media="screen" />
+<script type="text/javascript" src="<%=rootPath%>include/js/pngfixall.js"></script>
+<![endif]-->
+<!--Pour IE7+--->
+<!--[if gte IE 7]>
+<![endif]-->
+<script>
+//prototypeUpdateHelper.logLevel = UpdateHelper.Warn;
+</script>

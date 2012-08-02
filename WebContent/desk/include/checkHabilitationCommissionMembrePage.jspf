@@ -1,0 +1,26 @@
+<%
+	
+
+	if( sessionUser.getIdUserType() == modula.UserConstant.USER_ADMIN )
+	{
+		sessionCommissionMembreHabilitation.setAsSuperUser();
+	}
+	else
+	{
+		sessionCommissionMembreHabilitation.setHabilitations(sessionUser.getIdIndividual(), iIdCommission );
+	}
+
+	// on teste d'abord l'habilitation statique (en rapport avec le user )
+	if(!sessionUserHabilitation.isHabilitate(sPageUseCaseId))
+		{
+		// puis on teste l'habilitation dynamique (en rapport avec le rôle que le user à dans cette commission)
+		
+		if( !sessionCommissionMembreHabilitation.isHabilitate(sPageUseCaseId ))
+		{
+			
+			response.sendRedirect(response.encodeRedirectURL(rootPath + "desk/errorAdmin.jsp?idError=100&sUseCase=" + sPageUseCaseId ));
+			return;
+		}
+	}
+
+%>

@@ -1,0 +1,102 @@
+<%
+	/*
+	 *	Objets nécessaires :
+	 *		String sPavePiecesDemandeesTitre;
+	 *		Marche marche;
+	 */
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('pavePiecesDemandees')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePiecesDemandeesTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="pavePiecesDemandees" summary="Liste des pi&egrave;ces demand&eacute;es">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Liste des pi&egrave;ces demand&eacute;es pour l'enveloppe A :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+{ 
+	String sListePiecesEnveloppeA = marche.getListePiecesEnveloppeA();
+	if(sListePiecesEnveloppeA == null ) 
+	{
+		sListePiecesEnveloppeA = "";
+	}
+	
+	int[] listePiecesEnveloppeA = Outils.parserChaineVersEntier(sListePiecesEnveloppeA, "|");
+	if (listePiecesEnveloppeA != null)
+	{
+		for (int i = 0; i < listePiecesEnveloppeA.length; i++)
+		{
+			EnveloppeAPieceJointeType type = 
+				EnveloppeAPieceJointeType.getEnveloppeAPieceJointeType(listePiecesEnveloppeA[i]);
+%>
+							<%= type.getName() %><br />
+<%
+	}
+}
+else
+{
+%>
+							Aucune pi&egrave;ce
+<%
+}
+%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Commentaire :
+					</td>
+					<td class="pave_cellule_droite">
+					<%=((marche.getCommentairePiecesEnveloppeA()==null)||(marche.getCommentairePiecesEnveloppeA()=="")?"Pas de commentaire":marche.getCommentairePiecesEnveloppeA()) %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Liste des pi&egrave;ces demand&eacute;es pour l'enveloppe B :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+
+	String sListePiecesEnveloppeB  = marche.getListePiecesEnveloppeB();
+	if(sListePiecesEnveloppeB == null ) 
+	{
+		sListePiecesEnveloppeB = "";
+	}
+	int[] listePiecesEnveloppeB = Outils.parserChaineVersEntier(sListePiecesEnveloppeB, "|");
+	if (listePiecesEnveloppeB != null)
+	{
+		for (int i = 0; i < listePiecesEnveloppeB.length; i++)
+		{
+			EnveloppeBPieceJointeType type = 
+				EnveloppeBPieceJointeType.getEnveloppeBPieceJointeType(listePiecesEnveloppeB[i]);
+%>
+							<%= type.getName() %><br />
+<%
+	}
+}
+else
+{
+%>
+							Aucune pi&egrave;ce
+<%
+}
+%>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<%
+}
+%>
+</table>

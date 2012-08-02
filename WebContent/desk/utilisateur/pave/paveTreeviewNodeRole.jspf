@@ -1,0 +1,38 @@
+<%@page import="modula.TreeviewNoeud"%>
+<%@page import="org.coin.util.treeview.TreeviewNode"%>
+<%@page import="java.util.Vector"%>
+<table class="pave">
+		<tr>
+			<td class="pave_titre_gauche" colspan="12">Treeview : </td>
+			<td class="pave_titre_droite" ><%= sUseCase  %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="12">&nbsp;</td>
+		</tr>
+<%		Vector vHabilitation = TreeviewNoeud.getHabilitations((int)role.getId() ); 
+		Vector vItemList ;
+		
+		vItemList = TreeviewNoeud.getItemListWithHabilitations((int) treeview.getIdMenuTreeview(), 0, request.getContextPath()+"/", vHabilitation ) ;
+			
+	 	for (int i=0; i < vItemList.size(); i++)
+	 	{
+		 	TreeviewNode node = (TreeviewNode ) vItemList.get(i);
+			int j;
+		%> 	
+        <tr>
+            <td class="pave_cellule_gauche">
+              <table >
+                <tr >
+                    <%@ include file="paveTreeviewNode.jspf" %>
+                </tr>
+              </table>
+            </td>
+            <td class="pave_cellule_droite"><%=node.getName() %></td>
+        </tr>   
+	<%	
+		}
+%>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2">&nbsp;</td>
+		</tr>
+	</table>

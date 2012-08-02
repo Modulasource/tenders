@@ -1,0 +1,61 @@
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc8')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc 8 Justifications</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc8" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Justifications à produire quant aux qualités et capacités du candidat : </td>
+				<td class="pave_cellule_droite">
+<%
+
+try {
+	Node nodeJustifications =  BasicDom.getChildNodeByNodeName(nodeAnn, "justifications" );
+	Node noteJustifTemp = BasicDom.getFirstChildElementNode(nodeJustifications);
+	while (noteJustifTemp != null)
+	{
+		if(!noteJustifTemp.getNodeName().equals("justificationComment") )
+		{
+			if(!noteJustifTemp.getNodeName().equals("justificationAutre") )
+			{
+				%><%= noteJustifTemp.getNodeName()  %><br /><%
+			}
+			else
+			{
+				%><%= noteJustifTemp.getTextContent()  %><br /><%
+			}
+		}
+		noteJustifTemp = BasicDom.getNextSiblingElementNode(noteJustifTemp );
+ 	}
+ 
+} catch (Exception e) {}
+ %>	
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Commentaire : (Champ non Modula)</td>
+				<td class="pave_cellule_droite">
+<%
+try {
+	Node nodeJustifications =  BasicDom.getChildNodeByNodeName(nodeAnn, "justifications" );
+	Node noteJustifTemp = BasicDom.getFirstChildElementNode(nodeJustifications);
+	while (noteJustifTemp != null)
+	{
+		if(noteJustifTemp.getNodeName().equals("justificationComment") )
+		{
+			%><%= noteJustifTemp.getTextContent()  %><br /><%
+		}
+		noteJustifTemp = BasicDom.getNextSiblingElementNode(noteJustifTemp );
+ 	}
+ 
+ } catch (Exception e) {}
+ %>	
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

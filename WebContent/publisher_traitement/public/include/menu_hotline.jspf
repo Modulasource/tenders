@@ -1,0 +1,26 @@
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="org.coin.util.Outils"%>
+<div class="center">
+<%
+
+	String sHotLineNumber = "08 92 23 02 41";
+	try {
+		sHotLineNumber = Configuration.getConfigurationValueMemory("publisher.portail.hotline.number");
+	} catch (Exception e) { }
+
+	String sHotLinePrice = "0,34&euro; /min";
+	try {
+		sHotLinePrice = Configuration.getConfigurationValueMemory("publisher.portail.hotline.price");
+		sHotLinePrice = Outils.replaceAll(sHotLinePrice, "&amp;" , "&");
+	} catch (Exception e) {}
+%>
+
+         <br />
+		<div class="center" style="text-weight:normal">
+	Laissez vous guider par notre Hotline utilisateurs : <br />
+	<div style="font-size:11px;font-weight:bold;color:#99151C"><br />
+	<%= sHotLineNumber %>
+	</div>
+	<%= sHotLinePrice %>
+    </div>
+</div>

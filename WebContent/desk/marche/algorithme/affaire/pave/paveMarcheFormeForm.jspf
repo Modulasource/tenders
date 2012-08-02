@@ -1,0 +1,42 @@
+
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarcheForme"%>
+<table id="block_forme" class="pave" >
+<tr>
+	<td class="pave_titre_gauche" colspan="2">Forme du marché</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche" style="vertical-align:top;">
+	Forme du marché :
+	</td>
+	<td class="pave_cellule_droite">
+	<%	
+		Vector vFormes = MarcheForme.getAllMarcheForme();
+		for (int i = 0; i < vFormes.size(); i++)
+		{
+			MarcheForme forme = (MarcheForme) vFormes.get(i);
+			String sChecked = "";
+			if (marche.getIdMarcheForme() >= 0)
+			{
+				if (forme.getId() == marche.getIdMarcheForme())
+				{
+					sChecked = "checked";
+				}
+			}
+			else
+			{
+				/* Cas du marché  ordinaire sélectionné par défaut */
+				if (forme.getId() == 0)
+				{
+					sChecked = "checked";
+				}
+			}
+	%>
+	<input type="radio" name="<%=sFormPrefix %>iIdMarcheForme" value="<%= forme.getId() %>" <%= sChecked %> />
+	<%= forme.getName() %><br />
+<%
+	}
+%>
+	</td>
+</tr>
+</table>

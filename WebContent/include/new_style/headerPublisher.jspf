@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<%@page contentType="text/html; charset=ISO-8859-1" %>
+<%@ page buffer="100kb" %>
+
+<%@page import="org.coin.localization.Language"%>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<%
+	String sMetaDataKeywords = "modula, dématérialisation, logiciel, progiciel, marchés publics, appels d'offre, avis d'appel public à concurrence, AAPC, avis d'attribution, AATR, annonces légales, journal annonces légales, démat, acheteur public, infrastructure à clé publique, interfaçage marco agysoft, logiciels de gestion des marchés publics, portail de dématérialisation, plate-forme de dématérialisation, procédures formalisées, mapa, procédures adaptées, e-administration, publication marché";
+	sMetaDataKeywords = Configuration.getConfigurationDescriptionMemory("design.publisher.html.metadata.keywords",sMetaDataKeywords, false);
+	
+	String sMetaDataDescription = "solution globale, logiciel de dématérialisation de marchés et des achats publics. Service de dématérialisation des marchés publics fourni aux acheteurs publics, collectivités teriitoriales et entreprises publiques, conformément à l'article 56 du code des marchés publics. Progiciel interfaçable avec les logiciels de gestion de marchés publics et fourni à la presse quotidienne régionale.";
+	try{
+		if (!session.getAttribute("sMetaDataDescription").equals("")){
+			sMetaDataDescription = (String) session.getAttribute("sMetaDataDescription");
+		}
+	}catch(Exception e){
+		sMetaDataDescription = Configuration.getConfigurationDescriptionMemory("design.publisher.html.metadata.description",sMetaDataDescription, false);
+	}
+		
+	String sMetaDataTitle = "D&eacute;mat&eacute;rialisation de march&eacute;s publics";
+	try{
+		if (!session.getAttribute("sMetaDataTitle").equals("")){
+			sMetaDataTitle = (String) session.getAttribute("sMetaDataTitle");
+		}
+	}catch(Exception e){
+		sMetaDataTitle = Configuration.getConfigurationDescriptionMemory("design.publisher.html.metadata.title",sMetaDataTitle, false);
+	}
+
+
+%>
+<%@include file="/publisher_traitement/public/include/beanSessionUser.jspf" %>
+<%@include file="/include/publisherType.jspf"%>  
+<head>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="modula.UserConstant"%>
+<%@page import="modula.graphic.CSS"%>
+<%@page import="org.coin.util.JavascriptVersion"%>
+<%@page import="org.coin.ui.Border"%>
+<%@page import="java.net.URL"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<!--  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /> -->
+<meta name="keywords" content="<%= sMetaDataKeywords %>" />
+<meta name="description" content="<%= sMetaDataDescription %>"/>
+<meta name="robots" content="index, follow" />
+<meta name="rating" content="General" />
+<meta name="distribution" content="Global" />
+<meta name="revisit-after" content="5 days" />
+<meta name="author" content="Studio Matamore" />
+<meta name="copyright" content="Studio Matamore" />
+<meta name="copyright" content="MT Software" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<%
+
+
+  	String rootPath = request.getContextPath() +"/";
+	//Border.setContextPath(rootPath );
+  	session.setAttribute("sessionCurrentApplicationName","publisher_portail");
+  
+  	String sDesignUseOrganisationId = request.getParameter(CSS.DESIGN_USE_ORGANISATION_ID);
+    if(sDesignUseOrganisationId != null)
+    {
+        session.setAttribute(CSS.DESIGN_USE_ORGANISATION_ID  , sDesignUseOrganisationId);
+        session.setAttribute(CSS.DESIGN_CSS_CURRENT_URL ,"");
+    } else if(session.getAttribute(CSS.DESIGN_USE_ORGANISATION_ID) != null) {
+        session.setAttribute(CSS.DESIGN_USE_ORGANISATION_ID  , ""+session.getAttribute(CSS.DESIGN_USE_ORGANISATION_ID));
+    } else {
+		/**
+		 * On se réfere tjs à une id organisation pour définir le design
+		 */
+		
+		 try{
+			URL urlRequest = new URL( request.getRequestURL().toString());
+			sDesignUseOrganisationId =
+						Configuration.getConfigurationValueMemory(
+								CSS.PUBLISHER_MAIN_FRAME_ORGANISATION + urlRequest.getHost());
+			session.setAttribute(CSS.DESIGN_USE_ORGANISATION_ID  , sDesignUseOrganisationId);
+		 } catch (CoinDatabaseLoadException e) {
+			 
+		 }
+	}
+    // Valeur par défaut
+    int iIdApplicationName = UserConstant.USER_SESSION_APPLICATION_ID_PUBLISHER_GENERIQUE;
+    String sCurrentApplicationName = (String) session.getAttribute("sessionCurrentApplicationName");
+    if(sCurrentApplicationName == null )
+    {
+        // le générique par défaut
+        // ici on est pas passé par un des filtres : 
+        // - PublisherPortailHabilitationFilter.java
+        // - PublisherHabilitationFilter.java
+        sCurrentApplicationName = UserConstant.USER_SESSION_APPLICATION_PUBLISHER_GENERIQUE;
+    }
+
+    if( sCurrentApplicationName.equals( UserConstant.USER_SESSION_APPLICATION_PUBLISHER_GENERIQUE) )
+        iIdApplicationName = UserConstant.USER_SESSION_APPLICATION_ID_PUBLISHER_GENERIQUE ;
+    if( sCurrentApplicationName.equals( modula.UserConstant.USER_SESSION_APPLICATION_PUBLISHER_PORTAIL) )
+        iIdApplicationName = UserConstant.USER_SESSION_APPLICATION_ID_PUBLISHER_PORTAIL;
+    
+    int iIFrameWidth = Configuration.getIntValueMemory("welcome.page.cadre.iframe.width", 760);
+
+    String sUserAgent = "unknow";
+    if(request.getHeader("User-Agent").contains("MSIE"))
+    {
+    	if(request.getHeader("User-Agent").contains("MSIE 7.0"))
+	    {
+    		sUserAgent = "ie7";
+	    }else {
+	    	sUserAgent = "ie6";
+	    }
+    } 
+    if(request.getHeader("User-Agent").contains("Firefox"))
+    {
+    	sUserAgent = "fx";
+    } 
+
+
+%>
+
+<title><%= sMetaDataTitle %></title> 
+<link rel="SHORTCUT ICON" href="<%= rootPath %>include/modula.ico" />
+<script type="text/javascript" src="<%= rootPath %>include/js/prototype.js?v=<%= JavascriptVersion.PROTOTYPE_JS %>"></script>
+<script type="text/javascript" src="<%= rootPath %>include/js/fastinit.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/js/run.js?v=<%= JavascriptVersion.RUN_JS %>">"></script>
+<script type="text/javascript" src="<%= rootPath %>include/crypto.js" ></script>
+<script type="text/javascript" src="<%= rootPath %>include/cryptage.js" ></script>
+<script type="text/javascript" src="<%= rootPath %>include/popup.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/redirection.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/cacherDivision.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/verification.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/js/shadedborder.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/js/scriptaculous/scriptaculous.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/dragdrop.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/livepipe.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/window.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/js/mt.component.js?v=<%= JavascriptVersion.MT_COMPONENT_JS %>"></script>
+<script type="text/javascript" src="<%= rootPath %>dwr/engine.js"></script>
+<jsp:include page="/include/js/localization/localization.jsp" flush="false">
+<jsp:param name="iIdLang" value="<%= Language.LANG_FRENCH %>" />
+</jsp:include>
+<script type="text/javascript">
+<!--
+
+/*
+Event.observe(
+    window, 
+    "load", 
+    function() {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+);
+*/
+	var bOnLoadAutoScrollOnTheTop = true;
+	Event.observe(window, "load", function() {
+	    if(bOnLoadAutoScrollOnTheTop )
+	    {
+			 try{
+				 document.documentElement.scrollTop = 0;
+				 //window.scrollTo(0,0);
+				 //parent.frames["main"].scrollTo(0,0);
+			     parent.scrollTo(0,0);
+			  }catch (e) {}
+	   }
+	});
+
+
+    var documentFontSizeNormal = 100;
+    var documentFontSizeBig = 150;
+    //var documentFontSize = documentFontSizeNormal;
+    
+//-->
+</script>
+<script type="text/javascript">
+
+var rootPath = "<%= rootPath %>";
+var webService_url = rootPath+"WebServiceAjax";
+var debugMode = <%=Configuration.isEnabledMemory("debug.session")%>;
+var sUserAgent = "<%=sUserAgent%>";
+var isLogged = <%= sessionUser.isLogged %>;
+
+function closeModalAndRedirect(url){
+    closeModalAndRedirectWithTime(url, 3000);
+}
+    
+function closeModalAndRedirectWithTime(url, time){
+    doUrlForParentOrCurrentWindow(url);
+    setTimeout(function(){
+        try {new parent.Control.Modal.close();}
+        catch(e) { Control.Modal.close();}
+    }, time);  
+}
+
+    
+</script>
+
+
+<link rel="stylesheet" type="text/css" href="<%= rootPath %>include/css/publisher_main.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="<%= rootPath %>include/component/calendar/calendar.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="<%=rootPath%>include/new_style/popup_style.css" media="screen" />
+
+
+<script type="text/javascript" src="<%= rootPath %>include/component/calendar/calendar.js"></script>
+<!-- <link rel="stylesheet" type="text/css" href="<%= CSS.getUrlCss(session, request, iIdApplicationName) %>" media="screen" /> -->

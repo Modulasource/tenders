@@ -1,0 +1,40 @@
+<%
+    String sUserLogin = "";
+    try {
+        sUserLogin = user.getLogin();
+    }catch (Exception e)
+    {
+        sUserLogin = "Pas d'utilisateur associé " ;
+    }
+    
+    String sUserStatus = "";
+    try {
+        sUserStatus = UserStatus.getUserStatusName(user.getIdUserStatus());
+    }catch (Exception e)
+    {
+        sUserStatus = "code indéfini - " + user.getIdUserStatus();
+    }
+%>
+<%@page import="org.coin.bean.UserStatus"%>
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Compte utilisateur</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+	<%= hbFormulaire.getHtmlTrInput("Statut du compte :","",sUserStatus,"") %>
+	<%= hbFormulaire.getHtmlTrInput("Identifiant :","",sUserLogin,"") %>
+	<%= hbFormulaire.getHtmlTrInput("Mot de passe : :","","********","") %>
+    </table>
+  </div>
+</div>

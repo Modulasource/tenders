@@ -1,0 +1,58 @@
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<table class="pave" summary="none"> 
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Procédure</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td class="pave_cellule_gauche" style="vertical-align:middle"> 
+				Petite annonce groupée* :
+			</td>
+			<td class="pave_cellule_droite" style="vertical-align:middle">
+				<input type="radio" name="isGrouped" value="1" onclick="cacher('id_passation');cacher('type_annonce');"/>Oui&nbsp;&nbsp;
+				<input type="radio" name="isGrouped" value="0" checked='checked' onclick="montrer('id_passation');montrer('type_annonce')" />Non
+			</td>
+		</tr>
+		<tr id="type_annonce">
+			<td class="pave_cellule_gauche" style="vertical-align:middle"> 
+				Type de l'annonce* :
+			</td>
+			<td class="pave_cellule_droite" style="vertical-align:middle">
+				<input type="radio" name="typeAnnonce" value="1" checked="checked" />Avis d'appel public à la concurrence&nbsp;&nbsp;
+				<input type="radio" name="typeAnnonce" value="2" />Avis d'attribution&nbsp;&nbsp;
+				<input type="radio" name="typeAnnonce" value="3" />Récapitulatif d'Attribution
+			</td>
+		</tr>
+		<tr id="id_passation">
+			<td class="pave_cellule_gauche" style="vertical-align:middle">
+			Mode de passation :
+			</td>
+			<td class="pave_cellule_droite" style="vertical-align:middle">
+			<%
+				String sValueMarchePassationId = "";
+				String sValueMarchePassationName = "Choisissez le mode de passation";
+				Vector<MarchePassation> vPassation = MarchePassation.getAllStaticMemory();
+			%>
+			<select name="<%=sFormPrefix %>iIdMarchePassation" 
+				style="width:300px" >
+                <option value="<%= sValueMarchePassationId  %>" selected='selected'><%= sValueMarchePassationName  %></option>
+<%
+	for(MarchePassation mp : vPassation){
+		sValueMarchePassationId = ""+mp.getId();
+		sValueMarchePassationName = mp.getName();
+%>
+                <option value="<%= sValueMarchePassationId  %>" ><%= sValueMarchePassationName  %></option>
+<%
+	}
+%>                 
+            </select>&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.PASSATION) %>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		</table>

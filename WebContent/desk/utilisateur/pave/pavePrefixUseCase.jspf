@@ -1,0 +1,36 @@
+<%@page import="org.coin.bean.UseCase"%>
+<table class="pave" >
+		<tr>
+			<td class="pave_titre_gauche" >Cas d'utilisation : </td>
+			<td class="pave_titre_droite" ><%= sUseCase  %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2">&nbsp;</td>
+		</tr>
+<%
+	
+	for (int i=0; i < vUseCasesRole.size(); i++)
+	{
+		UseCase usecase = (UseCase) vUseCasesRole.get(i);
+		
+		for (int j=0; j < vUseCasesAll.size(); j++)
+		{
+			UseCase usecaseTemp = (UseCase) vUseCasesAll.get(j);
+			
+			if(usecaseTemp.getIdString().equals(usecase.getIdString() ) 
+			&& usecase.getIdString().startsWith(sUseCase) )
+			{
+				%>
+		<tr>
+			<td class="pave_cellule_gauche"><%= usecase.getIdString() %></td>
+			<td class="pave_cellule_droite"><%= usecase.getName() %></td>
+		</tr>
+				<%
+			}
+		}
+	}
+%>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2">&nbsp;</td>
+		</tr>
+	</table>

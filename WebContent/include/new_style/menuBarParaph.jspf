@@ -1,0 +1,411 @@
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%
+			String sMessageMyProfile = localizeButton
+			.getValue(30, "Mon profil");
+	String sMessageLogout = localizeButton.getValue(31, "Déconnexion");
+	String sMessageLog = "";
+	
+	   PersonnePhysique __personneLogueePP = PersonnePhysique
+       .getPersonnePhysique(sessionUser.getIdIndividual());
+
+	   __personneLogueePP.setAbstractBeanIdLanguage(sessionLanguage.getId());
+	   __personneLogueePP.bUseLocalization = true;
+
+
+	    String sPersonnePhysique = __personneLogueePP.getPrenomNom() ;
+
+	String __sOrgUserLog = "";
+	try {
+		Organisation __o = sessionUser.getOrganisation();
+		__sOrgUserLog = "- " + __o.getRaisonSociale();
+	} catch (Exception e) {
+		__sOrgUserLog = "";
+	}
+%>
+
+<div id="headerMenu">
+	<div id="blockMenuBarTop" class="blockMenuBarTop">
+	    <div id="blockMenuBarInfo">
+	        <div class="blockMenuBarInfoLeft">Connecté(e) : <%= sPersonnePhysique %></div>
+	        <div class="blockMenuBarInfoRight">
+	           <span class="blockMenuBarInfoButton">
+	               <span><img src="<%= rootPath %>/images/icons/24x24/help.png" /> Aide</span>
+		       </span>
+		       <span class="blockMenuBarInfoButton">
+		          <span><img src="<%= rootPath %>/images/icons/24x24/logout.png" /> Déconnexion</span>
+		       </span>
+		    </div>
+		    <div style="clear:both"></div>
+		</div>
+	    <div class="blockMenuBarMiddleItemActive menuTab">
+	        <span>Tableau de Bord</span>
+	    </div>
+	    <div class="blockMenuBarMiddleItem menuTab">
+            <span>Délégations</span>
+        </div>
+        <div class="blockMenuBarMiddleItem menuTab">
+            <span>Rechercher</span>
+        </div>
+        <div class="blockMenuBarMiddleItem menuTab">
+            <span>Circuit Perso</span>
+        </div>
+        <div id="adminMenu" class="blockMenuBarMiddleItem menuTab">
+            <span>Administration</span>
+        </div>
+        <div class="blockMenuBarMiddleItem blockMenuBarChangeFont">
+            <span id="blockMenuBarChangeFontBig" class="blockMenuBarChangeFontBig"
+            onclick="javascript:updateBigFontSize()">A</span>
+            &nbsp;
+            <span id="blockMenuBarChangeFontNormal" class="blockMenuBarChangeFontNormal blockMenuBarChangeFontSelect"
+            onclick="javascript:updateNormalFontSize()">A</span>
+        </div>
+        <div style="clear:both"></div>
+	</div>
+	<div id="blockMenuBarMiddle" class="blockMenuBarMiddle">
+	   <div class="menuMiddle" style="display:none"><div></div></div>
+	   <div class="menuMiddle" style="display:none">
+	       <div class="menuMiddleBloc" style="width:250px">
+		       <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/amsn.png" /><br />
+		        Délégation User1</span></div>
+		        <div style="clear:both"></div>
+		   </div>
+		   <div style="clear: both"></div>
+       </div>
+       <div class="menuMiddle" style="display:none"><div></div></div>
+       <div class="menuMiddle" style="display:none">
+	       <div class="menuMiddleBloc" style="width:280px">
+				<div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-blue.png" /><br />
+				Circuit de notes</span></div>
+				<div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-red.png" /><br />
+		        Circuit de notes avec Visas préalables</span></div>
+		        <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-green.png" /><br />
+		        Circuit de Courriers Sortants</span></div>
+		        <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-white.png" /><br />
+		        Circuit de Courriers Entrants</span></div>
+		        <div style="clear:both"></div>
+		   </div>
+		   <div style="clear: both"></div>
+       </div>
+		<div class="menuMiddle" style="display:none">
+			<div class="menuMiddleBloc" style="width: 70px">
+				<div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-blue.png" /><br />
+				Relance des Courriers Entrants</span></div>
+				<div style="clear: both"></div>
+			</div>
+			<div class="menuMiddleBloc" style="width: 220px">
+				<div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/amsn.png" /><br />
+				Gestion des délégations</span></div>
+				<div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/gdm.png" /><br />
+				Gestion des contacts</span></div>
+				<div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/gnome-other.png" /><br />
+				Gestion des classeurs</span></div>
+				<div style="clear: both"></div>
+			</div>
+			<div class="menuMiddleBloc" style="width: 70px">
+				<div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/administration.png" /><br />
+				Changer mon mot de passe</span></div>
+				<div style="clear: both"></div>
+			</div>
+			<div style="clear: both"></div>
+		</div>
+	</div>
+	<div id="blockMenuBarBottom" class="blockMenuBarBottom">
+        <div class="fullWidth">
+	        <div class="leftBottomBar">
+                <a href="#" style="">Tableau de bord</a>
+                <img src="<%= rootPath + Icone.ICONE_NAVIGATION_DELIMITER %>" />
+                <a href="#">Notes de service</a>
+            </div>
+            <div class="rightBottomBar">
+            <%=sMessageLog + sessionUser.getLogin()%> <%=__sOrgUserLog%> (<%=sessionUserHabilitation.getGroupName()%>)
+            </div>
+           <div style="clear:both"></div>
+	    </div>
+    </div>
+</div>
+
+
+
+<style>
+.leftBottomBar{
+    float:left;
+    font-size:10px;
+    color: #8A6D7C;
+}
+.rightBottomBar{
+    float:right;
+    font-size:10px;
+    color: #8A6D7C;
+}
+.blockMenuBarTop .sb-inner {background-color:#C5BDC9}
+.blockMenuBarTop .sb-border {background-color:#8A6D7C}
+.blockMenuBarTop{
+    padding:9px 10px 0px 10px;
+}
+.blockMenuBarBottom .sb-inner {background-color:#F3F3F3}
+.blockMenuBarBottom .sb-border {background-color:#CCC}
+.blockMenuBarBottom{
+    padding:3px 10px 4px 10px;
+}
+#blockMenuBarBottom a{
+    font-weight:normal;
+    color: #333;
+}
+#blockMenuBarBottom a:hover{
+    font-weight:normal;
+    text-decoration:underline;
+}
+
+.blockMenuBarMiddle{
+    padding:3px 10px 3px 10px;
+    background-color : #8A6D7C;
+    color:#FFF;
+    border-top:1px solid #FFF;
+}
+.menuMiddleBloc .sb-inner {background-color:#8F7181}
+.menuMiddleBloc .sb-border {background-color:#C5BDC9}
+.menuMiddleBloc{
+    padding:3px 3px 3px 3px;
+    float:left;
+    margin-left:5px;
+    height:90px;
+    vertical-align:middle;
+}
+
+.menuMiddleItem .sb-inner {background-color:#8F7181}
+.menuMiddleItem .sb-border {background-color:#8F7181}
+.menuMiddleItemActive .sb-inner {background-color:#FFE697}
+.menuMiddleItemActive .sb-border {background-color:#C5BDC9}
+.menuMiddleItem{
+    font-weight:normal;
+    color:#FFF;
+    text-align:center;
+    width:50px;
+    float:left;
+    cursor:pointer;
+    padding:3px 7px 3px 7px;
+    height:85px;
+    vertical-align:middle;
+}
+.menuMiddleItemActive{
+    font-weight:normal;
+    color:#8A6D7C;
+    text-align:center;
+    width:50px;
+    float:left;
+    cursor:pointer;
+    padding:3px 7px 3px 7px;
+    height:85px;
+    vertical-align:middle;
+}
+.blockMenuBarMiddleItemActive .sb-inner {background-color:#8A6D7C}
+.blockMenuBarMiddleItemActive .sb-border {background-color:#FFF}
+.blockMenuBarMiddleItemActive {
+    padding:7px 5px 3px 5px;
+    width:120px;
+    text-align:center;
+    color:#FFF;
+    /*font-weight:bold;*/
+    cursor:pointer;
+    float:left;
+    margin-left:2px;
+    font-size:14px;
+    position:absolute;
+    top:1px;
+}
+
+.blockMenuBarMiddleItem .sb-inner {background-color:#AEA8B3}
+.blockMenuBarMiddleItem .sb-border {background-color:#AEA8B3}
+.blockMenuBarMiddleItem {
+    padding:7px 5px 3px 5px;
+    width:110px;
+    text-align:center;
+    cursor:pointer;
+    float:left;
+    margin-left:2px;
+    /*font-weight:bold;*/
+    color:#FFF/*#8A6D7C*/;
+    font-size:14px;
+}
+.blockMenuBarChangeFont {
+    width:30px;
+    float:right;
+}
+.blockMenuBarChangeFontBig {
+    font-size:14px;
+    font-weight:bold;
+    color:#8A6D7C;
+}
+.blockMenuBarChangeFontNormal {
+    font-size:11px;
+    font-weight:bold;
+    color:#8A6D7C;
+}
+.blockMenuBarChangeFontSelect{
+    color:#FFF;
+}
+
+
+#blockMenuBarInfo{
+    color:#FFF;
+    margin-bottom: 5px;
+    font-size:12px;
+}
+#blockMenuBarInfo img{
+    vertical-align:middle;  
+}
+#blockMenuBarInfo .blockMenuBarInfoLeft{
+    float:left;
+    text-align:center;
+    width:80%;
+    font-size: 18px;
+    font-weight: bold;
+}
+#blockMenuBarInfo .blockMenuBarInfoRight{
+    float:right;
+}
+
+.blockMenuBarInfoButton .sb-inner {background-color:#C5BDC9}
+.blockMenuBarInfoButton .sb-border {background-color:#C5BDC9}
+.blockMenuBarInfoButton {
+    padding:7px 5px 7px 5px;
+    width:100px;
+    cursor:pointer;
+    color:#FFF;
+}
+.blockMenuBarInfoButtonActive .sb-inner {background-color:#FFE697}
+.blockMenuBarInfoButtonActive .sb-border {background-color:#CCC}
+.blockMenuBarInfoButtonActive {
+    padding:7px 5px 7px 5px;
+    width:100px;
+    cursor:pointer;
+    color:#8F7181;
+}
+
+</style>
+<script>
+function hideMenusMiddle(){
+    $$('.menuMiddle').each(function(item){
+        Element.hide(item);
+    });
+}
+function toggleMenusMiddle(indexMenuToggle){
+    $$('.menuMiddle').each(function(item,index){
+        if(index==indexMenuToggle) Element.toggle(item);
+        else Element.hide(item);
+    });
+}
+function updateNormalFontSize(){
+    Element.addClassName($("blockMenuBarChangeFontNormal"),"blockMenuBarChangeFontSelect");
+    Element.removeClassName($("blockMenuBarChangeFontBig"),"blockMenuBarChangeFontSelect");
+    mt.css.changeDocumentSize(documentFontSizeNormal);
+}
+function updateBigFontSize(){
+    Element.addClassName($("blockMenuBarChangeFontBig"),"blockMenuBarChangeFontSelect");
+    Element.removeClassName($("blockMenuBarChangeFontNormal"),"blockMenuBarChangeFontSelect");
+    mt.css.changeDocumentSize(documentFontSizeBig);
+}
+
+Event.observe(window, 'load', function(){
+    hideMenusMiddle();
+
+    var blockMenuBarTop = RUZEE.ShadedBorder.create({corner:5, border:1,edges:"tlr"});
+    blockMenuBarTop.render($('blockMenuBarTop'));
+
+    var blockMenuBarBottom = RUZEE.ShadedBorder.create({corner:5, border:1,edges:"blr"});
+    blockMenuBarBottom.render($('blockMenuBarBottom'));
+
+    var blockMenuBarMiddleItemActive = RUZEE.ShadedBorder.create({corner:7, border:1,edges:"tlr"});
+    $$('.blockMenuBarMiddleItemActive').each(function(item){
+        blockMenuBarMiddleItemActive.render(item);
+    });
+
+    var blockMenuBarMiddleItem = RUZEE.ShadedBorder.create({corner:7, border:1,edges:"tlr"});
+    $$('.blockMenuBarMiddleItem').each(function(item){
+        blockMenuBarMiddleItem.render(item);
+    });
+
+    var menuMiddleBloc = RUZEE.ShadedBorder.create({corner:5, border:1});
+    $$('.menuMiddleBloc').each(function(item){
+        menuMiddleBloc.render(item);
+    });
+
+    var menuMiddleItem = RUZEE.ShadedBorder.create({corner:5, border:1});
+    $$('.menuMiddleItem').each(function(item){
+        menuMiddleItem.render(item);
+    });
+
+    var menuMiddleItemActive = RUZEE.ShadedBorder.create({corner:5, border:1});
+    $$('.menuMiddleItemActive').each(function(item){
+        menuMiddleItemActive.render(item);
+    });
+
+    var blockMenuBarInfoButton = RUZEE.ShadedBorder.create({corner:5, border:1});
+    $$('.blockMenuBarInfoButton').each(function(item){
+        blockMenuBarInfoButton.render(item);
+    });
+
+    var blockMenuBarInfoButtonActive = RUZEE.ShadedBorder.create({corner:5, border:1});
+    $$('.blockMenuBarInfoButtonActive').each(function(item){
+        blockMenuBarInfoButtonActive.render(item);
+    });
+
+    //var blockMenuBarMiddle = $("blockMenuBarMiddle");
+    //var menuMiddles = $A(blockMenuBarMiddle.getElementsByClassName("menuMiddle"));
+
+    $$('.menuTab').each(function(item,index){
+        item.onclick = function(){
+            $$('.blockMenuBarMiddleItemActive').each(function(itemActive){
+                Element.removeClassName(itemActive,"blockMenuBarMiddleItemActive");
+	            Element.addClassName(itemActive,"blockMenuBarMiddleItem");
+	             blockMenuBarMiddleItem.render(item);
+            });
+            Element.removeClassName(item,"blockMenuBarMiddleItem");
+            Element.addClassName(item,"blockMenuBarMiddleItemActive");
+            blockMenuBarMiddleItemActive.render(item);
+            
+            toggleMenusMiddle(index);
+            //Effect.SlideDown(menuMiddles[index], { duration: 0.3,afterFinish:function(){mt.html.resizeLayout();} });
+            //Element.toggle(menuMiddles[index]);
+            mt.html.resizeLayout();
+        }
+    });
+
+    $$('.menuMiddleItem').each(function(item,index){
+        item.onmouseover = function(){
+            $$('.menuMiddleItemActive').each(function(itemActive){
+                Element.removeClassName(itemActive,"menuMiddleItemActive");
+                Element.addClassName(itemActive,"menuMiddleItem");
+                 menuMiddleItem.render(item);
+            });
+            Element.removeClassName(item,"menuMiddleItem");
+            Element.addClassName(item,"menuMiddleItemActive");
+            menuMiddleItemActive.render(item);
+        }
+        item.onmouseout = function(){
+            Element.removeClassName(item,"menuMiddleItemActive");
+            Element.addClassName(item,"menuMiddleItem");
+            menuMiddleItem.render(item);
+        }
+    });
+
+    $$('.blockMenuBarInfoButton').each(function(item,index){
+        item.onmouseover = function(){
+            $$('.blockMenuBarInfoButtonActive').each(function(itemActive){
+                Element.removeClassName(itemActive,"blockMenuBarInfoButtonActive");
+                Element.addClassName(itemActive,"blockMenuBarInfoButton");
+                blockMenuBarInfoButton.render(item);
+            });
+            Element.removeClassName(item,"blockMenuBarInfoButton");
+            Element.addClassName(item,"blockMenuBarInfoButtonActive");
+            blockMenuBarInfoButtonActive.render(item);
+        }
+        item.onmouseout = function(){
+            Element.removeClassName(item,"blockMenuBarInfoButtonActive");
+            Element.addClassName(item,"blockMenuBarInfoButton");
+            blockMenuBarInfoButton.render(item);
+        }
+    });
+});
+</script>

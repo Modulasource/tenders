@@ -1,0 +1,39 @@
+<%
+%>
+	<%@page import="org.coin.fr.bean.Pays"%>
+	<%= hbFormulaire.getHtmlTrInput("Complément de remise :",sFormPrefix+"sAdresseLigne1",adresse.getAdresseLigne1(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Complément de distribution :",sFormPrefix+"sAdresseLigne2",adresse.getAdresseLigne2(),"") %>
+	<tr>
+		<td class="pave_cellule_gauche" >Voie :
+		<input type="hidden" name="<%=sFormPrefix %>iIdAdresse" value="<%= adresse.getIdAdresse() %>" /> 
+		</td>
+		<td class="pave_cellule_droite" >
+		N° <input type="text" name="<%=sFormPrefix %>sVoieNumero" size="5" maxlength="10" 
+		value="<%= adresse.getVoieNumero() %>" />
+		Type <input type="text" name="<%=sFormPrefix %>sVoieType" size="8" maxlength="40" 
+		value="<%= adresse.getVoieType() %>" />
+		Nom <input type="text" name="<%=sFormPrefix %>sVoieNom" size="23" maxlength="40" 
+		value="<%= adresse.getVoieNom() %>" />
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Lieu-dit :",sFormPrefix+"sAdresseLigne3",adresse.getAdresseLigne3(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Boîte Postale :",sFormPrefix+"sBoitePostale",adresse.getBoitePostale(),"") %>
+	<tr>
+		<td class="pave_cellule_gauche" >Code Postal :</td>
+		<td class="pave_cellule_droite" >
+		<input type="text" name="<%=sFormPrefix %>sCodePostal" size="6" maxlength="5" 
+		value="<%= adresse.getCodePostal() %>" />
+		Localité :
+		<input type="text" name="<%=sFormPrefix %>sCommune" size="19" maxlength="30" 
+		value="<%= adresse.getCommune() %>" />
+		Cedex :
+		<input type="text" name="<%=sFormPrefix %>sCedex" size="6" maxlength="5" 
+		value="<%= adresse.getCedex() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Pays :</td>
+		<td class="pave_cellule_droite" >
+		<%= Pays.getPaysHTMLComboList(adresse.getIdPays(),sFormPrefix+"sIdPays") %>
+		</td>
+	</tr>

@@ -1,0 +1,59 @@
+
+<%@page import="org.coin.fr.bean.Organisation"%>
+
+
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="org.coin.fr.bean.OrganisationParametre"%>
+
+ 
+<%
+    int iNbPublicationsSelected = 0;
+    for(int i=0;i<vOrganisationsPublication.size();i++){            
+        Organisation organisation 
+            = vOrganisationsPublication.get(i);
+        String BlocGestionPublication_sSelected="";
+        String sIsHidden = "";
+        boolean bReadyToSend = false; 
+        for(int j=0;j<vExportsAFF.size();j++){
+            Export exportAFF = vExportsAFF.get(j); 
+            if(exportAFF.getIdObjetReferenceDestination() == organisation.getIdOrganisation())
+            {
+            	BlocGestionPublication_sSelected="checked=\"checked\"";
+            }
+        }
+        
+        try {
+            sIsHidden 
+	            = OrganisationParametre.getOrganisationParametreValue(
+	            		organisation.getIdOrganisation(), 
+	            		"export.hidden");  
+        } catch(Exception e){}
+        
+        if(!sIsHidden.equalsIgnoreCase("true")){
+            if(!BlocGestionPublication_sSelected.equalsIgnoreCase("")) iNbPublicationsSelected++;
+            
+%>
+
+            <tr>
+                <td class="pave_cellule_gauche" style="vertical-align:middle">
+                    <input type="checkbox" name="organisationSelected" value="<%=
+                        organisation.getIdOrganisation() %>" <%=BlocGestionPublication_sSelected %>
+                         class="organisationSelectedClass" />&nbsp;
+                </td>
+                <td class="pave_cellule_droite" style="vertical-align:middle">
+                    <%=organisation.getRaisonSociale() %>
+                    <%=(!BlocGestionPublication_sSelected.equalsIgnoreCase("")&&!bReadyToSend
+                    ?"<span class=\"mention\">Vous devez maintenant valider la publication associée.</span>"
+                    :"") %>
+                </td>    
+            </tr>
+<%
+        }
+        else{
+%>
+            <input type="hidden" name="organisationSelected" value="<%=organisation.getIdOrganisation() %>" />
+<%              
+        }
+    }
+ 
+%>

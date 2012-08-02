@@ -1,0 +1,28 @@
+            <form id="login_form_ap" action="<%= response.encodeURL(rootPath+"publisher_portail/logon.jsp")%>" 
+            onsubmit="crypterPassword(document.forms['login_form_ap'],'<%= sMotCache %>');"
+            method="post" 
+            name="login_form_ap">
+            <input type="hidden" name="cryptogramme" id="cryptogramme" value="" />
+            <input type="hidden" name="type" value="ap" />
+            
+            <table>
+                <tr>
+                    <td style="text-align:right;padding-bottom: 3px">Identifiant :&nbsp;</td>
+                    <td style="padding-bottom: 3px">
+                        <input type="text" class="clearFocus" name="login" size="17" 
+                            value=""  alt="identifiant ou adresse email" />
+                    </td>
+                    <td style="text-align:left;">
+                    <button type="submit" name="submit" class="butLogon">&nbsp;</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:right;padding-bottom: 3px;vertical-align: top;">Mot de passe :&nbsp;</td>
+                    <td style="padding-bottom: 3px;vertical-align: top;">
+                    <input type="password" class="clearFocus" name="pass" size="17" />
+                    </td>
+                    <td></td>
+                </tr>
+          </table>
+          
+          </form>

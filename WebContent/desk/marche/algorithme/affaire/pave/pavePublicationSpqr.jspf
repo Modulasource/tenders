@@ -1,0 +1,61 @@
+<%
+	Vector<PublicationSpqr> vPublicationsAAPCSpqr
+		= org.coin.fr.bean.export.PublicationSpqr.getAllPublicationSpqrFromAffaire(
+			PublicationType.TYPE_AAPC,
+			marche.getIdMarche());
+
+
+	if(vPublicationsAAPCSpqr.size() == 0)
+	{
+		Vector<Export> vExport = Export.getAllExportFromSourceAndDestination(
+				marche.getIdOrganisationFromMarche(),
+				TypeObjetModula.ORGANISATION,
+				PublicationSpqr.getIdOrganisationSpqr(),
+				TypeObjetModula.ORGANISATION);
+%>	
+				<tr>
+					<td class="pave_cellule_gauche" style="vertical-align:middle">Publication de l'AAPC au SPQR :</td>
+					<td class="pave_cellule_droite" style="vertical-align:middle">
+<%		
+		if(vExport.size() ==0)
+		{
+			%>Pas export défini vers le vers le SPQR.<%
+		}
+			
+		for (int i =0 ; i < vExport.size() ; i++)
+		{
+			Export export = vExport.get(i);
+			String sUrlCreate 
+				= rootPath + "desk/export/publication/modifierPublicationSpqr.jsp?"
+				+ "sAction=createIndentifiants"
+				+ "&amp;iIdTypeObjet=" + ObjectType.AFFAIRE
+				+ "&amp;iIdReferenceObjet=" + marche.getIdMarche()
+				+ "&amp;iIdExport=" + export.getIdExport()
+				+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+				+ "&amp;iIdPublicationEtat=" + PublicationEtat.ETAT_A_ENVOYER
+				+ "&amp;iIdExportMode=" + export.getIdExportMode()
+				+ "&amp;sUrlRedirect=" 
+				+ rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?"
+				+ "iIdAffaire="	+ marche.getIdMarche() 
+				+ "%26iIdOnglet=" + modula.graphic.Onglet.ONGLET_AFFAIRE_PLANNING;
+			
+			String sMode = ExportMode.getExportModeNameMemory(export.getIdExportMode());
+%>					<a href="<%= response.encodeURL( 
+								sUrlCreate 
+							)  %>" >
+							Ajouter une publication <%= sMode %>
+						</a><br /> 
+		
+<%		} %>						
+					</td>
+				</tr>
+<%
+	
+	}
+	else
+	{
+		// TODO : DK voir s'il est possible d'avoir 2 publications suivant les champs renseignés dans l'AAPC
+		PublicationSpqr publi = vPublicationsAAPCSpqr.get(0);
+%><%@ include file="../../../../export/publication/pave/pavePublicationSpqrCellule.jspf" %><%	
+	}
+%>

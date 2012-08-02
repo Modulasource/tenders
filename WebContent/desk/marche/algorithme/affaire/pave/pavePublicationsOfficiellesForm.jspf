@@ -1,0 +1,236 @@
+<%@page import="org.coin.autoform.component.AutoFormCptSelect"%>
+<%@page import="modula.marche.MarchePublicationJoue"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.fr.bean.Departement"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<div  id="tablePublicationOfficielle" >
+<table class="pave" >
+ 	<tr> 
+		<td class="pave_titre_gauche" colspan="2">
+		Publications Officielles Nationales et Internationales
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%
+//	if(bIsContainsAAPCPublicity)	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle" >Date d'envoi de l'avis au BOAMP :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix %>tsDateEnvoiBOAMP" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(marche.getDateEnvoiBOAMP()) %>" />&nbsp;
+			<strong>Heure :</strong>&nbsp;
+			<input class="dataType-hour-minute" type="text" name="<%=sFormPrefix %>tsHeureEnvoiBOAMP" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(marche.getDateEnvoiBOAMP())  %>" />&nbsp; 
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.BOAMP_WEB) %>
+		</td>
+	</tr>	
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle" >N° de bon de commande d'insertion au BOAMP :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix %>sNumCommandeBOAMP" size="15" maxlength="10" 
+			value="<%= marche.getNumCommandeBOAMP() %>" />&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.BOAMP_NUM_BON_COMMANDE) %>
+		</td>
+	</tr>	
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">Département de publication :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+<%
+	String sDepartementPublicationBOAMP = "";
+	try{
+		sDepartementPublicationBOAMP = marche.getDepPublicationBOAMP();
+		
+	}catch(Exception e){}
+%>		
+			<select name="<%=sFormPrefix %>sDepPublicationBOAMP" >
+					<option value="" selected="selected" >Choisissez un département</option>
+<%
+				Vector<Departement> vDepartement = Departement.getAllDepartement();
+					for(int i=0;i<vDepartement.size();i++){
+						try{
+			   		Departement departement = vDepartement.get(i);
+%>
+					<option value="<%= departement.getIdString()%>" <%= 
+						(""+departement.getIdString()).equals(marche.getDepPublicationBOAMP())?"selected=\"selected\"":""%>>
+					    <%= departement.getIdString()+ " - "+departement.getName()%>
+					</option>
+
+<%
+					}catch(Exception e){}
+			   	}
+%>
+	        </select>
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.BOAMP_DEP_PUBLICATION) %>
+		</td>
+	</tr>	
+	<tr>
+		<td class="pave_cellule_gauche">
+		&nbsp;
+		</td>
+		<td class="pave_cellule_droite">
+			<div class="mention">Cette zone doit impérativement être renseignée pour permettre au BOAMP 
+			d'opérer le tri des annonces par département.<br/>
+			Pour le BOAMP 1.7 le Code 20 n'est plus valable et doit être remplacé par 20A ou 20B.</div>
+		</td>
+	</tr>	
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">Département(s) de rappel :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+			<select name="<%=sFormPrefix %>iIdDepartement">
+					<option value="" selected="selected">Choisissez un département</option>
+<%
+					for(int i=0;i<vDepartement.size();i++){
+						try{
+			   		Departement departement = vDepartement.get(i);
+%>
+					<option value="<%= departement.getIdString()%>" >
+					    <%= departement.getIdString()+ " - "+departement.getName()%>
+					</option>
+
+<%
+					}catch(Exception e){}
+			   	}
+%>
+	        </select>
+			<button type="button" name="addDep" 
+			 onclick="javascript:if(document.formulaire.iIdDepartement.value!='') document.formulaire.sDepPublicationRappelBOAMP.value+=document.formulaire.iIdDepartement.value+';'"
+			  style="vertical-align:middle"
+			 >Ajouter</button>
+<%
+	String sDepRappelBOAMP = "";
+	Vector<org.coin.bean.boamp.BoampDepartementPublication> vBoampDepartementPublication = org.coin.bean.boamp.BoampDepartementPublication.getAllFromMarche(marche.getIdMarche());
+		for(int i=0;i<vBoampDepartementPublication.size();i++){
+			try{
+				Departement dep = Departement.getDepartement(""+vBoampDepartementPublication.get(i).getIdDepartement());
+				sDepRappelBOAMP += dep.getIdString()+";";
+			} catch (Exception e){
+				
+			}
+		}
+%>
+			<input type="text" name="<%=sFormPrefix %>sDepPublicationRappelBOAMP" size="10" maxlength="20" 
+			value="<%= sDepRappelBOAMP %>" style="vertical-align:middle" />&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.BOAMP_DEP_RAPPEL_PUBLICATION) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		&nbsp;
+		</td>
+		<td class="pave_cellule_droite">
+			<div class="mention">Attention, chaque extrait vous sera facturé par le BOAMP en sus de votre annonce.<br />
+			Pour formuler les adresses complémentaires, se reporter à l'onglet "Organisme".
+			</div>
+		</td>
+	</tr>	
+ 	<tr> 
+		<td class="pave_cellule_gauche">
+		Date d'envoi de l'avis au JOUE :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix %>tsDateEnvoiJOUE" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(marche.getDateEnvoiJOUE()) %>" />
+		</td>
+	</tr>
+	<%
+	/*
+	Parution n° :&nbsp;<input type="text" name="<%= sFormPrefix sNumeroParutionJOUE" size="50" maxlength="50"
+					value="<%= marche.getNumeroParutionJOUE() " /><br/>
+	*/
+	MarchePublicationJoue joue = null;
+	try{
+		joue = MarchePublicationJoue.getPublicationRelatifMarche(marche.getId());
+		if(joue == null)
+			throw new Exception("publication non existante");
+	}
+	catch(Exception e){
+		joue = new MarchePublicationJoue();
+		joue.setIdPublicationType(PublicationType.TYPE_AVIS_PRE_INFORMATION);
+	}
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Avis au JOUE relatif au m&ecirc;me march&eacute; :
+		</td>
+		<td class="pave_cellule_droite">
+		<select name="<%=sFormPrefix %>iIdPublicationType">
+			<%
+			String sSelected = "";
+			PublicationType typePreInfo = PublicationType.getPublicationTypeMemory(PublicationType.TYPE_AVIS_PRE_INFORMATION);
+			if(joue.getIdPublicationType() == typePreInfo.getId())
+				sSelected = "selected=\"selected\"";
+			%>
+			<option value="<%= typePreInfo.getId()%>" <%= sSelected %> >
+			    <%= typePreInfo.getName() %>
+			</option>
+			<%
+			sSelected = "";
+			PublicationType typeProfil = PublicationType.getPublicationTypeMemory(PublicationType.TYPE_AVIS_PROFIL_ACHETEUR);
+			if(joue.getIdPublicationType() == typeProfil.getId())
+				sSelected = "selected=\"selected\"";
+			%>
+			<option value="<%= typeProfil.getId()%>" <%= sSelected %> >
+			    <%= typeProfil.getName() %>
+			</option>
+	    </select><br/>
+		Annonce n° :&nbsp;<input type="text" name="<%= sFormPrefix %>sNumero" size="50" maxlength="50"
+					value="<%= joue.getNumero() %>" />
+		du <input type="text" name="<%=sFormPrefix %>tsDatePublication" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(joue.getDatePublication()) %>" /> <br/>
+		<i>Format AAAA /S PPP-1234567, exemple "2007/S48-059809" </i>
+		</td>
+	</tr>
+	<tr>
+	<td class="pave_cellule_gauche">
+		Autres publications antérieures : 
+		</td>
+		<td class="pave_cellule_droite">
+		<div id="AutresPublicationsJOUE">
+		<%
+		Vector<MarchePublicationJoue> vJOUE = MarchePublicationJoue.getAutresPublicationFromMarche(marche.getId());
+		if(vJOUE.isEmpty()){
+			%>
+			Annonce n° :&nbsp;<input type="text" name="newPublicationJOUE_0_sNumero" size="50" maxlength="50"
+						value="" />
+			du <input type="text" name="newPublicationJOUE_0_tsDatePublication" size="15" maxlength="10" 
+				class="dataType-date"
+				value="" />
+			<%
+		}else{
+			for(MarchePublicationJoue autre : vJOUE){
+				String sPrefix = autre.getId()+"_";
+			%>
+			<div>
+			Annonce n° :&nbsp;<input type="text" name="<%= sPrefix %>sNumero" size="50" maxlength="50"
+						value="<%= autre.getNumero() %>" />
+			du <input type="text" name="<%=sPrefix %>tsDatePublication" size="15" maxlength="10" 
+				class="dataType-date"
+				value="<%= CalendarUtil.getDateCourte(autre.getDatePublication()) %>" />
+			</div>
+			<%
+			}
+		}
+		%>
+		</div>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		</td>
+		<td class="pave_cellule_droite">
+		<button type="button" onclick="addPublicationJOUE()" >Ajouter une publication</button>
+		</td>
+	</tr>
+	<%
+//	}
+	%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+</div>

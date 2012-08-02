@@ -1,0 +1,111 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+
+//raison sociale
+var champRaisonSocialeAuth = "sRaisonSocialeAuth";
+var champRaisonSociale = "sRaisonSociale";
+var divRaisonSociale = "tr_infoRaisonSociale";
+function verifierRaisonSociale() 
+{
+	if(<%= bCheckDoublonRaisonSociale %>){
+	verifierChamp(champRaisonSociale,champRaisonSocialeAuth,divRaisonSociale,<%= 
+		CheckAjaxVerifField.ORGANISATION_RAISON_SOCIALE %>,"","desk");
+	}
+}
+
+//mail gerant
+var champMailGerantAuth = "sEmailAuth";
+var champMailGerant = "sEmail";
+var divMailGerant = "tr_infoEmail";
+function verifierMailGerant() 
+{
+	verifierChamp(champMailGerant,champMailGerantAuth,divMailGerant,<%= CheckAjaxVerifField.COIN_USER_LOGIN 
+	   %>,"","desk");
+}
+
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+	
+	//ENTREPRISE
+	if (isNull(document.getElementById("sRaisonSociale").value))
+	{
+		sError += "<%= locMessage.getValue(7,"Vous devez saisir une raison sociale.") %><br />";
+		bResult = false;
+	}
+	else if (document.getElementById("sRaisonSocialeAuth").value == 0)
+	{
+		sError += "<%= locMessage.getValue(1,"La raison sociale que vous avez saisie est déjà inscrite dans la base de données.\nVous ne pouvez pas poursuivre cette opération.")%><br />";
+		bResult = false;
+	}
+	<%
+	if (iIdOrganisationType == OrganisationType.TYPE_ACHETEUR_PUBLIC)
+	{
+	%>
+	if (document.getElementById("iIdTypeAcheteurPublic").value <= 0)
+	{
+		sError += "<%= locMessage.getValue(8,"Vous devez saisir un Type d'Acheteur Public.")%><br />";
+		bResult = false;
+	}
+	<%
+	}
+	%>
+	try{
+	if(document.getElementById("createGerant").checked)
+	{
+		//GERANT
+		if (isNull(document.getElementById("iIdCivilite").value)
+		|| document.getElementById("iIdCivilite").value <= 0)
+		{
+			sError += "<%= locMessage.getValue(9,"Vous devez saisir la civilit&eacute; du g&eacute;rant.")%><br />";
+			bResult = false;
+		}
+		if (isNull(document.getElementById("sNom").value))
+		{
+			sError += "<%= locMessage.getValue(10,"Vous devez saisir le nom du g&eacute;rant.")%><br />";
+			bResult = false;
+		}
+		if (isNull(document.getElementById("sPrenom").value))
+		{
+			sError += "<%= locMessage.getValue(11,"Vous devez saisir le prenom du g&eacute;rant.")%><br />";
+			bResult = false;
+		}
+		if(document.getElementById("createUser").checked || document.getElementById("sEmail").value != "")
+		{
+			if (!isMail(document.getElementById("sEmail").value))
+			{
+				sError += "<%= locMessage.getValue(12,"La syntaxe de l'email n'est pas correcte.")%><br />";
+				bResult = false;
+			}
+			else if(document.getElementById("sEmailAuth").value == 0)
+			{
+				sError += "<%= locMessage.getValue(2,"L'adresse email du gérant que vous avez saisie est déjà inscrite dans la base de données.\nVous ne pouvez pas poursuivre cette opération.")%><br />";
+				bResult = false;
+			}
+		}
+	}
+	}catch(e){}
+	
+	document.getElementById("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}
+
+function onAfterPageLoading()
+{
+try{
+	if(document.getElementById("createGerant").checked)
+	{
+		montrer('divGerant');
+	}
+	else
+	{
+		cacher('divGerant');
+	}
+}catch(e){}
+}

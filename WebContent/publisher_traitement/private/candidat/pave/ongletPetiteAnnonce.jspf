@@ -1,0 +1,52 @@
+<%@page import="org.coin.security.Password"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%@page import="modula.candidature.EnveloppeA"%>
+<%@page import="modula.candidature.EnveloppeB"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="mt.modula.html.HtmlAvisRectificatif"%>
+<%@page import="org.coin.security.SecureString"%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<br />
+<div class="titre_page">Résumé de l'annonce</div>
+<div style="clear:both"></div>
+<br />
+<%
+	String sStatut = "";
+	
+	boolean bIsAvisRectifPA = marche.isAvisRectifPA(false);
+	boolean bisClose = candidature.isClose(false);
+	
+	sStatut = "<button onclick=\"Redirect('"
+		   + response.encodeURL("consulterDossier.jsp?iIdOnglet=2&amp;cand="
+		   + SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session) )
+	       + "');\">" 
+	       + "Accéder au dossier</button>";
+	
+	if(bisClose)
+	{
+		sStatut = "Dossier clos";
+	}
+	int numAnnonce = 1;
+	
+	int iIdTypeAvisRect = AvisRectificatifType.TYPE_AAPC;
+	Vector<AvisRectificatif> vAvisRectificatif 
+	   = AvisRectificatif.getAllAvisRectificatifPubliesPublisherWithType(
+			   marche.getIdMarche(),
+			   iIdTypeAvisRect,
+			   vAvisRectificatifTotal);
+	
+	   
+    String sPrintMessAvisRectificatif = HtmlAvisRectificatif.getPrintMessAvisRectificatif(
+                marche,
+                vAvisRectificatif,
+                vAvisRectificatifTotal);
+    
+    CodeCpfSwitcher cpf = new CodeCpfSwitcher(ObjectType.AFFAIRE,marche.getId());
+    
+	
+	%><%@ include file="../../../../publisher_traitement/public/annonce/pave/petiteAnnonceAAPC.jspf" %><%
+%>
+
+

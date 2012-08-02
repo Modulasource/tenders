@@ -1,0 +1,26 @@
+<%
+	Node nodeNbCandidat =  BasicDom.getChildNodeByNodeName(nodeAnn, "nbcandidat" );
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc10')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc 10 Nombre de candidats</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc10" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Nombre maximal de candidats admis à présenter une offre : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeNbCandidat , "nombreMax" ) %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Nombre minimal de candidats admis à présenter une offre : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeNbCandidat , "nombreMin" ) %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

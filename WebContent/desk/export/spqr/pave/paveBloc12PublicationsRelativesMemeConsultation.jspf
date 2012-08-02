@@ -1,0 +1,31 @@
+<%
+	String sDateEnvoiJOUE = "";
+	try {
+		Node nodeJoce = BasicDom.getChildNodeByNodeName(nodeAnn, "joce" );
+		sDateEnvoiJOUE = BasicDom.getChildNodeValueByNodeNameOptional(nodeJoce , "DateEnvoiJOCE" ); 
+	}catch (Exception e) {}
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc12')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 12 Publications relatives à la même consultation</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc12" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Date d'envoi du présent avis au J.O.U.E. : </td>
+				<td class="pave_cellule_droite">
+					<%= sDateEnvoiJOUE  %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Avis de pré-information au J.O.U.E. relatif au même marché : </td>
+				<td class="pave_cellule_droite">Non traité par Modula.
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,16 @@
+	<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Rôle</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2">&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Nom : </td>
+			<td class="pave_cellule_droite"><%= role.getName()%></td>
+		</tr>
+<%= hbFormulaire.getHtmlTrSelect("Treeview :","lIdTreeview",treeview, false, false ,"", "") %>
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2">&nbsp;</td>
+		</tr>
+	</table>

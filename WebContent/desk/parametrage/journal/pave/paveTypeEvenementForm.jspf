@@ -1,0 +1,98 @@
+<%
+	/*
+	* 	Nécessite les objets suivants :
+	* 	
+	*/
+	
+%>
+<input type="hidden" name="iIdTypeEvenement" value="<%= oTypeEvenement.getIdTypeEvenement() %>" />
+<input type="hidden" name="sAction" value="<%= sAction %>" />
+<table class="pave" summary="none">		
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"> 
+			Type d'événement
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Libelle* :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix %>sLibelle" size="100" maxlength="255"
+			value="<%= oTypeEvenement.getLibelle() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'objet* :
+		</td>
+		<td class="pave_cellule_droite">
+		<select name="<%=sFormPrefix %>iIdTypeObjet" style="width:500px" >
+				<option value="">Choisissez un type d'objet</option>
+			<%
+				for (int i = 0 ; i < vTypesObjetsModula.size(); i++){
+					ObjectType oTypeObjetModula = (ObjectType) vTypesObjetsModula.get(i);
+					sSelected = "";
+					if( (int)oTypeObjetModula.getId() == oTypeEvenement.getIdTypeObjet() )
+					{
+						sSelected = "selected='selected'";
+					}
+						
+					%><option value="<%= oTypeObjetModula.getId() %>" <%= sSelected %>  ><%= oTypeObjetModula.getName() %></option>
+			<%
+				
+				}
+			%>
+		</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Horodatage* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sCheckedYes = "";
+			String sCheckedNo = "checked='checked'";
+			
+			if (oTypeEvenement.isHorodatage()){
+				sCheckedYes = "checked='checked'";
+				sCheckedNo = "";
+			}
+		%>
+			<input type="radio" name="<%=sFormPrefix %>bHorodatage" <%= sCheckedYes %>
+			value="true" /> Oui
+			<input type="radio" name="<%=sFormPrefix %>bHorodatage" <%= sCheckedNo %>
+			value="false" /> Non
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Cas d'utilisation* :
+		</td>
+		<td class="pave_cellule_droite">
+			<select name="<%=sFormPrefix %>sIdUseCase" size="20" style="width:600px" >
+			<%
+				for (int i = 0 ; i < vUseCases.size(); i++){
+					UseCase oUseCaseTmp = (UseCase)vUseCases.get(i);
+					sSelected = "";
+					if ((oUseCaseTmp.getIdString()).equals(oTypeEvenement.getIdUseCase()) )
+					{
+						sSelected = " selected='selected' ";
+					}
+				
+					%><option value="<%= oUseCaseTmp.getIdString() %>" <%= sSelected %> >[<%= 
+						oUseCaseTmp.getIdString() %>] <%= oUseCaseTmp.getName() %></option>
+					<%
+				}
+					%>
+		</select>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

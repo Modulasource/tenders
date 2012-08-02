@@ -1,0 +1,49 @@
+<%@page import="org.coin.util.Outils"%>
+<%
+PersonnePhysique personne = null;
+String sPavePersonneTitre = "";
+CorrespondantInfo correspondantInfo = null;
+
+	String sTitrePersonne = "Pouvoir adjudicateur";
+	Vector<Correspondant> vCorrespondantPRM = Correspondant.getAllCorrespondantFromTypeAndReferenceObjetAndFonction(ObjectType.AFFAIRE,marche.getIdMarche(),PersonnePhysiqueFonction.PRM);
+	Correspondant oCorrespondantPRM = null;
+	CorrespondantInfo oCorrespondantPRMInfo = null;
+	if(vCorrespondantPRM.size() == 1)
+	{
+		oCorrespondantPRM = vCorrespondantPRM.firstElement();
+		personne = PersonnePhysique.getPersonnePhysique(oCorrespondantPRM.getIdPersonnePhysique());
+		adresse = Adresse.getAdresse(personne.getIdAdresse());
+		pays = Pays.getPays(adresse.getIdPays());
+		sPavePersonneTitre = "Nom et adresse officiels de l'acheteur public";
+		String sNomPRM = "";
+		String sTelPRM = "";
+		String sPostePRM = "";
+		String sFaxPRM = "";
+		String sEmailPRM = "";
+		String sSiteWebPRM = "";
+		String sSiteWebPRM2 = "";
+		String sIdQaAdjudicateur = "";
+		try{
+			oCorrespondantPRMInfo = CorrespondantInfo.getAllFromCorrespondant(oCorrespondantPRM.getIdCorrespondant()).firstElement();
+			sNomPRM = oCorrespondantPRMInfo.getName();
+			sTelPRM = oCorrespondantPRMInfo.getTelephone();
+			sPostePRM =  Outils.getStringNotNull(oCorrespondantPRMInfo.getPoste());
+			sFaxPRM = oCorrespondantPRMInfo.getFax();
+			sEmailPRM = oCorrespondantPRMInfo.getEmail();
+			sSiteWebPRM = Outils.getStringNotNull(oCorrespondantPRMInfo.getSiteWeb());
+			sSiteWebPRM2 = Outils.getStringNotNull(oCorrespondantPRMInfo.getSiteWeb2());
+			sIdQaAdjudicateur = oCorrespondantPRMInfo.getIdQaAdjudicateur()+"";
+		}catch(Exception e){
+			sNomPRM = personne.getCivilitePrenomNom();
+			sTelPRM = personne.getTel();
+			sPostePRM = Outils.getStringNotNull(personne.getPoste());
+			sFaxPRM = personne.getFax();
+			sEmailPRM = personne.getEmail();
+			sSiteWebPRM = Outils.getStringNotNull(personne.getSiteWeb());
+		}
+		sFormPrefix = "PRM_";
+%>
+<%@ include file="pavePRM.jspf" %>
+<%
+}
+%>

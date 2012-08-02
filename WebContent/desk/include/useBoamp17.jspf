@@ -1,0 +1,16 @@
+<%
+	boolean bUseBoamp17 = false;
+	
+	try {
+	
+		String sUseBoamp17 
+			= modula.configuration.ModulaConfiguration.getConfigurationValueMemory(
+				modula.configuration.ModulaConfiguration.MODULA_USE_BOAMP_17);
+		
+		if(sUseBoamp17 != null && sUseBoamp17.equals("enabled"))
+		{
+			bUseBoamp17 = true;
+		}
+	} catch (Exception e) {}
+
+%>

@@ -1,0 +1,231 @@
+<script type="text/javascript">
+function selectLots()
+{
+	<%
+	if(bIsContainsEnveloppeAManagement || (!bIsContainsEnveloppeAManagement && !bIsContainsAAPCPublicity))
+	{
+	%>
+		if(document.formulaire.selectionA != null && document.formulaire.selectionLotsA != null)
+			remplirItemFromCheckboxesChecked(document.formulaire.selectionA,document.formulaire.selectionLotsA);
+		
+		if(document.formulaire.selectionLotsA.value == "")
+		{
+			alert("Attention! Vous devez séléctionner au moins un lot");
+			return false;
+		}
+	<%
+	}
+	if(vValiditeB != null)
+	{
+		for(int j = 0 ; j < vValiditeB.size() ; j++)
+		{
+		%>
+			if(document.formulaire.selectionB<%= j %> != null && document.formulaire.selectionLotsB<%= j %> != null)
+				remplirItemFromCheckboxesChecked(document.formulaire.selectionB<%= j %>,document.formulaire.selectionLotsB<%= j %>);
+
+			if(document.formulaire.formatCandidature.value == 2)
+			{
+				<%
+				if( (AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure()) != AffaireProcedure.TYPE_PROCEDURE_OUVERTE)
+						|| (AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure()) == AffaireProcedure.TYPE_PROCEDURE_OUVERTE && !bIsContainsEnveloppeAManagement) )
+				{
+				%>
+					var date = document.formulaire.enveloppeB_<%= j %>_tsDateEnveloppeBFin;
+					var heure = document.formulaire.enveloppeB_<%= j %>_tsHeureEnveloppeBFin;
+				<%
+				}
+				else
+				{
+				%>
+					var date = document.formulaire.tsDateEnveloppeAFin;
+					var heure = document.formulaire.tsHeureEnveloppeAFin;
+				<%
+				}
+				%>
+				if (!isNull(date.value) && !isNull(heure.value))
+				{
+					if(document.formulaire.selectionLotsB<%= j %> != null && document.formulaire.selectionLotsB<%= j %>.value == "")
+					{
+						alert("Attention! Vous devez séléctionner au moins un lot");
+						return false;
+					}
+				}
+			}
+		<%
+		}
+	}
+	%>
+	return true;
+}
+function checkDates()
+{
+	// controle de la date du DCE
+	if(document.formulaire.formatDCE.value == 2)
+	{
+		var item = document.formulaire.tsDateRetraitDCE;
+		if (isNull(item.value))
+		{
+			alert("Veuillez remplir la date de remise du DCE");
+			item.focus();
+			return false;
+		}
+		else {
+			if(!checkDate(item.value))
+			{
+				alert("Veuillez remplir la date de remise du DCE");
+				item.focus();
+				return false;
+			}
+		}
+
+		var item = document.formulaire.tsHeureRetraitDCE;
+		if (isNull(item.value))
+		{
+			alert("Veuillez remplir l'heure de remise du DCE");
+			item.focus();
+			return false;
+		}
+		else
+		{
+			if(!checkHeure(item.value))
+			{
+				item.focus();
+				return false;
+			}
+		}
+	}
+	// fin de controle de la date du DCE
+	if(document.formulaire.formatCandidature.value == 2)
+	{
+		<%
+		if(bIsContainsEnveloppeAManagement || (!bIsContainsEnveloppeAManagement && !bIsContainsAAPCPublicity))
+		{
+		%>
+			// controle de la date de l'enveloppe A
+			var date = document.formulaire.tsDateEnveloppeAFin;
+			var heure = document.formulaire.tsHeureEnveloppeAFin;
+			
+			if (!isNull(date.value) && !isNull(heure.value))
+			{
+				if(!checkDate(date.value))
+				{
+					alert("Veuillez remplir la date de récéption de la candidature au bon format(jj/mm/aaaa)");
+					date.focus();
+					return false;
+				}
+				if(!checkHeure(heure.value))
+				{
+					heure.focus();
+					return false;
+				}
+				<%
+				if(tsDateValiditeADebut != null)
+				{
+				%>
+					if(!comparerDateComplete('<%= CalendarUtil.getDateCourte(tsDateValiditeADebut)%>','<%= CalendarUtil.getHeureMinuteSec(tsDateValiditeADebut)%>',date.value,heure.value))
+					{
+						alert("Attention, la date de récéption de la candidature doit etre superieure a la date de debut de récéption des candidatures");
+						date.focus();
+						return false;
+					}
+					<%
+						Timestamp tsDateFin = new Timestamp(tsDateValiditeAFin.getTime()+marche.getDelaiUrgence()*60*60*1000);
+					%>
+					if(!comparerDateComplete(date.value,heure.value,'<%= CalendarUtil.getDateCourte(tsDateFin)%>','<%= CalendarUtil.getHeureMinuteSec(tsDateFin)%>'))
+					{
+						alert("Attention, la date de récéption de la candidature doit etre inférieure a la date de fin de récéption des candidatures auquel s'additionne le delais d'urgence de <%= marche.getDelaiUrgence()%> Heures");
+						date.focus();
+						return false;
+					}
+				<%
+				}
+				%>
+			}
+		<%
+		}
+		%>
+		// fin controle de la date de l'enveloppe A
+		<%
+		if( (AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure()) != AffaireProcedure.TYPE_PROCEDURE_OUVERTE)
+		|| (AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure()) == AffaireProcedure.TYPE_PROCEDURE_OUVERTE 
+				&& !bIsContainsEnveloppeAManagement) )
+		{
+			Vector<Validite> vValiditeEnveloppeB = Validite.getAllValiditeEnveloppeBFromAffaire(iIdAffaire);
+			if(vValiditeEnveloppeB != null)
+			{
+				for(int i = 0 ; i < vValiditeEnveloppeB.size() ; i++)
+				{
+					Validite oValiditeEnveloppeB = vValiditeEnveloppeB.get(i);
+					Timestamp tsDateValiditeBDebut = oValiditeEnveloppeB.getDateDebut();
+					Timestamp tsDateValiditeBFin = oValiditeEnveloppeB.getDateFin();
+					Timestamp tsDateFinB = null;
+					%>
+					var date = document.formulaire.enveloppeB_<%= i %>_tsDateEnveloppeBFin;
+					var heure = document.formulaire.enveloppeB_<%= i %>_tsHeureEnveloppeBFin;
+					
+					if (!isNull(date.value) && !isNull(heure.value))
+					{
+						if(!checkDate(date.value))
+						{
+							alert("Veuillez remplir la date de récéption de l'offre <%= i+1 %> au bon format(jj/mm/aaaa)");
+							date.focus();
+							return false;
+						}
+						if(!checkHeure(heure.value))
+						{
+							heure.focus();
+							return false;
+						}
+						if(!comparerDateComplete('<%= CalendarUtil.getDateCourte(tsDateValiditeBDebut)
+						%>','<%= CalendarUtil.getHeureMinuteSec(tsDateValiditeBDebut)%>',date.value,heure.value))
+						{
+							alert("Attention, la date de récéption de l'offre <%= i+1 %> doit etre superieure à la date de debut de récéption des offres");
+							date.focus();
+							return false;
+						}
+						<%
+						if(tsDateValiditeBFin!=null)
+						{
+							tsDateFinB = new Timestamp(tsDateValiditeBFin.getTime()+marche.getDelaiUrgence()*60*60*1000);
+						}
+						%>
+						if(!comparerDateComplete(date.value,heure.value,'<%= CalendarUtil.getDateCourte(tsDateFinB)
+						%>','<%= CalendarUtil.getHeureMinuteSec(tsDateFinB)%>'))
+						{
+							alert("Attention, la date de récéption de l'offre <%= i 
+							%> doit etre inférieure a la date de fin de récéption des offres auquel s'additionne le delai d'urgence de <%= 
+								marche.getDelaiUrgence()%> Heures.");
+							date.focus();
+							return false;
+						}
+					}
+					<%
+				}
+			}
+		}
+		
+		if(vLotsTotal.size() > 1)
+		{
+		%>
+		if(!selectLots())
+		{
+			return false;
+		}
+		<%
+		}
+		%>
+	}
+	<%
+	if(!bIsContainsEnveloppeAManagement && !bIsContainsAAPCPublicity && vLotsTotal.size() > 1)
+	{
+	%>
+		if(!selectLots())
+		{
+			return false;
+		}
+	<%
+	}
+	%>
+return true;
+}
+</script>

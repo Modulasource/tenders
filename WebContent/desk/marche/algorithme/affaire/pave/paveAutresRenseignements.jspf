@@ -1,0 +1,33 @@
+<%@page import="org.coin.util.Outils"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveAutresRenseignements')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveAutresRenseignements %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveAutresRenseignements" summary="Autres renseignements">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Autres informations :
+					</td>										
+				    
+					<td class="pave_cellule_droite">
+					<%= Outils.getTextToHtml( marche.getAutresInfos()) %>
+					</td>
+				</tr>				
+				<tr>
+					<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getTextToHtml( marche.getsAutresInfosDce()) %>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>				
+			</table>
+		</td>
+	</tr>
+</table>

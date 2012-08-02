@@ -1,0 +1,25 @@
+<tr class="liste<%=i%2%>" 
+	onmouseover="className='liste_over'" 
+	onmouseout="className='liste<%=i%2%>'" 
+	onclick="Redirect('<%= response.encodeRedirectURL(sUrlSynchroniser) %>')" >
+	
+	<td width="50%" align="left"><%= sFileName %></td> 
+	<td align="left" width="40%"><%=  org.coin.fr.bean.CarnetAdresseWrapper.getNbOrganismesAImporter(nodeOrganisme) %></td>
+	<td align="right" width="10%"> 
+<%					
+if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonSynchroniser))
+{
+%>
+	<a>
+		<img width="21" height="21" 
+			src="<%= rootPath + modula.graphic.Icone.ICONE_CONTINUER_PROCEDURE%>" 
+			 
+			alt="Continuer la proc&eacute;dure" title="Continuer la proc&eacute;dure de synchronisation" 
+			onmouseover="this.src='<%= rootPath + modula.graphic.Icone.ICONE_CONTINUER_PROCEDURE_OVER %>'" 
+			onmouseout="this.src='<%= rootPath + modula.graphic.Icone.ICONE_CONTINUER_PROCEDURE %>'" />
+<%
+}
+%>
+	</a>
+	</td>
+</tr>

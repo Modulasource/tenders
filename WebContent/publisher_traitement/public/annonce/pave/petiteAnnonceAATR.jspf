@@ -1,0 +1,398 @@
+<%@page import="modula.commission.Commission"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.marche.*"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.*"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.servlet.DownloadFile"%><%
+	
+	AvisAttribution aAvis = null;
+	try {
+		// car dans le cas d'une PA il n'y a pas d'avis d'attribution crée
+		aAvis = AvisAttribution.getAvisAttributionFromMarche(marche.getIdMarche());
+	} catch (Exception e) {}
+
+	if (iTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE)
+	{
+		bImprimer = true;
+		bLirePetiteAnnonce = true;
+		//bConsultationAATR = false;
+		bConsultationAATR = true;
+	}	
+	
+	//if (aAvis != null)
+	{
+%>
+
+<%@page import="org.coin.fr.bean.export.PublicationPdfGeneric"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+
+<%@page import="java.sql.Timestamp"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.security.SecureString"%>
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0"><tr>
+            <td>
+<%@ include file="paveAnnonceMarchePersonneItemCheckbox.jspf" %>
+
+           <strong class="post-title-alt"><%=sAffaireAcheteurPublic%></strong> réf. <%=
+                    marche.getReference() %> - <span class="post-title-alt">(<%= sTypePetiteAnnonce%>)</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00"><%=sPrintMessAvisRectificatif%></strong>
+            </td>
+        </tr></table>
+    </div>
+    
+    
+    
+    <table class="fullWidth" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="top">
+            <%@ include file="paveTypeMarche.jspf" %>
+        </td>
+<%
+if(bShowButtonAnnonceDetail) {
+%>
+       <td class="top" style="width:140px">
+            <div class="post-header post-block center" style="margin-left:0;">
+                <img class="middle" src="<%=rootPath %>images/icons/zoom.gif" />&nbsp;&nbsp;<a id="marche_<%=
+                    marche.getId() %>" class="middle" href="javascript:void(0)" >Détail de l'annonce</a>
+
+                <script type="text/javascript"> 
+                    
+                    Event.observe(window, "load", function() {
+                    
+                        $('marche_<%=marche.getId()%>').onclick = function() {
+ 
+ 
+ 					       if(sUserAgent == "ie6" || <%= 
+					    	   Configuration.isTrueMemory("publisher.display.annonce.detail.force.popup", false) %>)
+                          {
+                               OuvrirPopup("<%= response.encodeURL(rootPath 
+                                       + "publisher_portail/public/annonce/afficherAnnonce.jsp?a="
+                                       + SecureString.getSessionSecureString(
+                                               Long.toString(marche.getId()), session)) %>",800,650,"menubar=no,scrollbars=yes,statusbar=no");
+                              return ;
+                           }
+                                              
+                            var doc;
+                            try{doc = parent.document;doc.appendChild(doc.createTextNode(""));}
+                            catch(e){doc = document;}
+                            
+                            var popupDiv = doc.createElement("div");
+                            popupDiv.style.position = "relative";
+                            popupDiv.style.backgroundColor = "#EFF5FF";
+                            popupDiv.style.padding = "0 7px 0 7px";
+                            
+                            var img = doc.createElement("img");
+                            img.style.position = "absolute";
+                            img.style.top = "3px";
+                            img.style.right = "3px";
+                            img.style.cursor = "pointer";
+                            img.src = "<%=rootPath%>images/icons/close.gif";
+                            img.onclick = function(){
+                                try {new parent.Control.Modal.close();}
+                                catch(e) { Control.Modal.close();}
+                            }
+                            
+                            popupDiv.appendChild(img);
+                            
+                            var divHeader = doc.createElement("div");
+                            divHeader.style.textAlign = "center";
+                            divHeader.style.lineHeight = "28px";
+                            divHeader.innerHTML = 'Petite annonce référence <%= 
+                                Outils.replaceAll( marche.getReference(), "'", "''") %>';
+                            divHeader.style.height = "28px";
+                            
+                            var divIframe = doc.createElement("div");
+                            divIframe.style.border = "1px solid #888";
+                            //divIframe.style.backgroundColor = "#FFF";
+
+                            var iframe = doc.createElement("iframe");
+                            iframe.name = "offerPopup";
+                            iframe.id = "offerPopup";
+                            iframe.src = "<%= response.encodeURL(rootPath 
+                                    + "publisher_portail/public/annonce/afficherAnnonce.jsp?a="
+                                            + SecureString.getSessionSecureString(
+                                                    Long.toString(marche.getId()), session)) %>";
+                            iframe.style.width = "100%";
+                            iframe.style.height = "430px";
+                            iframe.style.border = 0;
+                            iframe.style.margin = 0;
+                            iframe.align = "top";
+                            iframe.frameborder = "0";
+                            iframe.border = "1";
+                            
+                            divIframe.appendChild(iframe);
+                            
+                            var divFooter = doc.createElement("div");
+                            divFooter.style.textAlign = "center";
+                            divFooter.style.lineHeight = "6px";
+                            //divFooter.innerHTML = '<button>un bouton ici</button>';
+                            divFooter.style.height = "6px";
+                            
+                            popupDiv.appendChild(divHeader);
+                            popupDiv.appendChild(divIframe);
+                            popupDiv.appendChild(divFooter);
+                            
+                            var modal ;
+                            try{ modal = new parent.Control.Modal(false,{width: 700, contents: popupDiv});}
+                            catch(e) {modal = new Control.Modal(false,{width: 700, contents: popupDiv});}
+                            modal.container.insert(popupDiv);
+                            modal.open();
+                            
+                        }
+                        
+                    });
+                    
+                </script>
+                
+            </div>
+        </td>
+<%
+}
+%>
+    </tr>
+    </table>
+    
+    <%@ include file="paveAnnonceCPF.jspf" %>
+    
+    <% if(!sAffaireAcheteurPublic.equals("")&& vMultimedias.size()>0) { %>
+    <div class="post-picture">
+            <img src="<%= response.encodeURL(
+                    rootPath+ "publisher_portail/DownloadFilePublisher?" 
+                    + DownloadFile.getSecureTransactionStringFullJspPage(
+                            request, 
+                            vMultimedias.firstElement().getIdMultimedia() , 
+                            TypeObjetModula.MULTIMEDIA,
+                            false /* permet de ne pas recharger le logo à chaque fois */)
+                    +"&amp;sContentType="+vMultimedias.firstElement().getContentType()
+                    +"&amp;sAction=view") %>" alt="Acheteur Public" />
+    </div>
+    <% } 
+       if(vAvisRectificatif != null && vAvisRectificatif.size() > 0) { %>
+    <div class="post-avis post-block" style="margin-top:0">
+        <%@ include file="paveListeAvisRectificatifs.jspf" %>
+    </div>
+    <%  } %>
+    
+    
+    
+    
+<%
+    if(bShowButtonToDownloadFile)
+    {
+%>
+    
+    <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="top">
+                <div class="post-header post-block" style="text-align:center;padding:5px">          
+<%
+		if (aAvis != null)
+		{		
+			if(bConsultationAATR)
+			{
+				boolean bAATRAutomatique = aAvis.isAATRAutomatique(true);
+		
+				if(bAATRAutomatique){
+%>
+ 			<a href='javascript:OuvrirPopup("<%= response.encodeURL( 
+ 				rootPath 
+ 				+ "publisher_portail/PublicationPdfGeneric?"
+ 				+ PublicationPdfGeneric.getSecureTransactionStringFullJspPage(
+ 				request, marche.getIdMarche(),  PublicationType.TYPE_AATR))
+					%>",800,650,"menubar=no,scrollbars=yes,statusbar=no")' 
+			style="color:#ff8c00;"><img src="<%=rootPath+ Icone.ICONE_FICHIER_PDF
+			%>" style="vertical-align:middle;" alt="Consulter l'AATR"/>&nbsp;Consulter l'AATR &nbsp;</a>
+<%
+				}
+				else{
+%>
+            <a href='javascript:OuvrirPopup("<%= 
+					response.encodeURL(
+							rootPath+ "publisher_portail/DownloadFilePublisher?" 
+									+ DownloadFile.getSecureTransactionStringFullJspPage(
+											request, 
+											aAvis.getIdAvisAttribution() , 
+											TypeObjetModula.AATR ))
+			%>",800,650,"menubar=no,scrollbars=yes,statusbar=no")'
+			style="color:#ff8c00;"><img src="<%=
+				rootPath+ Icone.getIconeFromFileName(aAvis.getNomAATR())
+				%>"  style="vertical-align:middle;" alt="Consulter l'AATR"/>&nbsp;Consulter l'AATR &nbsp;</a>
+<%
+				}
+			}
+		}
+		
+		/**
+		 * Ici c'est le cas d'une  PA avec un document joint
+		 */
+		
+		if(bConsultationAATR && !Outils.isNullOrBlank(marche.getNomAAPC()))
+		{
+				// c'est forcément un doc joint car il ne peut pas y avoir de génération PDF
+%>
+            <a href='javascript:OuvrirPopup("<%= 
+					response.encodeURL(
+							rootPath+ "publisher_portail/DownloadFilePublisher?" 
+									+ DownloadFile.getSecureTransactionStringFullJspPage(
+											request, 
+											marche.getIdMarche() , 
+											TypeObjetModula.AAPC ))
+			%>",800,650,"menubar=no,scrollbars=yes,statusbar=no")'
+			style="color:#ff8c00;"><img src="<%=
+				rootPath+ Icone.getIconeFromFileName(marche.getNomAAPC())
+				%>"  style="vertical-align:middle;" alt="Consulter l'avis"/>&nbsp;Consulter l'avis &nbsp;</a>
+<%
+		}
+
+    }
+%>
+            </td>
+        </tr>
+    </table>
+<%
+if (iTypeProcedure != AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE)
+{ 
+%>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+<%
+		if (aAvis!=null && aAvis.getDateAttributionMarche() != null)
+		{
+%>
+	<tr>
+		<td  colspan="2"><strong>Date d'attribution : </strong><%= 
+			CalendarUtil.getDateCourte(aAvis.getDateAttributionMarche()) %></td>
+	</tr>
+<%
+		}
+		
+		if (aAvis!=null && !aAvis.getMontantMarche().equalsIgnoreCase(""))
+		{
+%>
+	<tr>
+		<td  colspan="2"><strong>Montant : </strong><%= aAvis.getMontantMarche() %></td>
+	</tr>
+<%
+		}
+		Vector<MarcheLot> vLotsTotal = MarcheLot.getAllLotsFromMarche(marche.getIdMarche());
+		Vector<MarcheLot> vLots = MarcheLot.getAllLotsAttribuesFromMarche(marche.getIdMarche());
+		if(vLots != null)
+		{
+			for(int iLot = 0 ; iLot < vLots.size() ; iLot ++ )
+			{
+				MarcheLot lot = vLots.get(iLot);
+				String sTitreAttribution = "";
+				if(vLotsTotal.size() == 1) sTitreAttribution = "Marché attribué";
+				else sTitreAttribution = "Lot n° "+lot.getNumero() 
+					+ (lot.getDesignationReduite().equalsIgnoreCase("")?"":" ("
+					+lot.getDesignationReduite()+")")+ " attribué";
+				
+				Vector<Candidature> vCandidatures 
+					= Candidature.getAllCandidaturesAttribueesDefinitifFromLot(lot.getIdMarcheLot());
+				
+				if(vCandidatures != null)
+				{
+					String sTitreOrganisationAttribuee = "";
+					if(vCandidatures.size() == 1) sTitreOrganisationAttribuee = " à l'organisation : ";
+					else sTitreOrganisationAttribuee = " aux organisations : ";
+					%>
+					<tr>
+						<td  colspan="2">
+						<strong><%= sTitreAttribution + sTitreOrganisationAttribuee %></strong>
+					<%
+					for(int iCand = 0 ; iCand < vCandidatures.size() ; iCand ++ )
+					{
+						Candidature oCandidature = vCandidatures.get(iCand);
+						
+					%>
+						<%= Organisation.getOrganisation(oCandidature.getIdOrganisation()).getRaisonSociale() %>
+						<%
+						if(vCandidatures.size() > 1 && iCand != (vCandidatures.size() -1) ){%><%= ", " %><%}
+					}
+						%>
+						</td>
+				</tr>
+				<%
+				}
+				if (!lot.getMontantLot().equalsIgnoreCase(""))
+				{
+				%>
+					<tr>
+						<td  colspan="2"><strong>Montant de l'attribution: </strong><%= 
+							lot.getMontantLot() %></td>
+					</tr>
+				<%
+				}
+				if (!lot.getOffreBasse().equalsIgnoreCase(""))
+				{
+				%>
+					<tr>
+						<td   colspan="2"><strong>Offre la plus basse: </strong><%= 
+							lot.getOffreBasse() %></td>
+					</tr>
+				<%
+				}
+				if (!lot.getOffreHaute().equalsIgnoreCase(""))
+				{
+				%>
+					<tr>
+						<td  colspan="2"><strong>Offre la plus haute: </strong><%=
+							lot.getOffreHaute() %></td>
+					</tr>
+				<%
+				}
+			}
+		}
+
+%>
+</table>
+</div>
+<%
+} // ENDIF : (iTypeProcedure != AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE)
+
+    Timestamp tsDateLimite = null;
+    Timestamp tsDatePublication = null; 
+    Vector<Validite> vValiditesAnnonce = Validite.getAllValiditeAATRFromAffaire(marche.getIdMarche(), vValiditeTotal); 
+    if(vValiditesAnnonce != null)
+    {
+        if(vValiditesAnnonce.size() >= 1)
+        {
+            Validite oValiditeAnnonce = vValiditesAnnonce.firstElement();
+            tsDatePublication = oValiditeAnnonce.getDateDebut();
+            tsDateLimite = oValiditeAnnonce.getDateFin();
+        } else {
+            /* pour le cas d'une PA */
+            vValiditesAnnonce 
+              = Validite.getAllValiditeAffaireFromAffaire(marche.getIdMarche(), vValiditeTotal); 
+            
+            if(vValiditesAnnonce != null && vValiditesAnnonce.size() >= 1)
+            {
+                Validite oValiditeAnnonceAAPC = vValiditesAnnonce.firstElement();
+                tsDatePublication = oValiditeAnnonceAAPC.getDateDebut();
+                tsDateLimite = oValiditeAnnonceAAPC.getDateFin();
+            }
+        }
+    }
+%>
+ <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+        <tr>
+            <th>Date de publication :</th>
+        </tr>
+        <tr>
+            <td style="text-align:left"><%= CalendarUtil.getDateCourte(tsDatePublication) %></td>
+        </tr>
+    </table>
+ </div>
+</div>
+
+<%
+	}
+%>

@@ -1,0 +1,53 @@
+			<table class="pave" >
+				<tr>
+					<td class="pave_titre_gauche" colspan="2">
+						noeud numéro  <%= iIdNode %>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					libellé :
+					</td>
+					<td class="pave_cellule_droite">
+					<input type="text" name="sNodeLabel" size="100" maxlength="255" 
+					value="<%= node.sNodeLabel %>"
+					<%=bReadOnly?"readonly":"" %> />
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					URL :
+					</td>
+					<td class="pave_cellule_droite">
+					<input type="text" name="sURLLink" size="100" maxlength="255" 
+					value="<%= node.sURLLink %>"
+					<%=bReadOnly?"readonly":"" %> />
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					icone :
+					</td>
+					<td class="pave_cellule_droite">
+					<input type="text" name="sIconName" size="100" maxlength="255" 
+					value="<%= node.sIconName %>"
+					<%=bReadOnly?"readonly":"" %>  />
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					infobulle :
+					</td>
+					<td class="pave_cellule_droite">
+					<input type="text" name="sTooltip" size="100" maxlength="255" 
+					value="<%= node.sTooltip %>"
+					<%=bReadOnly?"readonly":"" %> />
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>

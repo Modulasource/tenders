@@ -1,0 +1,7 @@
+.dataType-date {
+	background-image: url(../../images/icons/calendar_view_month.gif);
+	background-repeat: no-repeat;
+	background-position: right 0;
+	padding-right:18px;
+	width:13ex;
+}

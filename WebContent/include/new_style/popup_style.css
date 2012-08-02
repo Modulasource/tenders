@@ -1,0 +1,45 @@
+
+#modal_overlay,#control_overlay {
+	background-color:transparent;
+}
+
+.window {	
+	background-position:top left;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	padding:0 8px 8px 8px;
+	min-width:150px;	
+	-moz-box-shadow: 0 1px 9px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 9px rgba(0,0,0,0.5);
+}
+
+.window .window_contents {
+	background-color:#FFF;
+	width:100%;
+	height:100%;	
+}
+
+.window .window_header {
+	text-align:center;
+	font-weight:bold;
+	padding:4px;
+}
+
+.window .window_title {
+	font-size:13px;
+	color:#FFF;
+	text-align:center;
+	/*cursor:move;*/
+}
+
+.window .window_close {
+	display:block;
+	position:absolute;
+	top:4px;
+	right:5px;
+	height:13px;
+	width:13px;
+	background-image:url("../../images/facebox/window_close.gif");
+	cursor:pointer;
+    cursor:hand;
+}

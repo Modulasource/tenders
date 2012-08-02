@@ -1,0 +1,22 @@
+/** PARAPH FOLDER IE ONLY */
+
+/** ALL IE */
+div.buttonDrop {
+	border: 1px solid #ABABAB;
+}
+
+.collapse_title{
+	margin-left: 8px;
+	margin-top: 10px;
+}
+#tableActions{
+
+}
+
+/** ONLY <= IE7 */
+*+html .tabsFolder .selected, * html .tabsFolder .selected{
+	padding-bottom:7px;
+}
+*+html .se_keyword, * html .se_keyword {
+	margin-top:-15px;
+}

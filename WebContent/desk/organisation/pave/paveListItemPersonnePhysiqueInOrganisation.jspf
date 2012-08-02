@@ -1,0 +1,20 @@
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.fr.bean.Adresse"%>
+
+<%@page import="org.coin.util.Outils"%><tr class="line<%=j %>" > 
+	<td class="cell" style="width:25%"><%= personne.getPrenomNom()%></td>
+	<td class="cell" style="width:20%"><%= personne.getFonction() %></td>
+	<td class="cell" style="width:25%"><a href="mailto:<%= personne.getEmail() %>" target="_blank"><%= personne.getEmail() %></a></td>
+	<td class="cell" style="width:25%"><%= adressePersonne.getAllAdresseString("<br/>\n") %></td>
+	<td class="cell" style="text-align:right;width:5%">
+			<img src="<%=rootPath+Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE %>" 
+                style="cursor: pointer;"
+                alt="<%= localizeButton.getValueDisplay() %>" 
+                title="<%= localizeButton.getValueDisplay() %>"
+                onclick="parent.addParentTabForced('Personne <%= Outils.addSlashes(personne.getPrenomNom() )
+                		%>','<%= response.encodeURL(
+                	    rootPath +"desk/organisation/afficherPersonnePhysique.jsp?iIdPersonnePhysique="+ 
+                        personne.getIdPersonnePhysique()) %>')"
+            />
+	</td>
+</tr>

@@ -1,0 +1,42 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePetiteAnnonceTitre %>
+			<input type="hidden" name="<%=sFormPrefix %>sDesignationReduite" value="" />
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			R&eacute;f&eacute;rence* :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%=sFormPrefix %>sReference" size="100" maxlength="250" 
+		value="<%= marche.getReference() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			N° d'ordre d'insertion :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%=sFormPrefix %>sReferenceExterne" size="100" maxlength="250" 
+		value="<%= marche.getReferenceExterne() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">Pièce jointe :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+			<% 	String sNomPieceJointe = marche.getNomAAPC();%>
+		<%= (sNomPieceJointe.equalsIgnoreCase("") || sNomPieceJointe.equalsIgnoreCase(null) ?"Pas de pièce jointe":sNomPieceJointe)%>
+		<img src="<%=rootPath + Icone.ICONE_PIECE_JOINTE %>" style="vertical-align:middle" />
+			<input type="button" value="<%= (sNomPieceJointe.equalsIgnoreCase("") || sNomPieceJointe.equalsIgnoreCase(null)?"Ajouter une ":"Modifier la ")%> pièce jointe" onclick="updateBeforeOpenPJ();" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />	

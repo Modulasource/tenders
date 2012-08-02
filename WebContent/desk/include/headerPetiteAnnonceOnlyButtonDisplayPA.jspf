@@ -1,0 +1,123 @@
+<%@ page import="modula.graphic.*" %>
+<%
+	//Declaration des variables daffichage
+	String sPhase = "";
+	String sEtape = "";
+	String sProcedure = "";
+	
+	if(marche.getIdAlgoAffaireProcedure() > 0)
+	{
+			AffaireProcedure affProc = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure());
+			sProcedure = Procedure.getProcedureMemory(affProc.getIdProcedure()).getLibelle();
+			PhaseEtapes oPhaseEtapes = PhaseEtapes.getPhaseEtapesMemory(marche.getIdAlgoPhaseEtapes());
+			PhaseProcedure oPhaseProcedure = PhaseProcedure.getPhaseProcedureMemory(oPhaseEtapes.getIdAlgoPhaseProcedure());
+			sPhase = Phase.getPhaseNameMemory(oPhaseProcedure.getIdAlgoPhase(),false);
+			sEtape = Etape.getEtapeNameMemory(oPhaseEtapes.getIdAlgoEtape(),false);
+	}
+	else
+	{
+		sPhase = "En instance de création";
+		sProcedure = "Création";
+	}
+	if(sHeadTitre.compareTo("") != 0) sPhase = sHeadTitre;
+%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="org.coin.fr.bean.export.Publication"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.fr.bean.export.PublicationSpqr"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.algorithme.PhaseEtapes"%>
+<%@page import="modula.algorithme.Procedure"%>
+<%@page import="modula.algorithme.PhaseProcedure"%>
+<%@page import="modula.algorithme.Phase"%>
+<%@page import="modula.algorithme.Etape"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+	<%
+		Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+		
+		String sUseCaseIdBoutonRevenirPetiteAnnonce = "IHM-DESK-PA-11";
+		String sUseCaseIdBoutonModifierStatut = "IHM-DESK-PA-10";
+		String sUseCaseIdBoutonAjouterOrganisation = "IHM-DESK-ORG-PRM-003";
+		String sUseCaseIdBoutonSupprimerPetiteAnnonce = "IHM-DESK-PA-4";
+		String sUseCaseIdBoutonValiderPetiteAnnonce = "IHM-DESK-PA-14";
+		String sUseCaseIdBoutonGenererPetiteAnnonceQXD = "IHM-DESK-PA-15";
+		String sUseCaseIdBoutonCalibrerPetiteAnnonce = "IHM-DESK-PA-18";
+		
+
+		
+		if(sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonRevenirPetiteAnnonce) )
+		{
+			vBarBoutons.add( 
+				new BarBouton(2,
+							"Retour à la petite annonce",
+							response.encodeURL(rootPath + "desk/marche/petitesAnnonces/afficherPetiteAnnonce.jsp?iIdAffaire=" + marche.getIdMarche()+"&amp;iIdOnglet=0"),
+							rootPath+"images/icons/36x36/affair.png", 
+							"",
+							"",
+							"",true) );
+		}
+	
+		
+		   try{
+	            int iIdOrganisationFromMarche = marche.getIdOrganisationFromMarche();
+	            
+	            if(iIdOrganisationFromMarche > 0)
+	            {
+	                vBarBoutons.add( 
+	                        new BarBouton(1,
+	                            "Aller à l'organisation",
+	                            response.encodeURL(rootPath + "desk/organisation/afficherOrganisation.jsp?iIdOrganisation="
+	                                    + iIdOrganisationFromMarche),
+	                            rootPath+"images/icons/36x36/home.png", 
+	                            "",
+	                            "",
+	                            "",
+	                            "",
+	                            true) );
+	            }
+	                
+	        } catch(CoinDatabaseLoadException e){   } 
+	        
+
+	%>
+
+<%@page import="modula.marche.Marche"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%><a name="ancreHP">&nbsp;</a>
+<div id="menuBorderAffaire" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+	<div class="fullWidth">
+		<%
+		out.write( BarBouton.getAllButtonHtmlDesk(vBarBoutons));
+		%>
+	</div>
+</div>
+<script>
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+	menuBorder.render($('menuBorderAffaire'));
+});
+</script>
+<br />	
+<div style=" align : center; " >
+ 	<br />
+ 	<p style="text-align:center;padding-left:2px;" class="mention">
+ 	Cr&eacute;ation : <%= CalendarUtil.getDateFormatteeNeant( marche.getDateCreation())  %>&nbsp;
+ 	par 
+ 	<% 	
+ 		PersonnePhysique createur = null;
+	 	Organisation createurOrganisation = null;
+	 	String sCreateurName = " créateur indéfini";
+	 	try {
+	 		createur = PersonnePhysique.getPersonnePhysique(marche.getIdCreateur() );
+	 		createurOrganisation = Organisation.getOrganisation(createur.getIdOrganisation() );
+		 	sCreateurName = createur.getPrenom() + " " + createur.getNom() ;
+		 	sCreateurName += " - " + createurOrganisation.getRaisonSociale() ;
+	 	} catch (Exception e) {}
+ 	%>
+ 	<%= sCreateurName %>
+ 	Modification : <%=CalendarUtil.getDateFormatteeNeant( marche.getDateModification()) %>
+ 	</p>
+</div>

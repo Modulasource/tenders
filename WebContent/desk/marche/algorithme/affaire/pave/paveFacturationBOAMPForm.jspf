@@ -1,0 +1,16 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Facturation</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Code client :</td>
+		<td class="pave_cellule_droite"><input type="text" name="sCodeClient" maxlength="6" value="<%= (sCodeClient!=""?sCodeClient:"") %>" />&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

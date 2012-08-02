@@ -1,0 +1,48 @@
+	<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche">Membres Délibératifs</td>
+		</tr>
+		<tr>
+			<td>
+				<table class="liste" summary="none">
+					<tr>
+						<th>Nom</th>
+						<th>E-mail</th>
+						<th>&nbsp;</th>
+					</tr>
+<%
+{
+	Vector vMembresDeliberatifs 
+		= CommissionMembre.getAllMembreParIdRole(
+			iIdCommission,
+			CommissionMembre.COMMISSION_MEMBRE_ID_ROLE_MEMBRE_DELIBERATIF);
+	int j;
+	for (int i = 0; i < vMembresDeliberatifs.size(); i++)
+	{
+		try
+		{
+			CommissionMembre membreDeliberatif = (CommissionMembre) vMembresDeliberatifs.get(i);
+			PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(membreDeliberatif.getIdPersonnePhysique());
+			Adresse personneAdresse = Adresse.getAdresse (personne.getIdAdresse()) ;
+			j = i % 2;
+	%>
+						<tr class="liste<%=j%>" 
+							onmouseover="className='liste_over'" 
+							onmouseout="className='liste<%=j%>'" 
+							onclick="Redirect('<%=response.encodeRedirectURL("afficherCommissionMembre.jsp?iIdCommissionMembre="+membreDeliberatif.getIdCommissionMembre()) %>')"> 
+							<td style="width:60%"><%= personne.getCivilitePrenomNomOptional()%></td>
+							<td style="width:30%"><a href="mailto:<%= personne.getEmail() %>" target="_blank"><%= personne.getEmail() %></a></td>
+							<td style="width:10%;text-align:right"><a href="<%=response.encodeURL("afficherCommissionMembre.jsp?iIdCommissionMembre="+membreDeliberatif.getIdCommissionMembre()) %>">
+							<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT %>" width="21" height="21"  alt="Afficher" title="Afficher"/>
+							</a>&nbsp;</td>
+						</tr>
+	<%
+		}
+		catch(Exception e){}
+	}
+}
+%>
+				</table>
+			</td>			
+		</tr>
+	</table>

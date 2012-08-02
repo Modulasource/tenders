@@ -1,0 +1,251 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		String sPaveCriteresAttributionTitre;
+	*		Vector vCritereTypes;
+	*/
+	String sFlecheHaut = rootPath + modula.graphic.Icone.ICONE_HAUT;
+	String sFlecheBas = rootPath + modula.graphic.Icone.ICONE_BAS;
+%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="org.coin.bean.question.Answer"%>
+<%@page import="org.coin.bean.question.AnswerGroup"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="modula.marche.MarcheEnchereElectronique"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="modula.marche.MarcheCritere"%>
+<%@page import="modula.marche.CritereType"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.graphic.*"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveCriteresAttributionTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align : top;">
+		Offre économiquement la plus avantageuse en fonction* :<br />
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CRITERE_ATTRIBUTION) %>
+		</td>
+		<td class="pave_cellule_droite">
+			<table class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>">
+<%
+{
+Vector<MarcheCritere> vCriteres = MarcheCritere.getAllMarcheCritereFromMarche(marche.getIdMarche());
+
+for (int i = 0; i < vCritereTypes.size(); i++)
+{
+	CritereType type = (CritereType)vCritereTypes.get(i);
+	String sChecked = "";
+	
+	switch ((int)type.getId())
+	{
+		case 1:
+		case 4:
+		case 5:
+			if (vCriteres.size() == 1)
+			{
+				MarcheCritere critere = vCriteres.firstElement();
+				if (critere.getIdCritereType() == type.getId())
+					sChecked = "checked='checked'";
+			}
+				
+%>
+				<tr>
+					<td>
+					<div id="selectionCritereTypeDiv<%= type.getId() %>">
+					<input id="selectionCritereType<%= type.getId() %>" type="radio" name="<%= sFormPrefix %>selectionCritere" value="<%= type.getId() %>" 
+					onclick="cacher('criterePonderes'); cacher('critereClasses');" <%= sChecked %> />
+					<%= type.getName() %>
+					</div>
+					</td>
+				</tr>
+<%
+				break;
+				
+		case 2: // critères pondérés
+			if (vCriteres.size() > 0)
+			{
+				MarcheCritere firstCritere = vCriteres.firstElement();
+				if (firstCritere.getIdCritereType() == type.getId())
+					sChecked = "checked='checked'";
+			}
+%>
+				<tr>
+					<td>
+					<input type="radio" name="<%= sFormPrefix %>selectionCritere" value="<%= type.getId() %>" 
+					onclick="montrer_cacher('criterePonderes'); cacher('critereClasses');" <%= sChecked %> />
+					<%= type.getName() %>
+					</td>
+				</tr>
+				<tr id="criterePonderes">
+					<td>
+						<table summary="none">
+							<tr>
+								<td>
+								<input type="text" name="ponderechiffre" value="xxx" maxlength="3" size="3"/>
+								<input type="text" name="pondereunites" value="unités en %, points ..." size="24"/>
+								<input type="text" name="ponderecritere" value="critère" />
+								</td>
+								<td>
+								<a href="javascript:ajoutOptionPondere(document.formulaire.ponderechiffre,document.formulaire.pondereunites, document.formulaire.ponderecritere,document.formulaire.listePonderes)">
+								<img src="<%= rootPath+Icone.ICONE_PLUS%>"  alt="Ajouter un critère" title="Ajouter un critère"/>
+								</a>
+								&nbsp;
+								<a href="javascript:supprimerOption(document.formulaire.listePonderes)">
+								<img src="<%= rootPath %>images/icons/icon_remove.png"  alt="Supprimer un critère" title="Supprimer un critère"/>
+								</a>
+								</td>
+								<td>
+								<select name="listePonderes" size="5" style="width:150px">
+<%
+			if (sChecked.equalsIgnoreCase("checked='checked'"))
+			{
+				for (int j = 0; j < vCriteres.size(); j++)
+				{
+					MarcheCritere critere = (MarcheCritere)vCriteres.get(j);
+%>
+									<option value="<%= critere.getLibelle() %>">
+									<%= critere.getLibelle() %>
+									</option>
+<%			
+				}
+			}
+%>
+								</select>
+								</td>
+							</tr>
+						</table>
+						<input type="hidden" name="listePonderesHidden" value="" />
+					</td>
+				</tr>
+<%
+				break;
+		case 3: // critères classés
+			if (vCriteres.size() > 0)
+			{
+				MarcheCritere firstCritere = vCriteres.firstElement();
+				if (firstCritere.getIdCritereType() == type.getId())
+					sChecked = "checked='checked'";
+			}
+%>
+				<tr>
+					<td>
+					<input type="radio" name="<%= sFormPrefix %>selectionCritere" value="<%= type.getId() %>" 
+					onclick="cacher('criterePonderes'); montrer_cacher('critereClasses');" <%= sChecked %> />
+					<%= type.getName() %>
+					</td>
+				</tr>
+				<tr id="critereClasses">
+					<td>
+						<table >
+							<tr>
+								<td>
+								<input type="text" name="classecritere" value="critère" />
+								</td>
+								<td>
+								<a href="javascript:ajoutOptionClasse(document.formulaire.classecritere,document.formulaire.listeClasses)">
+								<img src="<%= rootPath+Icone.ICONE_PLUS%>"  alt="Ajouter un critère" title="Ajouter un critère"/>
+								</a>
+								&nbsp;
+								<a href="javascript:supprimerOption(document.formulaire.listeClasses)">
+								<img src="<%= rootPath %>images/icons/icon_remove.png"  alt="Supprimer un critère" title="Supprimer un critère"/>
+								</a>
+								</td>
+								<td>
+								<select name="listeClasses" size="5" style="width:150px">
+<%
+			if (sChecked.equalsIgnoreCase("checked='checked'"))
+			{
+				for (int j = 0; j < vCriteres.size(); j++)
+				{
+					MarcheCritere critere = vCriteres.get(j);
+%>
+									<option value="<%= critere.getLibelle() %>">
+									<%= critere.getLibelle() %>
+									</option>
+<%			
+				}
+			}
+%>
+								</select>
+								</td>
+								<td>
+									<table >
+										<tr>
+											<td style="text-align:center">
+											<a href="javascript:monter(document.formulaire.listeClasses)">
+												<img src="<%= sFlecheHaut %>" />
+											</a>
+											</td>
+										</tr>
+										<tr>
+											<td style="text-align:center">
+												<a href="javascript:descendre(document.formulaire.listeClasses)">
+												<img src="<%= sFlecheBas %>" />
+												</a>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+						<input type="hidden" name="listeClassesHidden" value="" />
+					</td>
+				</tr>
+<%
+				break;
+	}
+%>				
+<%
+}
+}
+%>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+
+<%
+if(bUseBoamp17 && (bUseFormNS || bUseFormUE)){
+
+	MarcheEnchereElectronique marcheEnchereElectronique =null;
+	try {
+		marcheEnchereElectronique =  MarcheEnchereElectronique.getMarcheEnchereElectroniqueFromIdMarche(marche.getId());
+	}catch (Exception e ) {
+		marcheEnchereElectronique = new MarcheEnchereElectronique();
+	}
+%>
+	<br/>
+	<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Enchère électronique</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+	<%= QuestionAnswer.getHTML(
+			"EnchereElectroniqueEffectuer", 
+			"lIdQaEnchereEffectuer",
+			marcheEnchereElectronique.getIdQaEnchereEffectuer(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_SELECT) %>
+		<tr>
+			<td class="pave_cellule_gauche" >
+			Dans l'affirmative, renseignements complémentaires sur l'enchère électronique :
+			</td>
+			<td class="pave_cellule_droite">
+			<textarea rows="3" cols="60" name="sRenseignementComplementaire"><%= 
+				marcheEnchereElectronique.getRenseignementComplementaire() %></textarea>
+			</td>
+		</tr>
+	</table>
+<%}%>

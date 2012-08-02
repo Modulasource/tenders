@@ -1,0 +1,22 @@
+	<tr>
+		<td class="pave_titre_gauche"><%= recherche.sPaveHeaderLibelle %> </td>
+<%
+	if(recherche.getNbResultats()>1){
+%>
+			<td class="pave_titre_droite"><%=recherche.getNbResultats() %> <%= recherche.sPaveHeaderNOccurenceLibelle %></td>
+<%
+	}
+	else{
+		if(recherche.getNbResultats() ==1){
+%>
+			<td class="pave_titre_droite"><%= recherche.sPaveHeader1OccurenceLibelle %></td>
+<%
+		}
+		else{
+%>
+			<td class="pave_titre_droite"><%= recherche.sPaveHeader0OccurenceLibelle %></td>
+<%
+		}
+	}
+%>
+	</tr>

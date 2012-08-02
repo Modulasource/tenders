@@ -1,0 +1,58 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">
+			<input type="checkbox" name="PAToImport" value="<%=i%>" style="padding:0px;spacing:0px;margin:0px" />&nbsp;
+			Annonce n°<%= "" + (i+1) %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Type d'annonce (AAPC / AATR) :</td>
+		<td class="pave_cellule_droite"><%=sTypeAnnonce %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Avis rectificatif :</td>
+		<td class="pave_cellule_droite"><%= pa.getAvisRectificatif()?"oui":"non" %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Réference :</td>
+		<td class="pave_cellule_droite"><%= pa.getReference() %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Objet :</td>
+		<td class="pave_cellule_droite"><%= pa.getObjet() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Mode de passation :</td>
+		<td class="pave_cellule_droite"><%=(passation!=null?passation.getName():"Indéfini")%></td>
+	</tr>
+    <tr>
+        <td class="pave_cellule_gauche">Secteur d'activité :</td>
+        <td class="pave_cellule_droite"><%= (!pa.getSecteurActivite().equals("")?pa.getSecteurActivite():"Indéfini") %></td>
+    </tr>
+	<tr>
+		<td class="pave_cellule_gauche">Date de début de mise en ligne sur le site Internet :</td>
+		<td class="pave_cellule_droite"><%= sDateDebutMiseEnLignePublisher  %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Date de fin de mise en ligne sur le site Internet :</td>
+		<td class="pave_cellule_droite"><%= sDateFinMiseEnLignePublisher  %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">Pièce jointe :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle"><%= (pa.getPieceJointeName() == ""?"Pas de pièce jointe":pa.getPieceJointeName())%><img src="<%=rootPath + Icone.ICONE_PIECE_JOINTE %>" style="vertical-align:middle" /></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Libelle :</td>
+		<td class="pave_cellule_droite">
+		<%= sPetiteAnnonceTexteLibre %>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>
+<br />

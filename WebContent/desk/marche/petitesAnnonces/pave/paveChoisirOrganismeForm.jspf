@@ -1,0 +1,30 @@
+
+<%@page import="modula.graphic.CSS"%><table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2" >Renseignements sur l'organisme et la commission</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">Acheteur public* :</td>
+		<td class="pave_cellule_droite">
+			<button type="button" id="AJCL_but_iIdOrganisation" 
+			 style="width:400px" >Cliquer ici pour sélectionner l'organisme</button>
+			<input type="hidden" id="iIdOrganisation" name="iIdOrganisation" style="width:400px;text-align:center" />
+	   	 </td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Commission* :</td>
+		<td class="pave_cellule_droite">
+			<select name="iIdCommission" id="iIdCommission" style="width:400px;text-align:center" class ="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>">
+				<option selected="selected" value="" />
+			</select>
+		</td>
+	</tr>
+ 	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+ 			* Champs obligatoires
+ 		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />

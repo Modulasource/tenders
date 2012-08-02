@@ -1,0 +1,153 @@
+<%@page import="modula.marche.MarcheProcedureRecours"%>
+<%@page import="org.coin.fr.bean.Adresse"%>
+<%@page import="org.coin.fr.bean.CorrespondantOrganisation"%>
+<%@page import="org.coin.fr.bean.CorrespondantOrganisationInfo"%>
+<%
+	MarcheProcedureRecours marcheProcedureRecours = null;
+	try {
+		marcheProcedureRecours = MarcheProcedureRecours
+			.getMarcheProcedureRecoursFromIdMarche(marche.getId());
+	} catch (Exception e) {
+		marcheProcedureRecours = new MarcheProcedureRecours();
+	}
+
+
+	String sPaveAdresseTitre = "Adresse ";
+
+	CorrespondantOrganisation coRecours = marcheProcedureRecours.getOrNewCorrespondantOrganisationRecours(false);
+	CorrespondantOrganisation coMediation = marcheProcedureRecours.getOrNewCorrespondantOrganisationMediation(false);
+	CorrespondantOrganisation coIntroductionRecours = marcheProcedureRecours.getOrNewCorrespondantOrganisationIntroductionRecours(false);
+
+	Adresse adresseRecours = (Adresse) CoinDatabaseAbstractBean.getOrNewAbstractBean(coRecours.getIdAdresse(),	new Adresse());
+	Adresse adresseMediation = (Adresse) CoinDatabaseAbstractBean.getOrNewAbstractBean(coMediation.getIdAdresse(),	new Adresse());
+	Adresse adresseIntroductionRecours = (Adresse) CoinDatabaseAbstractBean.getOrNewAbstractBean(coIntroductionRecours.getIdAdresse(),	new Adresse());
+
+	Adresse adresse = null;
+	
+	CorrespondantOrganisationInfo coiRecours 
+		= CorrespondantOrganisationInfo
+			.getOrNewCorrespondantOrganisationInfoFromIdCorrespondantOrganisation(coRecours.getId(), false);
+	
+	CorrespondantOrganisationInfo coiMediation 
+		= CorrespondantOrganisationInfo
+			.getOrNewCorrespondantOrganisationInfoFromIdCorrespondantOrganisation(coMediation.getId(), false);
+
+	CorrespondantOrganisationInfo coiIntroductionRecours 
+		= CorrespondantOrganisationInfo
+			.getOrNewCorrespondantOrganisationInfoFromIdCorrespondantOrganisation(coIntroductionRecours.getId(), false);
+
+	CorrespondantOrganisationInfo correspondantOrganisationInfo = null;
+	
+	HtmlBeanTableTrPave hbFormulaire = new HtmlBeanTableTrPave();
+	hbFormulaire.bIsForm = true;
+
+%>  
+<%@page import="org.coin.bean.html.HtmlBeanTableTrPave"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="org.coin.util.Outils"%>
+<input type="hidden" name="MarcheProcedureRecours_lIdCoRecours" value="<%= marcheProcedureRecours.getIdCoRecours()%>" />
+<input type="hidden" name="MarcheProcedureRecours_lIdCoMediation" value="<%= marcheProcedureRecours.getIdCoMediation()%>" />
+<input type="hidden" name="MarcheProcedureRecours_lIdCoIntroductionRecours" value="<%= marcheProcedureRecours.getIdCoIntroductionRecours()%>" />
+
+
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Procédure de recours</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align:left"><b>Instance chargée des procédures de recours</b></td>
+	</tr>
+	<% 	
+		sFormPrefix = "CoRecours_"; 
+		adresse = adresseRecours;
+		correspondantOrganisationInfo = coiRecours;
+
+		if(coRecours.getId() == 0)
+		{
+			%>
+			<tr>
+				<td colspan="2" style="text-align:left"><i>Néant</i></td>
+			</tr>
+			<%
+		} else {
+			%><%@ include file="correspondantOrganisationInfoTr.jspf" %><% 
+		}	
+	%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align:left"><b>Organe chargé des procédures de médiation</b></td>
+	</tr>
+	<% 	
+		sFormPrefix = "CoMediation_"; 
+		adresse = adresseMediation;
+		correspondantOrganisationInfo = coiMediation;
+
+		if(coMediation.getId() == 0)
+		{
+			%>
+	<tr>
+		<td colspan="2" style="text-align:left"><i>Néant</i></td>
+	</tr>
+			<%
+		} else {
+			%><%@ include file="correspondantOrganisationInfoTr.jspf" %><% 
+		}	
+	%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align:left">
+			<b>Introduction des recours</b>
+		</td>
+	</tr>
+	<% 	
+
+	if(coiIntroductionRecours.getId() == 0)
+	{
+		if(Outils.isNullOrBlank( marcheProcedureRecours.getIntroductionRecoursDescription())){
+			%>
+			<tr>
+				<td colspan="2" style="text-align:left"><i>Néant</i></td>
+			</tr>
+			<%
+		} else {			
+		%>
+	<tr>
+		<td colspan="2" style="text-align:left" >
+			Introduction des recours au format libre.
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Précision(s) concernant le(s) délai(s) d'introduction des recours :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= Outils.getTextToHtml(
+				marcheProcedureRecours.getIntroductionRecoursDescription()) %>
+		</td>
+	</tr>
+		<% 
+		}
+	} else {
+		%>
+	<tr>
+		<td colspan="2" style="text-align:left" >
+			Service auprès duquel des renseignements peuvent être obtenus concernant l'introduction des recours.
+		</td>
+	</tr>
+	<% 	
+		sFormPrefix = "CoIntroductionRecours_"; 
+		adresse = adresseIntroductionRecours;
+		correspondantOrganisationInfo = coiIntroductionRecours;
+	%>
+	<%@ include file="correspondantOrganisationInfoTr.jspf" %>
+	<% 
+	}
+	%>
+	
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

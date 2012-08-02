@@ -1,0 +1,132 @@
+<%
+    String sPublisherUrl = request.getRequestURL().toString();
+	boolean bDisplayLogoFM = false;
+	if(sPublisherUrl.contains("normandieLegales") 
+		|| sPublisherUrl.contains("capLegales")
+		|| sPublisherUrl.contains("antilles-legales")
+		|| sPublisherUrl.contains("guyane-legales")) {
+		bDisplayLogoFM = true;
+	}
+	
+	String sListMenuStyle = "style=\"border:1px solid #3E615B;background-color:#C7D8C6\"";
+	
+	if(sPublisherUrl.contains("modula_outremer")) sListMenuStyle = "style=\"border:1px solid #E2001A;background-color:#FFF\"";
+	
+%>
+<table width="120" border="0" cellspacing="0" cellpadding="2" 
+    align="center" 
+    style="background:url(images/fond-nav-gauche.jpg);background-repeat:no-repeat ;vertical-align:top;height:1900 px">
+        <tr> 
+          <td height="5"></td>
+        </tr>
+        <tr> 
+          <td style="width:145px;height:35px">
+            <img src="images/bouton_entreprises.gif" />
+          </td>
+        </tr>
+        <tr> 
+          <td height="22"> 
+            <table width="145" cellspacing="0" cellpadding="2" 
+             <%= sListMenuStyle %> height="25">
+              <tr align="center"> 
+                <td><a href="<%=response.encodeURL(
+                    rootPath + "publisher_portail/public/pagesStatics/assistance/presentationEntreprise.jsp"
+                    ) %>" target="main">Pr&eacute;sentation</a></td>
+              </tr>
+            </table>  
+	       </td>
+        </tr>
+        <tr> 
+          <td height="22"> 
+             <table width="145" cellspacing="0" 
+             cellpadding="2" <%= sListMenuStyle %> height="25">
+              <tr align="center"> 
+                <td><a href="<%=response.encodeURL(
+                	rootPath + "publisher_portail/public/pagesStatics/assistance/formations.jsp"
+                	) %>" target="main">Formation et accompagnement</a></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr> 
+          <td height="25">&nbsp;</td>
+        </tr>
+        <tr> 
+          <td height="35"><img src="images/bouton_acheteurs.gif" ></td>
+        </tr>
+        <tr> 
+          <td height="25"> 
+             <table width="145" cellspacing="0" cellpadding="2" 
+                <%= sListMenuStyle %> height="25">
+              <tr align="center"> 
+                <td height="25"><a href="<%= response.encodeURL(
+                	rootPath + "publisher_portail/public/pagesStatics/assistance/presentationAP.jsp")
+                	%>" target="main">Pr&eacute;sentation</a></td>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+        <tr> 
+          <td height="25"> 
+             <table width="145" cellspacing="0" cellpadding="2" 
+                <%= sListMenuStyle %> height="25">
+              <tr align="center"> 
+                <td height="25"><a href="<%= response.encodeURL(
+                    rootPath + "publisher_portail/public/pagesStatics/assistance/formations.jsp")
+                    %>" target="main">Contacts</a></td>
+              </tr>
+            </table>
+		  </td>
+        </tr>
+        <tr>
+          <td height="25">
+            <table width="145" cellspacing="0" cellpadding="2" 
+                <%= sListMenuStyle %> height="25">
+              <tr align="center"> 
+                <td><a href="<%= response.encodeURL(
+                    rootPath + "publisher_portail/public/pagesStatics/assistance/contactAP.jsp")
+                    %>" target="main">Formation et accompagnement</a></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+        	<td height="100" style="text-align:center">
+				<img src="<%= response.encodeURL(
+                    rootPath + "templatesClients/common/images/logo_boamp.jpg") %>" />
+			</td>
+       	</tr>
+        <tr>
+<% 
+if(bDisplayLogoFM) { 
+%>
+            <td height="50" style="text-align:center">
+                <a href="http://www.francemarches.com/" target="_blank">
+                <img src="<%= response.encodeURL(
+                    rootPath + "templatesClients/common/images/france-marches.gif") %>" 
+                    alt="March&eacute public France March&eacute;s"
+                    style="border:0"/>
+                </a>
+            </td>
+<%
+} else {
+%>
+            <td>&nbsp;</td>            
+<%
+}
+%>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+
+</table>

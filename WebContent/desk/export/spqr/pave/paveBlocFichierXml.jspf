@@ -1,0 +1,16 @@
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBlocXML')" >
+		<td class="pave_titre_gauche" colspan="2">Fichier XML</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBlocXML" >
+			<tr>
+				<td class="pave_cellule_droite" colspan="2">
+				<%= org.coin.util.Outils.getTextToHtml(sXmlFileToSend)   %>
+				</td>
+			</tr>
+		</table>
+		</td>
+	</tr>
+</table>		

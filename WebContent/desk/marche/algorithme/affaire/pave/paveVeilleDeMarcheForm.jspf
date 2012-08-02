@@ -1,0 +1,27 @@
+<%
+	boolean bVeilleDeMarche = true;
+	try{
+		bVeilleDeMarche = marche.isVeilleDeMarche();
+	}catch(Exception e){}
+%>
+<input type="hidden" name="bVeilleDeMarche" value="1" />
+<!-- 
+<table class="pave">
+	<tr>
+		<td colspan="2" class="pave_titre_gauche">
+		Gestion des alertes par mail aux entreprises
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<input type="checkbox" name="bVeilleDeMarche" value="1" <%=!bVeilleDeMarche?"":"checked=\"checked\"" %> />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+			&nbsp;J'autorise l'information par mail des entreprises abonnées à la veille des marchés pour le lancement de mon marché
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />
+ -->	

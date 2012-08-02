@@ -1,0 +1,139 @@
+<%
+	String sFishTank = rootPath + "images/fishtank/";
+
+	Vector<Multimedia> vMultimedias = 
+	    Multimedia.getAllMultimedia(
+	            MultimediaType.TYPE_USER_BACKGROUND_IMAGE, 
+	            sessionUser.getIdIndividual(), 
+	            ObjectType.PERSONNE_PHYSIQUE);
+	
+	String sFishtankBG = "";
+	if(vMultimedias.size() > 0)
+	{
+		//sFishtankBG = "background-image: url("+  sFishTank + "tankBG.jpg);";
+		sFishtankBG = "background: #FFF url("
+				+ response.encodeURL(
+						rootPath+ "publisher_portail/DownloadFilePublisher?" 
+						+ DownloadFile.getSecureTransactionStringFull(
+								request, 
+								vMultimedias.firstElement().getIdMultimedia() , 
+								TypeObjetModula.MULTIMEDIA,
+								"&",
+								false /* permet de ne pas recharger le logo à chaque fois */)
+						+"&sContentType="+vMultimedias.firstElement().getContentType()
+						+"&sAction=view") 
+				+ ") 0 0 no-repeat;";
+	}
+	
+	int iFishTankWidth = 800;
+	int iFishTankHeight = 600;
+%>
+
+	
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.Multimedia"%>
+<%@page import="org.coin.fr.bean.MultimediaType"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="modula.TypeObjetModula"%>
+
+<script type="text/javascript">
+<!--
+
+var g_fishTankItemCount = 4;
+var g_fishTankDiv = "fishTank";
+var g_fishTank = new Array();
+var g_fishTankImagePrefix = "fish";
+
+function Fish(id) 
+{
+	this.fishType = Math.round(Math.random() * 7) + 1;					// choose fish type (1-8)
+	this.positionX = Math.round(Math.random() * 530);						// choose random start X co-ordinate
+	this.positionY = Math.round(Math.random() * 425);						// choose random start Y co-ordinate
+	while (!(this.directionX = Math.round(Math.random() * 2) - 1));			// choose random X direction (left or right)
+	while (!(this.directionY = Math.round(Math.random() * 2) - 1));			// choose random Y direction (up or down)
+
+	$(g_fishTankDiv).appendChild(this.canvas = document.createElement('img'));
+	this.canvas.style.left = this.positionX + 'px';
+	this.canvas.style.top = this.positionY + 'px';
+	this.id = id;
+	this.bAnimated = false;
+}
+
+
+
+
+
+Fish.prototype.animate = FishAnimate;
+Fish.prototype.stop = FishStop;
+Fish.prototype.start = FishStart;
+
+function FishAnimate() {
+	var newImageName = '<%= sFishTank %>' 
+		+ g_fishTankImagePrefix 
+		+ this.fishType 
+		+ (this.directionX > 0 ? '_flipped' : '') + '.gif';
+	
+	if (newImageName  
+	!= this.canvas.src.substr(this.canvas.src.lastIndexOf('/') + 1)) 
+	{
+		this.canvas.src = newImageName;
+	}	
+		
+	var xPos = parseInt(this.canvas.style.left, 10) + this.directionX;
+	var yPos = parseInt(this.canvas.style.top, 10) + this.directionY;
+	if (xPos > <%= iFishTankWidth + 10 %> || Math.round(Math.random() * 200) > 199) this.directionX = 0-(Math.round(Math.random()) + 1);
+	if (xPos < -75 || Math.round(Math.random() * 200) > 199) this.directionX = Math.round(Math.random()) + 1;
+	if (yPos > <%= iFishTankHeight - 10 %> || Math.round(Math.random() * 200) > 199) this.directionY = -1;
+	if (yPos < 10 || Math.round(Math.random() * 200) > 199) this.directionY = 1;
+	this.canvas.style.left = xPos + 'px';
+	this.canvas.style.top = yPos + 'px';
+
+	this.canvas.title = "Hello Buddy !";
+	this.canvas.parent = this;
+	this.canvas.onclick = function() {
+		if(this.parent.bAnimated) {
+			this.parent.stop();
+		} else {
+			this.parent.start();
+		}
+	}
+}
+
+function FishStop() {
+	clearInterval( this.handleInterval );
+	this.bAnimated = false;
+}
+
+function FishStart() {
+	// choose random speed (20, 30, 40, 50, 60)
+	this.handleInterval
+		 = setInterval(
+			"g_fishTank['" + this.id + "'].animate();", 
+			(Math.round(Math.random() * 4) + 3) * 10);
+	
+	this.bAnimated = true;
+}
+
+function createAllFishAndAnimate() {
+	for (var i=0; i<g_fishTankItemCount; i++) {
+		 var fish = new Fish('fish' + i);
+		 fish.start();
+		 g_fishTank['fish' + i] = fish;
+	}
+}
+
+function startAllFish() {
+	for (var i=0; i<g_fishTankItemCount; i++) {
+		g_fishTank['fish' + i].start();
+	}
+}
+
+
+function stopAllFish() {
+	for (var i=0; i<g_fishTankItemCount; i++) {
+		g_fishTank['fish' + i].stop();
+	}
+}
+//-->
+</script>

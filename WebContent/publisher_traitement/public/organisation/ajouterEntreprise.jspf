@@ -1,0 +1,280 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+String.prototype.removeAccents = function() {
+	var str = this.replace(/[áàâãä]/g, "a");
+	str = str.replace(/[éèêë]/g, "e");
+	str = str.replace(/[íìîï]/g, "i");
+	str = str.replace(/[óòôõö]/g, "o");
+	str = str.replace(/[úùûü]/g, "u");
+	str = str.replace(/[ýÿ]/g, "y");
+	str = str.replace(/[ç]/g, "c");
+	str = str.replace(/[ñ]/g, "n");
+	
+	str = str.replace(/[ÁÀÂÃÄ]/g, "A");
+	str = str.replace(/[ÉÈÊË]/g, "E");
+	str = str.replace(/[ÍÌÎÏ]/g, "I");
+	str = str.replace(/[ÓÒÔÕÖ]/g, "O");
+	str = str.replace(/[ÚÙÛÜ]/g, "U");
+	str = str.replace(/[Ý]/g, "Y");
+	str = str.replace(/[Ç]/g, "C");
+	str = str.replace(/[Ñ]/g, "N");
+	return str;
+}
+
+
+
+function trimPhoneNumber(str)
+{
+	str = str.replace(/\+/g, "00");
+    str = str.replace(/\ /g, "");
+    str = str.replace(/\./g, "");
+    str = str.replace(/\(/g, "");
+    str = str.replace(/\)/g, "");
+    str = str.replace(/\-/g, "");
+	
+	return str;
+}
+
+//raison sociale
+var champRaisonSocialeAuth = "sRaisonSocialeAuth";
+var champRaisonSociale = "sRaisonSociale";
+var divRaisonSociale = "tr_infoRaisonSociale";
+function verifierRaisonSociale() 
+{
+	verifierChamp(champRaisonSociale,champRaisonSocialeAuth,divRaisonSociale,<%= 
+		CheckAjaxVerifField.ORGANISATION_RAISON_SOCIALE %>,"","publisher_portail");
+}
+
+//mail gerant
+var champMailGerantAuth = "sEmailAuth";
+var champMailGerant = "sEmail";
+var divMailGerant = "tr_infoEmail";
+function verifierMailGerant() 
+{
+	verifierChamp(champMailGerant,champMailGerantAuth,divMailGerant,<%= 
+		CheckAjaxVerifField.PERSONNE_PHYSIQUE_EMAIL %>,"","publisher_portail");
+}
+
+var g_inputBackgroundColorHighlightOn = "#EFF5FF";
+var g_inputBackgroundColorHighlightOff = "#FFF";
+
+function highlightInput(id , bHighlight) 
+{
+  if(bHighlight)
+  {
+    $(id).style.backgroundColor = g_inputBackgroundColorHighlightOn;
+  } else {
+    $(id).style.backgroundColor = g_inputBackgroundColorHighlightOff;
+  }
+}
+
+
+
+//verification du formulaire
+function checkForm()
+{
+    var form = document.formulaire;
+    var sError = "";
+    var bResult = true;
+    var sCurrentFieldValue ;
+
+  
+
+    
+    
+
+
+	//ENTREPRISE
+	if (isNull($("sRaisonSociale").value))
+	{
+		sError += "Vous devez saisir une raison sociale.<br />";
+		bResult = false;
+        highlightInput("sRaisonSociale" , true); 
+	}
+	else if ($("sRaisonSocialeAuth").value == 0)
+	{
+		sError += "La raison sociale que vous avez saisie est déjà inscrite dans la base de données.\n"
+		      + "Vous ne pouvez pas poursuivre cette opération.<br />";
+		bResult = false;
+        highlightInput("sRaisonSociale" , true); 
+ 	} else {
+        highlightInput("sRaisonSociale" , false); 
+	}
+	
+	sCurrentFieldValue = $("organisation_adresse_sCodePostal").value;
+	if (!isNum (sCurrentFieldValue)
+    || sCurrentFieldValue.length < 5 )
+    {
+        sError += "Vous renseigner le code postal.<br />";
+        bResult = false;
+        highlightInput("organisation_adresse_sCodePostal" , true); 
+    } else {
+        highlightInput("organisation_adresse_sCodePostal" , false); 
+	}
+	
+	sCurrentFieldValue = $("organisation_adresse_sCommune").value;
+    if (isNull(sCurrentFieldValue)
+    || sCurrentFieldValue.length < 3 )
+    {
+        sError += "Vous renseigner la localité.<br />";
+        bResult = false;
+        highlightInput("organisation_adresse_sCommune" , true); 
+    } else {
+        highlightInput("organisation_adresse_sCommune" , false); 
+    }
+
+<%
+	if(Configuration.isTrueMemory("addressbook.organization.type.candidate.code.naf.mandatory", true))
+	{
+%>        
+    var iIdCodeNaf = $("iIdCodeNaf");
+    if(iIdCodeNaf != null)
+    {
+        if(iIdCodeNaf.value == null
+        || iIdCodeNaf.value == "")
+        {
+            sError += "Vous devez choisir un code Naf.<br />";
+            bResult = false;
+            highlightInput("iIdCodeNaf" , true); 
+        } else {
+            highlightInput("iIdCodeNaf" , false); 
+        }
+    }
+<%
+	}
+%>    
+    Visualise($("iIdCompetenceSelected"),$("iIdCompetenceNewSelection"));
+    
+ 
+
+<%
+	if(Configuration.isTrueMemory("addressbook.organization.type.candidate.skill.mandatory", true))
+	{
+%>             
+    var iIdCompetenceNewSelection = $("iIdCompetenceNewSelection");
+    if(iIdCompetenceNewSelection != null)
+    {
+        if(iIdCompetenceNewSelection.value == null
+        || iIdCompetenceNewSelection.value == "")
+        {
+            sError += "Vous devez choisir au moins une compétence.<br />";
+            bResult = false;
+            highlightInput("iIdCompetenceAll" , true);
+            highlightInput("iIdCompetenceSelected" , true);
+        } else {
+            highlightInput("iIdCompetenceAll" , false);
+            highlightInput("iIdCompetenceSelected" , false); 
+        }
+    }
+<%
+	}
+%>   
+	//GERANT
+	if (isNull($("iIdCivilite").value)
+	|| $("iIdCivilite").value <= 0)
+	{
+		sError += "Vous devez saisir la civilité du gérant.<br />";
+		bResult = false;
+        highlightInput("iIdCivilite" , true); 
+    } else {
+        highlightInput("iIdCivilite" , false); 
+    }
+    
+	if (isNull($("sNom").value))
+	{
+		sError += "Vous devez saisir le nom du gérant.<br />";
+		bResult = false;
+        highlightInput("sNom" , true); 
+    } else {
+        highlightInput("sNom" , false); 
+    }
+    
+	if (isNull($("sPrenom").value))
+	{
+		sError += "Vous devez saisir le prenom du gérant.<br />";
+		bResult = false;
+        highlightInput("sPrenom" , true); 
+    } else {
+        highlightInput("sPrenom" , false); 
+    }
+	
+	sCurrentFieldValue = $("sTel").value;
+    $("sTel").value=trimPhoneNumber(sCurrentFieldValue);
+	if ( !isNum (sCurrentFieldValue)
+    || sCurrentFieldValue.length < 10 ) 
+    {
+        sError += "Vous devez saisir le numéro de téléphone au format '1234567890' ou international '0036123456789'.<br />";
+        bResult = false;
+        highlightInput("sTel" , true); 
+    } else {
+        highlightInput("sTel" , false); 
+    }
+	
+	var sEmail = document.getElementById("sEmail").value;
+	sEmail = sEmail.removeAccents();
+	
+	if (!isMail(sEmail))
+	{
+		sError += "La syntaxe de l'email n'est pas correcte.<br />";
+		bResult = false;
+        highlightInput("sEmail" , true); 
+	}
+	else if($("sEmailAuth").value == 0)
+	{
+		sError += "L'adresse email du gérant que vous avez saisie est déjà inscrite dans la base de données.\n"
+		+"Vous ne pouvez pas poursuivre cette opération.<br />";
+		bResult = false;
+	    highlightInput("sEmail" , true); 
+    } else {
+        highlightInput("sEmail" , false); 
+    }	
+
+
+
+    /**
+    * TODO_AG : added departement and CodeCpfGroup
+    */
+    var listCodeCpfGroup = $("listCodeCpfGroup");
+    if(listCodeCpfGroup != null)
+    {
+        if(listCodeCpfGroup.value == null
+        || listCodeCpfGroup.value == "")
+        {
+            sError += "Vous devez saisir choisir au moins une activités.<br />";
+            bResult = false;
+            highlightInput("listCodeCpfGroup" , true); 
+        } else {
+            highlightInput("listCodeCpfGroup" , false); 
+        }
+    }
+    var listDepartement = $("listDepartement");
+    if(listDepartement != null)
+    {
+        if(listDepartement.value == null
+        || listDepartement.value == "")
+        {
+            sError += "Vous devez saisir choisir au moins un département.<br />";
+            bResult = false;
+            highlightInput("listDepartement" , true); 
+        } else {
+            highlightInput("listDepartement" , false); 
+        }
+    }
+
+    
+	if (!form.CGU.checked)
+	{
+		sError += "L'inscription ne peut être prise en compte si vous n'acceptez pas les conditions "
+		+"générales d'utilisation de la plate-forme.<br/>";
+		bResult = false;
+	}
+
+
+	
+	$("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}

@@ -1,0 +1,34 @@
+<%
+ 	String sid_AnnEmetteur = BasicDom.getChildNodeValueByNodeName(nodeAnn, "id_AnnEmetteur");
+	String sEmetteurLogin = BasicDom.getChildNodeValueByNodeName(nodeEmetteur , "login");
+ 	String sEmetteurMel = BasicDom.getChildNodeValueByNodeName(nodeEmetteur , "mel");
+
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBlocParamEnvoi')" >
+		<td class="pave_titre_gauche" colspan="2">Paramètres de l'envoi</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBlocParamEnvoi" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">id_AnnEmetteur : </td>
+				<td class="pave_cellule_droite"><%= sid_AnnEmetteur %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">emetteur login : </td>
+				<td class="pave_cellule_droite"><%= sEmetteurLogin  %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">emetteur mel : </td>
+				<td class="pave_cellule_droite"><%=  sEmetteurMel  %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,55 @@
+<%
+	/*
+	* 	Nécessite les objets suivants :
+	* 	String sPaveObjetMarcheTitre;
+	*
+	*	Champs utilisés :
+	*	String sReference;
+	*	String sObjet;
+	*	String sDesignationReduite;
+	*/
+	
+%>
+<%@page import="modula.graphic.*"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveObjetMarcheTitre %></td>   
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Numéro de référence de l'affaire* :<br>
+            <i>ne  doit pas dépasser 32 caractères pour un envoi au BOAMP et/ou JOUE)</i>
+		</td>
+		<td class="pave_cellule_droite">
+		<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" type="text" name="<%=sFormPrefix %>sReference" size="100" maxlength="250" 
+		value="<%= marche.getReference() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Objet du marché* :
+		</td>
+		<td class="pave_cellule_droite">
+		<textarea class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="<%=sFormPrefix %>sObjet" cols="100" rows="4"><%= 
+			marche.getObjet() %></textarea>
+		</td>
+	</tr>
+	<tr >
+         <td class='pave_cellule_gauche' >Volume du marché (montant estimatif) * : </td>
+         <td class='pave_cellule_droite' >
+             <%= marcheVolumeType.getAllInHtmlSelect("lIdMarcheVolumeType",true) %>
+         </td>
+    </tr>
+	
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+			<input type="hidden" name="<%=sFormPrefix 
+						%>sDesignationReduite" value="<%=
+							marche.getDesignationReduite() %>" />
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+	

@@ -1,0 +1,7 @@
+<div class="footer">
+	<a href="javascript:openModal('<%= 
+		response.encodeURL(rootPath + "publisher_portail/public/pagesStatics/infoslegales.jsp") 
+		%>','CGU');" >Conditions générales d'utilisation</a>
+	&nbsp;<span>|</span>&nbsp; 
+	<a href="http://www.modula-demat.com" target="_blank">Credits</a>
+</div>

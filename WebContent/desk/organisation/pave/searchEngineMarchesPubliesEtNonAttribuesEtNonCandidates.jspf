@@ -1,0 +1,168 @@
+<%@page import="org.coin.util.SearchEngine"%>
+<%
+  	final int nbElements = 10;
+	String sRequest = Marche.getSelectAllMarchePublicFromMarcheCommissionOrganisationCorrespondant();
+
+ 	// pour vérouiller la recherche
+	String sConstraint = " AND com.id_organisation = -1 ";
+	if(	!sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-3") ) // Afficher toutes les affaires
+	{
+		String sConstraintTemp = null;
+		String sConstraintList = "";
+		boolean bFirstConstraint = true;
+		
+		// il ne peut pas afficher la liste de toutes les affaires, il faut contraindre la recherche.
+		personne = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual());
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-5") ) // Afficher les affaires de son organisation
+		{
+			// restriction aux marchés de son organisation.
+			sConstraintTemp = " com.id_organisation = " + personne.getIdOrganisation();
+			
+		}
+		
+		if( sConstraintTemp != null)
+		{
+			if(bFirstConstraint ) { bFirstConstraint = false ; }
+			else { sConstraintList += "\n OR ";	}
+			
+			sConstraintList += sConstraintTemp ;
+			sConstraintTemp = null;
+		}
+		
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-42") ) // Afficher les affaires que l'on a créé
+		{
+			sConstraintTemp = " mar.id_createur = " + personne.getIdPersonnePhysique();
+		}
+
+		if( sConstraintTemp != null)
+		{
+			if(bFirstConstraint ) { bFirstConstraint = false ; }
+			else { sConstraintList += "\n OR ";	}
+			
+			sConstraintList +=  sConstraintTemp; 
+			sConstraintTemp = null;
+		}
+
+		//FIXME: JR: modification du filtre avec le syst des corresp
+		// à vérifier
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-43") )
+		{
+			sConstraintTemp = " corres.id_personne_physique = " + personne.getIdPersonnePhysique();
+		}
+
+		if( sConstraintTemp != null)
+		{
+			if(bFirstConstraint ) { bFirstConstraint = false ; }
+			else { sConstraintList += "\n OR ";	}
+			
+			sConstraintList +=  sConstraintTemp; 
+			sConstraintTemp = null;
+		}
+
+		if(!sConstraintList.equals(""))
+		{
+			sConstraint = "\n AND ( " + sConstraintList + " ) ";
+		}
+	}
+	else
+	{
+		// pas de contrainte 
+		sConstraint = "";
+	}
+
+	/* TRI */
+	String tri = " marche.date_dern_modif desc "; /* Tri par default */
+	if (request.getParameter("tri") != null)
+		tri = org.coin.security.PreventInjection.preventStore(request.getParameter("tri"));
+	String sTri = "";//" ORDER BY "+tri;
+	/* /TRI */
+
+	
+	SearchEngine recherche = new SearchEngine(sRequest + sConstraint + sTri,nbElements)
+	{
+		// ancienne méthode 
+		public boolean isObjectAddable(String sItem, Object oContext){
+			boolean bIsAffairePublieeSurPublisher = false;
+			boolean bIsAffaireAttribueeDefinitivement = false;
+			boolean bIsCandidatPourCeMarche = false;
+			int iIdMarche = -1;
+			try	{ iIdMarche = Integer.parseInt(sItem);	} catch(Exception e){}
+			try
+			{
+				Marche aff = Marche.getMarche(iIdMarche);
+				
+				Candidature candidature = null;
+				try{candidature = Candidature.getCandidature(iIdMarche,iIdPersonnePhysique);}
+				catch(Exception e){}
+				if(candidature != null) bIsCandidatPourCeMarche = true;
+				
+				bIsAffairePublieeSurPublisher = aff.isAffairePublieeSurPublisher(false);
+				bIsAffaireAttribueeDefinitivement = aff.isAffaireAttribueeDefinitivement(false);
+				
+				boolean bIsContainsAAPCPublicity = AffaireProcedure.isContainsAAPCPublicity(aff.getIdAlgoAffaireProcedure());
+				//Pour afficher les marchés qui ne comporte pas de phase de publication
+				if(!bIsContainsAAPCPublicity) bIsAffairePublieeSurPublisher = true;
+				
+			}
+			catch(Exception e){}
+	
+			if(!bIsCandidatPourCeMarche && bIsAffairePublieeSurPublisher && !bIsAffaireAttribueeDefinitivement) return true; 
+			
+			return false;
+		}
+
+		// Nouvelle méthode 
+		public boolean isObjectToAdd(Object oItem, Object oContext){
+			boolean bIsAffairePublieeSurPublisher = false;
+			boolean bIsAffaireAttribueeDefinitivement = false;
+			boolean bIsCandidatPourCeMarche = false;
+			try
+			{
+				Marche aff = (Marche) oItem;
+
+				Candidature candidature = null;
+				try{candidature = Candidature.getCandidature(aff.getIdMarche(),iIdPersonnePhysique);}
+				catch(Exception e){}
+				if(candidature != null) bIsCandidatPourCeMarche = true;
+
+				try{bIsAffairePublieeSurPublisher = aff.isAffairePublieeSurPublisher();}
+				catch(Exception e){}
+				try{bIsAffaireAttribueeDefinitivement = aff.isAffaireAttribueeDefinitivement();}
+				catch(Exception e){}
+				
+				boolean bIsContainsAAPCPublicity = AffaireProcedure.isContainsAAPCPublicity(aff.getIdAlgoAffaireProcedure());
+				//Pour afficher les marchés qui ne comporte pas de phase de publication
+				if(!bIsContainsAAPCPublicity) bIsAffairePublieeSurPublisher = true;
+			}
+			catch(Exception e){}
+			
+			if(!bIsCandidatPourCeMarche && bIsAffairePublieeSurPublisher && !bIsAffaireAttribueeDefinitivement) return true;
+	
+			return false;
+		}
+		
+		public Object getObjetFromResultSet(ResultSet rs) throws SQLException{
+			Marche marche = new Marche ();
+			
+			marche.setFromResultSet(rs);
+			marche.setIdMarche(rs.getInt(marche.SELECT_FIELDS_NAME_SIZE + 1));
+			return marche;
+		}
+	
+	};
+
+	recherche.setParam("choisirMarche.jsp","mar.date_dern_modif desc"); 
+	recherche.setExtraParamHeaderUrl("&amp;iIdPersonnePhysique="+iIdPersonnePhysique);
+	recherche.setFromFormPrevent(request, "");
+	recherche.getAllResultObjects();
+
+	Vector vRecherche = recherche.getAllResults();
+	recherche.addFieldName("mar.reference" , "Référence" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("org.raison_sociale" , "Acheteur Public" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("mar.objet" , "Objet" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	recherche.addFieldName("mar.date_cloture" , "Clôture" , SearchEngineArrayHeaderItem.FIELD_TYPE_NONE);
+	recherche.addFieldName("pass.libelle" , "Mode de passation" , SearchEngineArrayHeaderItem.FIELD_TYPE_STRING);
+	
+	Vector vMarches = recherche.getCurrentPage();
+	recherche.preventFromForm();
+%>

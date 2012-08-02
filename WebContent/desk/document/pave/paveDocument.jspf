@@ -1,0 +1,11 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Propriétés du Document</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :","",doc.getName(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Type de document :","",DocumentType.getDocumentTypeName(doc.getIdDocumentType()),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Description :","",doc.getDescription()) %>
+	<%= hbFormulaire.getHtmlTrInput("Date de création :","",CalendarUtil.getDateCourte(doc.getDateCreation()),"") %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

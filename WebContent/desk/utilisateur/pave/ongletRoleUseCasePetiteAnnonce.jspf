@@ -1,0 +1,21 @@
+	<%
+		sUseCasePrefix = org.coin.util.Outils.replaceAll(sUseCasePetiteAnnonce, "-", "_");
+		sUseCase = sUseCasePetiteAnnonce;
+		vUseCasesAll = UseCase.getAllUseCaseWithPrefixMemory(sUseCase);
+	
+		if(sAction.equals("store") )
+ 		{
+ 		%>
+			<%@ include file="paveBalanceUseCase.jspf" %>
+			<br />
+		<%
+		} else {
+		%>
+			<%@ include file="pavePrefixUseCase.jspf" %>
+			<br />
+		<%
+		}
+		
+	
+		
+	%>

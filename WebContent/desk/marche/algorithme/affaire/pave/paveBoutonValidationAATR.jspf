@@ -1,0 +1,55 @@
+<div align="right" >
+<%
+if(sAction.equals("store") )
+{
+	if(bShowForm && !bLectureSeule)
+	{ 
+%>
+							<input type="hidden" name="iIdAffaire" value="<%= marche.getIdMarche() %>" />
+							<input type="hidden" name="sAction" value="<%= sAction %>" />
+							<input type="hidden" name="iIdOnglet" value="<%= iIdOnglet %>" />
+							<button type="submit" onclick="return checkForm()">Valider</button>
+<% 	
+	}
+	else
+	{
+%>
+							<button 
+								type="button" 
+								onclick='javascript:Redirect("<%= 
+									response.encodeURL("afficherAttribution.jsp?"
+										+ "iIdOnglet=" + iIdOnglet 
+										+ "&amp;iIdAffaire=" + marche.getIdMarche()
+										+ "&amp;nonce=" + System.currentTimeMillis() ) %>")' >Retour</button>
+<%
+	}
+}
+else
+{
+	
+	boolean bDisplayButtonModifyAffaire = true;
+	if(sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-66" )
+	&& !(marche.getIdCreateur() == sessionUser.getIdIndividual())  )
+	{
+		bDisplayButtonModifyAffaire = false;
+	}
+	
+	if(sessionUserHabilitation.isSuperUser() ) bDisplayButtonModifyAffaire = true;
+	
+	if(bDisplayButtonModifyAffaire && !bLectureSeule)
+	{ 
+
+%>
+							<button 
+								type="button" 
+								onclick="Redirect('<%= 
+									response.encodeURL("afficherAttribution.jsp?"
+										+ "iIdAffaire=" + marche.getIdMarche() 
+										+ "&amp;iIdOnglet=" + iIdOnglet 
+										+ "&amp;sAction=store"
+										+ "&amp;nonce=" + System.currentTimeMillis() )%>') " >Modifier</button>
+<% 
+	}
+}
+	%>
+</div>

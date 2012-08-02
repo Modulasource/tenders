@@ -1,0 +1,47 @@
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt"><%=sTitle %></strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" >
+		<tr>
+			<td style="text-align:left">
+				<br />
+				<ul>
+				<li>Code des marchés publics :<br /><br />
+					<a href="http://www.legifrance.gouv.fr/WAspad/UnCode?commun=&amp;code=CMARPBN0.rcv" target="_blank">
+					http://www.legifrance.gouv.fr</a>
+					<br />
+					<br />
+					<br />
+				</li>
+				<li>Manuel d'application du code des marchés publics (version consolidée) : <br /><br />
+					<a href="<%=rootPath %>publisher_traitement/public/pagesStatics/legislation/Documentation_nouveau_code_des_marches_publics.pdf" target="_blank">
+					<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/pdf.gif"  align="baseline" /></a>
+					<br />
+					<br />
+					<br />
+				</li>
+				<li>Décret du 30 avril 2002 pris en application du 1° et du 2° de l'article 56 du code des marchés publics et relatif à la dématérialisation des procédures de passation des marchés publics  : <br /><br />
+					<a href="../../include/CCAG.pdf" target="_blank">
+					<img src="<%=rootPath %>publisher_traitement/public/pagesStatics/images/pdf.gif"  align="baseline" /></a>
+					<br />
+					<br />
+					<br />
+				</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+    </div>
+</div>

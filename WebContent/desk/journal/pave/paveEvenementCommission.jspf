@@ -1,0 +1,75 @@
+<%
+	org.coin.bean.User oUser = org.coin.bean.User.getUser(oEvenement.getIdUser() );
+	org.coin.fr.bean.PersonnePhysique oPers 
+		= org.coin.fr.bean.PersonnePhysique.getPersonnePhysique( oUser.getIdIndividual() );
+	String sUtilisateur = oPers.getPrenom() + " " + oPers.getNom();
+		
+ %>
+<table class="pave" summary="none">		
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"> 
+	<input type="hidden" name="iIdEvenement" value="<%= oEvenement.getIdEvenement() %>" />
+	<input type="hidden" name="sType" value="<%= sType %>" />
+			Evénement
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Date de création de l'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oEvenement.getDateCreationEvenement() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'événement :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oEvenement.getTypeEvenement() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'objet :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oEvenement.getTypeObjet() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= oEvenement.getTypeObjet() %> :
+		</td>
+		<td class="pave_cellule_droite">
+			<a href="<%= response.encodeURL(rootPath + "desk/commission/afficherCommission.jsp?iIdCommission="+ oCommission.getIdCommission() ) %>"><%= oCommission.getNom() %></a>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Identifiant de l'utilisateur :
+		</td>
+		<td class="pave_cellule_droite">
+			<a href="<%= response.encodeURL(rootPath + "desk/utilisateur/afficherUtilisateurGroupe.jsp?iIdUser="+oEvenement.getIdUser() ) %>" ><%= oEvenement.getUser() %></a>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Id jeton d'horodatage :
+		</td>
+		<td class="pave_cellule_droite">
+			<% 
+				if (oEvenement.getIdJetonHorodatage() < 1){
+					%>Pas de Jeton associé<%
+				} else {%>
+			<%= oEvenement.getIdJetonHorodatage() %>
+				<%}%>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

@@ -1,0 +1,159 @@
+<%
+	MarcheConditionParticipation mcp = null;
+	try {
+		mcp =  MarcheConditionParticipation.getMarcheConditionParticipationFromIdMarche(marche.getId());
+	}catch (Exception e ) {
+		mcp = new MarcheConditionParticipation();
+	}
+
+%>
+<%@page import="org.coin.bean.question.AnswerGroup"%>
+<%@page import="org.coin.bean.question.Answer"%>
+<%@page import="modula.marche.MarcheConditionParticipation"%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Conditions de participation</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Crit&egrave;res de s&eacute;lection des candidatures* :
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td><%= Outils.getStringNotNullNeant( marche.getCriteresCandidature())
+					%>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Situation juridique - r&eacute;f&eacute;rences requises :
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td><%= Outils.getStringNotNullNeant(marche.getReferenceJuridique()) %>
+					
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Capacité économique et financière
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td>
+									Références requises : <br/>
+									<%= Outils.getStringNotNullNeant(marche.getReferenceEco() )
+									%>
+								</td>
+								<td>
+									Niveau(x) spécifique(s) minimal(aux) exigé(s)<br/>
+									<%= Outils.getStringNotNullNeant(
+									mcp.getCapaciteEcoFinNiveauMin()) %>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Référence professionnelle et capacité technique
+		</td>
+		<td class="pave_cellule_droite">
+			<table summary="none">
+				<tr>
+					<td>
+						<table>
+							<tr>
+								<td>
+									Références requises : <br/>
+									<%= Outils.getStringNotNullNeant(marche.getReferenceTech() )
+									%>
+								</td>
+								<td>
+									Niveau(x) spécifique(s) minimal(aux) exigé(s)<br/>
+									<%= Outils.getStringNotNullNeant(
+									mcp.getCapaciteTechNiveauMin()) %>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<% 
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE)){
+	%>		
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserve", 
+			"lIdQaMarcheReserve",
+			mcp.getIdQaMarcheReserve(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_LABEL) %>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserveAtelierProtege", 
+			"lIdQaReserveAtelierProtege",
+			mcp.getIdQaReserveAtelierProtege(),
+			false,
+			false,
+			QuestionAnswer.FORM_TYPE_CHECKBOX) %>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserveProgrammeEmploiProtege", 
+			"lIdQaProgrammeEmploiProtege",
+			mcp.getIdQaProgrammeEmploiProtege(),
+			false,
+			false,
+			QuestionAnswer.FORM_TYPE_CHECKBOX) %>
+	
+	<tr><td colspan="2"><strong>CONDITIONS PROPRES AUX MARCHES DE SERVICES OU DE CONCOURS</strong></td></tr>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationMarcheReserveProfessionParticuliere", 
+			"lIdQaReserveProfParticuliere",
+			mcp.getIdQaReserveProfParticuliere(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_LABEL) %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Dans l'affirmative, indiquez les références des dispositions législatives, réglementaires ou administratives 
+		applicables ou bien en cas de concours quelle profession :
+	</td>
+		<td class="pave_cellule_droite">
+		<%= Outils.getStringNotNullNeant(
+			mcp.getReserveProfParticuliereReference()) %>
+		</td>
+	</tr>
+	<%= QuestionAnswer.getHTML(
+			"ConditionParticipationIndiquerNomEtQualification", 
+			"lIdQaIndiquerNomEtQualification",
+			mcp.getIdQaIndiquerNomEtQualification(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_LABEL) %>
+
+	<%} %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

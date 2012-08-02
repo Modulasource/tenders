@@ -1,0 +1,121 @@
+<%@page import="modula.marche.*"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.db.*"%>
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*/
+{
+	Vector<MarcheActiviteAdjudicateurSelected> vMarcheActiviteAdjudicateurSelected
+		= MarcheActiviteAdjudicateurSelected.getAllFromIdOrganisation(organisation.getIdOrganisation() );
+	
+	Vector vMAAPouvoirAdjudicateur
+		= MarcheActiviteAdjudicateur
+			.getAllWithMarcheActiviteAdjudicateurType(
+					MarcheActiviteAdjudicateurType.TYPE_POUVOIR_ADJUDICATEUR);
+	
+	Vector vMAAEntiteAdjudicatrice
+		= MarcheActiviteAdjudicateur
+			.getAllWithMarcheActiviteAdjudicateurType(
+				MarcheActiviteAdjudicateurType.TYPE_ENTITE_ADJUDICATRICE);
+
+
+	String sMAAPouvoirAdjudicateurAutre = "";
+	for (MarcheActiviteAdjudicateurSelected 
+			selected : vMarcheActiviteAdjudicateurSelected) 
+	{
+		if(selected.getIdMarcheActiviteAdjudicateur() 
+			== MarcheActiviteAdjudicateur.ID_POUVOIR_ADJUDICATEUR_AUTRE)
+		{
+			sMAAPouvoirAdjudicateurAutre = selected.getAutre();
+		}
+	}
+
+	
+	
+	CoinDatabaseHtmlTraitment trt = new CoinDatabaseHtmlTraitment(){
+		public boolean isItemChecked(CoinDatabaseAbstractBean item)
+		{
+			Vector<MarcheActiviteAdjudicateurSelected> 
+				vMAAPouvoirAdjudicateurSelected = (Vector)context1;
+			
+			for (MarcheActiviteAdjudicateurSelected 
+				selected : vMAAPouvoirAdjudicateurSelected) 
+			{
+				if(selected.getIdMarcheActiviteAdjudicateur() == item.getId())
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+		
+	};
+	
+	trt.context1 = vMarcheActiviteAdjudicateurSelected;
+	trt.iColumn = 2;
+	if(!bIsForm)
+	{
+		trt.sDisable = " disabled='disabled'  ";	
+	}
+
+%>
+<table class="pave" width="100%">
+	<tr><td colspan="2">Attention : vous ne pouvez choisir que des types d'activités en tant 
+	que pouvoir adjudicateur ou entité adjudicatrice </td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveTypeActiviteTitre %></td> 
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align: left" ><b>Principale(s) activité(s) du pouvoir adjudicateur</b></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2">
+		<%=  trt.getHtmlTableInput(
+				vMAAPouvoirAdjudicateur, 
+				"cbMarcheActiviteAdjudicateurSelected", 
+				"checkbox") %>	
+		</td>
+	</tr>
+	<tr><td colspan="2" style="text-align: left" >Autre (veuillez préciser): 
+<%
+	if(bIsForm)
+	{
+%>		<input 
+			type="text" 
+			name="sMAAEntiteAdjudicatriceAutre" 
+			value="<%= sMAAPouvoirAdjudicateurAutre %>" />
+
+<%
+	} else {
+%>	<%= sMAAPouvoirAdjudicateurAutre %>
+<%
+	} 
+%>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2" style="text-align:left" >OU</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align: left" ><b>Principale(s) activité(s) de l'entité adjudicatrice</b></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+		<%=  trt.getHtmlTableInput(
+				vMAAEntiteAdjudicatrice, 
+				"cbMarcheActiviteAdjudicateurSelected",
+				"checkbox") %>	
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+<%
+}
+%>
+</table>

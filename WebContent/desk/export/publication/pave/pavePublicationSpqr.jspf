@@ -1,0 +1,14 @@
+		<%@ include file="pavePublication.jspf" %>
+		<tr>
+			<td class="pave_cellule_gauche">id pub boamp : </td>
+			<td class="pave_cellule_droite"><%= publi.getIdPublicationSpqr() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Nom du fichier : </td>
+			<td class="pave_cellule_droite"><%= publi.getNomFichier() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Fichier Xml envoyé : </td>
+			<td class="pave_cellule_droite"><%= org.coin.util.Outils.convertXmlToHtmlOptional(publi.getFichier()) %></td>
+		</tr>
+		

@@ -1,0 +1,32 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Vérification des règles</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+
+<%	
+	Collections.sort(vRegleValidationResult);
+	for(int i=0;i<vRegleValidationResult.size();i++){
+		BoampRegle regle = BoampRegle.getRegleBoampFromIdRegleBoamp(vRegleValidationResult.get(i).getIdRegleBoamp());
+%>
+	<tr >
+		<td class="pave_cellule_gauche" style="width:15%">Règle n°<%= regle.getIdRegleBoamp()%> :<br />
+			<span style="font-weight:normal;font-style:italic">
+				<%= regle.getBloquante()==1?"(règle bloquante)":"(règle non bloquante)"%>
+			</span>
+		</td>
+		<td class="pave_cellule_droite" style="width:85%">
+		<%=regle.getLibelle() %><br />
+		<%=vRegleValidationResult.get(i).getMessage() %>
+		</td>
+	</tr>
+<%
+		if(!vRegleValidationResult.get(i).getSuccess()) bIsAvisValide = false;
+	}
+%>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

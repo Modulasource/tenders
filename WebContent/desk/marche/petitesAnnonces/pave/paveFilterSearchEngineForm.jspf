@@ -1,0 +1,26 @@
+<table class="pave" >
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td align="right" style="width : 50%;" >Les petites annonces : 
+			<select name="sStatut" >
+				<option value="toutes" <%= sStatut.equals("toutes")?sSelected:"" %> >Toutes</option>
+				<option value="a_moderer" <%= sStatut.equals("a_moderer")?sSelected:"" %> >A modérer</option>
+				<option value="en_ligne" <%= sStatut.equals("en_ligne")?sSelected:"" %> >En ligne</option>
+				<option value="archivees" <%= sStatut.equals("archivees")?sSelected:"" %> >Achivées</option>
+			</select>
+		</td>
+		<td align="left" >
+			 &nbsp;De type :
+			<select name="sTypeAnnonce">
+			<option value="toutes" <%= sTypeAnnonce.equals("toutes")?sSelected:"" %> >Toutes</option>
+			<option value="AAPC" <%= sTypeAnnonce.equals("AAPC")?sSelected:"" %> >AAPC</option>
+			<option value="AATR" <%= sTypeAnnonce.equals("AATR")?sSelected:"" %> >AATR</option>
+			<option value="RA" <%= sTypeAnnonce.equals("RA")?sSelected:"" %> >Les avis récapitulatifs (RA)</option>
+			</select>&nbsp;
+			<button type="submit" >Filtrer</button>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td>
+	</tr>
+</table>
+<br />

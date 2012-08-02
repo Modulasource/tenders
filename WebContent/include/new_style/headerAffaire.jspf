@@ -1,0 +1,539 @@
+<%@ page import="modula.graphic.*" %>
+<%@page import="modula.marche.AvisAttribution"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.util.treeview.TreeviewTest"%>
+<%@page import="modula.algorithme.PhaseEtapes"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="modula.algorithme.PhaseProcedure"%>
+<%@page import="modula.algorithme.Phase"%>
+<%@page import="modula.algorithme.Etape"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarcheSynchroMarco"%>
+<%@page import="modula.commission.Commission"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="org.coin.fr.bean.export.PublicationPdfGeneric"%>
+<%@page import="modula.marche.MarcheSynchro"%>
+
+<%@page import="org.coin.bean.conf.Configuration"%><script type="text/javascript" >
+function confirmRectification()
+{
+	return confirm("Les modifications ne doivent pas atteindre l'objet même du marché et ne doivent pas être discriminatoires.\nEtes-vous sûr de vouloir rectifier votre affaire?");
+}
+</script>
+<%
+{
+	boolean bIsMarco = false;
+	if(marche.getIdMarcheSynchro()==MarcheSynchro.MARCO)
+		bIsMarco = true;
+	
+	boolean bAffaireValidee = marche.isAffaireValidee(false);
+	boolean bIsAAPC = marche.isAffaireAAPC(false);
+	boolean bIsAATR = marche.isAffaireAATR(false);
+	boolean bAffairePublieePublisher = marche.isAffairePublieeSurPublisher(false);
+	boolean bIsCandidatureCloses = marche.isCandidaturesCloses(false);
+	boolean bDCEModifieApresPublication = marche.isDCEModifieApresPublication(false);
+	boolean bCandidatsPrevenusModificationDCE = marche.isCandidatsPrevenusModificationDCE(true);	
+	boolean bIsDCEDisponible = marche.isDCEDisponible(false);
+	boolean bIsArchivee = marche.isAffaireArchivee(false);
+	boolean bAffaireEnCoursDeRectification = marche.isAffaireEnCoursDeRectification(false);
+	boolean bAffaireAnnulee = marche.isAffaireAnnulee(false);
+	boolean bIsAvisAttributionPubliePublisher = false;
+	if(bIsAATR)
+	{
+		try
+		{
+			AvisAttribution attrib = AvisAttribution.getAvisAttributionFromMarche(marche.getIdMarche());
+			bIsAvisAttributionPubliePublisher = attrib.isAATRPublieSurPublisher();
+			bAffaireEnCoursDeRectification = attrib.isAATREnCoursDeRectification();
+		}
+		catch(Exception e){}
+	}
+	
+	Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+	String sExtraParam = " class='opacity75' ";
+	String sExtraParamOnMouseOver= " this.className='opacity100' ";
+	String sExtraParamOnMouseOut= " this.className='opacity75' ";
+
+	
+	Commission commissionHeaderAffaire = Commission.getCommission(marche.getIdCommission());
+	vBarBoutons.add( 
+			new BarBouton(1,
+				"Afficher l'acheteur public",
+				response.encodeURL(rootPath 
+						+ "desk/organisation/afficherOrganisation.jsp?iIdOrganisation=" 
+						+ commissionHeaderAffaire.getIdOrganisation()) ,
+				rootPath+"images/icons/36x36/home.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				sExtraParam,
+				true) );
+	
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-48")
+	&& (!bStartWithAATR) && (marche.getIdMarche()>0) )
+	{
+		
+		vBarBoutons.add( 
+				new BarBouton(2,
+					"Générer l'AAPC au format PDF",
+					"",
+					rootPath+"images/icons/36x36/aapc_pdf.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"OuvrirPopup('"+response.encodeURL(rootPath 
+							+ "desk/PublicationPdfGeneric?"
+							+ PublicationPdfGeneric.getSecureTransactionStringFullJspPage(
+									request, 
+									marche.getIdMarche(),  
+									PublicationType.TYPE_AAPC)
+									)+"',850,650,'menubar=no,scrollbars=yes,statusbar=no')",
+					sExtraParam,
+					true) );
+			
+			
+			
+		
+	}
+	
+	try
+	{
+		AvisAttribution.getAvisAttributionFromMarche(iIdAffaire);
+	
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-50") )
+		{
+			vBarBoutons.add( 
+					new BarBouton(3,
+						"Générer l'AATR au format PDF",
+						"",
+						rootPath+"images/icons/36x36/aatr_pdf.png", 
+						sExtraParamOnMouseOver,
+						sExtraParamOnMouseOut,
+						"OuvrirPopup('"+response.encodeURL(rootPath 
+								+ "desk/PublicationPdfGeneric?"
+								+ PublicationPdfGeneric.getSecureTransactionStringFullJspPage(
+										request, 
+										marche.getIdMarche(),  
+										PublicationType.TYPE_AATR)
+										)+"',850,650,'menubar=no,scrollbars=yes,statusbar=no')",
+						sExtraParam,
+						true) );
+		}
+		
+
+		
+	}
+	catch(Exception e){}	
+
+		String sTitreAnnulationAffaire = "";
+		if(bAffaireValidee)
+		{
+			sTitreAnnulationAffaire = "Déclarer l'affaire sans suite";
+		}
+		else
+		{
+			sTitreAnnulationAffaire = "Supprimer l'affaire";
+		}
+		
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-32")
+		||  sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-36")
+		||  (sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-61" )
+			&& marche.getIdCreateur() == sessionUser.getIdIndividual())
+		||  (sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-62" )
+			&& marche.getIdCreateur() == sessionUser.getIdIndividual())
+		)
+		{
+			vBarBoutons.add( 
+				new BarBouton(4,sTitreAnnulationAffaire,response.encodeURL(
+						rootPath + "desk/marche/algorithme/annulation/annulerAffaireForm.jsp?iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/affair_delete.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				true) );
+		}
+	
+
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-45") )
+	{
+		vBarBoutons.add( 
+			new BarBouton(6,
+				"Afficher les événements",
+				response.encodeURL(rootPath + "desk/journal/afficherTousEvenements.jsp?sType=1&amp;sIdObjet=" + marche.getIdMarche() 
+					+ "&amp;sReference=" + marche.getReference()),
+				rootPath+"images/icons/36x36/eventlog.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				true) );
+	}
+	
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-45") )
+	{
+        vBarBoutons.add( 
+            new BarBouton(6,
+                "Afficher les emails",
+                response.encodeURL(rootPath + "desk/marche/algorithme/affaire/displayAllEmailMarche.jsp?lId=" + marche.getIdMarche()) ,
+                rootPath+"images/icons/36x36/xfmail.png", 
+                sExtraParamOnMouseOver,
+                sExtraParamOnMouseOut,
+                "",
+                true) );
+	}
+	    
+	    
+	
+	/*
+	 Il faut toujours l'afficher même s'il est vide
+	if(marche.isAffairePublieeSurPublisher(false) 
+	|| (marche.isAffaireAATR(false))
+	|| (!AffaireProcedure.isContainsAAPCPublicity(marche.getIdAlgoAffaireProcedure()) 
+		&& bAffaireValidee))
+	*/
+	{
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-44") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(8,
+					"Registre",
+					response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherRegistre.jsp?sAction=create&amp;iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icons/36x36/register.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+		}
+	}
+		
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-54")
+	||  (sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-63" )
+			&& marche.getIdCreateur() == sessionUser.getIdIndividual()))
+	{
+		vBarBoutons.add( 
+			new BarBouton(9,
+				"Suivi de l'affaire",
+				response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherProcedureAffaire.jsp?iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/affair_algo.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+				true) );
+	}
+
+
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-78") 
+	||  (sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-64" )
+			&& marche.getIdCreateur() == sessionUser.getIdIndividual()))
+	{
+		boolean bAfficherBoutonDisplayAllPublication = false;
+	    try{    
+	        marche.isPubliePapier();
+	        /**
+	         * le flag est bien instancié
+ 	         */
+	        bAfficherBoutonDisplayAllPublication = true;
+	    }catch(Exception e){}
+	    
+		if((bAffaireValidee 
+		&& marche.isPubliePapier())
+		|| sessionUserHabilitation.isSuperUser() 
+		)
+		{
+			vBarBoutons.add( 
+				new BarBouton(11,	
+					"Suivi des publications",
+					response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherToutesPublications.jsp?iIdAffaire=" + marche.getIdMarche()+"&amp;sIsProcedureLineaire=false"),
+					rootPath+"images/icons/36x36/affair_newspapers.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+		}
+	}
+
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-FQR-001") 
+	||	(sessionUserHabilitation.isHabilitate("IHM-DESK-FQR-006" )
+			&& marche.getIdCreateur() == sessionUser.getIdIndividual()  ))
+	{
+		vBarBoutons.add( 
+			new BarBouton(12,	
+				"FQR",
+				response.encodeURL(rootPath + "desk/FQR/afficherFQR.jsp?iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/candidates_fqr.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+				true) );
+	}
+	
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-40") )
+	{
+		vBarBoutons.add( 
+			new BarBouton(13,
+				"Statut de l'affaire",
+				response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherStatus.jsp?iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/affair_status.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				true) );
+	}
+	
+	if(bIsDCEDisponible 
+	&& !bIsAATR 
+	&& bCandidatsPrevenusModificationDCE 
+	&& !bDCEModifieApresPublication 
+	&& (sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-23") 
+		||	(sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-65" )
+			&& marche.getIdCreateur() == sessionUser.getIdIndividual()  )	))
+	{
+		vBarBoutons.add( 
+			new BarBouton(14,
+				"Modifier le DCE",
+				response.encodeURL(rootPath + "desk/marche/algorithme/affaire/modifierDCE.jsp?sAction=debuter&amp;iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/affair_dce_modify.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+				true) );
+
+	}
+	if(!bAffaireEnCoursDeRectification 
+	&& (
+		(bIsAAPC && bAffairePublieePublisher && !bIsCandidatureCloses) 
+		|| ( bIsAATR && bIsAvisAttributionPubliePublisher && !bIsArchivee) ) 
+	&& (
+		sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-RECT-2") 
+		||	(sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-RECT-13" )
+				&& marche.getIdCreateur() == sessionUser.getIdIndividual()  )))
+	{
+		vBarBoutons.add( 
+			new BarBouton(15,
+				"Rectifier l'affaire",
+				response.encodeURL(rootPath + "desk/marche/algorithme/avis_rectificatif/modifierAvisRectificatif.jsp?sActionRectificatif=create&amp;iTypeAvisRectificatif="+(bIsAAPC?AvisRectificatifType.TYPE_AAPC:AvisRectificatifType.TYPE_AATR)+"&amp;iIdOnglet="+(bIsAAPC?Onglet.ONGLET_AFFAIRE_RECTIFICATIF:Onglet.ONGLET_ATTRIBUTION_RECTIFICATIF)+"&amp;iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/affair_rectification.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"return confirmRectification()",
+				true) );
+
+	}
+
+	
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-GED-004") )
+	{
+		vBarBoutons.add( 
+				new BarBouton(18,
+					"Générateur de documents officiels",
+					response.encodeURL(rootPath + "desk/document/afficherTousDocumentsGeneres.jsp?iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icons/36x36/papers_official.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+	}
+	
+	/**
+	* TODO : mettre nouvelle icone
+	*/
+	if( bIsMarco )
+	{
+		int iIdExportMarco = 0;
+		try{
+			iIdExportMarco = MarcheSynchroMarco.getIdExportWithIdMarche((int)marche.getId());
+		}catch(Exception e){}
+		vBarBoutons.add( 
+				new BarBouton(19,
+					"Visualiser les données importées depuis Marco",
+					response.encodeURL(rootPath 
+							+ "desk/marche/marco/afficherExportPostAnalyse.jsp?iIdExportMarco=" 
+							+ iIdExportMarco+"&iIdMarche="+marche.getId()) ,
+					rootPath+"images/icones/envoyer-marche-modifie.gif", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+	}
+
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-CDT-PAPIER-1") 
+	|| (sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-CDT-PAPIER-2" )
+			&& marche.getIdCreateur() == sessionUser.getIdIndividual() ))
+	{
+		vBarBoutons.add( 
+				new BarBouton(20,
+					"Ajouter une candidature papier",
+					response.encodeURL(rootPath 
+							+ "desk/marche/algorithme/proposition/candidature/modifyCandidatureForm.jsp?iIdAffaire=" 
+							+ marche.getId()) ,
+					rootPath+"images/icons/36x36/offer_paper.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+	}
+
+	if(false && sessionUserHabilitation.isHabilitate("IHM-DESK-STICKER-1") )
+	{
+		vBarBoutons.add( 
+				new BarBouton(20,
+					"Ajouter un sticker",
+					"javascript:createStickerMarche()" ,
+					rootPath+"images/icons/36x36/sticker_add.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+	}
+
+	if(false && sessionUserHabilitation.isHabilitate("IHM-DESK-LEGAL-CTRL-1") )
+	{
+		vBarBoutons.add( 
+				new BarBouton(20,
+					"Contrôle de légalité",
+					response.encodeURL(
+							rootPath + "desk/marche/legality_control/displayAllDocument.jsp?iIdAffaire=" 
+									+ marche.getId()) ,
+					rootPath+"images/icons/36x36/legality_control.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+	}
+	
+	
+	
+	if(sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-INFO-1") )
+    {
+		
+		try {
+			  Configuration messageBoamp = Configuration.getConfigurationMemory("design.desk.message.information.boamp.page.html");
+		%>
+		<textarea style="display: none;" id="sInformationMessageBoamp" ><%= messageBoamp.getDescription() %></textarea>
+		<%  
+
+		vBarBoutons.add( 
+                new BarBouton(20,
+                    "Information pour la publication au BOAMP",
+                    "javascript:displayInformationMessageBoamp()" ,
+                    rootPath+"images/icons/36x36/xmag.png", 
+                    sExtraParamOnMouseOver,
+                    sExtraParamOnMouseOut,
+                    "",
+                    true) );
+		} catch (Exception e ) {
+			//e.printStackTrace();
+		}
+    }
+	
+	
+
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-41") )
+	{
+		String sIconAffaireType = "";
+		String sRedirectPage = "";
+		if(marche.isAffaireAAPC(false))
+		{
+			sRedirectPage = "afficherAffaire.jsp";
+			sIconAffaireType = "affair_aapc.png";
+			
+			if(avisAttribution != null)
+			{
+				vBarBoutons.add( 
+						new BarBouton(23,
+							"Afficher l'AATR",
+							response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp"
+									+"?iIdAffaire=" + marche.getIdMarche()),
+							rootPath+"images/icons/36x36/affair_aatr.png", 
+							sExtraParamOnMouseOver,
+							sExtraParamOnMouseOut,
+							"",
+							true) );
+				
+			}
+			
+		}
+		else if(marche.isAffaireAATR(false))
+		{
+			sRedirectPage = "afficherAttribution.jsp";
+			sIconAffaireType = "affair_aatr.png";
+
+			if(!bStartWithAATR)
+			{
+				vBarBoutons.add( 
+						new BarBouton(22,
+							"Afficher l'AAPC",
+							response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp"
+									+"?iIdAffaire=" + marche.getIdMarche()),
+							rootPath+"images/icons/36x36/affair_aapc.png", 
+							sExtraParamOnMouseOver,
+							sExtraParamOnMouseOut,
+							"",
+							true) );
+			}
+		}
+		
+		vBarBoutons.add( 
+			new BarBouton(21,
+				"Retour à l'affaire",
+				response.encodeURL(rootPath + "desk/marche/algorithme/affaire/"+sRedirectPage
+						+"?iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/" + sIconAffaireType, 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				true) );
+		
+
+	}
+	
+	
+	// FLON : il faut voir pour toujours rendre visible l'AAPC => PB et LR
+	if(bAfficherPoursuivreProcedure)
+	{
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-39") )
+		{
+            // pour mettre un blanc en +
+			
+			vBarBoutons.add( 
+                    new BarBouton(
+                        99,
+                        "",
+                        "",
+                        "", 
+                        "",
+                        "",
+                        "",
+                        true) );
+
+			vBarBoutons.add( 
+				new BarBouton(
+					100,
+					"Continuer la procédure",
+					response.encodeURL(rootPath 
+							+ "desk/marche/algorithme/affaire/poursuivreProcedure.jsp"
+							+ "?sAction=next"
+							+ "&amp;iIdAffaire=" + marche.getIdMarche()),
+					rootPath+Icone.ICONE_CONTINUER_PROCEDURE, 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+					true) );
+		}
+	}
+%>
+<a name="ancreHP">&nbsp;</a>
+<div id="menuBorderAffaire" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+	<div class="fullWidth">
+		<%
+		out.write( BarBouton.getAllButtonHtmlDesk(vBarBoutons));
+		%>
+	</div>
+</div>
+<script type="text/javascript">
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+	menuBorder.render($('menuBorderAffaire'));
+});
+</script>
+<%
+} 
+%>

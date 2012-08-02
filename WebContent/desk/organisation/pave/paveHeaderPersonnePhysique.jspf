@@ -1,0 +1,225 @@
+<%@page import="modula.graphic.BarBouton"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.localization.Language"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.bean.UserStatus"%>
+<div id="menuBorder" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+	<div class="fullWidth">
+	<%
+	String sExtraParam = " class='opacity75' ";
+	String sExtraParamOnMouseOver= " this.className='opacity100' ";
+	String sExtraParamOnMouseOut= " this.className='opacity75' ";
+	
+	
+	String sLocalizationNameDisplayOrganization = locAddressBookButton.getValue(12,"Afficher l'organisation");
+	String sLocalizationNameDisplayCandidatureList = locAddressBookButton.getValue(13,"Liste des candidatures");
+	String sLocalizationNameActivateAccount = locAddressBookButton.getValue(14,"Activer le compte");
+	String sLocalizationNameDisableAccount = locAddressBookButton.getValue(15,"Désactiver le compte");
+	String sLocalizationNameDisplayAllEvent = locAddressBookButton.getValue(7,"Afficher tous les événements");
+	String sLocalizationNameAddDocument = locAddressBookButton.getValue(9,"Ajouter un document");
+	String sLocalizationNameAddEditorialContent = locAddressBookButton.getValue(10,"Ajouter un contenu rédactionnel");
+	String sLocalizationNameGenerateNewPassword = locAddressBookButton.getValue(16,"Générer un nouveau mot de passe");
+	String sLocalizationNameDisplayUserHabilitation = locAddressBookButton.getValue(17,"Afficher les droits de l'utilisateur");
+	String sLocalizationNameGenerateVCard = locAddressBookButton.getValue(18,"Générer la VCard");
+	
+	
+	Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+	
+	if(dih.bDisplayButtonDisplayOrganization)
+	{
+		vBarBoutons.add( 
+				new BarBouton(1,
+					sLocalizationNameDisplayOrganization,
+					response.encodeURL(rootPath + "desk/organisation/afficherOrganisation.jsp?iIdOrganisation=" 
+							+ personne.getIdOrganisation()),
+					rootPath+"images/icons/36x36/home.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					sExtraParam,
+					true) );
+	}
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonSupprimerPersonne))
+	{
+		vBarBoutons.add( 
+				new BarBouton(2,
+					localizeButton.getValueDelete(),
+					response.encodeURL(rootPath + "desk/organisation/supprimerPersonnePhysiqueForm.jsp?iIdPersonnePhysique=" + personne.getIdPersonnePhysique()),
+					rootPath+"images/icons/36x36/user_male_delete.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					sExtraParam,
+					true) );
+	}
+	
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonListeCandidature)
+	|| sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonListeCandidatureAP))
+	{
+		vBarBoutons.add( 
+				new BarBouton(3,
+						sLocalizationNameDisplayCandidatureList,
+					response.encodeURL(rootPath + "desk/organisation/afficherToutesCandidatures.jsp?iIdPersonnePhysique=" + personne.getIdPersonnePhysique()),
+					rootPath+"images/icones/liste_marche.gif", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					sExtraParam,
+					true) );
+	}
+	
+	if(userPersonne != null)
+	{
+		if (userPersonne.getIdUserStatus() == UserStatus.INVALIDE)
+		{
+			if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonActiverCompte))
+			{
+				vBarBoutons.add( 
+						new BarBouton(4,
+							sLocalizationNameActivateAccount,
+							//response.encodeURL(rootPath + "desk/organisation/activerCompteForm.jsp?iIdUser=" + userPersonne.getIdUser()),
+							"",
+							rootPath+Icone.ICONE_ACTIVER_COMPTE, 
+							sExtraParamOnMouseOver,
+							sExtraParamOnMouseOut,
+							"javascript:changeAccountStatus()",
+							sExtraParam,
+							true) );
+			}
+		}
+		else 
+		{
+			if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonDesactiverCompte))
+			{
+				vBarBoutons.add( 
+						new BarBouton(5,
+							sLocalizationNameDisableAccount,
+							//response.encodeURL(rootPath + "desk/organisation/activerCompteForm.jsp?iIdUser=" + userPersonne.getIdUser()),
+							"",
+							rootPath+Icone.ICONE_DESACTIVER_COMPTE, 
+							sExtraParamOnMouseOver,
+							sExtraParamOnMouseOut,
+							"javascript:changeAccountStatus()",
+							sExtraParam,
+							true) );
+			}
+			
+			if(sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonGenererMotDePasse))
+			{
+				vBarBoutons.add( 
+						new BarBouton(6,
+							sLocalizationNameGenerateNewPassword,
+							"javascript:void(0)",
+							rootPath+"images/icones/generer-password.gif", 
+							sExtraParamOnMouseOver,
+							sExtraParamOnMouseOut,
+							"javascript:regeneratePassword()",
+							sExtraParam,
+							true) );
+			}
+		}
+
+		if( sessionUserHabilitation.isHabilitate(sUseCaseIdAfficherDroits ) )
+		{
+			vBarBoutons.add( 
+					new BarBouton(7,
+						sLocalizationNameDisplayUserHabilitation,
+						response.encodeURL(rootPath + "desk/utilisateur/afficherUtilisateurGroupe.jsp?iIdUser=" + userPersonne.getIdUser()),
+						rootPath+"images/icones/monitoring.gif", 
+						sExtraParamOnMouseOver,
+						sExtraParamOnMouseOut,
+						"",
+						sExtraParam,
+						true) );
+		}
+	}
+
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonGenererVCard))
+	{
+		vBarBoutons.add( 
+				new BarBouton(8,
+					sLocalizationNameGenerateVCard,
+					response.encodeURL(rootPath + "desk/organisation/genererVCard.jsp?iIdPersonnePhysique=" + personne.getIdPersonnePhysique()),
+					rootPath+"images/icons/36x36/vcard.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					sExtraParam,
+					true) );
+	}
+	
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonAfficherJournalEvt) )
+	{
+		vBarBoutons.add( 
+				new BarBouton(9,
+					sLocalizationNameDisplayAllEvent,
+					response.encodeURL(rootPath + "desk/journal/afficherTousEvenements.jsp"
+							+ "?sType=" + TypeObjetModula.PERSONNE_PHYSIQUE
+							+ "&sIdObjet=" + personne.getIdPersonnePhysique() 
+							+ "&sReference=" + personne.getNom()),
+					rootPath+"images/icons/36x36/eventlog.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					sExtraParam,
+					true) );
+		
+	
+	}
+	
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonAjouterDocument) )
+	{
+		vBarBoutons.add( 
+				new BarBouton(12,
+					sLocalizationNameAddEditorialContent,
+					response.encodeURL(rootPath + "desk/document/ajouterDocumentForm.jsp?iIdTypeObjet="+org.coin.bean.ObjectType.PERSONNE_PHYSIQUE + "&amp;iIdReferenceObjet="+ personne.getId()),
+					rootPath+"images/icons/36x36/document_add.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					sExtraParam,
+					true) );
+	}
+	
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonAjouterEditorial) )
+	{
+		vBarBoutons.add( 
+				new BarBouton(13,
+					sLocalizationNameAddEditorialContent,
+					response.encodeURL(rootPath + "desk/editorial/ajouterEditorialAssistanceForm.jsp?iIdTypeObjet="+org.coin.bean.ObjectType.PERSONNE_PHYSIQUE + "&amp;iIdReferenceObjet="+ personne.getId()),
+					rootPath+"images/icons/36x36/document_aideredac_add.png", 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					sExtraParam,
+					true) );
+	}
+
+    if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonAdminParaph) )
+    {
+        vBarBoutons.add( 
+                new BarBouton(14,
+                    "Administration Parapheur",
+                    response.encodeURL(rootPath + "desk/organisation/paraph/displayIndividualParaphAdmin.jsp?lId="+ personne.getId()),
+                    rootPath+"images/icons/36x36/paraph_admin.png", 
+                    sExtraParamOnMouseOver,
+                    sExtraParamOnMouseOut,
+                    "",
+                    sExtraParam,
+                    true) );
+    }
+
+
+	out.write( BarBouton.getAllButtonHtmlDesk(vBarBoutons));
+
+%>
+	</div>
+</div>
+<script>
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+	menuBorder.render($('menuBorder'));
+});
+</script>
+	<br />

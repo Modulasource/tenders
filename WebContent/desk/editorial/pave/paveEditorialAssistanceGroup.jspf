@@ -1,0 +1,11 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Groupe</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :","",group.getName(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Date de création :","",CalendarUtil.getDateCourte(group.getDateCreation()),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Date de modification :","",CalendarUtil.getDateCourte(group.getDateModification()),"") %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

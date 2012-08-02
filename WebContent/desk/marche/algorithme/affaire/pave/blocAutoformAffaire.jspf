@@ -1,0 +1,132 @@
+
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="modula.marche.MarcheParametre"%>
+<%@page import="modula.marche.MarcheProcedure"%>
+<%@page import="modula.marche.ArticleLoi"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.bean.boamp.BoampFormulaireType"%>
+<%@page import="org.coin.fr.bean.export.PublicationDestinationType"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.autoform.component.AutoFormCptInputRadioSet"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="org.coin.autoform.component.AutoFormCptDoubleMultiSelect"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="org.coin.autoform.component.AutoFormCptSelect"%>
+<%@page import="org.coin.autoform.component.AutoFormCptBlock"%>
+<%
+
+/*
+AutoFormCptDoubleMultiSelect afIdArticleSelection = null;
+AutoFormCptSelect afIdMarchePassation = null;
+AutoFormCptSelect afIdProcedure = null;
+AutoFormCptBlock afBlockTypeAvis = null;
+AutoFormCptBlock afBlockProcedure = null;
+AutoFormCptBlock afBlockPub = null;
+AutoFormCptInputRadioSet afTypePublication = null;
+MarcheProcedure marProc = new MarcheProcedure();
+*/
+
+
+	AffaireProcedure affProc = new AffaireProcedure();
+	try{affProc = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure());}
+	catch(Exception e){}
+	
+	
+	//Pavé procédure
+	
+	afBlockProcedure = new AutoFormCptBlock("Procédure", "block_procedure");
+	
+	afIdMarchePassation = new AutoFormCptSelect(
+	        InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.PASSATION)
+	        +"Mode de passation",
+	        "iIdMarchePassation", 
+	        "" + affProc.getIdMarchePassation(), 
+	        true);
+	
+	afIdMarchePassation.getSelect().setStyle("width:450px;");
+	afBlockProcedure.addComponent(afIdMarchePassation);
+	
+	afIdProcedure = new AutoFormCptSelect(
+	        "Niveaux de traitement",
+	        "iIdProcedure", 
+	        ""+affProc.getIdProcedure(), 
+	        true);
+	afIdMarchePassation.getSelect().setStyle("width:450px;");
+	afBlockProcedure.addComponent(afIdProcedure);
+	
+	String sMarcheParametreProcedureSimpleEnveloppe = "";
+	try{
+	    MarcheParametre marcheParametreProcedureSimpleEnveloppe 
+		    = MarcheParametre.getMarcheParametre(marche.getIdMarche(),"iIdProcedureSimpleEnveloppe");
+	    sMarcheParametreProcedureSimpleEnveloppe 
+		    = marcheParametreProcedureSimpleEnveloppe.getValue(); 
+	} catch (CoinDatabaseLoadException e) {}
+    afProcedureSimpleEnveloppe = QuestionAnswer.getAutoformCptSelectWithKeyword(
+            "ProcedureSimpleEnveloppe",
+            "iIdProcedureSimpleEnveloppe",
+            sMarcheParametreProcedureSimpleEnveloppe, 
+            false);
+    afProcedureSimpleEnveloppe.setName("trProcedureSimpleEnveloppe");
+    afProcedureSimpleEnveloppe.setId("trProcedureSimpleEnveloppe");
+    
+    afBlockProcedure.addComponent(afProcedureSimpleEnveloppe);
+	
+	afIdArticleSelection = new AutoFormCptDoubleMultiSelect(
+	        "Articles du CMP", "idArticleHidden", false, rootPath);
+	afBlockProcedure.addComponent(afIdArticleSelection);
+	
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE)){
+	    AutoFormCptSelect afAvisImplique = QuestionAnswer.getAutoformCptSelectWithKeyword(
+	            "AvisImplique", "iIdQaAvisImplique", marProc.getIdQaAvisImplique()+"", false);
+	    afAvisImplique.getSelect().setStyle("width:450px;");
+	    afBlockProcedure.addComponent(afAvisImplique);
+	    
+	    AutoFormCptSelect afAccordAMP = QuestionAnswer.getAutoformCptSelectWithKeyword(
+	            "AMP", "iIdQaAccordOmc", marProc.getIdQaAccordOmc()+"", false);
+	    afBlockProcedure.addComponent(afAccordAMP);
+	    
+	    AutoFormCptSelect afAvis = QuestionAnswer.getAutoformCptSelectWithKeyword(
+	            "avisCorrespond", "iIdQaAvisCorrespondance", marProc.getIdQaAvisCorrespondance()+"", false);
+	    afAvis.getSelect().setStyle("width:450px;");
+	    afBlockProcedure.addComponent(afAvis);
+	}
+	
+	
+	
+	// Pavé publications officielles suite
+    
+    afBlockPub = new AutoFormCptBlock("Publications (1)", "block_pub");
+    
+    afTypePublication 
+        = new AutoFormCptInputRadioSet("Publications Officielles", "iIdPublicationDestinationType", marProc.getIdPublicationDestinationType()+"", true);
+    afTypePublication.addItem("Aucune Publication Officielle", "", "");
+    Vector<PublicationDestinationType> vPub = PublicationDestinationType.getAllOfficialMemory();
+    for(PublicationDestinationType type : vPub){
+        afTypePublication.addItem(type.getName(), type.getName(), type.getId()+"");
+    }
+    afBlockPub.addComponent(afTypePublication);
+    
+
+
+
+	// Pavé publications officielles
+	afBlockTypeAvis = new AutoFormCptBlock("Type d'avis", "block_type_avis");
+
+	AutoFormCptInputRadioSet afTypeAvis 
+    = new AutoFormCptInputRadioSet(
+    		"Type d'avis", 
+    		"iIdBoampFormulaireType", 
+    		marProc.getIdBoampFormulaireType()+"", 
+    		true);
+
+	Vector<BoampFormulaireType> vTypeForm = BoampFormulaireType.getAllStaticMemory();
+	for(int i = 0;i<vTypeForm.size();i++){
+	    BoampFormulaireType type = vTypeForm.get(i);
+	    afTypeAvis.addItem(type.getLibelle(), type.getId()+"");
+	    afTypeAvis.getElements().get(i).getAfRadio().setOnClick("displayFields("+type.getId()+")");
+	}
+	afBlockTypeAvis.addComponent(afTypeAvis);
+
+
+%>

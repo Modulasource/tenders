@@ -1,0 +1,43 @@
+<%
+	Vector<Multimedia> vCSS = Multimedia.getAllMultimedia(
+			MultimediaType.TYPE_CSS,
+			organisation.getIdOrganisation(),
+			ObjectType.ORGANISATION);
+%>
+
+<%@page import="org.coin.fr.bean.Multimedia"%>
+<%@page import="org.coin.fr.bean.MultimediaType"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<table class="pave">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">
+			Charte graphique du site Web
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Identifiant de l'organisme dans la BDD :
+		</td>
+		<td class="pave_cellule_droite"><%=organisation.getIdOrganisation() %></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle" >
+			Feuille de styles associée (CSS) :
+		</td>
+		<td class="pave_cellule_droite">
+			<select style="vertical-align:middle" name="iIdCSS">
+<%
+	for(int i=0;i<vCSS.size();i++){
+		Multimedia css = vCSS.get(i);
+%>		
+				<option value="<%=css.getIdMultimedia() %>"><%=css.getFileName()%></option>
+<%
+	}
+%>			
+			</select>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

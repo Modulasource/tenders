@@ -1,0 +1,263 @@
+<%
+if(!marche.isOngletInstancie(Onglet.ONGLET_AFFAIRE_LOTS))
+{
+%>
+<%@page import="modula.marche.MarchePieceJointeType"%>
+<%@page import="modula.graphic.Onglet"%>
+<p class="mention" style="color:#F00">
+Veuillez préalablement renseigner l'onglet "LOTS" pour définir si votre DCE doit être alloti ou non
+</p>
+<%	
+}
+	boolean bisDCEModifieApresPublication = false;
+	try{bisDCEModifieApresPublication = marche.isDCEModifieApresPublication(); }
+	catch(Exception e){}
+	boolean bisCandidatsPrevenusModificationDCE = true;
+	try{bisCandidatsPrevenusModificationDCE = marche.isCandidatsPrevenusModificationDCE();}
+	catch(Exception e){}
+
+if(!bisCandidatsPrevenusModificationDCE)
+{
+%>
+<p class="mention" style="color:#F00">
+ATTENTION! Vous n'avez pas communiqué la modification du DCE aux candidats.
+</p>
+<%
+}
+	boolean bSuppression = false;
+	boolean bAffichageLienActif = false;
+	boolean bLienActif = true;
+%>
+<script type="text/javascript" src="<%=rootPath %>dwr/interface/MarchePieceJointe.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/swfupload/swfupload_handlers.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/swfupload/swfupload_2.2.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/swfobject.js"></script>
+<%
+String sURLDCEV2 = response.encodeURL("afficherAffaire.jsp?iIdOnglet="+Onglet.ONGLET_AFFAIRE_DCE+"&sAction=store&iIdAffaire=" + marche.getIdMarche());
+%>
+<script type="text/javascript">
+var suComponent;
+var sUploadURL = "<%= response.encodeURL(rootPath + "desk/marche/algorithme/affaire/uploadPieceDCEV2.jsp") %>";
+mt.config.enableAutoLoading = false;
+
+function initSWFUpload(){
+    // Instantiate a SWFUpload Instance
+    suComponent = new SWFUpload({
+        // Backend Settings
+        button_placeholder_id : "btnBrowse",
+        button_image_url : "<%= rootPath %>images/btn_add_file_flash.gif", 
+        button_width : 124, 
+        button_height : 26, 
+        button_text : "", 
+        button_text_style : "", 
+        button_text_left_padding : 0, 
+        button_text_top_padding : 0, 
+        button_action : SWFUpload.BUTTON_ACTION.SELECT_FILES, 
+        button_disabled : false, 
+        button_cursor : SWFUpload.CURSOR.HAND, 
+        button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT, 
+        
+        upload_url: sUploadURL, // I can pass query strings here if I want
+        use_query_string : false,
+        post_params: { "bDisplayHTML": "false", "iIdAffaire":"<%= marche.getId() %>"},    // Here are some POST values to send. These can be changed dynamically
+        file_post_name: "document",    // This is the "name" of the file item that the server-side script will receive. Setting this doesn't work in the Linux Flash Player
+        requeue_on_error: false,
+
+        // File Upload Settings
+        file_size_limit : "16 MB",
+        file_types : "*.*",
+        file_types_description : "Type de document",
+        file_upload_limit : "30",
+
+        // Event Handler Settings
+        swfupload_loaded_handler : FeaturesUpload.swfUploadLoaded,
+        file_dialog_start_handler : FeaturesUpload.fileDialogStart,
+        file_queued_handler : addFile,
+        file_queue_error_handler : FeaturesUpload.fileQueueError,
+        file_dialog_complete_handler : FeaturesUpload.fileDialogComplete,
+        upload_start_handler : FeaturesUpload.uploadStart,
+        upload_progress_handler : FeaturesUpload.uploadProgress,
+        upload_error_handler : FeaturesUpload.uploadError,
+        upload_success_handler : FeaturesUpload.uploadSuccess,
+        
+        upload_complete_handler : uploadComplete,
+        debug_handler : FeaturesUpload.debug,
+        
+        // Flash Settings
+        flash_url : "<%= rootPath+"include/js/swfupload/swfupload_f10.swf" %>", // Relative to this file
+
+        // Debug Settings
+        debug_enabled: <%= Configuration.getConfigurationValueMemory("debug.session").equalsIgnoreCase("enable") %> // For the purposes of this demo I wan't debug info shown
+    });
+
+    FeaturesUpload.init("FeaturesUploadDiv",
+                        "<%= rootPath+"images/icons/cross.gif" %>",
+                        "<%= rootPath+"images/icons/arrow_right.gif" %>",
+                        "<%= rootPath+"images/icons/accept.gif" %>",
+                        "<%= rootPath+"images/icons/exclamation.gif" %>");
+    /*
+    $("btnBrowse").onclick = function(){
+        if(isNull($("typeFile").value ))
+        {
+            alert('Veuillez choisir un type de fichier');
+            return;
+        }else{
+          suComponent.selectFiles();
+          this.blur();
+        }  
+    }
+    */
+    
+}
+
+function storeAndUpload(){
+    var iIndex = FeaturesUpload.iCurrentIndex;
+    if (iIndex<FeaturesUpload.arrFile.length){
+        if (iIndex == 0) FeaturesUpload.displayStartedUpload();
+        FeaturesUpload.displayMessageInItem(iIndex, "Création...");
+        var sPrefix = "doc_"+FeaturesUpload.arrFile[iIndex].id+"_";
+
+        var doc = new Object();
+        try{doc.iIdMarche = $("iIdMarche").value;}catch(e){}
+        try{doc.iIdMarcheLot = $(sPrefix+"iIdMarcheLot").value;}catch(e){}
+        try{doc.iIdMarchePieceJointeType = $(sPrefix+"iIdMarchePieceJointeType").value;}catch(e){}
+        try{doc.bLienActif = $("actif").value;}catch(e){}
+        
+        MarchePieceJointe.storeFromJSONString(Object.toJSON(doc), function(lId){
+            if (lId>0) {
+                FeaturesUpload.SU.setUploadURL(sUploadURL+"?lId="+lId);
+                FeaturesUpload.uploadStart();
+                FeaturesUpload.SU.startUpload(FeaturesUpload.arrFile[iIndex].id);
+            } else {
+                alert("un problème est survenu lors de l'enregistrement");
+            }
+        });
+
+    }else{
+        location.href = "<%=sURLDCEV2%>";
+    }
+}
+function addFile(file){
+    FeaturesUpload.addFile(file);
+    var sFileId = file.id;
+    var divFile = $("item_"+sFileId);
+    var sPrefix = "doc_"+sFileId+"_";
+    
+    var divClear = document.createElement("div");
+    divClear.style.clear = "both";
+    divFile.appendChild(divClear);
+    
+    var docTypeValue = $("typeFile").value;
+    var docTypeText = $("typeFile").getSelectedText();
+    var lotValue = 0;
+    var lotText = "Marché non alloti";
+    <%if(vLots.size()>1){%>
+    lotValue = $("iIdLot").value;
+    lotText = $("iIdLot").getSelectedText();
+    <%}%>
+
+    var divForm = document.createElement("div");
+    divForm.innerHTML = '<table class=\"formLayout\" cellspacing=\"3\">'+
+    '<tr><td class="pave_cellule_gauche">Type de pièce jointe :</td>'+
+       '<td class="pave_cellule_droite">'+docTypeText+
+           '<input type="hidden" name="'+sPrefix+'iIdMarchePieceJointeType" id="'+sPrefix+'iIdMarchePieceJointeType" value="'+docTypeValue+'"'+
+    '</td></tr>'+
+    '<tr><td class="pave_cellule_gauche">Allotissement :</td>'+
+       '<td class="pave_cellule_droite">'+lotText+
+           '<input type="hidden" name="'+sPrefix+'iIdMarcheLot" id="'+sPrefix+'iIdMarcheLot" value="'+lotValue+'"'+
+    '</td></tr>'+
+    '</table>';
+
+    divFile.appendChild(divForm);
+}
+function uploadComplete(){
+    FeaturesUpload.uploadComplete();
+    $("item_"+FeaturesUpload.arrFile[FeaturesUpload.iCurrentIndex].id).style.backgroundColor = "#6FC764";
+    FeaturesUpload.iCurrentIndex++;
+    storeAndUpload();
+}
+onPageLoad = function() {
+    checkFlashVersion('<%= Configuration.getConfigurationValueMemory("plugin.flash.version","9.0.124") %>', 
+                      '<%= Configuration.getConfigurationValueMemory("plugin.flash.link","http://www.adobe.com/go/BPCKN") %>',
+                      $("checkFlashVersion"),
+                      $("uploadPieceDCE"));
+   
+    $('submit_btn').onclick = function() {
+        //$('btnBrowse').disabled = true;
+        $('submit_btn').disabled = true;
+        $('submit_btn').innerHTML = "Chargement en cours...";
+        
+        storeAndUpload();
+    }
+    mt.html.setSuperCombo($("typeFile"));
+    <%if(vLots.size()>1){%>
+    mt.html.setSuperCombo($("iIdLot"));
+    <%}%>
+    
+    initSWFUpload();
+}
+</script>
+<div id="checkFlashVersion" style="display: none;"></div>    
+<div id="uploadPieceDCE" name="uploadPieceDCE">
+    <input type="hidden" name="actif" id="actif" value="<%= bLienActif %>" />
+    <input type="hidden" name="iIdMarche" id="iIdMarche" value="<%= marche.getIdMarche() %>" />
+    <table class="pave" summary="none">
+        <tr>
+            <td class="pave_titre_gauche" colspan="2"> Ajouter la pièce suivante au DCE </td>
+        </tr>
+        <tr><td colspan="2">&nbsp;</td></tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2" style="vertical-align:baseline">
+<%
+    MarchePieceJointeType[] listeTypes = MarchePieceJointeType.getAllMarchePieceJointeType();
+%>
+                &nbsp;<select name="typeFile" id="typeFile" style="width:330px;vertical-align:baseline">
+<%
+    for (int j = 0; j < listeTypes.length; j++)
+    {
+%>
+                    <option value="<%= listeTypes[j].getIdType() %>">
+                    <%= listeTypes[j].getTypeDocument() %></option>
+<%
+    }
+%>
+                </select>
+                
+                <%
+                if(vLots.size()>1)
+                {
+                %>
+                &nbsp;<select name="iIdLot" id="iIdLot" style="vertical-align:baseline">
+                    <option value="0" selected="selected">Commune à plusieurs lots</option>
+<%
+    for (int j = 0; j < vLots.size(); j++)
+    {
+        
+%>
+    <option value="<%= vLots.get(j).getIdMarcheLot() %>">Lot n°<%= vLots.get(j).getNumero() %></option>
+<%
+    }
+%>
+                </select>
+                <%
+                }
+                %>
+                </td>
+            </tr>
+            <tr>
+                <td class="pave_cellule_droite" colspan="2">
+                 <button id="btnBrowse" type="button" style=""><img src="<%= rootPath+"images/icons/plus.gif" %>" style="padding-right: 3px; vertical-align: bottom;">Ajouter un fichier</button>
+                 <div id="FeaturesUploadDiv" />
+                </td>
+              </tr>
+              <tr>
+              <td colspan="2">
+              <button type="submit" id="submit_btn">Télécharger</button></td>
+              </tr>
+        </table> 
+</div>
+	<br />
+	<%
+	bSuppression = true;
+	%>
+	<%@ include file="paveDCE.jspf" %>

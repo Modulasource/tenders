@@ -1,0 +1,70 @@
+<script type="text/javascript">
+
+function cacherDivisionLots()
+{
+	cacher('divisionA');
+	<%
+	Vector<Validite> vValiditeB = Validite.getAllValiditeEnveloppeBFromAffaire(iIdAffaire);
+	for(int i = 0 ; i < vValiditeB.size() ; i++)
+	{
+	%>
+		cacher('divisionB<%=i%>');
+	<%
+	}
+	%>
+}
+<%
+if(sAction.equals("store"))
+{
+%>
+function afficherDCE()
+{
+	var item = document.formulaire.formatDCE;
+	
+		if(item.value==0){
+			cacher('DCEDatesForm');
+			cacher('DCEDates');
+		}
+		if(item.value==1){
+			cacher('DCEDatesForm');
+			montrer('DCEDates');
+		}
+		if(item.value==2){
+			montrer('DCEDatesForm');
+			cacher('DCEDates');
+		}
+}
+function afficherCandidature()
+{
+	var item = document.formulaire.formatCandidature;
+
+		if(item.value==0){
+			cacher('CandidatureDatesForm');
+			cacher('CandidatureDates');
+		}
+		if(item.value==1){
+			cacher('CandidatureDatesForm');
+			montrer('CandidatureDates');
+		}		
+		if(item.value==2){
+			montrer('CandidatureDatesForm');
+			cacher('CandidatureDates');
+		}
+}
+<%
+}
+%>
+function onAfterPageLoading()
+{
+	cacherDivisionLots();
+	<%
+	if(sAction.equals("store"))
+	{
+	%>
+	afficherDCE();
+	afficherCandidature();
+	<%
+	}
+	%>
+}
+</script>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<%@ page contentType="text/html; charset=iso-8859-1" %>
+<%@ include file="headerDeskCommon.jspf" %>
+<%
+String sPersonParamDeskDesignType = 
+		PersonnePhysiqueParametre
+			.getPersonnePhysiqueParametreValueOptional(
+					sessionUser.getIdIndividual(), 
+					"desk.design.type");
+
+//BUG #3908: Parameter is deprecated and may not exist
+if(sPersonParamDeskDesignType.equals("outlook")
+|| (sPersonParamDeskDesignType.equals("") && !Theme.getTheme().equalsIgnoreCase("modula") && !Theme.getTheme().equalsIgnoreCase("veolia")))
+{
+%>
+<script>
+mt.config.limitTabsTitle = true;
+mt.config.limitTabsTitleLength = 20;
+</script>
+<%}else if(Theme.getTheme().equalsIgnoreCase("modula")){%>
+<script>
+mt.config.limitTabsTitle = true;
+mt.config.limitTabsTitleLength = 40;
+</script>
+<%}%>
+

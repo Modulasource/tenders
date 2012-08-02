@@ -1,0 +1,25 @@
+<br />
+<br />
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%=sMessTitle%></td>
+	</tr>
+	<tr><td colspan="2" >&nbsp;</td></tr>
+		<%
+		for(int i=0;i<vMessages.size();i++)
+		{
+			Vector<String> vMessage = vMessages.get(i);
+			String sUrlIcone = vMessage.firstElement();
+			String sMess = vMessage.get(1);
+			%>
+			<tr>
+			<td class="message_icone"><img src="<%=sUrlIcone%>" alt="Icone" /></td>
+			<td style="text-align:left"><%=sMess%></td>
+			</tr>
+			<%
+		}
+		%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br />
+<br />

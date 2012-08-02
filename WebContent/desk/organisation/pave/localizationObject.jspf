@@ -1,0 +1,34 @@
+<%@page import="org.coin.localization.LocalizationConstant"%>
+<%@page import="org.coin.localization.Localize"%>
+<%
+	
+	/**
+     * Use localization
+     */
+ 	Localize locTabs = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_TAB);
+
+ 	Localize locBloc = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_BLOC);
+
+ 	Localize locTitle = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_TITLE);
+
+	Localize locMessage = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_MESSAGE);
+
+	Localize locAddressBookButton = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_ADDRESS_BOOK_PAGE_BUTTON);
+
+	
+	request.setAttribute("locTabs", locTabs);
+	request.setAttribute("locBloc", locBloc);
+	request.setAttribute("locTitle", locTitle);
+	request.setAttribute("locMessage", locMessage);
+	request.setAttribute("locAddressBookButton", locAddressBookButton);
+%>

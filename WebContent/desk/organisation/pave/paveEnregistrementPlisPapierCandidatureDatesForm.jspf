@@ -1,0 +1,240 @@
+<%@page import="modula.candidature.EnveloppeB"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="modula.Validite"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.candidature.EnveloppeALot"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.candidature.EnveloppeA"%>
+<table id="CandidatureDatesForm">
+	<%
+	boolean bCandidatureDecachetees = false;
+	try{bCandidatureDecachetees = marche.isEnveloppesADecachetees();}
+	catch(Exception e){}
+	
+	boolean bOffresDecachetees = false;
+	try{bOffresDecachetees = marche.isEnveloppesBDecachetees();}
+	catch(Exception e){}
+	
+	boolean bInvitationOffreEnvoye = false;
+	try{bInvitationOffreEnvoye = marche.isMailInvitationPresenterOffreEnvoye();}
+	catch(Exception e){}
+	
+	boolean bIsDialogue = false;
+	boolean bIsAllLotsFigesForDialogue = false; 
+	if(AffaireProcedure.isDialogueComplete(marche.getIdAlgoAffaireProcedure()))
+	{
+		bIsDialogue = true;
+		bIsAllLotsFigesForDialogue = MarcheLot.isAllLotsFromMarcheFigesForDialogue(marche.getIdMarche());
+	}
+	
+	if(bIsContainsEnveloppeAManagement )
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+			<%= sTitreEnveloppeA %>
+		</td>
+		<%
+		String sDisabledA = "";
+		if((!bIsCandidaturePapier && bCandidatureDecachetees) 
+		|| (bIsCandidaturePapier && (bInvitationOffreEnvoye || bOffresDecachetees))
+		)
+		{
+			if(!sessionUserHabilitation.isSuperUser())
+			{
+				sDisabledA = "disabled='disabled'";
+			}
+		}
+		%>
+		<td class="pave_cellule_droite">
+			<strong>Date:</strong>&nbsp;
+			<input <%= sDisabledA %> type="text" name="<%= sFormPrefix %>tsDateEnveloppeAFin" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(tsDateEnveloppeAFin) %>"/>
+			
+			<strong>Heure:</strong>&nbsp;
+			<input <%= sDisabledA %> type="text" name="<%=sFormPrefix %>tsHeureEnveloppeAFin" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateEnveloppeAFin )%>" />&nbsp;
+			<%
+			String sStatutA = "";
+			String sHorsDelaisA = "";
+			if(candidature != null )
+			{
+				sPostComplement = "<strong>Pour les lots:&nbsp;</strong>";
+				
+				if(vEnveloppesALot != null)
+				{
+					for(int j=0;j<vEnveloppesALot.size();j++)
+					{
+						EnveloppeALot envALot = vEnveloppesALot.get(j);
+						MarcheLot lot = MarcheLot.getMarcheLot(envALot.getIdLot());
+						sPostComplement += "Lot n° "+lot.getNumero();
+						try
+						{
+							try{sStatutA = envALot.getStatutLibelleValue(EnveloppeALot.ID_STATUS_RECEVABLE);}
+							catch(Exception e){}
+							
+							boolean bIsRecevable = false;
+							try{bIsRecevable = envALot.isRecevable();}
+							catch(Exception e){}
+							
+							if(bIsRecevable && bIsDialogue && bIsAllLotsFigesForDialogue)
+							{
+								try{sStatutA = envALot.getStatutLibelleValue(EnveloppeALot.ID_STATUS_ADMIS_DIALOGUE);}
+								catch(Exception e){}
+							}
+							if(!sStatutA.equalsIgnoreCase(""))
+								sPostComplement += "("+sStatutA+")";
+						}
+						catch(Exception e){}
+						if(j != vEnveloppesALot.size() -1) sPostComplement += ", ";
+					}
+					EnveloppeA envA = vEnveloppesA.firstElement();
+					try
+					{
+						if(envA.isHorsDelais()) sHorsDelaisA += "<span class='rouge' style='font-weight:bold'>Hors délais </span>";
+					}
+					catch(Exception e){}
+				}
+			}
+			if(!sDisabledA.equalsIgnoreCase(""))
+			{
+			%>
+			<%= sHorsDelaisA+(vLotsTotal.size() > 1 ? sPostComplement : sStatutA) %>&nbsp;
+			<%
+			}
+			if(vLotsTotal.size() > 1)
+			{
+				int i=0;
+				if(!bCandidatureDecachetees || (bCandidatureDecachetees && bIsCandidaturePapier && !bInvitationOffreEnvoye && !bOffresDecachetees)){%><a style="color:red;" href="#" onclick="montrer_cacher('divisionA');">Sélectionner les lots</a>&nbsp;<%} %>
+		</td> 
+	</tr>
+	<tr id="divisionA">
+		<td class="pave_cellule_gauche" style="vertical-align: top;">
+			Liste des lots pour cette offre:
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align: top;">
+			<%@ include file="paveSelectLotsA.jspf" %>
+		</td> 
+	</tr>
+	<%
+	}
+	else if(vLotsTotal.size() == 1 && vLots.size() == 1)
+	{
+	%>
+		<input type="hidden" name="selectionLotsA" value="<%= vLots.firstElement().getIdMarcheLot() %>" /></td>
+	<%
+	}
+	else
+	{
+	%>
+	</td>
+	<%
+	}
+	}
+	
+	if(iAfficherPeriodesB != 0)
+	{
+		String sPreComplement = "";
+		String sPostComplementB = "<strong>Pour les lots:&nbsp;</strong>";
+		String sStatutB = "";
+		boolean bDisabled = true;
+		
+		for(int i=iShowRowB;i<vValiditeEnveloppesB.size();i++)
+		{
+			sPostComplementB = "<strong>Pour les lots:&nbsp;</strong>";
+			Validite oValidite = vValiditeEnveloppesB.get(i);
+
+			Timestamp tsDateEnveloppeBFin = null;
+			if(iAfficherPeriodesB == 2) sTitreEnveloppeB = "Récéption de la "
+				+ Outils.sConverionEntierLiterralFeminin[i] 
+			    + " offre : ";
+			if(candidature != null)
+			{
+				vEnveloppesB = EnveloppeB.getAllEnveloppeBFromCandidatureAndValidite(
+						candidature.getIdCandidature(),
+						oValidite.getIdValidite());
+	
+				if(vEnveloppesB != null)
+				{
+					for(int j=0;j<vEnveloppesB.size();j++)
+					{
+						EnveloppeB envB = (EnveloppeB)vEnveloppesB.get(j);
+						tsDateEnveloppeBFin = envB.getDateFermeture();
+						
+						MarcheLot lot = MarcheLot.getMarcheLot(envB.getIdLot());
+						sPostComplementB += "Lot n° "+lot.getNumero();
+						sStatutB = "";
+						try
+						{
+							if(envB.isHorsDelais()) sStatutB += "<font style='color:red;'><strong>Hors délais - <strong></font>";
+						}
+						catch(Exception e){}
+						sStatutB += envB.getStatutLibelleValueCourant(lot.getIdValiditeEnveloppeBCourante());
+						if(!sStatutB.equalsIgnoreCase("")) sPostComplementB += "("+sStatutB+")";
+						if(j != vEnveloppesB.size() -1) sPostComplementB += ", ";
+					}
+				}
+			}
+
+			if((!bOffresDecachetees || bOffresDecachetees && bIsCandidaturePapier) && bDisabled && vLots.size() > 0 && (oValidite.getIdValidite() == vLots.firstElement().getIdValiditeEnveloppeBCourante()) )
+				bDisabled = false;
+			
+			sFormPrefix = "enveloppeB_"+i+"_";
+			%>
+			<tr>
+				<td class="pave_cellule_gauche">
+					<%= sTitreEnveloppeB %>
+				</td>
+				<td class="pave_cellule_droite">
+					<strong>Date:</strong>&nbsp;
+					<input type="text" <%= bDisabled?"disabled='disabled'":"" %> name="<%= sFormPrefix %>tsDateEnveloppeBFin" size="15" maxlength="10" 
+					class="dataType-date"
+					value="<%= CalendarUtil.getDateCourte(tsDateEnveloppeBFin) %>" />
+					
+					<strong>Heure:</strong>&nbsp;
+					<input type="text" <%= bDisabled?"disabled='disabled'":"" %> name="<%=sFormPrefix %>tsHeureEnveloppeBFin" size="5" maxlength="5" 
+					value="<%=CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDateEnveloppeBFin)%>" />&nbsp;
+					<%
+					if(bDisabled)
+					{
+					%>
+					<%= (vLotsTotal.size() > 1 ? sPostComplementB : sStatutB) %>&nbsp;
+					<%
+					}
+					if((vLotsTotal.size() > 1)) 
+					{
+						if(!bDisabled){%><a style="color:red;" href="javascript:montrer_cacher('divisionB<%= i %>');">Sélectionner les lots</a>&nbsp;<%} %>
+				</td> 
+			</tr>
+			<tr id="divisionB<%= i %>">
+				<td class="pave_cellule_gauche" style="vertical-align: top;">
+					Liste des lots pour cette offre:
+				</td>
+				<td class="pave_cellule_droite" style="vertical-align: top;">
+					<%@ include file="paveSelectLotsB.jspf" %>
+				</td> 
+			</tr>
+			<%
+			}
+			else if(vLotsTotal.size() == 1 && vLots.size() == 1)
+			{
+				for(int j=0;j<vValiditeEnveloppesB.size();j++)
+				{
+				%>
+				<input type="hidden" name="selectionLotsB<%= j %>" value="<%= vLots.firstElement().getIdMarcheLot() %>" />
+				<%
+				}
+				%></td></tr><%
+			}
+			else
+			{
+			%>
+	</td></tr>
+	<%
+	}
+		}	
+	}
+	%>
+</table>

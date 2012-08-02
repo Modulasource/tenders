@@ -1,0 +1,90 @@
+<%
+	/*
+	 *	Objets nécessaires :
+	 *		String sPaveTypeMarcheTitre;
+	 *		Marche marche;
+	 */
+	 
+	 MarcheType mtType = new MarcheType();
+	    if ((marche.getIdMarcheType() > 0))
+	        mtType = MarcheType.getMarcheType(marche.getIdMarcheType());
+	 
+	 String sTypeMarcheLibelle = "";
+     try{
+         sTypeMarcheLibelle = mtType.getLibelle();
+         if(Outils.isNullOrBlank(sTypeMarcheLibelle)){
+        	 throw new CoinDatabaseLoadException(""+marche.getIdMarcheType(),"");
+         }
+     } catch (CoinDatabaseLoadException e) {
+         sTypeMarcheLibelle = "à renseigner";
+     }
+     String sTypeMarcheLibelleDetail = "";
+     try{
+         sTypeMarcheLibelleDetail = mtType.getLibelleDetail();
+         if(Outils.isNullOrBlank(sTypeMarcheLibelleDetail)){
+             throw new CoinDatabaseLoadException(""+marche.getIdMarcheType(),"");
+         }
+     } catch (CoinDatabaseLoadException e) {
+         sTypeMarcheLibelleDetail = "à renseigner";
+     }
+%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="modula.marche.MarcheType"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="modula.marche.MarcheParametre"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="mt.modula.affaire.type.MarcheTypeExtension"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.HashMap"%>
+<table class="pave" >
+	<tr onclick="montrer_cacher('paveTypeMarche')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveTypeMarcheTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveTypeMarche" >
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Type de marché* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= sTypeMarcheLibelle %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Type de prestations* :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= sTypeMarcheLibelleDetail %>
+					</td>
+				</tr>
+				<%
+			    if(MarcheTypeExtension.isExtentionEnabled()){
+			    	ArrayList<HashMap<String, String>> arrExtension = MarcheTypeExtension.getAllActiveExtentionFromMarche(marche.getId(),mtType);
+			        if(arrExtension.size()>0){
+			    %>
+			    <tr id="trExtensions">
+			        <td class="pave_cellule_gauche" style="vertical-align:middle">
+			            Extensions :
+			        </td>
+			        <td class="pave_cellule_droite">
+			        <% for(HashMap<String, String> mapExtension : arrExtension){ %>
+			        <span style="font-weight:bold" ><%= mapExtension.get("name") %></span> : <%= Boolean.valueOf(mapExtension.get("value"))?"oui":"non" %>
+			        <br/>
+			        <%} %>
+			        </td>
+			    </tr>
+			    <% 
+			        }
+			    } %>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

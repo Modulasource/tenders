@@ -1,0 +1,80 @@
+<%
+
+	MarcheNombreCandidat mnc = null;
+	try {
+		mnc =  MarcheNombreCandidat.getMarcheNombreCandidatFromIdMarche(marche.getId());
+	}catch (Exception e ) {
+		mnc = new MarcheNombreCandidat();
+	}
+
+%>
+<%@page import="modula.marche.MarcheNombreCandidat"%>
+<%@page import="org.coin.autoform.component.AutoFormCptSelect"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="org.coin.autoform.component.AutoFormCptDoubleLabel"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Nombre de candidats</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2"><i>Dans le cas d'une procédure restreinte, négociée ou de dialogue compétitif.</i></td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Nombre minimal de candidats admis à présenter une offre :
+		</td>
+		<td class="pave_cellule_droite"><%= ( marche.getNbMinCandidats() > 0 ? ""+marche.getNbMinCandidats() : "") %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Nombre maximal de candidats admis à présenter une offre :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= (marche.getNbMaxCandidats() > 0 ? ""+marche.getNbMaxCandidats() : "") %>
+		</td>
+	</tr>
+
+<% 
+if(bUseBoamp17)
+{
+  %>
+	<%= QuestionAnswer.getHTML(
+			"CandidatDejaSelectionne", 
+			"lIdQaCandidatDejaSelectionne",
+			mnc.getIdQaCandidatDejaSelectionne(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_LABEL) %>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<font style="font-weight:normal;font-size:1">
+				<i>(le cas échéant et uniquement en cas de procédure négociée)</i></font>
+		</td>
+		<td class="pave_cellule_droite">
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Critères objectifs de limitation du nombre de candidats :
+		</td>
+		<td class="pave_cellule_droite">
+		<%= mnc.getCritereObjectifLimitation() %>
+		</td>
+	</tr>
+	<tr><td colspan="2" style="text-align: left">
+		Réduction du nombre d'opérateurs durant la négociation ou le dialogue (procédure négociéé, 
+		dialogue compétitif) : 
+		</td>
+	</tr>
+	<%= QuestionAnswer.getHTML(
+			"PhaseSucessive", 
+			"lIdQaPhaseSucessive",
+			mnc.getIdQaPhaseSucessive(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_LABEL) %>
+	<%} %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

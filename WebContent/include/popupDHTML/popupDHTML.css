@@ -1,0 +1,27 @@
+.fondModal {
+	background: #ffffff;
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 400%;
+	width: 100%;
+	opacity: 0.6;
+}
+
+* html .fondModal {
+	position: absolute;
+	filter: alpha(opacity=60);
+}
+.divModifierCellule {
+	border: 0px solid #191970;
+	background: #eee;
+	position: absolute;
+	/* left: 30%; */
+	padding: 1px 1px;
+}
+
+.divPopupDHTML{
+	position:absolute;
+	display: none;
+	visibility:hidden;
+}

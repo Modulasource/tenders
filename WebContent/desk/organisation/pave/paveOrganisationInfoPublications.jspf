@@ -1,0 +1,97 @@
+<%
+
+	Adresse adresseExpedition = null;
+	Pays paysExpedition = null;
+	Adresse adresseFacturation = null;
+	Pays paysFacturation = null;
+	boolean bIsClientBOAMP = false;
+
+	String sSiretToPrint = organisation.getSiretValueDisplay(adresse.getIdPays());
+    
+	String sOrganisationTvaIntra = localizeButton.getValueUndefined();
+    
+    String sOrganisationClasseProfit = OrganisationClasseProfit.getOrganisationClasseProfitName(organisation.getIdOrganisationClasseProfit());
+    
+    if(!Outils.isNullOrBlank( organisation.getTvaIntra()))
+    {
+        sOrganisationTvaIntra = organisation.getTvaIntra();
+    }
+	
+
+	BOAMPProperties boampProperties = new BOAMPProperties();
+	try	{
+	    boampProperties = BOAMPProperties.getBOAMPPropertiesFromOrganisation(organisation.getIdOrganisation());
+	    if(boampProperties != null) bIsClientBOAMP = true;
+	    else boampProperties = new BOAMPProperties();
+	} catch(Exception e){
+		boampProperties = new BOAMPProperties();
+	}
+	try	{
+		adresseExpedition = Adresse.getAdresse(boampProperties.getIdAdresseExpedition());
+		paysExpedition = Pays.getPays(adresseExpedition.getIdPays());
+	} catch(Exception e){
+		adresseExpedition = new Adresse();
+		paysExpedition = new Pays();
+	}
+	
+	try	{
+		adresseFacturation = Adresse.getAdresse(boampProperties.getIdAdresseFacturation());
+		paysFacturation = Pays.getPays(adresseFacturation.getIdPays());
+	} catch(Exception e){
+		adresseFacturation =  new Adresse();
+		paysFacturation = new Pays();
+	}
+
+%>
+
+
+<%@page import="org.coin.fr.bean.BOAMPProperties"%>
+<%@page import="org.coin.fr.bean.Adresse"%>
+<%@page import="org.coin.fr.bean.Pays"%>
+<%@page import="java.sql.Connection"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.fr.bean.OrganisationClasseProfit"%>
+<%@page import="org.coin.util.Outils"%>
+<table class="pave" summary="BOAMP">
+	<tr>
+		<td class="pave_titre_gauche">BOAMP</td>
+		<td class="pave_titre_droite">
+			<a class="orange" href='javascript:OuvrirPopup("<%=response.encodeURL("afficherTarifsBoamp.jsp")%>",450,400,"menubar=no,scrollbars=yes,statusbar=no")'>Tarifs du BOAMP</a>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:right">
+			&nbsp;
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Vous bénéficiez d'un compte au BOAMP :","",bIsClientBOAMP?"Oui":"Non","") %>
+<%
+	if(bIsClientBOAMP) {
+		int iTypeFacturation = boampProperties.getIdTypeFacturation();
+%>	
+		<%= hbFormulaire.getHtmlTrInput("Login :","",boampProperties.getLogin()!=null?boampProperties.getLogin():"Indéfini","") %>
+		<%= hbFormulaire.getHtmlTrInput("Password :","","*********","") %>
+		<%= hbFormulaire.getHtmlTrInput("Email :","",boampProperties.getEmail()!=null?boampProperties.getEmail():"Indéfini","") %>
+		<%= hbFormulaire.getHtmlTrInput(organisation.getSiretLabel() + " :","",!Outils.isNullOrOnlyBlank(sSiretToPrint)?sSiretToPrint:localizeButton.getValueUndefined(),"") %>
+        <%= hbFormulaire.getHtmlTrInput(organisation.getTvaIntraLabel() + " :","",sOrganisationTvaIntra ,"") %>
+        <%= hbFormulaire.getHtmlTrInput("Classe profit :","",!sOrganisationClasseProfit.equalsIgnoreCase("")?sOrganisationClasseProfit:localizeButton.getValueUndefined(),"") %>
+		<%= hbFormulaire.getHtmlTrInput("Système de facturation :","","Facturation "+(iTypeFacturation == 1?"groupée":"séparée"),"") %>
+<%
+		if(iTypeFacturation == BOAMPProperties.FACTURATION_GROUPEE){
+%>
+			<%= hbFormulaire.getHtmlTrInput("Code client :","",boampProperties.getCodeClient(),"") %>
+<%
+		}
+		else{
+%>
+			<%= hbFormulaire.getHtmlTrInput("Dénomination :","",!boampProperties.getDenomination().equals("")?boampProperties.getDenomination():"Indéfini","") %>
+			<%= hbFormulaire.getHtmlTrInput("Adresse de facturation :","",((adresseFacturation != null)?""+adresseFacturation.getAllAdresseString("<br />"):""),"") %>
+<%
+		}
+%>
+		<%= hbFormulaire.getHtmlTrInput("Adresse d'expédition de la facture :","",((adresseExpedition != null)?""+adresseExpedition.getAllAdresseString("<br />"):""),"") %>
+<%
+	}
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

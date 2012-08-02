@@ -1,0 +1,141 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+<%@page import="modula.graphic.Onglet"%>
+//mail personne physique
+var champMailPPAuth = "sEmailAuth";
+var champMailPP = "sEmail";
+var divMailPP = "tr_infoEmail";
+function verifierMailPP() 
+{
+	if(document.getElementById(champMailPP).value != '<%= personne.getEmail() %>')
+	{
+		verifierChamp(champMailPP,champMailPPAuth,divMailPP,<%= 
+		    CheckAjaxVerifField.PERSONNE_PHYSIQUE_EMAIL %>,"","publisher_portail");
+	}
+}
+
+//user login
+var champLoginAuth = "sLoginAuth";
+var champLogin = "sLogin";
+var divLogin = "tr_infoLogin";
+function verifierLogin() 
+{
+	if(document.getElementById(champLogin).value != '<%= user.getLogin() %>')
+	{
+		verifierChamp(champLogin,champLoginAuth,divLogin,<%= CheckAjaxVerifField.COIN_USER_LOGIN 
+		  %>,"","publisher_portail");
+	}
+}
+<%
+if(user.getIdUserStatus() == UserStatus.VALIDE)
+{
+%>
+//user mdp
+var champMDPAuth = "ancienAuth";
+var champMDP = "ancien";
+var divMDP = "tr_infoMDP";
+function verifierMDP() 
+{
+	verifierChamp(champMDP,champMDPAuth,divMDP,<%= 
+	    CheckAjaxVerifField.COIN_USER_MDP %>,[{data:"iIdUser",value:<%= user.getIdUser() %>}] ,"publisher_portail");
+}
+<%
+}
+%>
+
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+
+	<%
+	if( iIdOnglet == Onglet.ONGLET_PERSONNE_PHYSIQUE_DONNEES_ADMINISTRATIVES)
+	{
+	%>
+		if (isNull(document.getElementById("iIdCivilite").value)
+		|| document.getElementById("iIdCivilite").value <= 0)
+		{
+			sError += "Vous devez saisir la civilit&eacute;.<br />";
+			bResult = false;
+		}
+		if (isNull(document.getElementById("sNom").value))
+		{
+			sError += "Vous devez saisir un nom.<br />";
+			bResult = false;
+		}
+		if (isNull(document.getElementById("sPrenom").value))
+		{
+			sError += "Vous devez saisir un pr&eacute;nom.<br />";
+			bResult = false;
+		}
+		if (!isMail(document.getElementById("sEmail").value))
+		{
+			sError += "La syntaxe de l'email n'est pas correcte.<br />";
+			bResult = false;
+		}
+		else if(document.getElementById("sEmailAuth").value == 0
+		&& document.getElementById("sEmail").value != '<%= personne.getEmail() %>')
+		{
+			sError += "L'adresse email que vous avez saisie est déjà inscrite dans la base de données.\nVous ne pouvez pas poursuivre cette opération.<br />";
+			bResult = false;
+		}
+	<%
+	}
+	%>
+	<%
+	if( iIdOnglet == Onglet.ONGLET_PERSONNE_PHYSIQUE_COMPTE_UTILISATEUR)
+	{
+		if(user.getIdUserStatus() == UserStatus.VALIDE)
+		{
+	%>
+		if (!isNull(document.getElementById("ancien").value)
+		&& !isNull(document.getElementById("newMdp1").value))
+		{
+			if(document.getElementById("ancienAuth").value == 0)
+			{
+				bResult = false;
+			}
+
+			if (isNull(document.getElementById("newMdp2").value))
+			{
+				sError += "Vous devez confirmer le nouveau mot de passe.<br />";
+				bResult = false;
+			}
+			if (!isNull(document.getElementById("newMdp2").value)
+			&& document.getElementById("newMdp1").value != document.getElementById("newMdp2").value)
+			{
+				sError += "la confirmation du mot de passe saisi est erron&eacute;e.<br />";
+				bResult = false;
+			}
+		}
+		<%
+		}
+		%>
+		if (!isMail(document.getElementById("sLogin").value))
+		{
+			sError += "Le login doit avoir une syntaxe d'email correcte.<br />";
+			bResult = false;
+		}
+		else if(document.getElementById("sLoginAuth").value == 0
+		&& document.getElementById("sLogin").value != '<%= user.getLogin() %>')
+		{
+			sError += "Le login que vous avez saisi est déjà inscrit dans la base de données.\nVous ne pouvez pas poursuivre cette opération.<br />";
+			bResult = false;
+		}
+	<%
+	}
+	if(iIdOnglet == Onglet.ONGLET_PERSONNE_PHYSIQUE_VEILLE_MARCHE){
+	%>
+	Visualise(document.formulaire.iIdCompetenceSelection,document.formulaire.iIdCompetenceSelectionListe);
+	<%
+	}
+	%>
+	
+	document.getElementById("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+} 

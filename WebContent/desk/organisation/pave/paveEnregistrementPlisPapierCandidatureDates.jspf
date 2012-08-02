@@ -1,0 +1,126 @@
+<table id="CandidatureDates">
+	<%
+	boolean bIsAffaireDialogue = false;
+	boolean bIsAllLotsFigesForAffaireDialogue = false; 
+	if(AffaireProcedure.isDialogueComplete(marche.getIdAlgoAffaireProcedure()))
+	{
+		bIsAffaireDialogue = true;
+		bIsAllLotsFigesForAffaireDialogue = MarcheLot.isAllLotsFromMarcheFigesForDialogue(marche.getIdMarche());
+	}
+	
+	if(bIsContainsEnveloppeAManagement)
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= sTitreEnveloppeA %>
+		</td>
+		<td class="pave_cellule_droite">
+			<%if(tsDateEnveloppeAFin != null){ %>
+			<strong>le</strong>&nbsp;
+			<%= CalendarUtil.getDateCourte(tsDateEnveloppeAFin) %>&nbsp;
+			<strong>&agrave;</strong>&nbsp;
+			<%= CalendarUtil.getHeureMinuteSecLitterale(tsDateEnveloppeAFin)%>&nbsp;
+			<%
+			String sStatut = "";
+			String sHorsDelais = "";
+			if(candidature != null )
+			{
+				sPostComplement = "<strong>Pour les lots:&nbsp;</strong>";
+				
+				if(vEnveloppesALot != null)
+				{
+					for(int j=0;j<vEnveloppesALot.size();j++)
+					{
+						EnveloppeALot envALot = vEnveloppesALot.get(j);
+						MarcheLot lot = MarcheLot.getMarcheLot(envALot.getIdLot());
+						sPostComplement += "Lot n° "+lot.getNumero();
+						try
+						{
+							try{sStatut = envALot.getStatutLibelleValue(EnveloppeALot.ID_STATUS_RECEVABLE);}
+							catch(Exception e){}
+							
+							boolean bIsRecevable = false;
+							try{bIsRecevable = envALot.isRecevable();}
+							catch(Exception e){}
+							
+							if(bIsRecevable && bIsAffaireDialogue && bIsAllLotsFigesForAffaireDialogue)
+							{
+								try{sStatut = envALot.getStatutLibelleValue(EnveloppeALot.ID_STATUS_ADMIS_DIALOGUE);}
+								catch(Exception e){}
+							}
+							
+							if(!sStatut.equalsIgnoreCase(""))
+								sPostComplement += "("+sStatut+")";
+						}
+						catch(Exception e){}
+						if(j != vEnveloppesALot.size() -1) sPostComplement += ", ";
+					}
+					EnveloppeA envA = vEnveloppesA.firstElement();
+					try
+					{
+						if(envA.isHorsDelais()) sHorsDelais += "<span class='rouge' style='font-weight:bold'>Hors délais </span>";
+					}
+					catch(Exception e){}
+				}
+			}
+			%>
+			<%= sHorsDelais+(vLotsTotal.size() > 1 ? sPostComplement : sStatut) %>&nbsp;
+			<%}else{ %>Indéfini<%} %>
+		</td> 
+	</tr>
+	<%
+	}
+	if(iAfficherPeriodesB != 0)
+	{
+		String sPreComplement = "";
+		String sStatut = "";
+		for(int i=iShowRowB;i<vValiditeEnveloppesB.size();i++)
+		{
+			sPostComplement = "<strong>Pour les lots:&nbsp;</strong>";
+			Timestamp tsDateEnveloppeBFin = null;
+			if(iAfficherPeriodesB == 2) sTitreEnveloppeB = "Récéption de la " + Outils.sConverionEntierLiterralFeminin[i] + " offre : ";
+			if(candidature != null)
+			{
+				Validite oValidite = vValiditeEnveloppesB.get(i);
+				vEnveloppesB = EnveloppeB.getAllEnveloppeBCacheteeFromCandidatureAndValidite(candidature.getIdCandidature(),oValidite.getIdValidite());
+				if(vEnveloppesB != null)
+				{
+					for(int j=0;j<vEnveloppesB.size();j++)
+					{
+						EnveloppeB envB = (EnveloppeB)vEnveloppesB.get(j);
+						tsDateEnveloppeBFin = envB.getDateFermeture();
+						MarcheLot lot = MarcheLot.getMarcheLot(envB.getIdLot());
+						sPostComplement += "Lot n° "+lot.getNumero();
+						sStatut = "";
+						try
+						{
+							if(envB.isHorsDelais()) sStatut += "<font style='color:red;'><strong>Hors délais</strong> - </font>";
+						}
+						catch(Exception e){}
+						sStatut += envB.getStatutLibelleValueCourant(lot.getIdValiditeEnveloppeBCourante());
+						if(!sStatut.equalsIgnoreCase("")) sPostComplement += "("+sStatut+")";
+						if(j != vEnveloppesB.size() -1) sPostComplement += ", ";
+					}
+				}
+			}
+			%>
+			<tr>
+				<td class="pave_cellule_gauche">
+					<%= sTitreEnveloppeB %>
+				</td>
+				<td class="pave_cellule_droite">
+					<%if(tsDateEnveloppeBFin != null){ %>
+					<strong>le</strong>&nbsp;
+					<%= CalendarUtil.getDateCourte(tsDateEnveloppeBFin) %>&nbsp;
+					<strong>&agrave;</strong>&nbsp;
+					<%= CalendarUtil.getHeureMinuteSecLitterale(tsDateEnveloppeBFin) %>&nbsp;
+					<%= vLotsTotal.size() > 1 ? sPostComplement : sStatut %>&nbsp;
+					<%}else{ %>Indéfini<%} %>
+				</td> 
+			</tr>
+			<%
+		}	
+	}
+	%>
+</table>

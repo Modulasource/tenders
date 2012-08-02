@@ -1,0 +1,76 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+//raison sociale
+var champRaisonSocialeAuth = "sRaisonSocialeAuth";
+var champRaisonSociale = "sRaisonSociale";
+var divRaisonSociale = "tr_infoRaisonSociale";
+<%
+	String sRaisonSocialeUnHtml = organisation.getRaisonSociale() ;
+
+	sRaisonSocialeUnHtml = Outils.replaceAll(sRaisonSocialeUnHtml, "&#039;", "\'");
+	sRaisonSocialeUnHtml = Outils.replaceAll(sRaisonSocialeUnHtml, "'", "\\'");
+	
+%>
+
+function verifierRaisonSociale() 
+{
+	if(<%= doh.bCheckDoublonRaisonSociale %>){
+		if($(champRaisonSociale).value.toLowerCase().trim() != $("sRaisonSocialeOldValue").value.toLowerCase().trim())
+		{
+			verifierChamp(champRaisonSociale,champRaisonSocialeAuth,divRaisonSociale,<%= 
+			    CheckAjaxVerifField.ORGANISATION_RAISON_SOCIALE %>,[{data:"iIdOrganisation",value:<%= organisation.getId() %>}],"desk");
+		}
+	}
+}
+
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+
+	<%
+	if( iIdOnglet == modula.graphic.Onglet.ONGLET_ORGANISATION_DONNEES_ADMINISTRATIVES)
+	{
+	%>
+		if (isNull($("sRaisonSociale").value))
+		{
+			sError += "<%= locMessage.getValue(7,"Vous devez saisir une raison sociale.") %><br />";
+			bResult = false;
+		}
+		else if ($("sRaisonSocialeAuth").value == 0
+		&& $(champRaisonSociale).value.toLowerCase().trim() != $("sRaisonSocialeOldValue").value.toLowerCase().trim() )
+		{
+			sError += "<%= locMessage.getValue(1,"Attention, la raison sociale saisie ci-dessous est déjà enregistrée dans la base de données.")%><br />";
+			bResult = false;
+		}
+		<%
+		if (organisation.getIdOrganisationType() == OrganisationType.TYPE_CANDIDAT)
+		{
+		%>
+			Visualise($("iIdCompetenceSelected"),$("iIdCompetenceNewSelection"));
+		<%
+		}
+		%>
+	<%
+	}
+	if(iIdOnglet == modula.graphic.Onglet.ONGLET_ORGANISATION_INFORMATION_PUBLICATION){
+	%>
+	if (!checkAdresseIfNecessary(form, "BOAMP_adresse_expedition_"))
+		return false;
+
+	if (!checkAdresseIfNecessary(form, "BOAMP_adresse_facturation_"))
+		return false;
+		
+	<%
+	}
+	%>
+	$("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}

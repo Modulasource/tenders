@@ -1,0 +1,73 @@
+<%
+	/**
+	* nécessite : 
+	* String  sSousEnsembleEtapesName =  ex "Constitution de l'affaire"
+	* String  sSousEnsembleEtapesId = ex "ALGOMODULA-CONSTITUTION"
+	*/
+%>
+		<tr>
+			<td class="pave_cellule_gauche" style="font-weight:normal">
+				Etapes disponibles : <br />
+				<select name="<%=sSousEnsembleEtapesId %>iIdUseCase" size="10" style="width:500px" multiple="multiple" >
+<%
+	
+	{ // pour les variables locales
+	Vector vUseCasesAll = UseCase.getAllUseCaseWithPrefixMemory(sSousEnsembleEtapesId);
+
+	for (int i=0; i < vUseCasesAll.size(); i++)
+	{
+		UseCase usecase = (UseCase) vUseCasesAll.get(i);
+		boolean bDisplayUseCase = true; 
+		/*for (int j=0; j < vUseCasesRole.size(); j++)
+		{
+			UseCase usecaseTmp = (UseCase) vUseCasesRole .get(j);
+		
+			if(usecase.getIdString().equals(usecaseTmp.getIdString() ) )
+			{
+				bDisplayUseCase = false;
+			}
+		}
+		*/
+		if(bDisplayUseCase )
+		{
+			out.write("<option value='"+ usecase.getIdString() + "'>" + /*"[" + usecase.getIdString() + "]" + */ usecase.getName() + "</option>\n");
+		}
+	}
+		  %>
+                </select>
+			</td >
+			<td >
+				<table summary="none">
+					<tr>
+						<td style="width:100px;text-align:center">
+							<a href="javascript:DeplacerTous(document.formulaire.<%=sSousEnsembleEtapesId %>iIdUseCaseSelection,document.formulaire.<%=sSousEnsembleEtapesId %>iIdUseCase)" >
+								<img src="<%= rootPath + modula.graphic.Icone.ICONE_GAUCHE%>"  
+								alt="Enlever" /></a>
+							<a href="javascript:DeplacerTous(document.formulaire.<%=sSousEnsembleEtapesId %>iIdUseCase,document.formulaire.<%=sSousEnsembleEtapesId %>iIdUseCaseSelection)" >
+								<img src="<%= rootPath + modula.graphic.Icone.ICONE_DROITE%>"  
+								alt="Ajouter" /></a> 
+						</td>
+						<td>
+							Etapes sélectionnées : <br />
+						
+							<select name="<%=sSousEnsembleEtapesId %>iIdUseCaseSelection" size="10" style="width:500px" multiple="multiple" >
+<%
+/*
+	for (int i=0; i < vUseCasesRole.size(); i++)
+	{
+		UseCase usecase = (UseCase) vUseCasesRole.get(i);
+		out.write("<option value='"+ usecase.getIdString() + "'>" 
+				+ "[" + usecase.getIdString() + "]"+ usecase.getName() + "</option>\n");
+	}
+*/
+
+	} //FIN : pour les variables locales
+		  %>
+		                    </select>
+							<input type="hidden" name="<%=sSousEnsembleEtapesId %>iIdUseCaseSelectionListe" />
+						</td>
+					</tr>
+				</table>
+
+		  </td>
+		</tr>

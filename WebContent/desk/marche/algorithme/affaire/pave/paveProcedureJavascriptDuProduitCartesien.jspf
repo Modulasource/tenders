@@ -1,0 +1,65 @@
+<%@page import="modula.marche.CritereType"%>
+<%@page import="org.coin.fr.bean.export.PublicationDestinationType"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.marche.ArticleLoi"%>
+<%@page import="modula.algorithme.Phase"%>
+<%@page import="org.coin.bean.boamp.BoampFormulaireType"%>
+<%@page import="java.util.Vector"%><%
+int iIdPhaseDemarrage = Phase.PHASE_CREATION;
+AffaireProcedure affProc = null;
+Vector<ArticleLoi> vArticleLoiMarche = null;
+try
+{
+	affProc = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure());
+	vArticleLoiMarche = ArticleLoi.getArticleLoiPourIdMarche(marche.getIdMarche());
+
+	if(marche.isAffaireAATR())
+		iIdPhaseDemarrage = Phase.PHASE_CREATION_AATR;
+}
+catch(Exception e){}
+%>
+
+
+<%@ include file="paveJavascriptModePassation.jspf" %>
+
+
+function displayFields(iTypeAvis,bInit){
+	var sIdBlockPubOffi = "<%=afBlockPub.getId()%>";
+	var sIdBlockProcedure = "<%=afBlockProcedure.getId()%>";
+	var sIdCaseBOAMP = "<%=PublicationDestinationType.getPublicationDestinationTypeNameMemory(PublicationDestinationType.TYPE_BOAMP)%>";
+	var sIdCaseJOUE = "<%=PublicationDestinationType.getPublicationDestinationTypeNameMemory(PublicationDestinationType.TYPE_JOUE)%>";
+	
+	if (iTypeAvis==0){
+		//hideDiv(sIdBlockPubOffi);
+		hideDiv(sIdBlockProcedure);
+	}else{
+		showDiv(sIdBlockProcedure);
+		updateListPassation(bInit);
+
+		if(iTypeAvis == <%= BoampFormulaireType.TYPE_MAPA %>){
+			showDiv("selectionCritereTypeDiv<%= CritereType.TYPE_AUCUN_CRITERE %>");
+			$("selectionCritereType<%= CritereType.TYPE_AUCUN_CRITERE %>").name = "<%= sFormPrefix %>selectionCritere";
+		}else{
+			hideDiv("selectionCritereTypeDiv<%= CritereType.TYPE_AUCUN_CRITERE %>");
+			$("selectionCritereType<%= CritereType.TYPE_AUCUN_CRITERE %>").name = "<%= sFormPrefix %>selectionCritereHiddenType";
+		}
+	}
+}
+function hideDiv(sIdDiv){
+	var div = document.getElementById(sIdDiv);
+	try{
+	  	div.style.display = "none";
+	  	div.style.visibility = "hidden";
+	}catch(exception){
+		alert("hideDiv : "+exception);
+	}
+}
+function showDiv(sIdDiv){
+	var div = document.getElementById(sIdDiv);
+	try{
+	  	div.style.display = "";
+	  	div.style.visibility = "visible";
+	}catch(exception){
+		alert("showDiv : "+exception);
+	}
+}

@@ -1,0 +1,100 @@
+
+
+
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+
+<head>
+<META HTTP-EQUIV="Expires" CONTENT="-1"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<TITLE>Inscrire une personne</TITLE>
+<script src="/modula/desk/include/verification.js" type="text/javascript"></script>
+<script type="text/javascript">
+function ChangeUrl(formulaire, champFormulaire, message, redirection)
+{
+	var champ = formulaire.elements[champFormulaire];
+		
+	if (champ.selectedIndex != 0)
+	{
+	
+		var url =  redirection + champ.options[champ.selectedIndex].value;
+		
+		window.top.main.location.href = url ;
+ 	}
+	else 
+	{
+		if (message != null)
+			alert(message);
+	}
+}
+</SCRIPT>
+<style type="text/css">
+<!--
+@import url("../include/css/desk.css");
+-->
+</style>
+<script src="../include/inscrirePersonneForm.js" type="text/javascript"></script>
+<script src="../include/redirection.js" type="text/javascript"></script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="20" topmargin="20" marginwidth="20" marginheight="20">
+<form action="creerMarcheForm2a.jsp" method="post"  name="formulaires">
+<div style="text-align:center; width : 99%;">
+	<div class="moteur">
+		<div class="contenu">
+			Le marché est en cours de modification, il vous faut dans un premier temps PREVENIR les supports de publication sur lesquels vous avez publié votre Avis d'Appel Public à Concurence (APPC)
+		</div>
+	</div>
+	<br />
+	<div class="moteur">
+	<div class="contenu" style="text-align:left;border-bottom:1px solid #000;"><strong>Supports de publication</strong></div>
+		<div class="contenu">
+		<table summary="none">
+			<tr><!-- on associe l'id cbx a toutes les checkbox -->
+				<td id="cell" style="border-top:none;text-align:right;width:50%">Nom du support de publication</td>
+				<td id="cell" style="border-top:none;text-align:left;width:50%"><input type="checkbox" id="cbx" /></td>
+			</tr>
+			<tr><!-- on associe l'id cbx a toutes les checkbox -->
+				<td id="cell" style="border-top:none;text-align:right;width:50%">Nom du support de publication</td>
+				<td id="cell" style="border-top:none;text-align:left;width:50%"><input type="checkbox" id="cbx" /></td>
+			</tr>
+			<tr><!-- on associe l'id cbx a toutes les checkbox -->
+				<td id="cell" style="border-top:none;text-align:right;width:50%">Nom du support de publication</td>
+				<td id="cell" style="border-top:none;text-align:left;width:50%"><input type="checkbox" id="cbx" /></td>
+			</tr>
+			<tr><!-- on associe l'id cbx a toutes les checkbox -->
+				<td id="cell" style="border-top:none;text-align:right;width:50%">Nom du support de publication</td>
+				<td id="cell" style="border-top:none;text-align:left;width:50%"><input type="checkbox" id="cbx" /></td>
+			</tr>
+			<tr><!-- on associe l'id cbx a toutes les checkbox -->
+				<td id="cell" style="border-top:none;text-align:right;width:50%">Nom du support de publication</td>
+				<td id="cell" style="border-top:none;text-align:left;width:50%"><input type="checkbox" id="cbx" /></td>
+			</tr>
+			<tr><!-- on associe l'id cbx a toutes les checkbox -->
+				<td id="cell" style="border-top:none;text-align:right;width:50%">Nom du support de publication</td>
+				<td id="cell" style="border-top:none;text-align:left;width:50%"><input type="checkbox" id="cbx" /></td>
+			</tr>
+		</table>
+		</div>
+	</div>
+	<div style="text-align:left;width:80%;padding-top: 15px;"><strong>Mail de type préselectionné :</strong></div>
+	<table style="width:90%" cellpadding="5">
+		<tr>
+			<td width="60%" align="right" style="border-top:none;">
+				<div><strong>Objet type :</strong> xxxxxxx</div>
+				<div><textarea cols="50" rows="10" /></textarea></div>
+			</td>
+			<td style="width:40%;vertical-align:top;border-top:none;padding-left:30px;">
+				<div><strong>Balises actives</strong></div>
+				<div>[ Nom ]<br />[ Prénom ]</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="text-align:center;border-top:none;"><input type="button" value="Valider cette étape" /></td>
+		</tr>
+	</table>
+</div>
+</form>
+<div style="text-align:center"><a href="IHM-CEU-001B.html">&lt;&lt;</a>&nbsp;<a href="IHM-CEU-001D.html">&gt;&gt;</a></div>
+</body>
+
+</html>

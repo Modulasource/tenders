@@ -1,0 +1,56 @@
+	
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.fr.bean.Departement"%><tr>
+		<td class="pave_cellule_gauche">Date d'envoi de l'avis au BOAMP :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+			<%= (marche.getDateEnvoiBOAMP()!=null?CalendarUtil.getDateCourte(marche.getDateEnvoiBOAMP())+" <strong>à</strong> "+CalendarUtil.getHeureMinuteSecLitterale(marche.getDateEnvoiBOAMP()):"Indéfinie") %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">N° de bon de commande d'insertion au BOAMP :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+			<%= ((marche.getNumCommandeBOAMP() != null && !marche.getNumCommandeBOAMP().equalsIgnoreCase("null") && !marche.getNumCommandeBOAMP().equalsIgnoreCase(""))?marche.getNumCommandeBOAMP():"Indéfini") %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Département de publication :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+<%
+	String sDepartementPublication = "Pas de département de publication";
+	try{
+		sDepartementPublication = Departement.getDepartement(marche.getDepPublicationBOAMP()).getName(); 
+		
+	}catch(Exception e){}
+%>		
+			<%= sDepartementPublication %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Département(s) de rappel :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+<%
+		Vector<org.coin.bean.boamp.BoampDepartementPublication> vBoampDepartementPublication = null;
+		try{vBoampDepartementPublication = org.coin.bean.boamp.BoampDepartementPublication.getAllFromMarche(marche.getIdMarche());}
+		catch(Exception e){}
+		for(int i=0;i<vBoampDepartementPublication.size();i++){
+			try{
+				Departement dep = Departement.getDepartement(""+vBoampDepartementPublication.get(i).getIdDepartement());
+%>
+				<%= dep.getName() %> - 
+<%
+			}catch(Exception e){
+				// TODO : mettre dans la log
+				System.out.println("Département non trouvé : "+vBoampDepartementPublication.get(i).getIdDepartement());
+			}
+		}
+		if(vBoampDepartementPublication.size()<1){
+%>
+			Aucun département de rappel
+<%
+		}
+%>
+		</td>
+	</tr>
+				
+				
+				

@@ -1,0 +1,10 @@
+				<tr>
+					<td class="pave_cellule_gauche"><%= sPaveAdresseTitre %> :</td>
+					<td class="pave_cellule_droite">
+					<span id="<%= sFormPrefix %>sAllAdresseString" >
+					<%try{%>
+					<%= ((adresse != null)?adresse.getAllAdresseString("<br />"):"")%>
+					<%}catch(Exception e){out.print("Adresse indéfinie");} %>
+					</span>
+					</td>
+				</tr>

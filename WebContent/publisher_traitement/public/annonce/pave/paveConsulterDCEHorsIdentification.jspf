@@ -1,0 +1,236 @@
+<%@ include file="/include/new_style/headerPublisher.jspf" %>
+
+<%@ page import="modula.graphic.*,modula.commission.*,java.sql.*,modula.algorithme.*,org.coin.fr.bean.*,modula.*,modula.marche.*, modula.candidature.*, java.util.*" %>
+<%@ include file="/publisher_traitement/public/include/beanCandidat.jspf" %> 
+<%@ page import="org.coin.db.*"%>
+<%@ page import="mt.modula.html.HtmlAnnonce"%>
+<%@ page import="mt.modula.affaire.candidature.CandidatureEnveloppe"%>
+<%@ page import="modula.fqr.*"%>
+<%
+	Marche marche = Marche.getMarche(Integer.parseInt(request.getParameter("iIdAffaire")));
+	Vector<MarcheLot> vLotsTotal = MarcheLot.getAllLotsFromMarche(marche.getIdMarche());
+	MarchePieceJointe[] listePJTotal = MarchePieceJointe.getAllMarchePieceJointeFromMarche(marche.getIdMarche(), false);
+	
+	String sAvertissement = "Conformément à l'arrêté du 14 Décembre 2009 relatif à la dématérialisation des"
+							+" procédures de passation des marchés publics, l'inscription des entreprises pour"
+							+" l'accès au Dossier de Consultation des Entreprises (DCE) d'un marché n'est plus"
+							+" obligatoire. Vous êtes donc en mesure de télécharger le dossier de façon"
+							+" anonyme."
+							+"<br/><br/>"
+							+"Toutefois, nous vous informons qu'aucune des informations suivantes liées au"
+							+" marché ne vous pourra vous être communiqué si vous ne vous êtes pas identifié :"
+							+"<br/>"
+							+"- Modification du DCE en cours de marché"
+							+"<br/>"
+							+"- Publication d'un Avis Rectificatif"
+							+"<br/>"
+							+"- Publication des questions / réponses destinées aux candidats<br/><br/>"
+							+"L'équipe MODULA DEMATERIALISATION"
+							+"<br/>";
+
+	int iTypeProcedure = AffaireProcedure.getTypeProcedure(marche.getIdAlgoAffaireProcedure());
+	
+	session.setAttribute("bIsDCEDownload", "false");	
+%>
+
+</head>
+<body>
+<%@ include file="/publisher_traitement/public/include/header.jspf" %>
+
+<div class="titre_page">Affaire Référence : <%= marche.getReference() %></div>
+<div class="tabFrame">
+	<div class="tabContentWithAllBorder">
+	    <%= sAvertissement %>
+	</div>
+</div>
+<div class="tabFrame">
+    <div class="tabContentWithAllBorder">
+		<div class="titre_page">Liste des pièces du DCE</div>
+		<div style="text-align:center">
+			<span style="text-align:center;vertical-align:middle;">
+			    TELECHARGER TOUTES LES PIECES DU DCE :
+			</span>
+			<%
+			    if(listePJTotal == null || listePJTotal.length==0)
+			    {
+			    	if(iTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE) {
+    		%><a href='javascript:OuvrirPopup("<%= response.encodeURL(
+    		     rootPath+ "publisher_portail/DownloadFilePublisher?" 
+                 + DownloadFile.getSecureTransactionStringFullJspPage(
+                                request, 
+                                marche.getIdMarche(), 
+                                TypeObjetModula.AAPC )
+                 +"&amp;bHorsIdentification=true") %>",800,650,"menubar=no,scrollbars=yes,statusbar=no")'
+        style="color:#ff8c00;"><img src="<%=rootPath+ Icone.getIconeFromFileName(marche.getNomAAPC())
+        %>" style="vertical-align:middle;"  />&nbsp;Télécharger le DCE &nbsp;</a>
+			    	<%
+			    	} else {
+			%>aucune pièce disponible<%  
+			    	}
+			    } else {
+			%>
+			    <img alt="TELECHARGER TOUTES LES PIECES DU DCE"
+			        style="cursor: pointer; vertical-align:middle"
+			        src="<%= rootPath %>images/icons/32x32/zip.png"
+			        onclick="javascript:OuvrirPopup('<%= 
+			        response.encodeURL(rootPath + "publisher_portail/DownloadZipAffaireDceServlet?"
+			        + DownloadZipAffaireDceServlet
+			            .getSecureTransactionString(marche.getIdMarche(), request)
+			        + "&amp;bHorsIdentification=true") 
+			            %>',400,200,'menubar=no,scrollbars=yes,statusbar=no');" />
+			<%
+			    }
+			%>
+        </div>
+<%
+	for(int j=-1;j<vLotsTotal.size();j++)
+	{
+	    int nbPieces = 0;
+	    MarchePieceJointe[] listePJ = null;
+	    String sTitrePaveDCE = "Liste des pièces du DCE ";
+	    
+	    if(j < 0)
+	    {
+	        listePJ = MarchePieceJointe.getAllMarchePieceJointeFromMarcheAndLot(marche.getIdMarche(),0, listePJTotal);
+	        sTitrePaveDCE += "communes à plusieurs lots";
+	    }
+	    else
+	    {
+	        MarcheLot lot = vLotsTotal.get(j);
+	        listePJ = MarchePieceJointe.getAllMarchePieceJointeFromMarcheAndLot(marche.getIdMarche(),lot.getIdMarcheLot(), listePJTotal);
+	        sTitrePaveDCE += "pour le lot n°"+lot.getNumero();
+	    }
+	
+	    if(listePJ != null && listePJ.length > 0)
+	    {
+	        nbPieces = listePJ.length;
+%>
+        <br/>
+
+	<div class="post">
+	    <div class="post-title">
+	        <table class="fullWidth" cellpadding="0" cellspacing="0">
+		        <tr>
+		            <td>
+		                <strong class="post-title-alt"><%= sTitrePaveDCE %></strong>
+		            </td>
+		            <td class="right">
+		                <strong style="color:#B00"><%= nbPieces %> <%= (nbPieces > 1 ? "pièces" : "pièce")%></strong>
+		            </td>
+		        </tr>
+	        </table>
+	    </div>
+	    
+        <div class="post-footer post-block" style="margin-top:0">
+            <table class="fullWidth">
+				<tr>
+				    <th style="width:35%">Nom du document</th>
+				    <th style="width:30%">Type</th>
+				    <th style="width:25%">Commentaire</th> 
+				</tr>
+	
+<%
+	String url =  request.getContextPath();
+	
+	for (int i = 0; i < listePJ.length; i++)
+	{
+	    int iIdPieceJointeType = listePJ[i].getIdMarchePieceJointeType();
+	    MarchePieceJointe mpj = listePJ[i];
+	    
+	    String urlFile = url + "/publisher_portail/DownloadPieceMarchePublisher?"
+			            + DownloadPieceMarche.getSecureTransactionString(
+			              marche.getIdMarche(), 
+			              mpj.getIdMarchePieceJointe(),
+			              request)
+			              + "&amp;bHorsIdentification=true";
+	            
+	            
+	    /* Test sur date de création de la pièce jointe (après la mise en ligne du DCE) */
+	    Vector<Validite> vValiditeOffres = Validite.getAllValiditeEnveloppeBFromAffaire(marche.getIdMarche());
+	    Validite oFirstValiditeOffre = null;
+	    Timestamp tsDateDebutOffre = null;
+	    if(vValiditeOffres != null)
+	    {
+	        if(vValiditeOffres.size() >= 1)
+	        {
+	            oFirstValiditeOffre = vValiditeOffres.firstElement();
+	            tsDateDebutOffre = oFirstValiditeOffre.getDateDebut();
+	        }
+	    }
+	    String sPhrase = "";
+	
+	    if(mpj.getDateModif() != null 
+	    && mpj.getDateCreation() != null 
+	    && tsDateDebutOffre != null){
+	        if(mpj.getDateModif().after(tsDateDebutOffre) 
+	        || mpj.getDateCreation().after(tsDateDebutOffre))
+	        {
+	            if (listePJ[i].isLienActif()) sPhrase = "Pièce ajoutée le " 
+	                + CalendarUtil.getDateFormattee(mpj.getDateCreation());
+	            else sPhrase = "Pièce supprimée le " + CalendarUtil.getDateFormattee(mpj.getDateModif());
+	        }
+	    } else {
+	        if(tsDateDebutOffre == null)
+	        {
+	            /**
+	             * si la date de debut offre n'est pas renseignée
+	             * on est sans doute dans un dialogue compétitif 
+	             * et on doit voir les pieces du DCE
+	             */
+	            if (listePJ[i].isLienActif()) sPhrase = "Pièce ajoutée le " 
+	                + CalendarUtil.getDateFormattee(mpj.getDateCreation());
+	            else sPhrase = "Pièce supprimée le " + CalendarUtil.getDateFormattee(mpj.getDateModif());
+	
+	            
+	        } else {
+	            sPhrase = "id=" + mpj.getId() 
+	                + " getDateCreation " +  mpj.getDateCreation()
+	                + " getDateCreation " + mpj.getDateModif();
+	        }
+	    }	    
+	    
+	    String sUrlDocument = "<img src=\"" + rootPath + Icone.getIconeFromFileName(mpj.getNomPieceJointe()) + "\"" 
+					        + " style=\"vertical-align:middle\" />" 
+					        + "&nbsp;&nbsp;"
+					        + mpj.getNomPieceJointe() ;
+	        
+	    if(listePJ[i].isLienActif()){
+	        sUrlDocument 
+	           = "<a href=\"" +  response.encodeURL(urlFile ) + "\">"
+	           + sUrlDocument
+	           + "</a>";
+	    }
+%>
+				<tr>
+				    <td>
+				        <%= sUrlDocument %>
+				    </td>
+				    <td>
+				        <%= MarchePieceJointeType.getMarchePieceJointeTypeNameMemory(iIdPieceJointeType) %>
+				    </td>
+				    <td>
+				        <p style="color:red"><%=sPhrase%></p>
+				    </td>
+				</tr>
+<%
+    }
+%>
+            </table>
+        </div>
+<%
+		}
+%>
+	</div>
+<%
+	}
+%>
+    </div>
+</div>
+
+<%@ include file="/publisher_traitement/public/include/footer.jspf"%>
+</body>
+
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="mt.modula.servlet.DownloadZipAffaireDceServlet"%>
+<%@page import="modula.servlet.DownloadPieceMarche"%>
+<%@page import="org.coin.servlet.DownloadFile"%></html>

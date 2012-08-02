@@ -1,0 +1,219 @@
+<%@page import="modula.candidature.EnveloppeB"%>
+<script type="text/javascript">
+var listeAttribuees,listeNonAttribuees,listeNonRetenues,listeNonConformes ;
+var allList = new Array();
+
+Event.observe(window, 'load', function(){
+	//offres retenues (sous reserve)
+	if(<%= bAfficheListeAttribues %>){
+		listeAttribuees = new mt.component.Envelope("listeAttribuees", 
+							$("listeAttribueesDiv"), 
+							false, 
+							<%= EnveloppeB.toJSONArrayList(vAttribuees,response,request,bIsAnonyme,bAfficherBoutonContenu,bAfficherBoutonCommentaire)%>, 
+							"<%= rootPath %>");
+		listeAttribuees.setStyle("<%= rootPath %>images/icons/candidat_first.png",
+						"<%= sTitreListeAttribues %>",
+						"list_first",
+						"candidat_");
+						
+		listeAttribuees.onUpdateList = function(){
+			try{Element.remove("listeAttribuees_titulaire");}
+			catch(e){}
+	
+			var spanButton = document.createElement("span");
+			spanButton.id="listeAttribuees_titulaire";
+			
+			var imgButton = document.createElement("img");
+			imgButton.src = "<%= rootPath %>images/icones/supprimer.gif";
+			imgButton.style.verticalAlign = "middle";
+			imgButton.style.cursor = "pointer";
+			spanButton.appendChild(imgButton);
+			
+			var lis = this.container.getElementsByTagName("li");
+			if(lis.length>0){
+				var li = lis[0];
+				li.className = "list_item_first";
+				var id = li.id.substr(this.prefix.length,li.id.length );
+				
+				spanButton.onclick = function(){
+					if(checkNonRetenu()){
+						self.sortableEventActive = false;
+						var newli = li.cloneNode(true);
+						newli.className = "list_item";
+						$("listeNonAttribuees").appendChild(newli);
+						Element.remove(li);
+						
+						try{
+							allList.each(function(list){
+								Sortable.destroy(list.name);
+								list.createSortable();
+							});
+						}catch(e){}
+						
+						listeAttribuees.updateList();
+						listeNonAttribuees.updateList();
+						
+						if(<%= bIsClassementEnveloppesBFige %>){
+							document.formulaire.submit();
+						}
+					}
+				}
+				
+				$(this.prefixAction+id).appendChild(spanButton);
+				new Control.ToolTip($(spanButton.id),"Attribuer à l'offre le statut non retenu",{
+					className:'infobulle_tooltip',
+					position: 'mouse',
+					offsetTop: 30,
+					offsetLeft: -15
+				});
+			}
+		}
+		listeAttribuees.render();
+	}
+	///offres retenues (sous reserve)
+	
+	//offres non retenues (avec rang de classement)
+	if(<%= bAfficheListeRetenues %>){
+		listeNonAttribuees = new mt.component.Envelope("listeNonAttribuees", 
+							$("listeNonAttribueesDiv"), 
+							true, 
+							<%= EnveloppeB.toJSONArrayList(
+									vRetenues,
+									response,
+									request,
+									bIsAnonyme,
+									bAfficherBoutonContenu,
+									bAfficherBoutonCommentaire)%>, 
+							"<%= rootPath %>");
+		listeNonAttribuees.setStyle("<%= rootPath %>images/icons/candidat_ok.png",
+						"<%= sTitreListeRetenues %>",
+						"list_ok",
+						"candidat_");
+		
+		if(<%= bAfficheListeAttribues %>){
+			//on ne peut deplacer que le 1er element de listeNonAttribuees vers listeAttribuees
+			listeNonAttribuees.onUpdateList = function(){
+				try{Element.remove("listeNonAttribuees_titulaire");}
+				catch(e){}
+	
+				var spanButton = document.createElement("span");
+				spanButton.id="listeNonAttribuees_titulaire";
+				
+				var imgButton = document.createElement("img");
+				imgButton.src = "<%= rootPath %>images/icons/star.png";
+				imgButton.style.verticalAlign = "middle";
+				imgButton.style.cursor = "pointer";
+				spanButton.appendChild(imgButton);
+				
+				var lisAttribuees = listeAttribuees.container.getElementsByTagName("li");
+				var lis = this.container.getElementsByTagName("li");
+	
+				if(lis.length>0 && lisAttribuees.length==0){
+					var li = lis[0];
+					var id = li.id.substr(this.prefix.length,li.id.length );
+					
+					spanButton.onclick = function(){
+						self.sortableEventActive = false;
+						var newli = li.cloneNode(true);
+						$("listeAttribuees").appendChild(newli);
+						Element.remove(li);
+						listeAttribuees.updateList();
+						listeNonAttribuees.updateList();
+						
+						if(<%= bIsClassementEnveloppesBFige %>){
+							document.formulaire.submit();
+						}
+					}
+					
+					$(this.prefixAction+id).appendChild(spanButton);
+					new Control.ToolTip($(spanButton.id),"Définir le candidat comme titulaire sous réserve",{
+						className:'infobulle_tooltip',
+						position: 'mouse',
+						offsetTop: 30,
+						offsetLeft: -15
+					});
+				}
+			}
+		}
+		listeNonAttribuees.render();
+	}
+	///offres non retenues (avec rang de classement)
+	
+	//offres non retenues
+	if(<%= bAfficheListeNonRetenues %>){
+		listeNonRetenues = new mt.component.Envelope("listeNonRetenues", 
+							$("listeNonRetenuesDiv"), 
+							false, 
+							<%= EnveloppeB.toJSONArrayList(vNonRetenues,response,request,bIsAnonyme,bAfficherBoutonContenu,bAfficherBoutonCommentaire)%>, 
+							"<%= rootPath %>");
+		listeNonRetenues.setStyle("<%= rootPath %>images/icons/candidat.png",
+						"<%= sTitreListeNonRetenues %>",
+						"list_ok",
+						"candidat_");
+		
+		listeNonAttribuees.addContainment("listeNonRetenues");
+		listeNonAttribuees.addContainment("listeNonAttribuees");
+		listeNonRetenues.addContainment("listeNonRetenues");
+		listeNonRetenues.addContainment("listeNonAttribuees");
+		
+		listeNonRetenues.render();
+	}
+	///offres non retenues
+	
+	//offres non conformes
+	if(<%=bAfficheListeNonConformes%>){
+		listeNonConformes = new mt.component.Envelope("listeNonConformes", 
+							$("listeNonConformesDiv"), 
+							false, 
+							<%= EnveloppeB.toJSONArrayList(vNonConformes,response,request,bIsAnonyme,bAfficherBoutonContenu,bAfficherBoutonCommentaire)%>, 
+							"<%= rootPath %>");
+		listeNonConformes.setStyle("<%= rootPath %>images/icons/candidat_nok.png",
+						"<%= sTitreListeNonConformes %>",
+						"list_nok",
+						"candidat_");
+		
+		listeNonConformes.addContainment("listeNonConformes");
+		if(<%= bAfficheListeNonRetenues %>){
+			listeNonConformes.addContainment("listeNonRetenues");
+			listeNonRetenues.addContainment("listeNonRetenues");
+			listeNonRetenues.addContainment("listeNonConformes");
+		}
+		else{
+			listeNonConformes.addContainment("listeNonAttribuees");
+			listeNonAttribuees.addContainment("listeNonAttribuees");
+			listeNonAttribuees.addContainment("listeNonConformes");
+		}
+		listeNonConformes.render();
+	}
+	///offres non conformes
+	
+	if(<%= bAfficheListeAttribues %>)
+		allList.push(listeAttribuees);
+	if(<%= bAfficheListeRetenues %>)
+		allList.push(listeNonAttribuees);
+	if(<%= bAfficheListeNonRetenues %>)
+		allList.push(listeNonRetenues);
+	if(<%= bAfficheListeNonConformes %>)
+		allList.push(listeNonConformes);
+	
+	allList.each(function(list){
+		list.createSortable();
+	});
+});
+
+function checkNonConformes()
+{
+	var ret = false;
+	if(!checkMailOffres(<%= ((vLots.size() > 1)?MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_SEPARE:MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_UNIQUE) %>,false))
+		ret = confirm("Etes vous sûr de vouloir figer les statuts du <%= sLibelleOnglet %> définitivement ?");
+	else
+	{
+		alert("Avant de figer les statuts, vous devez notifier les candidats \"non conformes\" ")
+		ret = false;
+	}
+	if(ret){
+		$('sAction').value='figer';
+		document.formulaire.submit();
+	}
+}
+</script>

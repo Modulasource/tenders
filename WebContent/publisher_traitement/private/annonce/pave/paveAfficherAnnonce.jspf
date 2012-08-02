@@ -1,0 +1,61 @@
+<%@page import="modula.marche.Marche"%>
+<%@page import="mt.modula.html.HtmlAnnonce"%>
+<%@page import="modula.algorithme.PhaseEtapes"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%@page import="org.coin.security.SecureString"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%
+	int iRecherche = vRecherche.size();
+	for (int i = 0; i < iRecherche; i++)  
+	{
+		//int iIdMarche = Integer.parseInt((String)vRecherche.get(i));
+		//Marche marche = Marche.getMarche(iIdMarche);
+		Marche marche = (Marche)vRecherche.get(i);
+		
+		
+		int iIdTypeAvisRect = AvisRectificatifType.TYPE_AAPC;
+		if(marche.isAffaireAATR(false))
+			iIdTypeAvisRect = AvisRectificatifType.TYPE_AATR;
+		
+		Vector<AvisRectificatif> vAvisRectificatif 
+			= AvisRectificatif.getAllAvisRectificatifEnLigneWithType(
+					marche.getIdMarche(),
+					iIdTypeAvisRect,
+					vAvisRectificatifTotal);
+		
+	    CodeCpfSwitcher cpf = new CodeCpfSwitcher(ObjectType.AFFAIRE,marche.getId());
+	    
+		
+		HtmlAnnonce htmlAnnonce = new HtmlAnnonce();
+        htmlAnnonce.updateStatut(marche, candidat, session, request, response);
+		
+		
+		String sStatut = htmlAnnonce.sHtmlStatutCandidature;
+		String sStatutDCE = htmlAnnonce.sHtmlStatutDCE;
+		String sEtape = htmlAnnonce.sEtape ;
+		
+		int numAnnonce = i;
+				
+		int iPetiteAnnonceType = HtmlAnnonce.getAnnonceType(marche, sType_annonce, sType_avis);
+		
+		switch (iPetiteAnnonceType)
+		{
+		case HtmlAnnonce.ANNONCE_TYPE_AAPC:
+			%><%@ include file="/publisher_traitement/public/annonce/pave/petiteAnnonceAAPC.jspf" %><%
+			break;
+
+		case HtmlAnnonce.ANNONCE_TYPE_AATR:
+			%><%@ include file="/publisher_traitement/public/annonce/pave/petiteAnnonceAATR.jspf" %><%
+            break;
+			
+        case HtmlAnnonce.ANNONCE_TYPE_GROUPED:
+            %><%@ include file="/publisher_traitement/public/annonce/pave/petiteAnnonceGrouped.jspf" %><%     
+
+            break;
+		}
+	}
+
+		
+%>
+<%@ include file="/publisher_traitement/public/annonce/pave/paveSearchEnginePagination.jspf"%>

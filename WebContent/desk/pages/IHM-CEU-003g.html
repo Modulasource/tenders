@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<head>
+<META HTTP-EQUIV="Expires" CONTENT="-1"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<TITLE>IHM-CEU-002a</TITLE>
+<script src="/modula/desk/include/verification.js" type="text/javascript"></script>
+<script type="text/javascript">
+function ChangeUrl(formulaire, champFormulaire, message, redirection)
+{
+	var champ = formulaire.elements[champFormulaire];
+		
+	if (champ.selectedIndex != 0)
+	{
+	
+		var url =  redirection + champ.options[champ.selectedIndex].value;
+		
+		window.top.main.location.href = url ;
+ 	}
+	else 
+	{
+		if (message != null)
+			alert(message);
+	}
+}
+</SCRIPT>
+<style type="text/css">
+<!--
+@import url("../include/css/desk.css");
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="20" topmargin="20" marginwidth="20" marginheight="20">
+<form name="validerPDT" method="post" action="validerMarche.jsp" enctype="multipart/form-data" >
+<div id="entete">CUE-003g : Le marché a été modifié.</div>
+<div style="text-align:center; width : 99%;">
+	<div class="titre">MODIFIER LE MARCHE : CONFIRMATION DE PROCEDURE</div>
+	<br />
+	<!-- Mailer publication -->
+<div class="moteur">
+		<div class="contenu">
+			Message contextuel symbolisé par l'icône "Post-it" : <br />
+			Le marché a été modifié par le secrétaire, le président l'a validé et les supports de publication et les candidats concernés par le marché ont été prévenus. Le Cas Exceptionnel d'Utilisation (CEU) : Modifier un marché en cours a été traité avec succès.
+		</div>
+	</div>
+	<br />
+	<div>
+	<table summary="none">
+		<tr>
+			<!--<td width="50" align="left">&lt;&lt;</td>-->
+			<td style="width:50" align="left"></td>
+			<td style="text-align : center">
+			<input type="submit" name="valider" value="Valider cette étape" />
+			</td>
+			<td width="50" align="right"><a href="IHM-CEU-002b.html">&gt;&gt;</a></td>
+		<tr>
+	<table summary="none">
+	</div>
+	<br />
+</div>
+</form>
+</body>
+
+</html>

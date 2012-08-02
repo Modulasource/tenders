@@ -1,0 +1,119 @@
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.marche.AvisRectificatifRubriqueSousType"%>
+<%@page import="modula.marche.AvisRectificatifRubrique"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.util.Vector"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche">Rubriques modifiées</td>
+		<td class="pave_titre_droite">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+<%
+	Vector<AvisRectificatifRubrique> vRubriques = AvisRectificatifRubrique.getAllAvisRectificatifRubriqueForIdAvisRectificatif(avis.getIdAvisRectificatif());
+	String sRubriqueName = "";
+	String sRubriqueAncienneValeur = "";
+	String sRubriqueNouvelleValeur = "";
+	String sAvisRectificatifRubriqueSousType = "";
+	String sAvisRectificatifRubriqueSousTypeAction = "";
+	
+	for(int i=0; i < vRubriques.size(); i++)
+	{
+		sRubriqueName = "";
+		sRubriqueAncienneValeur = "";
+		sRubriqueNouvelleValeur = "";
+		sAvisRectificatifRubriqueSousType = " au lieu de ";
+		sAvisRectificatifRubriqueSousTypeAction = " lire ";
+
+		AvisRectificatifRubrique rubrique = vRubriques.get(i);
+			
+		switch(rubrique.getIdAvisRectificatifRubriqueType() )
+		{
+		case AvisRectificatifRubrique.RUBRIQUE_TYPE_DATE: 
+			sRubriqueName = rubrique.getRubrique();
+		
+		 	if( rubrique.getRubrique().equals("ReceptCandidatures"))
+		 		sRubriqueName = "Réception des candidatures";
+	
+		 	if( rubrique.getRubrique().equals("ReceptionOffres"))
+		 		sRubriqueName = "Réception des offres";
+	
+		 	if( rubrique.getRubrique().equals("EnvoiInvitation"))
+		 		sRubriqueName = "Envoi de l'invitation à présenter une offre";
+	
+		 	if( rubrique.getRubrique().equals("RemiseCandidatures"))
+		 		sRubriqueName = "Remise des candidatures";
+		 		
+		 	sRubriqueAncienneValeur = CalendarUtil.getDateFormattee( rubrique.getDateAncienneValeur());
+		 	sRubriqueNouvelleValeur = CalendarUtil.getDateFormattee( rubrique.getDateNouvelleValeur());
+		 	break;
+		 	
+		case AvisRectificatifRubrique.RUBRIQUE_TYPE_TEXTE: 
+			sRubriqueName = rubrique.getRubrique();
+		 	sRubriqueAncienneValeur = rubrique.getTexteAncienneValeur();
+		 	sRubriqueNouvelleValeur = rubrique.getTexteNouvelleValeur();
+		 	
+		 	/**
+		 	 * ce qui est définit comme couple de valeurs
+		 	 * (auLieuDe, lire)
+		 	 * (apresLaMention, supprimer)
+		 	 * (apresLaMention, ajouter)
+		 	 * 
+		 	 */
+		 	 
+		 	
+			if(rubrique.getIdAvisRectificatifRubriqueSousType() == AvisRectificatifRubriqueSousType.SOUS_TYPE_AJOUTER)
+			{
+				sAvisRectificatifRubriqueSousType = "après la mention ";
+				sAvisRectificatifRubriqueSousTypeAction = " ajouter ";
+				
+			}
+			
+			
+			
+			if(rubrique.getIdAvisRectificatifRubriqueSousType() == AvisRectificatifRubriqueSousType.SOUS_TYPE_SUPPRIMER)
+			{
+				sAvisRectificatifRubriqueSousType = "après la mention ";
+				sAvisRectificatifRubriqueSousTypeAction = " supprimer ";
+			}
+					
+		} 
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= sRubriqueName %>			
+		</td>
+		<td class="pave_cellule_droite">
+			<table >
+				<tr>
+					<td><%= sAvisRectificatifRubriqueSousType %><br/>
+						<u><%= Outils.getTextToHtml( sRubriqueAncienneValeur ) %></u>,<br/><br/>
+						<b><%= sAvisRectificatifRubriqueSousTypeAction %></b><br/><br/>
+						<u><%= Outils.getTextToHtml( sRubriqueNouvelleValeur ) %></u>
+					</td>
+					<td style="text-align : right">
+						<button 
+							type="button" 
+							onclick="Redirect('<%= 
+								response.encodeURL(
+									rootPath+"desk/marche/algorithme/avis_rectificatif/modifierAvisRectificatifRubrique.jsp?"
+									+ "sAction=remove"
+									+ "&iIdAffaire=" + iIdAffaire
+									+ "&iIdOnglet=" + iIdOnglet 
+									+ "&iIdAvisRectificatifType=" + avis.getIdAvisRectificatifType() 
+									+ "&iIdAvisRectificatifRubrique=" + rubrique.getIdAvisRectificatifRubrique() ) 
+									%>')">Supprimer</button>
+					 </td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+<%
+	}
+%>
+	<tr>
+		<td class="pave_cellule_droite" colspan="2">&nbsp;</td>
+	</tr>
+</table>

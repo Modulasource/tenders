@@ -1,0 +1,77 @@
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc5')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc 5 Renseignements relatifs aux lots</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc5" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+<%
+	
+	boolean bPresentationOffreUnLot = false;
+	boolean bPresentationOffrePlusieursLots = false;
+	boolean bPresentationOffreEnsemblesDesLots = false;
+	boolean bMarcheUnique = true;
+	Node nodeLots = null;
+	try {
+		nodeLots = BasicDom.getChildNodeByNodeName(nodeAnn, "lots");
+		bMarcheUnique = false;
+	} catch (Exception e) {}
+	
+	
+if (!bMarcheUnique)
+{
+	try {
+		BasicDom.getChildNodeByNodeName(nodeLots, "unLot");
+		bPresentationOffreUnLot = true;
+	} catch (Exception e) {}
+	
+	try {
+		BasicDom.getChildNodeByNodeName(nodeLots, "plusieursLot");
+		bPresentationOffrePlusieursLots = true;
+	} catch (Exception e) {}
+	
+	try {
+		BasicDom.getChildNodeByNodeName(nodeLots, "tousLots");
+		bPresentationOffreEnsemblesDesLots = true;
+	} catch (Exception e) {}
+	
+ %>
+			<tr>
+				<td class="pave_cellule_gauche">Possibilité de présenter une offre pour : </td>
+				<td class="pave_cellule_droite">
+					<img src="<%= bPresentationOffreUnLot?sSrcImageChecked:sSrcImageNotChecked %>" /> un lot<br/>
+					<img src="<%= bPresentationOffrePlusieursLots?sSrcImageChecked:sSrcImageNotChecked  %>" /> Un ou plusieurs lots<br/>
+					<img src="<%= bPresentationOffreEnsemblesDesLots?sSrcImageChecked:sSrcImageNotChecked  %>" /> l'ensemble des lots<br/>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+<%
+	Node nodeLot = BasicDom.getChildNodeByNodeName(nodeLots, "lot");
+	
+	while(nodeLot != null)
+	{
+		if(!nodeLot.getNodeName().equals("lot"))
+			break;
+			
+%>
+			<tr>
+				<td class="pave_cellule_gauche">Lot <%= BasicDom.getChildNodeValueByNodeName(nodeLot, "numLot") %>:</td>
+				<td class="pave_cellule_droite">
+					<%= BasicDom.getChildNodeValueByNodeName(nodeLot, "description") %> : 
+					<%= BasicDom.getChildNodeValueByNodeName(nodeLot, "quantite") %> <br/>
+					<b>Exécution :</b> <%= BasicDom.getChildNodeValueByNodeName(nodeLot, "dateExecution") %> 
+					<b>Livraison :</b> <%= BasicDom.getChildNodeValueByNodeName(nodeLot, "dateLivraison") %> <br/>
+					CODIFICATION CPV à revoir !!
+				</td>
+			</tr>
+<%	
+		nodeLot = BasicDom.getNextSiblingElementNode(nodeLot);
+	} 
+}
+%>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

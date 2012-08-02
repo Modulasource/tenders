@@ -1,0 +1,92 @@
+<table class="menu" cellspacing="2" summary="Menu">
+	<tr>
+	<%
+		Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+		
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-PA-4") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(0 , 
+					"Supprimer les petites annonces sélectionnées",
+					"javascript:removePA()" , 
+					rootPath+Icone.ICONE_SUPPRIMER , 
+					"this.src='"+ rootPath+Icone.ICONE_SUPPRIMER+"'" , 
+					"this.src='"+rootPath+Icone.ICONE_SUPPRIMER+"'" , 
+					"" ,
+					true) );
+		}
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-PA-17") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(0 , 
+					"Purger les annonces archivées",
+					response.encodeURL("supprimerPAArchives.jsp") , 
+					rootPath+Icone.ICONE_PURGE , 
+					"this.src='"+ rootPath+Icone.ICONE_PURGE+"'" , 
+					"this.src='"+rootPath+Icone.ICONE_PURGE+"'" , 
+					"javascript:return removePAArchivees()" ,
+					true) );
+		}
+		if( sessionUserHabilitation.isSuperUser() )
+        {
+			String sURLRedirect = response.encodeURL(rootPath+"desk/marche/petitesAnnonces/pave/paveSupprimerPAAnneeN.jsp");
+            vBarBoutons.add( 
+                new BarBouton(0 , 
+                    "Purger les annonces archivées pour l'année N",
+                    "javascript:openModal('"+sURLRedirect+"','Purge des petites annonces archivées','700px','550px')", 
+                    rootPath+Icone.ICONE_PURGE_ANNEE , 
+                    "this.src='"+ rootPath+Icone.ICONE_PURGE_ANNEE+"'" , 
+                    "this.src='"+rootPath+Icone.ICONE_PURGE_ANNEE+"'" , 
+                    "" ,
+                    true) );
+        }
+		
+		
+/*		if( sessionUserHabilitation.isHabilitate("IHM-DESK-PA-16") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(0 , 
+					"Envoyer les PA validées au SPQR",
+					"javascript:Redirect('" + response.encodeURL("envoyerXMLParFTP.jsp") + "')" , 
+					rootPath+Icone.ICONE_UPLOAD_PA_SPQR, 
+					"this.src='"+ rootPath+Icone.ICONE_UPLOAD_PA_SPQR+"'" , 
+					"this.src='"+rootPath+Icone.ICONE_UPLOAD_PA_SPQR+"'" , 
+					"" ,
+					true) );
+		}
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-PA-XXX") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(0 , 
+					"Envoyer les Affaires validées au SPQR",
+					"javascript:Redirect('" + response.encodeURL(rootPath + "desk/export/publication/publierAllPublicationSpqr.jsp") + "')" , 
+					rootPath+Icone.ICONE_UPLOAD_AFF_SPQR, 
+					"this.src='"+ rootPath+Icone.ICONE_UPLOAD_AFF_SPQR+"'" ,  
+					"this.src='"+rootPath+Icone.ICONE_UPLOAD_AFF_SPQR+"'" , 
+					"" ,
+					true) );
+		}*/
+		for(int i=0;i<vBarBoutons.size();i++)
+		{
+			BarBouton bouton = vBarBoutons.get(i);
+			if(bouton.bVisible)
+			{
+			%>
+			<th>
+				<a href="<%= !bouton.sTargetURL.equalsIgnoreCase("")?bouton.sTargetURL:"#"%>" 
+				onclick="<%= bouton.sOnClick %>" >
+				<img height="30" src="<%= bouton.sPathImage %>"   
+				 title="<%= bouton.sLibelle %>" alt="<%= bouton.sLibelle %>" 
+				 onmouseover="<%= bouton.sPathImageOver %>" 
+				 onmouseout="<%= bouton.sPathImageOut %>" />
+				</a>
+			</th>
+			<%
+			}
+		}
+
+		
+	%>
+	<td>&nbsp;</td>
+	</tr>
+</table>

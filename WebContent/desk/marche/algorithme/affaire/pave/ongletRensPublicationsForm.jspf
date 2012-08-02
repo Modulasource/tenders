@@ -1,0 +1,234 @@
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.fr.bean.export.*"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.Validite"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="modula.graphic.*" %>
+<script type="text/javascript">
+<!--
+
+function uploadAatrLibre()
+{
+	if(!checkForm())
+	{
+		return false;
+	}
+	var form2 = $("formulaire");
+	form2.submit();
+
+	openModal('<%=
+				response.encodeURL(rootPath +"desk/marche/algorithme/affaire/uploadAATRForm.jsp"
+						+ "?iIdAffaire=" + marche.getId() )
+				%>','Sélectionner le fichier à charger','400px','300px');
+				
+	return true;
+}
+
+//-->
+</script>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Publications</td>
+	</tr>
+	<tr><td style="width:45%">&nbsp;</td><td>&nbsp;</td></tr>
+	<%
+		sFormPrefix = "AATR_";
+		Vector<Validite> vValiditesAATR = Validite.getAllValiditeAATRFromAffaire(iIdAffaire);
+		Validite oValiditeAATR = null;
+		Timestamp tsDateAATRDebut = null;
+		Timestamp tsDateAATRFin = null;
+		if(vValiditesAATR != null)
+		{
+			if(vValiditesAATR.size() == 1) 
+			{
+				oValiditeAATR = vValiditesAATR.firstElement();
+				tsDateAATRDebut = oValiditeAATR.getDateDebut();
+				tsDateAATRFin = oValiditeAATR.getDateFin();
+			}
+		}
+		long iDureePublication = CalendarUtil.getDifferenceBetweenTimestamps(tsDateAATRDebut,tsDateAATRFin);
+		iDureePublication = iDureePublication/(60*24);
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Date d'envoi du présent avis à la publication* :
+		</td>
+		<td class="pave_cellule_droite">
+		<input type="text" name="<%=sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+			class="dataType-date <%= CSS.DESIGN_CSS_MANDATORY_CLASS %>"
+		value="<%= CalendarUtil.getDateCourte(tsDateAATRDebut) %>" />  
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" >
+		Date de mise en ligne sur le site Internet de l'AAPC relatif* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			Vector<Validite> vValiditeAAPC = Validite.getAllValiditeAAPCFromAffaire(iIdAffaire);
+			Validite oValiditePublication = null;
+			Timestamp tsDatePublicationDebut = null;
+			Timestamp tsDatePublicationFin = null;
+			sFormPrefix = "AAPC_RELATIF_";
+			if(vValiditeAAPC != null  && vValiditeAAPC.size() == 1)
+			{
+				oValiditePublication = vValiditeAAPC.firstElement();
+			}else {
+				oValiditePublication = new Validite();
+				oValiditePublication.setDateDebut(new Timestamp(System.currentTimeMillis())); 
+				oValiditePublication.setDateFin(new Timestamp(System.currentTimeMillis())) ;
+				oValiditePublication.setIdTypeObjetModula(TypeObjetModula.AAPC);
+				oValiditePublication.setIdReferenceObjet((int)marche.getId());
+			}
+			tsDatePublicationDebut = oValiditePublication.getDateDebut();
+			tsDatePublicationFin = oValiditePublication.getDateFin();
+		%>
+			<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" type="text" name="<%=sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+			class="dataType-date"
+			value="<%= CalendarUtil.getDateCourte(tsDatePublicationDebut) %>" />
+			<strong>Heure :</strong>&nbsp;
+			<input type="text" name="<%=sFormPrefix %>tsHeureValiditeDebut" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDatePublicationDebut) %>" />&nbsp; 
+			<input type="hidden" name="<%=sFormPrefix %>iIdReferenceObjet" value="<%= marche.getId() %>" />
+			<input type="hidden" name="<%=sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.AAPC %>" />
+		</td>
+	</tr>
+	<% 
+		// on remet le formPrefix
+		sFormPrefix = "AATR_";
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Durée de publication du présent avis* :
+		<a href='javascript:OuvrirPopup("<%=response.encodeURL(rootPath+"include/avertissementUtilisateur.jsp?id="+InfosBullesConstant.DUREE_PUBLICATION_AATR )%>",400,250,"menubar=no,scrollbars=yes,statusbar=no")'>
+		<img src="<%=rootPath+modula.graphic.Icone.ICONE_AU%>" alt="Avertissement utilisateur" title="Avertissement utilisateur" width="21" height="21"  style="vertical-align:middle" />
+		</a>
+		</td>
+		<td class="pave_cellule_droite">
+		<input  class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" type="text" name="<%=sFormPrefix %>sDureePublication" size="3" maxlength="3" 
+		value="<%= (iDureePublication == 0) ? 15 : iDureePublication %>" />&nbsp;jours
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Edition de l'AATR * :
+		</td>
+		<td class="pave_cellule_droite">
+			<%
+				String sCheckedAATRFormatAuto = "checked='checked'";
+				String sCheckedAATRFormatLibre = "";
+				if(!bAATRAutomatique)
+				{
+					sCheckedAATRFormatLibre = "checked='checked'";
+					sCheckedAATRFormatAuto = "";
+				}
+			%>
+			<input type="radio" name="<%=sFormPrefix %>sAATRFormat" <%= sCheckedAATRFormatAuto %>
+			  value="automatique" onclick="javascript:cacher('uploadAATRLibre')" /> Format automatique généré en PDF &nbsp;&nbsp;
+			<input type="radio" name="<%=sFormPrefix %>sAATRFormat" <%= sCheckedAATRFormatLibre %>
+			  value="libre" onclick="javascript:montrer('uploadAATRLibre')" /> Format libre
+		</td>
+	</tr>
+	<tr id="uploadAATRLibre">
+		<td class="pave_cellule_gauche">
+		AATR au format libre :
+		</td>
+		<td class="pave_cellule_droite">
+			<button type="button" onclick="uploadAatrLibre()" >Sélectionner le fichier à charger</button> &nbsp;&nbsp;
+			<% 	String sNomAATRLibre = avisAttribution.getNomAATR();
+				if (sNomAATRLibre != null && !sNomAATRLibre.equals("") )
+				{
+					String sURLAATR = "desk/DownloadFileDesk?"
+							+ DownloadFile.getSecureTransactionStringFullJspPage(
+									request, 
+									avisAttribution.getIdAvisAttribution() , 
+									TypeObjetModula.AATR );
+							
+					sURLAATR = response.encodeURL(rootPath+ sURLAATR);
+					%>
+					<a href='<%= sURLAATR %>'><%= sNomAATRLibre %></a>
+					<%		
+				}
+				else
+				{
+					%><span class="rouge">pas de document associé</span><%
+				}
+			 %>
+			 <br/>
+			 <strong>Attention : c'est ce document qui sera mis à disposition des entreprises 
+			 sur le site Internet et envoyé aux publications papiers</strong>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<div style="display:none">
+				Complément d'annonce :<br /><br />
+				<div class="mention" style="font-size:9px;text-align:right">
+					(s'affiche dans l'annonce<br/> en cliquant sur "en savoir plus")
+				</div>
+			</div>
+		</td>
+		<td class="pave_cellule_droite">
+			<div style="display:none">
+				<table style="width:100%" summary="Texte Libre">
+					<tr>
+						<td><textarea name="sPetiteAnnonceTexteLibre" id="sPetiteAnnonceTexteLibre" style="width:100%;height:400px"><%=avisAttribution.getPetiteAnnonceTexteLibre() %></textarea></td>
+						<%= modula.editorial.EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdPetiteAnnonceTexteLibre",rootPath,sessionUserHabilitation) %>
+	 				</tr>
+	 			</table>
+	 		</div>
+		</td>
+		<input type="hidden" name="<%=sFormPrefix %>iIdReferenceObjet" value="<%= iIdAffaire %>" />
+		<input type="hidden" name="<%=sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.AATR %>" />
+		<input type="hidden" name="<%=sFormPrefix %>tsDateValiditeFin" value="" />
+		<input type="hidden" name="<%=sFormPrefix %>tsHeureValiditeDebut" value="00:00" />
+		<input type="hidden" name="<%=sFormPrefix %>tsHeureValiditeFin" value="00:00" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+
+<%
+	/**
+	 * permet de savoir si l'affaire a commencé sur un AAPC ou un AATR
+	 */
+	if(bStartWithAATR)
+	{
+%>
+	<%@page import="org.coin.util.HttpUtil"%><br />
+	<jsp:include page='<%= Theme.getDeskTemplateFilePath("/desk/marche/algorithme/affaire/pave/paveChoixPublicationOfficielleForm.jsp",request)%>' flush="false">
+	<jsp:param name="lIdMarche" value="<%= marche.getId() %>" />
+	</jsp:include>
+<%
+	}
+%>
+
+
+
+<br/>
+<%@ include file="ongletRensPublicationsCommon.jspf" %>
+<% 
+if(exportBoamp != null)
+{
+    if(sessionUserHabilitation.isSuperUser()) {
+%>
+        <%@ include file="paveBoampExportPhaseAATR.jspf" %>
+<%
+    }
+} else {
+	%><input type="hidden" name="bExportBoampDefined" value="false" /><% 
+}
+%>
+

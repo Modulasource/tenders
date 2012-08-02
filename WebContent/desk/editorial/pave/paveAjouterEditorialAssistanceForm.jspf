@@ -1,0 +1,56 @@
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="org.coin.bean.editorial.EditorialAssistanceType"%>
+<%@page import="org.coin.bean.editorial.EditorialAssistanceGroup"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Contenu &eacute;ditorial</td>
+	</tr>
+	<% hbFormulaire.bIsForm = false; %>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<% hbFormulaire.bIsForm = true; %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :",sFormPrefix+"sNom",edit.getName(),"size='50'") %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Type de contenu :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= CoinDatabaseAbstractBeanHtmlUtil.getHtmlSelect(sFormPrefix+"iIdEditorialAssistanceType",1,
+					EditorialAssistanceType.getAllType(),edit.getIdEditorialAssistanceType()) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Contenu :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sContenu" id="<%=sFormPrefix %>sContenu" cols="100" rows="4"><%= 
+				edit.getContenu() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Groupe :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= CoinDatabaseAbstractBeanHtmlUtil.getHtmlSelect(sFormPrefix+"iIdEditorialAssistanceGroup",1,
+					EditorialAssistanceGroup.getAllGroupWithHabilitations(
+							sessionUser,sessionUserHabilitation),edit.getIdEditorialAssistanceGroup()) %>
+		</td>
+	</tr>
+	<% String sChecked = "checked='checked'"; %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Visibilit&eacute; :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="radio" name="<%=sFormPrefix %>sVisibilite" id="<%=sFormPrefix 
+			         %>sVisibilite" value="public" <%= 
+			        	 (sVisibilite.equalsIgnoreCase("public")?sChecked:"") + sDisabled%> />Public&nbsp;
+			        	 
+			<input type="radio" name="<%=sFormPrefix %>sVisibilite" id="<%=sFormPrefix 
+			     %>sVisibilite"  value="private" <%= 
+			    	 (sVisibilite.equalsIgnoreCase("private")?sChecked:"") + sDisabled %> />Priv&eacute;&nbsp;
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

@@ -1,0 +1,151 @@
+<%
+	/*
+	 *	Objets nécessaires :
+	 *		String sPaveCaracPrincipalesTitre;
+	 *		Marche marche;
+	 */
+	 
+
+	MarcheCaracteristique marcheCaracteristique = null;
+	try {
+		marcheCaracteristique= MarcheCaracteristique.getMarcheCaracteristiqueFromMarche (marche.getId());
+	} catch (Exception e) {
+		marcheCaracteristique = new MarcheCaracteristique();
+		marcheCaracteristique.setIdMarche(marche.getId());
+	}
+	
+	Currency currency = null;
+	try {
+		currency = Currency.getCurrency(marcheCaracteristique.getIdCurrency());
+	} catch (Exception e) {
+		currency = new Currency ("EUR");
+	}
+	
+%>
+<%@page import="org.coin.bean.accountancy.Currency"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.marche.MarcheCaracteristique"%>
+<%@page import="modula.marche.MarcheVariantes"%>
+<table class="pave" >
+	<tr onclick="montrer_cacher('paveCaracPrincipales')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveCaracPrincipalesTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveCaracPrincipales" >
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Caract&eacute;ristiques principales :
+					</td>
+					<td class="pave_cellule_droite">
+					<%=  Outils.getStringNotNullNeant(marche.getCaracPrincipales()) %>
+					</td>
+				</tr>
+
+<%
+	if(bUseFormNS || bUseFormUE)
+	{
+%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Refus des variantes :
+					</td>
+					<td class="pave_cellule_droite">
+					<%=marche.getIdMarcheVariantes()==MarcheVariantes.VARIANTES_INTERDITES?"oui":"non" %>
+					</td>
+				</tr>
+<%
+	}
+%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Quantités (fourniture &amp; services), nature et étendue (travaux) :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(marche.getQuantites()) %>
+					</td>
+				</tr>
+
+<%
+	if(bUseFormNS || bUseFormUE)
+	{
+	
+		if(bUseBoamp17)
+		{
+%>
+				<tr>
+					<td class="pave_cellule_gauche"></td>
+					<td class="pave_cellule_droite">
+		<br/>
+		Le cas échéant (en chiffre uniquement), valeur estimée (H.T.) :
+		<%if(marcheCaracteristique.getValeurEstimee() > 0){ %>
+		<%= Outils.getFormatedValueNeant( marcheCaracteristique.getValeurEstimee()) %>
+		<%}else{ %>
+		entre <%= Outils.getFormatedValueNeant(marcheCaracteristique.getValeurEstimeeBasse()) %> et 
+		<%= Outils.getFormatedValueNeant(marcheCaracteristique.getValeurEstimeeHaute()) %>
+		<%} %>
+		<%= currency.getName() %><br>
+<%
+		} 
+%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Options, description concernant les achats complémentaires :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(marche.getOptions() ) %>
+<%
+		if(bUseBoamp17)
+		{
+%>
+		<br/>
+		S'il est connu, calendrier prévisionnel de l'exercice de ces options : 
+		<%= marcheCaracteristique.getDureeOption() %>
+		<%
+			String sDureeTypeSelected = "";
+			if(!Outils.isNullOrBlank(marcheCaracteristique.getDureeOptionType()) 
+			&& marcheCaracteristique.getDureeOptionType().equals("mois"))
+			{
+				sDureeTypeSelected = " mois ";
+			} else{
+				sDureeTypeSelected = " année(s) ";
+			}
+			
+		%>
+		<%= sDureeTypeSelected %> à compter de la notification du marché.
+		<br/>
+		Nombre de reconductions éventuelles : 
+		<%if(marcheCaracteristique.getNbReconductionEstimee() > 0){ %>
+		<%= marcheCaracteristique.getNbReconductionEstimee() %>
+		<%}else{ %>
+		entre <%= marcheCaracteristique.getNbReconductionEstimeeBas() %>
+		et <%= marcheCaracteristique.getNbReconductionEstimeeHaut() %>
+		<%} %>
+<%
+		}
+%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Calendrier des marchés ultérieurs en cas de marchés reconductibles  :<br/>
+                    <i>Ne doit pas être rempli pour les formulaires JOUE 2 et 5 </i>
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(marche.getCalendrierUlterieur()) %>
+					</td>
+				</tr>
+<%	
+	}
+%>				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

@@ -1,0 +1,44 @@
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%
+	/*String sRootUrl = null;
+	
+	try {
+	    sRootUrl = Configuration.getConfigurationValueMemory("welcome.page.url");
+	} catch (CoinDatabaseLoadException e){
+	}
+
+    String sParam = "";
+    try {
+    	if(request.getParameter("filtreType") != null) {
+    		sParam = "&filtreType="+request.getParameter("filtreType");
+    	}
+        if(request.getParameter("filtre") != null) {
+            sParam += "&filtre="+request.getParameter("filtre");
+        }
+    } catch(Exception e) {}*/
+    
+    // Dans le js :: response.encodeURL(rootPath + sRootUrl + "?pre="+request.getRequestURI() +sParam)
+%>
+
+
+<script type="text/javascript">
+
+Event.observe(window,"load",function(){
+
+    if(<%= Configuration.isEnabled("publisher.main.parent.frame.missing.auto-reload", false) %>)
+    {
+	    if(window.parent == window )
+	    {
+	        /**
+	         * there is no IFRAME parent, so redirect to parent
+	         */
+            doUrl("<%= response.encodeURL(
+                    rootPath + "designMainPublisher.jsp"
+                    + "?pre=" + request.getRequestURI()
+                    + "&" + ((request.getQueryString()==null)?"":request.getQueryString()) ) %>");
+            
+	    }
+    }
+});
+</script>

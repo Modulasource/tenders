@@ -1,0 +1,97 @@
+<%
+        String sUserStatus = "";
+        try {
+            sUserStatus = UserStatus.getUserStatusName(user.getIdUserStatus());
+        }catch (Exception e)
+        {
+            sUserStatus = "code indéfini - " + user.getIdUserStatus();
+        }
+        
+%>
+<%@page import="org.coin.bean.UserStatus"%>
+<input type="hidden" name="sLoginAuth" id="sLoginAuth" value="" /> 
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Compte utilisateur</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+    
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+
+ 		<% hbFormulaire.bIsForm = false; %>
+ 		<%= hbFormulaire.getHtmlTrInput("Statut du compte :","",sUserStatus,"") %>
+		<% hbFormulaire.bIsForm = true; %>
+		<tr id="tr_infoLogin" style="display: none; visibility: hidden;">
+			<td class="pave_cellule_gauche" >&nbsp;</td>
+			<td class="pave_cellule_droite" >
+				<div class="rouge" style="text-align:left">
+				Attention, le login saisi ci-dessous est déjà enregistré dans la base de données.
+				Veuillez en saisir au autre.
+				</div>
+			</td>
+		</tr>
+		<tr >
+			<td class="pave_cellule_gauche" >Login : </td>
+			<td class="pave_cellule_droite" >
+				<input type="hidden" id="sLogin"  name="sLogin" value="<%= user.getLogin() %>" />
+				<%= user.getLogin() %>
+			</td>
+		</tr>
+	</table>
+	<br>
+  </div>
+<%
+if(user.getIdUserStatus() == UserStatus.VALIDE)
+{
+%>
+  <div class="post-footer post-block" style="margin-top:0">
+   <table class="fullWidth">
+		<tr>
+			<td class="pave_cellule_gauche" colspan="2"><strong> Changer le mot de passe </strong></td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr id="tr_infoMDP" style="display: none; visibility: hidden;">
+			<td class="pave_cellule_gauche" >&nbsp;</td>
+			<td class="pave_cellule_droite" >
+				<div class="rouge" style="text-align:left">
+				Attention, le mot de passe saisi ci-dessous n'est pas correct.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Ancien mot de passe* :</td>
+			<td class="pave_cellule_droite" >
+			<input type="password" name="ancien" id="ancien" size="20" 
+			onBlur="verifierMDP();" />
+			<input type="hidden" name="ancienAuth" id="ancienAuth" value="" />
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" >Nouveau mot de passe* :</td>
+			<td class="pave_cellule_droite" >
+			<input type="password" name="newMdp1" id="newMdp1" size="20" />
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche" >Confirmation du nouveau mot de passe* :</td>
+			<td class="pave_cellule_droite" >
+			<input type="password" name="newMdp2" id="newMdp2" size="20" />
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>
+	</div>
+		<%
+	}
+	%>
+</div>

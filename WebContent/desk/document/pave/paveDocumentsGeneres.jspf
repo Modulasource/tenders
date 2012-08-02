@@ -1,0 +1,80 @@
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.document.DocumentLibrary"%>
+<%@page import="org.coin.bean.document.Document"%>
+<table class="pave" summary="Documents Générés">
+	<tr><td class="pave_titre_gauche">Documents Générés</td></tr>
+	<tr>
+		<td>
+			<table  class="liste" summary="Documents Générés">
+				<tr>
+					<th style="width:35%">Nom</th>
+					<th style="width:35%">Référence du document</th>
+					<th style="width:20%">Date de génération</th>
+					<th style="width:5%">T&eacute;l&eacute;charger</th>
+					<th style="width:5%">Supprimer</th>
+				</tr>
+				<%
+				for(int i= 0; i < vDocumentsGeneres.size() ; i++)
+				{
+					int j = i % 2;
+					Document doc = vDocumentsGeneres.get(i);
+
+					String sReference = "";
+					String sURLReference = "";
+					try
+					{
+						Vector<DocumentLibrary> vLibRef = DocumentLibrary.getAllDocumentLibraryFromDocumentAndTypeObjet((int)doc.getId(),TypeObjetModula.DOCUMENT);
+						DocumentLibrary libRef = vLibRef.firstElement();
+						Document docRef = Document.getDocument(libRef.getIdReferenceObjet());
+						if(docRef.getIdDocumentType()==DocumentType.TYPE_BALISE)
+						{
+							vLibRef = DocumentLibrary.getAllDocumentLibraryFromDocumentAndTypeObjet((int)docRef.getId(),TypeObjetModula.DOCUMENT);
+							libRef = vLibRef.firstElement();
+							docRef = Document.getDocument(libRef.getIdReferenceObjet());
+						}
+						sReference = docRef.getName();
+						sURLReference = "desk/document/afficherDocument.jsp?iIdDocument="+docRef.getId();
+						sURLReference = response.encodeURL(rootPath+ sURLReference);
+					}
+					catch(Exception e){}
+				%>
+				<tr class="liste<%=j%>" onmouseover="className='liste_over'" onmouseout="className='liste<%=j%>'" >
+					<td><%= doc.getName() %></td>
+					<td><a href="<%= sURLReference %>"><%= sReference %></a></td>
+					<td><%= org.coin.util.CalendarUtil.getDateFormattee(doc.getDateCreation()) %></td>
+					<td style="text-align:center">
+						<%
+						String sURLTelecharger = "desk/DownloadFileDesk?"
+								+ DownloadFile.getSecureTransactionStringFullJspPage(
+										request, 
+										doc.getId(), 
+										TypeObjetModula.DOCUMENT );
+								
+						sURLTelecharger = response.encodeURL(
+								rootPath+ sURLTelecharger );
+						%>
+						<a href="<%= sURLTelecharger %>">
+					 		<img src="<%=rootPath + modula.graphic.Icone.ICONE_DOWNLOAD %>" 
+						   	title="Télécharger le document" alt="Télécharger le document" />
+						</a>
+					</td>
+					<td style="text-align:center">
+						<%
+						String sURLSupprimer = "desk/document/modifierDocument.jsp?sAction=removeFromAffaire&amp;iIdDocument="+doc.getId()+"&amp;iIdAffaire="+iIdAffaire;
+						sURLSupprimer = response.encodeURL(rootPath+ sURLSupprimer);
+						%>
+						<a href="javascript:if(confirm('Etes-vous sûr de vouloir supprimer ce document?')){Redirect('<%= sURLSupprimer %>');}">
+					 		<img src="<%=rootPath + modula.graphic.Icone.ICONE_SUPPRIMER %>" 
+						   	title="Supprimer le document" alt="Supprimer le document" />
+						</a>
+					</td>
+				</tr>
+				<%
+				} 
+				%>
+			</table>
+		</td>
+	</tr>
+</table>		

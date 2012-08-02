@@ -1,0 +1,458 @@
+<%@page import="org.coin.autoform.component.AutoFormCptDoubleMultiSelect"%>
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="modula.marche.MarcheCritere"%>
+<%@page import="modula.marche.MarcheLot"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveObjetAATR.js" %>" ></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveTypeMarche.js" %>" ></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveCriteresAttribution.js" %>" ></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/paveAdresses.js" %>" ></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/organisation/paveAdresse.js" %>" ></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/ajouterRenseignements.js" %>" ></script>
+<script type="text/javascript" src="<%= rootPath + "include/js/desk/marche/pave/ajouterRensPublications.js" %>" ></script>
+<script type="text/javascript" src="<%= rootPath %>include/bascule.js" ></script>
+<script type="text/javascript" src="<%= rootPath %>include/date.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/fonctions.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/calendar.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/produitCartesien.js" ></script>
+<script type="text/javascript" src="<%= rootPath %>include/changeUrl.js" ></script>
+<script type="text/javascript" src="<%= rootPath %>include/AjaxAideRedac.js"></script>
+<script type="text/javascript" src="<%= rootPath %>include/DataGrid.js"></script>
+<script type="text/javascript">
+var g_numdiv = 0;
+<%
+	AutoFormCptDoubleMultiSelect mot_cle = new AutoFormCptDoubleMultiSelect(
+			"Liste des mots Clefs", "lIdBoampMotCle", true, rootPath);
+	mot_cle.setEnabledSearch(true);
+%>
+<%
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_OBJET) 
+{
+%>
+	<%@ include file="paveTypeMarcheJavascriptDuProduitCartesien.jspf" %>
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_CRITERES)
+{
+	
+%>
+	<%@ include file="paveProcedureJavascriptDuProduitCartesien.jspf" %>
+<%
+}
+%>
+
+function ajouterDiv(prefix,iNumDivDefault)
+{
+	if(iNumDivDefault && g_numdiv==0) g_numdiv = iNumDivDefault-1;
+	g_numdiv++;
+	var division = prefix + 'objetSupp' + g_numdiv;
+	if( g_numdiv == 3 ) cacher(prefix+'ajouterCPV');
+	if( g_numdiv < 4 ) montrer(division);
+}
+function checkForm()
+{
+	var form = document.formulaire;
+	
+<%
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_OBJET)
+{
+%>
+	// pour envoyer la liste des compétences
+	Visualise(form.iIdCompetenceSelection,form.iIdCompetenceSelectionListe);
+	if(form.iIdGroupCompetenceSelection)
+		Visualise(form.iIdGroupCompetenceSelection,form.iIdGroupCompetenceSelectionListe);
+
+	<%if(bUseFormMAPA){%>
+	<%= mot_cle.getJavascriptControlCode() %>
+	<%}%>
+	
+	if (!checkObjet(form, ""))
+		return false;
+	
+	if (!checkTypeMarche(form, ""))
+		return false;
+
+	
+	if (!checkAdresseIfNecessary(form, "lieu_execution_"))
+		return false;
+		
+	<%
+	if(bUseBoamp17 && !bUseFormNS){
+	%>
+		if (!checkAdresseIfNecessary(form, "lieu_livraison_"))
+			return false;
+	<%
+	}
+	%>
+		
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_CRITERES)
+{
+	if(!bIsRectification){
+%>
+	var listePassation = document.forms['formulaire'].elements['<%= sFormPrefix %>iIdMarchePassation'];
+	if(listePassation.options[listePassation.options.selectedIndex].value == 20
+	|| listePassation.options[listePassation.options.selectedIndex].value == "")
+	{
+		alert("Vous devez séléctionner un mode de passation.");
+		return false;
+	}
+
+	var bResult = true;
+	<%=afBlockTypeAvis.getJavascriptControlCode() %>
+
+	<%=afBlockProcedure.getJavascriptControlCode() %>
+	
+	if(!bResult)
+		return bResult;
+	<%}%>
+	
+	Visualise(document.forms['formulaire'].elements['listePonderes'], 
+						document.forms['formulaire'].elements['listePonderesHidden']);
+	
+	Visualise(document.forms['formulaire'].elements['listeClasses'], 
+						document.forms['formulaire'].elements['listeClassesHidden']);
+						
+	var item = document.forms['formulaire'].elements['iIdMarchePassation'];
+	
+	if (!checkCriteresAttribution(form, ""))
+	{
+		return false;
+	}
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_LOTS)
+{
+	if(vLots.size() > 1)
+	{
+		int iNbEmptyDesignations = 0;
+		String sReferencesLots = "";
+		for(int i=0;i<vLots.size();i++)
+		{ 
+			MarcheLot lot = vLots.get(i);
+			if(lot.getDesignationReduite().equalsIgnoreCase(""))
+			{
+				if(iNbEmptyDesignations != 0)
+					sReferencesLots += " et ";
+				sReferencesLots += "réf."+lot.getReference();
+				iNbEmptyDesignations++;
+			}
+		}
+		if(iNbEmptyDesignations > 0)
+		{
+			String sMessage = "Veuillez remplir la description succincte du lot ";
+			if(iNbEmptyDesignations > 1)
+				sMessage = "Veuillez remplir les descriptions succinctes des lots ";
+			%>
+			alert("<%= sMessage + sReferencesLots %>");
+			return false;
+			<%
+		}
+	}
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_ORGANISME)
+{
+%>
+	var item = form.elements['iIdPRM'];
+	
+	if (item.value==0)
+	{
+		alert("Veuillez sélectionner le pouvoir adjudicateur.");
+		item.focus();
+        return false;
+	}
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_JUSTIFICATIF_NEGOCIE){
+%>
+	var item = form.elements;
+	for(var i=0;i<item.length;i++)
+		if(item[i].checked) return true;
+	alert("Vous devez impérativement justifier le choix de la procédure négociée");
+	return false;
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_RENSEIGNEMENTS_COMPLEMENTAIRES)
+{
+%>
+	if (!checkRenseignements(form, ""))
+		return false;
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_RENSEIGNEMENTS_PUBLICATION)
+{
+%>
+	//updateRTE('rte');
+	//formulaire.sPetiteAnnonceTexteLibre.value = formulaire.rte.value;
+	
+	if (!checkPublications(form, "", "true", "true"))
+		return false;
+<%
+}
+%>
+<%
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_JOUE)
+{
+%>
+    var item = document.forms['formulaire'].elements;
+    
+    for(var i=0; i<item.length; i++) {
+        if(item[i].checked) {
+            var prefix = item[i].name.substring(0,31);
+            if(prefix == "cbMarcheJoueFormulaireSelected_") {
+                var iId = item[i].name.substring(31,32);
+                if(iId != 3) {
+                    alert("En phase d'attribution, seul le formulaire 3 peut être sélectionné");
+                    return false;
+                }
+            }
+        }
+    }
+    
+<%
+}
+%>
+	return true;
+}
+<%
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_RECTIFICATIF)
+{
+%>
+
+	function checkAvisRectificatif()
+	
+	{
+		var item = document.forms['formulaire'].elements['sTypeDescription'];
+		if ((!item[0].checked)&&(!item[1].checked)) {
+			alert("Vous devez donner une description de l'avis rectificatif");
+			return false;
+		}
+		else return true;
+	
+	}
+<%
+}
+%>
+function onAfterPageLoading()
+{
+	if (!window.XMLHttpRequest && !window.ActiveXObject)
+	{
+		alert("Attention, votre navigateur n'est pas compatible avec la technologie \"Ajax\".\nVeuillez installer un navigateur récent : www.GetFirefox.com");
+	}
+<%
+if (iIdOnglet == Onglet.ONGLET_ATTRIBUTION_OBJET )
+{
+%>
+	try { init1();	} catch (e) {}
+	try { montrer('ajouterCPV');	} catch (e) {}
+	//try { cacher('objetSupp1');	} catch (e) {}
+	//try { cacher('objetSupp2');	} catch (e) {}
+	//try { cacher('objetSupp3');	} catch (e) {}
+	try { prepareCPVButton();	} catch (e) {}
+
+	selectionnerOption2NiveauxId('iIdMarcheType', "<%= oMarcheType.getIdCodeType() %>", 'idTypeDetaille', "<%= oMarcheType.getIdType() %>");
+	
+<%
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_CRITERES)
+{
+	//if(sessionUserHabilitation.isSuperUser())
+	if(true)
+	{
+		if(bUseBoamp17){
+		if(!bIsRectification){%>
+		displayFields(<%= marProc.getIdBoampFormulaireType()%>,true);
+		<%}}else{%>
+		updateListPassation(true);
+		<%}
+	}
+	Vector<MarcheCritere> vCriteresTemp = MarcheCritere.getAllMarcheCritereFromMarche(marche.getIdMarche());
+	MarcheCritere critere ;
+
+	if (vCriteresTemp.size() > 0)
+	{
+		critere = vCriteresTemp.firstElement();
+
+		switch ( critere.getIdCritereType() )
+		{
+			case 1:
+			case 4:
+			%>
+	cacher('critereClasses');
+	cacher('criterePonderes');
+			<%
+				break;
+			case 2: // critères pondérés
+			%>
+	cacher('critereClasses');
+			<%
+				break;
+			case 3: // critères classés
+			%>
+	cacher('criterePonderes');
+			<%
+				break;
+		}
+	}
+	else
+	{			
+	%>				
+	cacher('critereClasses');
+	cacher('criterePonderes');
+	<%
+	}
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_LOTS)
+{
+	if( vLots.size() < 2)
+	{
+	%>
+	cacher('trGestionLots');
+	<%	
+	}
+}
+if (iIdOnglet == Onglet.ONGLET_ATTRIBUTION_TITULAIRES )
+{
+	if (vLotsAttribues.size() > 0)
+	{
+		for (int i = 0; i < vLotsAttribues.size(); i++)
+		{
+			MarcheLot lot = vLotsAttribues.get(i);
+
+			boolean bAttribue = lot.isAttribue(false);
+			boolean bInfructueux = lot.isInfructueux(false);
+			boolean bSousTraite = lot.isSousTraite(false);
+			
+			if ( bAttribue && !bInfructueux )
+			{
+				if ( (!lot.getOffreBasse().equalsIgnoreCase("")) || (!lot.getOffreHaute().equalsIgnoreCase("")) )
+					out.write("montrer('offre" + i + "');cacher('montant"+i+"');");
+				
+				if (!lot.getMontantLot().equalsIgnoreCase(""))
+					out.write("cacher('offre" + i + "');montrer('montant" + i + "');");
+			}
+			if ( bSousTraite )
+			{
+				out.write("montrer('soustraitance" + i + "');");
+			}
+			else
+			{
+				out.write("cacher('soustraitance" + i + "');");
+			}
+		}
+	}
+	else
+	{
+		out.write("cacher('soustraitance');");
+	}
+}
+if(iIdOnglet == Onglet.ONGLET_ATTRIBUTION_RENSEIGNEMENTS_PUBLICATION)
+{
+%>
+	<%= modula.editorial.EditorialAssistance.getAideRedactionnelleAJAX(modula.editorial.EditorialAssistance.AATR_COMPLEMENT,"iIdPetiteAnnonceTexteLibre","sPetiteAnnonceTexteLibre",rootPath,sessionUserHabilitation,session.getId()) %>
+	
+	cacher('publicationAAPC');
+	cacher('publicationRectification');
+<%
+	if (bAATRAutomatique)
+	{
+%>
+		cacher('uploadAATRLibre');
+<%
+	}
+	else{
+%>
+		montrer('uploadAATRLibre'); 
+<%
+	}
+}
+if((iIdOnglet == Onglet.ONGLET_ATTRIBUTION_RECTIFICATIF)) {
+	int iAvisRectificatif = -1;
+	try{
+		iAvisRectificatif = Integer.parseInt(request.getParameter("iIdAvisRectificatif"));
+	}catch(Exception e){}
+	if (iAvisRectificatif != -1){
+		AvisRectificatif avis = AvisRectificatif.getAvisRectificatif(iAvisRectificatif);
+		if (avis.getDescriptionType().equalsIgnoreCase("texte_libre")){
+%>
+			cacher('piece_jointe');
+<%
+		}
+		else if (avis.getDescriptionType().equalsIgnoreCase("piece_jointe")){
+%>
+			cacher('texte_libre');
+<%
+		}
+		else{
+%>
+			cacher('piece_jointe');
+			cacher('texte_libre');
+<%
+		}
+	}
+	else{
+%>
+		cacher('piece_jointe');
+		cacher('texte_libre');
+<%
+	}
+}
+%>
+}
+
+function attribuerLots()
+{
+	<%
+	for (int i = 0; i < vLots.size(); i++)
+	{
+		MarcheLot lot = vLots.get(i);
+%>
+		if($('<%= sFormPrefix %>selectStatut<%= lot.getIdMarcheLot() %>_1').checked)
+		{
+			/**
+			 * Il faut vérifier qu'une personne a été sélectionnée avant de poursuivre
+			 */
+			 var iIdCandidatureSelected = 0;
+			 try{
+				 iIdCandidatureSelected = $('<%= sFormPrefix %>iIdCandidature<%= lot.getIdMarcheLot() %>').value ;
+			 } catch (e) {}
+			 
+			 
+			 
+			 if(iIdCandidatureSelected <= 0)
+			 {
+				alert("Le candidat n'a pas été sélectionné pour le lot <%= lot.getNumero() %> !");
+				return false;
+			 }
+			  
+		} else {
+			if($('<%= sFormPrefix %>selectStatut<%= lot.getIdMarcheLot() %>_0').checked)
+			{
+				/**
+				 * Rien à vérifier, le lot est déclaré infructueux
+				 */
+			} else {
+				alert("Le statut du lot <%= lot.getNumero() %> n'a pas été attribué ! Vous devez lui attribuer un statut pour poursuivre");
+				return false;
+			}
+		}
+<%
+		
+		
+	}
+	%>
+
+
+	if(!confirm("Etes vous sûr de vouloir valider les attributions de tous les lots ?\nVous ne pourrez plus ajouter de candidature papier apres cette étape."))
+	{
+		return false;
+	}
+	
+	
+
+	document.formulaire.sAttribution.value = "attribution";
+	document.formulaire.submit();
+} 
+</script>

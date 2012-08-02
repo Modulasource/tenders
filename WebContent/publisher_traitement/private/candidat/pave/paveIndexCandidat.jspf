@@ -1,0 +1,323 @@
+<%@ include file="/include/new_style/headerPublisher.jspf" %>
+<%@ page import="org.coin.db.ConnectionManager"%>
+<%@ page import="java.sql.*" %>
+<%@ page import="org.coin.bean.boamp.*" %>
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@ include file="/publisher_traitement/public/include/beanCandidat.jspf" %> 
+<%
+	String sTitle = "";
+	String sPageUseCaseId = "IHM-PUBLI-2";
+	String sFormPrefix = "";
+
+	String sAction = HttpUtil.parseStringBlank("alert_sAction", request);
+	
+	if(sAction.equals("updateEmail"))
+	{
+		candidat.setEmail(request.getParameter("alert_sUpdateEmail"));
+		candidat.store();
+	}
+	
+	if(Configuration.isTrueMemory("addressbook.organization.type.candidate.code.naf.mandatory", true))
+	{
+	
+		if(sessionUser.getOrganisation().getIdCodeNaf() == 0
+		|| BoampCPFItem.getAllFromTypeAndReferenceObjet(ObjectType.ORGANISATION, sessionUser.getOrganisation().getId()).isEmpty())
+		{
+			String sMessage = "Le renseignement du code Naf et des compétences de l'organisation est désormais obligatoire.";
+			
+			if(sessionUser.getOrganisation().getIdCodeNaf() != 0
+			&& CodeNaf.getCodeNaf(sessionUser.getOrganisation().getIdCodeNaf()).getIdCodeNafEtat() == 2) {
+				sMessage += " Le code Naf de votre entreprise doit également être réactualisé avec la nouvelle liste.";
+			}
+			response.sendRedirect(response.encodeRedirectURL(rootPath + "publisher_portail/private/organisation/afficherOrganisation.jsp?sAction=store&sMessage="+sMessage));
+			return;
+		}
+		if(CodeNaf.getCodeNaf(sessionUser.getOrganisation().getIdCodeNaf()).getIdCodeNafEtat() == 2) {
+			String sMessage = "Le code Naf de votre entreprise doit être réactualisé avec la nouvelle liste.";	
+			response.sendRedirect(response.encodeRedirectURL(rootPath + "publisher_portail/private/organisation/afficherOrganisation.jsp?sAction=store&sMessage="+sMessage));
+			return;
+		}
+		
+	}	
+	
+%>
+</head>
+<body>   
+<%@ include file="/publisher_traitement/public/include/header.jspf" %>
+
+<div style="padding:10px 25px 25px 25px">
+    <div class="roundCorners_ boardBox">
+
+        <div class="boardContent">
+        				
+		    <table class="fullWidth"><tr>
+		        <td class="top" style="width:50%">
+
+                    <div class="boardPanel">
+                        <div class="title">
+                            <a style="color:#F60;" href="<%=response.encodeRedirectURL(rootPath
+                                + "publisher_portail/private/organisation/displayVeilleMarche.jsp"
+                                ) %>">Ma veille de marchés</a>
+                           </div>
+                        <div class="panelContent">
+                            Retrouvez la veilles de marchés que vous avez enregistré pour être averti par 
+                            courriel de l'ajout d'une nouvelle annonces
+                             <div>
+                                <%
+                                Vector<VeilleMarcheAbonnes> vAgent = VeilleMarcheAbonnes.getAllVeilleMarcheAbonnesFromPersonnePhysique(candidat.getIdPersonnePhysique());
+                                if (vAgent.size()>0) {%>
+                                    <div style="line-height:1.4em;font-weight:bold;color:#FF6600;padding:3px;background-color:#FAFAFA;border:1px solid #EEE;margin:5px">
+                                    <% for (VeilleMarcheAbonnes agent : vAgent) { %>
+                                        <div style="position:relative">
+                                            <a style="color:#F60;" href="<%=response.encodeRedirectURL(rootPath
+                                                    + "publisher_portail/private/organisation/displayVeilleMarche.jsp"
+                                                    ) %>">Veille de marché enregistrée</a>
+                                            <!-- <img onclick="removeAgent(<%=agent.getId() 
+                                            %>)" style="position:absolute;top:0;right:0" class="handCursor" src="<%=
+                                                rootPath %>images/delete.gif" /> -->
+                                        </div>
+                                    <% } %>
+                                    </div>
+                                <% } else { %>
+                                    <div style="padding:3px;background-color:#FAFAFA;border:1px solid #EEE;margin:5px">
+                                        <i>Vous n'avez pas encore enregistré de veille de marché</i>
+                                    </div>
+                                <% } %>
+                             </div>
+                             
+                        </div>
+                    </div>
+
+		            <div class="boardPanel">
+		                <div class="title"><a href="<%=
+		                	response.encodeURL(rootPath + sPublisherPath 
+		                			+ "/private/organisation/afficherPersonnePhysique.jsp")
+		                			%>">Mon Profil</a>
+		                </div>
+		                <div class="panelContent">
+		                    Renseignez vos informations personnelles et professionnelles
+		                     pour vous faire connaître des acheteurs publics. 
+		                </div>
+		            </div>
+
+		            <div class="boardPanel">
+		                <div class="title"><a href="<%=
+		                	response.encodeURL(rootPath + sPublisherPath 
+		                			+ "/private/organisation/afficherPersonnePhysique.jsp?iIdOnglet="
+		                			+  Onglet.ONGLET_PERSONNE_PHYSIQUE_COMPTE_UTILISATEUR)
+		                	%>">Changer de mot de passe</a>
+		                </div>
+		                <div class="panelContent">
+		                    Permet de définir le mot de passe de votre choix. 
+		                </div>
+		            </div>
+                    <div class="boardPanel">
+                        <div class="title"><a href="<%= response.encodeURL(rootPath + sPublisherPath
+                        		+ "/private/organisation/afficherOrganisation.jsp")
+                            %>">Profil de l'entreprise</a></div>
+                        <div class="panelContent">
+                            Permet de mettre en valeur votre société pour les acheteurs publics.
+                        </div>
+                    </div>
+                    <div class="boardPanel">
+                        <div class="title"><a href="<%=response.encodeURL(rootPath + sPublisherPath + "/private/organisation/transfererGeranceOrganisationForm.jsp")
+                            %>">Transférer la gérance</a></div>
+                        <div class="panelContent">
+                            votre entreprise change de gérant, pas de problème, vous pouvez redefinir la gérance de 
+                            celle-ci en cliquant sur le lien ci-dessus.
+                        </div>
+                    </div>
+                    <div class="boardPanel">
+                        <div class="title"><a href="<%=response.encodeURL(rootPath + sPublisherPath 
+                                + "/private/candidat/accederDossierEnCours.jsp")
+                        %>">Mes candidatures</a></div>
+                        <div class="panelContent">
+                            Consultez les offres pour lesquelles vous avez postulé et suivez 
+                            l'évolution de vos candidatures en temps réel.
+                        </div>
+                    </div>     
+                    <div class="boardPanel">
+                        <div class="title"><a href="<%=response.encodeURL(rootPath + sPublisherPath 
+                                + "/public/annonce/afficherAnnonces.jsp")
+                        %>">Rechercher des annonces</a></div>
+                        <div class="panelContent">
+                            Commencez dès à présent votre recherche d'annonces choisissant votre secteur d'activité, 
+                            votre métier et la zone qui vous intéresse. Vous pouvez à tout moment affiner 
+                            votre recherche et modifier vos critères de sélection.
+                        </div>
+                    </div>
+ 
+		        </td>
+
+                <td class="top">
+
+<%
+	if(Configuration.isEnabledMemory("publisher.portail.company.index.advert", false))
+	{
+%>
+
+                    <div class="boardPanel">
+                        <div class="title">Information pratique
+                        </div>
+                        <div class="panelContent">
+				            <div style="text-align: left; padding: 5px">
+					            <div style="margin-bottom:10px;">
+					            Cet espace vous permet de <strong>consulter tous les appels d'offres de la Région Rhône Alpes PACA</strong>, 
+					            quel que soit le support sur lequel ces annonces sont parues initialement.
+					            </div>
+					             <div style="margin-bottom:10px;">
+					            Dans cet espace, vous pourrez, lorsqu'il est disponible, <strong>télécharger le Dossier de Consultation 
+					            des Entreprises (DCE)</strong>. 
+					            </div>
+					             <div style="margin-bottom:10px;">
+					            Vous pouvez également choisir de <strong>répondre par voie électronique</strong> par le biais de notre 
+					            plateforme en utilisant un certificat électronique émanant d'une <a target="main" href="##__[rootPath]ublisher_portail/public/pagesStatics/certificat/listeAutorites.jsp##">autorité de certification référencée par le Minefi</a>. Notre site vous permettra d'obtenir un tel certificat, si vous n'en avez pas déjà un.
+					            </div>
+					             <div style="margin-bottom:10px;">
+					            Un <strong>espace personnel</strong> vous est dédié en tant qu'entreprise, mettant à votre disposition 
+					            un bureau virtuel vous permettant de gérer vos différentes candidatures, votre profil, vos contacts.
+					            </div>
+					             <div style="margin-bottom:10px;">
+					            Enfin, les Affiches de Grenoble et du Dauphiné vous proposent de vous <strong>abonner à son service de veille</strong> des marchés publics. Vous pourrez alors recevoir automatiquement chaque jour, par fax ou par e-mail, les résumés des appels d'offres qui vous intéressent, et accéder en ligne à touts ceux correspondant à votre profil 
+					            d'abonnement dans votre périmètre, en Rhône-Alpes ou PACA.
+					            </div>
+				            </div>           
+                         </div>
+                    </div>
+<%
+	}
+%>
+
+
+<!-- 
+ TODO_AG 
+-->
+                  <div class="boardPanel">
+                      <div class="title">
+                        <a href="<%=response.encodeURL(rootPath
+                        		+ sPublisherPath + "/private/organisation/displayAllMarchePersonneItem.jsp")
+                            %>">Mes sélections d'annonces</a> 
+                      </div>
+                      <div class="panelContent">
+                          Mémorisez toutes les annonces qui vous intéressent dans un panier 
+                          afin de les consulter plus tard sans avoir à faire une nouvelle recherche
+                      </div>
+                    </div>
+
+
+	                <div class="boardPanel">
+                        <div class="title">
+                                Testez-vous à la soummission électronique, sans stress !
+                           </div>
+<%
+    int iIdMarcheTestReponseElectronique = Configuration.getIntValueMemory("soumission.electronique.test.marche.id",0);
+    String sUrlRedir = "";
+    
+    if(iIdMarcheTestReponseElectronique != 0) {
+        PersonnePhysique personne = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual());
+        
+        Candidature candidature = null;
+        
+        try{
+        	candidature = Candidature.getCandidature(iIdMarcheTestReponseElectronique, sessionUser.getIdIndividual());
+            
+        }catch (CoinDatabaseLoadException e) {}
+
+        
+        
+        /*if (!Candidature.isDoublonCandidature(
+                personne.getIdPersonnePhysique(), 
+                personne.getIdOrganisation(), 
+                iIdMarcheTestReponseElectronique))
+                */
+        if(candidature == null)       
+        {
+            Marche marche = Marche.getMarche(iIdMarcheTestReponseElectronique);
+            
+            candidature = Candidature.createNewCandidature(
+                        marche,
+                        candidat.getIdPersonnePhysique(),
+                        organisation.getIdOrganisation());
+        } 
+        
+        
+        
+        
+        String sCand 
+           = SecureString.getSessionSecureString(
+                Long.toString(candidature.getIdCandidature()),session);
+        sUrlRedir
+	        = rootPath + "publisher_portail/private/candidat/consulterDossier.jsp?cand="
+	        + sCand+"&iIdOnglet=1" ;
+	 
+    }
+    
+      
+%>
+                        <div class="panelContent">
+                            Vous souhaitez répondre électroniquement à un marché public 
+                            sur la plateforme dans les prochains jours ?<br/>
+                            Pour réaliser le dépôt de plis sans stress,  
+<%
+  if(!sUrlRedir.equals("")){
+%>                              <a style="color:#F60;" href="<%=
+ response.encodeURL(sUrlRedir) %>">accéder au marché de test</a> 
+<%
+  } else {
+%>
+<i>(marché de test pas encore disponible)</i>
+<%
+  }
+%>
+ dès maintenant pour :<br/>
+* vérifier la conformité de votre poste, <br/>
+* effectuer un dépôt de plis avec votre certificat électronique référencé par le MINEFE, <br/>
+* et cacheter votre dossier de candidature autant de fois que vous le souhaitez
+ <br/><br/>
+
+Le <a href="http://ec.europa.eu/i2010" 
+    target="_blank">plan d'action i2010</a> adopté par la Commission Européenne, a fixé pour l'échéance de 2010, 
+un ensemble d'objectifs, dont ceux-ci :<br/>
+* mettre en ligne 100 % des marchés publics,<br/>
+* faire en sorte que 50 % des marchés publics formalisés soient passés par voie électronique.<br/>
+<br/>
+Suivant la même logique, l'article 56 III 2° du code des marchés publics 2006 prévoit qu'
+<i><b> à compter du 1er janvier 2010, le pouvoir adjudicateur pourra exiger la transmission 
+des candidatures et des offres par voie électronique</b></i>.<br/>
+<br/>
+Pour préparer cette échéance de 2010, qui simplifira la vie des entreprises, la plateforme Modula met à disposition
+un marché de test et dispense des <b>formations à la dématérialisation des marchés publics</b>.<br/>
+<br/>
+<a href="<%= response.encodeURL(rootPath +
+		"publisher_portail/public/pagesStatics/assistance/formations.jsp" )
+%>">Pour de plus amples renseignements, cliquez-ici</a>
+                        </div>
+                    </div>
+
+
+                    
+		        </td>
+		        
+<!-- 
+                <td class="top" style="width:33%">
+          
+                   <div class="boardPanel">
+                        <div class="title"> Mes documents officiels</div>
+                        <div class="panelContent">
+                            Ajoutez tous vos documents officels (DC4, DC7, K-bis, etc) pour
+                             pouvoir les utilisez pour l'ensemble de vos candidatures.
+                        </div>
+                    </div>
+-->
+
+
+             </tr></table>
+		</div>
+	</div>
+</div>
+
+<%@include file="/publisher_traitement/public/include/footer.jspf"%>
+</body>
+
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%></html>

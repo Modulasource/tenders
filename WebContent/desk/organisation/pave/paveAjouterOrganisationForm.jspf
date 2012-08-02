@@ -1,0 +1,107 @@
+<%@page import="modula.marche.TypeAcheteurPublic"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveAjouterOrganisationTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr id="tr_infoRaisonSociale" style="display: none; visibility: hidden;">
+		<td class="pave_cellule_gauche" >&nbsp;</td>
+		<td class="pave_cellule_droite" >
+			<div class="rouge" style="text-align:left">
+			<%= locMessage.getValue(1,"Attention, la raison sociale saisie ci-dessous est déjà enregistrée dans la base de données.	Il est possible que cette organisation soit déjà inscrite.")%>
+			</div>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput(organisation.getRaisonSocialeLabel() + "* :",
+			"sRaisonSociale",organisation.getRaisonSociale()
+			,"onBlur=\"verifierRaisonSociale();\" onKeyUp=\"verifierRaisonSociale();\"",true) %>
+	<input type="hidden" name="sRaisonSocialeAuth" id="sRaisonSocialeAuth" value="<%= bCheckDoublonRaisonSociale?"":"1" %>" />
+	<% if(!sAdressFieldMode.equals("hide")){ %>
+	<tr>
+        <td class="pave_cellule_gauche" ><%= adresse.getCodePostalLabel() %> :</td>
+        <td class="pave_cellule_droite" >
+        <input type="text" <%= sAdressFieldMode.equals("mandatory")?"class='obligatory dataType-notNull'":"" %> name="<%=sFormPrefix %>sCodePostal" size="6" maxlength="5" 
+        value="<%= adresse.getCodePostal() %>" />
+        <%= adresse.getCommuneLabel()  %> :
+        <input type="text" <%= sAdressFieldMode.equals("mandatory")?"class='obligatory dataType-notNull'":"" %> name="<%=sFormPrefix %>sCommune" size="19" maxlength="30" 
+        value="<%= adresse.getCommune() %>" />
+        <%= adresse.getCedexLabel()  %> :
+        <input type="text" name="<%=sFormPrefix %>sCedex" size="6" maxlength="5" 
+        value="<%= adresse.getCedex() %>" />
+        </td>
+    </tr>
+    <tr>
+        <td class="pave_cellule_gauche" ><%= adresse.getIdPaysLabel() %> :</td>
+        <td class="pave_cellule_droite" >
+        <%= pays.getAllInHtmlSelect(sFormPrefix+"sIdPays",sAdressFieldMode.equals("mandatory")?"class='obligatory dataType-notNull'":"") %>
+        </td>
+    </tr>
+    <%} %>
+	<%
+    if (iIdOrganisationType == OrganisationType.TYPE_ACHETEUR_PUBLIC) {
+%>
+    <% TypeAcheteurPublic oTypeAcheteurPublic = new TypeAcheteurPublic(organisation.getIdTypeAcheteurPublic()); %>
+    <%= hbFormulaire.getHtmlTrSelect(organisation.getIdTypeAcheteurPublicLabel()+"* :","iIdTypeAcheteurPublic",oTypeAcheteurPublic) %>
+<%
+    }
+%>
+	<%
+    if(bAddCommissionBloc){
+    %>
+    <tr>
+        <td class="pave_cellule_gauche" style="vertical-align:middle" />
+        <input class="cbx" type="checkbox" 
+            name="createCommission" 
+            id="createCommission" 
+            value="1" 
+            checked="checked" 
+            onclick="montrer_cacher('divCommission')"/>
+        </td>
+        <td class="pave_cellule_droite" style="vertical-align:middle" >
+        <font style="font-weight:bold;"><%= sLocalizedMessageCreateCommission %></font>
+        </td>
+    </tr>
+    <%} %>
+	<%
+	if(bAuthorizeCreateIndividual){
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle" />
+		<input class="cbx" type="checkbox" 
+			name="createGerant" 
+			id="createGerant" 
+			value="1" 
+			checked="checked" 
+			onclick="montrer_cacher('divGerant')"/>
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+		<font style="font-weight:bold;"><%= sLocalizedMessageCreateManager %></font>
+		</td>
+	</tr>
+	<%} %>
+	<%
+    if(bAuthorizeModifySynchronize){
+    %>
+	<tr>
+        <td class="pave_cellule_gauche" style="vertical-align:middle" />
+        <input class="cbx" type="checkbox" 
+            name="synchronize" 
+            id="synchronize" 
+            value="1" 
+            checked="checked" />
+        </td>
+        <td class="pave_cellule_droite" style="vertical-align:middle" >
+        <font style="font-weight:bold;"><%= sLocalizedMessageSynchronize %></font>
+        </td>
+    </tr>
+    <%
+    }else{
+    %>
+    <tr><td colspan="2"><input type="hidden" 
+            name="synchronize" 
+            id="synchronize" 
+            value="<%= bSynchronize?"1":"0" %>" /></td></tr>
+    <% } %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

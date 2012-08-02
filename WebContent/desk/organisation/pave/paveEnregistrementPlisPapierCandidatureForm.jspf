@@ -1,0 +1,48 @@
+<table summary="none">
+	<tr>
+		<td colspan="2" class="mention"><br/>Gestion du Dossier de candidature</td>
+	</tr>
+	<%
+	if(!bIsContainsEnveloppeAManagement && !bIsContainsAAPCPublicity)
+	{
+	%>
+	</table>
+	<%@ include file="paveEnregistrementPlisPapierCandidatureContactForm.jspf" %>
+	<table summary="none">
+	<%
+	}
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= sTitreFormatCandidature %>
+		</td>
+		<td class="pave_cellule_droite">
+			<select name="formatCandidature" onChange="cacherDivisionLots();afficherCandidature();">
+				<option value="0" <%= bIsCandidatureIndefini?"selected='selected'":"" %> >Attribuer un format</option>
+				<option value="1" <%= (!bIsCandidaturePapier && !bIsCandidatureIndefini)?"selected='selected'":"" %>>électronique</option>
+				<option value="2" <%= (bIsCandidaturePapier && !bIsCandidatureIndefini)?"selected='selected'":"" %> >papier</option>
+			</select>
+		</td> 
+	</tr>
+</table>
+<%@ include file="paveEnregistrementPlisPapierCandidatureDatesForm.jspf" %>
+<%@ include file="paveEnregistrementPlisPapierCandidatureDates.jspf" %>
+<table summary="none">
+	<tr>
+		<td class="pave_cellule_gauche">
+		<%= "Identifiant de la candidature : " %>
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+		String sRef = "Indéfini";
+		if(candidature != null)
+		{
+			sRef = "CDT"+candidature.getIdCandidature();
+			if(bAnonyme)
+				sRef = "CDT?/ORG"+personne.getIdOrganisation();
+		}
+		%>
+		<%= sRef %>
+		</td>
+	</tr>
+</table>

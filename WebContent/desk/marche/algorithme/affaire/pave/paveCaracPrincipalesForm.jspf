@@ -1,0 +1,252 @@
+<%
+	/*
+	*	Nécessite les champs suivants :
+	*		String sPaveCaracPrincipalesTitre;
+	*	
+	*	Champs renvoyés :
+	*		String sCaracPrincipales;
+	*		String sQuantite;
+	*		String sOptions;
+	*		String sCalendrierUlterieur;
+	*/
+	
+
+	MarcheCaracteristique marcheCaracteristique = null;
+	try {
+		marcheCaracteristique= MarcheCaracteristique.getMarcheCaracteristiqueFromMarche (marche.getId());
+	} catch (Exception e) {
+		marcheCaracteristique = new MarcheCaracteristique();
+		marcheCaracteristique.setIdMarche(marche.getId());
+	}
+	
+	Currency currency = null;
+	try {
+		currency = Currency.getCurrency(marcheCaracteristique.getIdCurrency());
+	} catch (Exception e) {
+		currency = new Currency ("EUR");
+	}
+	
+%>
+<%@page import="org.coin.bean.accountancy.Currency"%>
+<%@page import="modula.marche.MarcheCaracteristique"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveCaracPrincipalesTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Caractéristiques principales :
+		</td>
+		<td class="pave_cellule_droite" >
+		<textarea name="<%=sFormPrefix %>sCaracPrincipales" cols="100" rows="4"><%= marche.getCaracPrincipales() %></textarea>
+		</td>
+	</tr>
+<%
+	if(bUseFormNS || bUseFormUE)
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle">
+		Refus des variantes :
+		</td>
+		<td class="pave_cellule_droite">
+<%	
+	String sCheckedVariantes = "checked='checked'";
+%>
+			<input type="checkbox" value="2" name="iIdMarcheVariantes" style="vertical-align:middle" <%=MarcheVariantes.VARIANTES_INTERDITES == marche.getIdMarcheVariantes()?sCheckedVariantes:""%>/>
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.VARIANTES) %>
+		</td>
+	</tr>
+<%
+	}
+%>
+
+	<tr>
+		<td class="pave_cellule_gauche">
+		Quantités (fourniture et services), nature et étendue (travaux) :<br />
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.QUANTITE) %>
+		</td>
+		<td class="pave_cellule_droite">
+		<table >
+			<tr>
+				<td><textarea name="<%=sFormPrefix %>sQuantite" id="<%=sFormPrefix %>sQuantite" cols="100" rows="6"><%= marche.getQuantites() %></textarea></td>
+				<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton(
+						"iIdQuantite",rootPath,sessionUserHabilitation) %>
+			</tr>
+		</table>
+<%
+	if(bUseBoamp17 && (bUseFormNS || bUseFormUE))
+	{
+%>
+		<br/>
+		Le cas échéant (en chiffre uniquement), valeur estimée (H.T.) :
+		<table>
+<%
+		String sCheckedValeurEstimeeNeant = "";
+		String sCheckedValeurEstimeeUnique = "";
+		String sCheckedValeurEstimeeFourchette = "";
+	
+		
+		switch (marcheCaracteristique.getIdValeurEstimeeType())
+		{
+		case MarcheCaracteristique.VALEUR_TYPE_NEANT:
+			sCheckedValeurEstimeeNeant = "checked='checked'";
+			break;
+		case MarcheCaracteristique.VALEUR_TYPE_UNIQUE:
+			sCheckedValeurEstimeeUnique= "checked='checked'";
+			break;
+		case MarcheCaracteristique.VALEUR_TYPE_FOURCHETTE:
+			sCheckedValeurEstimeeFourchette= "checked='checked'";
+			break;
+		}
+
+%>
+		<tr><td>
+		<input type="radio" name="MarcheCaracteristique_valeur_estimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_NEANT %>" <%= sCheckedValeurEstimeeNeant %> />&nbsp; Néant
+		</td></tr>
+		<tr><td>
+		<input type="radio" name="MarcheCaracteristique_valeur_estimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_UNIQUE %>" <%= sCheckedValeurEstimeeUnique %> />&nbsp;
+				Montant <input type="text" size="10" name="MarcheCaracteristique_dValeurEstimee" value="<%= 
+					Outils.getFormatedValueNeant(marcheCaracteristique.getValeurEstimee()) %>" />
+		</td></tr>
+		<tr><td>
+		<input type="radio" name="MarcheCaracteristique_valeur_estimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_FOURCHETTE %>" <%= sCheckedValeurEstimeeFourchette %> />&nbsp;
+				Fourchette : entre <input type="text" size="10" name="MarcheCaracteristique_dValeurEstimeeBasse" value="<%=
+					Outils.getFormatedValueNeant(marcheCaracteristique.getValeurEstimeeBasse() ) %>" /> 
+				et <input type="text" size="10" name="MarcheCaracteristique_dValeurEstimeeHaute" value="<%=
+					Outils.getFormatedValueNeant(marcheCaracteristique.getValeurEstimeeHaute() ) %>" />
+		</td></tr>
+		<tr><td>
+		<br/>
+		monnaie
+		<%= currency.getAllInHtmlSelect("MarcheCaracteristique_sIdCurrency")  %>
+		</td></tr>
+</table>
+<%	
+	} 
+
+%>
+		</td>
+	</tr>
+<%
+	if(bUseFormNS || bUseFormUE)
+	{
+
+%>	<tr>
+		<td class="pave_cellule_gauche">
+		Options, description concernant les achats complémentaires :<br />
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.OPTION) %>
+		</td>
+		<td class="pave_cellule_droite">
+		<table summary="none">
+			<tr>
+				<td><textarea name="<%=sFormPrefix 
+					%>sOptions" id="<%=sFormPrefix %>sOptions" cols="100" rows="6"><%= marche.getOptions() 
+					%></textarea>
+<%
+		if(bUseBoamp17)
+		{
+%>
+		<br/>
+		S'il est connu, calendrier prévisionnel de l'exercice de ces options :
+		<input type="text" size="3" name="MarcheCaracteristique_lDureeOption" value="<%= 
+			marcheCaracteristique.getDureeOption() %>" />
+		<%
+			String sDureeTypeMoisSelected = "";
+			String sDureeTypeAnneeSelected = "";
+			if(!Outils.isNullOrBlank(marcheCaracteristique.getDureeOptionType()) 
+			&& marcheCaracteristique.getDureeOptionType().equals("mois"))
+			{
+				sDureeTypeMoisSelected = " selected='selected' ";
+				sDureeTypeAnneeSelected = " ";
+			} else{
+				sDureeTypeMoisSelected = " ";
+				sDureeTypeAnneeSelected = " selected='selected' ";
+			}
+			
+		%>
+		<select name="MarcheCaracteristique_sDureeOptionType" >
+			<option value="mois" <%= sDureeTypeMoisSelected %> >mois</option>
+			<option value="annee" <%= sDureeTypeAnneeSelected %> >année(s)</option>
+		</select>
+		à compter de la notification du marché.<br/>
+	
+		<%
+
+			String sCheckedReconductionEstimeeNeant = "";
+			String sCheckedReconductionEstimeeUnique = "";
+			String sCheckedReconductionEstimeeFourchette = "";
+	
+			switch (marcheCaracteristique.getIdNbReconductionEstimeeType() )
+			{
+			case MarcheCaracteristique.VALEUR_TYPE_NEANT:
+				sCheckedReconductionEstimeeNeant = "checked='checked'";
+				break;
+			case MarcheCaracteristique.VALEUR_TYPE_UNIQUE:
+				sCheckedReconductionEstimeeUnique = "checked='checked'";
+				break;
+			case MarcheCaracteristique.VALEUR_TYPE_FOURCHETTE:
+				sCheckedReconductionEstimeeFourchette = "checked='checked'";
+				break;
+			}
+
+		%>
+			<br/>
+			Nombre de reconductions éventuelles :
+			<br/>
+			<input type="radio" name="MarcheCaracteristique_reconduction_estimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_NEANT %>" <%= sCheckedReconductionEstimeeNeant %> />&nbsp; Néant<br/>
+			<input type="radio" name="MarcheCaracteristique_reconduction_estimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_UNIQUE %>" <%= sCheckedReconductionEstimeeUnique %> />&nbsp;
+			<input type="text" size="10" name="MarcheCaracteristique_lNbReconductionEstimee" value="<%= 
+				marcheCaracteristique.getNbReconductionEstimee() %>" />
+			<br/>
+			<input type="radio" name="MarcheCaracteristique_reconduction_estimee" value="<%= 
+			MarcheCaracteristique.VALEUR_TYPE_FOURCHETTE %>" <%= sCheckedReconductionEstimeeFourchette %> />&nbsp;
+			fourchette : entre
+			<input type="text" size="10" name="MarcheCaracteristique_lNbReconductionEstimeeBas" value="<%=
+				marcheCaracteristique.getNbReconductionEstimeeBas() %>" /> 
+			et <input type="text" size="10" name="MarcheCaracteristique_lNbReconductionEstimeeHaut" value="<%=
+				marcheCaracteristique.getNbReconductionEstimeeHaut() %>" />
+<%
+		}
+%>
+				</td>
+				<%= modula.editorial.EditorialAssistance
+						.getAideRedactionnelleDeskTdBouton(
+								"iIdOptions",rootPath,sessionUserHabilitation) %>
+			</tr>
+		</table>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Calendrier des march&eacute;s ult&eacute;rieurs en cas de marchés reconductibles :<br />
+        <i>Ne doit pas être rempli pour les formulaires JOUE 2 et 5 </i><br/>
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CALENDRIER) %>
+		</td>
+		<td class="pave_cellule_droite">
+		<table  >
+			<tr>
+				<td><textarea name="<%=sFormPrefix %>sCalendrierUlterieur" id="<%=
+					sFormPrefix %>sCalendrierUlterieur" cols="100" rows="6"><%= 
+						marche.getCalendrierUlterieur() %></textarea></td>
+				<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton(
+						"iIdCalendrierUlterieur",rootPath,sessionUserHabilitation) %>
+			</tr>
+		</table>
+		</td>
+	</tr>
+<%
+	} 
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

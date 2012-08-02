@@ -1,0 +1,15 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Groupe</td>
+	</tr>
+	<% hbFormulaire.bIsForm = false; %>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<% hbFormulaire.bIsForm = true; %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :","sNom",group.getName(),"size='50'") %>
+	<% hbFormulaire.bIsForm = false; %>
+	<%= hbFormulaire.getHtmlTrInput("Date de création :","",CalendarUtil.getDateCourte(group.getDateCreation()),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Date de modification :","",CalendarUtil.getDateCourte(group.getDateModification()),"") %>
+	<% hbFormulaire.bIsForm = true; %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

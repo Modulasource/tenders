@@ -1,0 +1,328 @@
+<%@page import="java.util.Vector"%>
+<%@page import="modula.fqr.FQRCoupleQR"%>
+<%@page import="modula.fqr.FQR"%>
+<%@page import="org.coin.security.Password"%>
+<%@page import="modula.fqr.FQRTypeQuestion"%>
+<%@page import="org.coin.security.SecureString"%>
+<%
+	String sMess=HttpUtil.parseStringBlank("mess", request);
+    boolean bWriteQuestion=HttpUtil.parseBoolean("bWriteQuestion", request, false);
+    Vector<MarcheFqr> vMarcheFqrAll = MarcheFqr.getAllMarcheFqrFromMarche(marche.getIdMarche());
+    Vector<MarcheFqr> vMarcheFqrCandidat = new Vector<MarcheFqr>();
+    Vector<MarcheFqr> vMarcheFqrValide = new Vector<MarcheFqr>();
+    
+    for(MarcheFqr marcheFqr : vMarcheFqrAll)
+    {
+        if(marcheFqr.getIdMarcheFqrStatut() == MarcheFqrStatut.STATUT_VALIDE )
+        {
+        	vMarcheFqrValide.add(marcheFqr);
+        }
+        
+        if(marcheFqr.getIdPersonnePhysique() == sessionUser.getIdIndividual()) 
+        {
+        	vMarcheFqrCandidat.add(marcheFqr);
+        }
+                
+    }
+    
+	if(bWriteQuestion){
+		 MarcheFqrType marcheFqrTypeCreation = new MarcheFqrType();
+%>    	
+
+
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="mt.modula.affaire.fqr.*"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="modula.graphic.Icone"%>
+
+<form name="poserQuestion" method="post" action="<%= 
+	response.encodeURL(rootPath+"publisher_traitement/private/FQR/sauvegarderQuestionFQRPub.jsp")%>" >
+
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Définir la question</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+        <tr>
+            <td class="pave_cellule_gauche">Type de question : </td>
+            <td class="pave_cellule_droite">
+            <%= marcheFqrTypeCreation.getAllInHtmlSelect("lIdMarcheFqrType") %>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_gauche">Titre de la question : </td>
+            <td class="pave_cellule_droite">
+                <input name="sTitre"   id="idFqrTitre" type="text" size="50" value="" />
+            </td>
+        </tr>
+            <td class="pave_cellule_gauche"><strong>Question : <strong></td>
+            <td class="pave_cellule_droite">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center">
+                <textarea name="sQuestion"  id="idFqrQuestion" cols="99" rows="10"></textarea>
+            </td>
+        </tr>                                   
+    </table>
+  </div>
+</div>
+<script type="text/javascript">
+function checkFormFqr(){
+
+    try{
+	    if ($("lIdMarcheFqrType").value == 0){
+	        alert("Vous devez spécifier un type de question"); 
+	        $("lIdMarcheFqrType").focus();
+	        return false;
+	    }
+
+		if ($("idFqrTitre").value == null || $("idFqrTitre").value.length < 5){
+	        alert("Vous devez spécifier un titre à votre question (au moins 5 caractères)");
+	        $("idFqrTitre").focus();
+	        return false;
+	    }
+
+	    
+	    if ($("idFqrQuestion").value == null ||  $("idFqrQuestion").value.length < 5){
+	        alert("Vous devez poser votre question (au moins 5 caractères)");
+	        $("idFqrQuestion").focus();
+	        return false;
+	    }
+    } catch(e) {
+		alert(e);
+		return false;
+    }
+
+    return true;
+    
+}
+
+</script>
+<div style="text-align:center">                     
+    <input type="hidden" name="idMarche" value="<%= marche.getIdMarche() %>" />
+    <input type="hidden" name="cand" value="<%= sCand %>" />
+    <input type="hidden" name="sAction" value="create" />
+    <button type="submit" onclick="javascript:return checkFormFqr()" >Valider</button>&nbsp;
+    <button type="button"  onclick="Redirect('<%= 
+        response.encodeURL("../candidat/consulterDossier.jsp?cand="
+            + sCand + "&iIdOnglet=3" ) %>')" >Annuler</button>&nbsp;&nbsp;
+</div>    	
+<%    	
+	} // bWriteQuestion
+	else 
+	{
+		if (!sMess.equalsIgnoreCase("")){ 
+%>
+
+<%@page import="org.coin.util.HttpUtil"%>
+<div style="text-align:center">
+    <font color="#090">Votre question a bien été prise en compte.<br />
+    La personne habilitée y répondra dans les plus brefs délais.
+    </font>
+</div>
+<br />
+<%
+		}
+		
+    
+%>
+<br />
+
+
+
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Liste des questions / réponses validés</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+        <tr>
+            <td >
+
+	            <table class="liste" >
+	                <tr>
+                        <th style="width: 10%" >Etat</th>
+	                    <th style="width: 50%" >Question / Réponse</th>
+	                    <th style="width: 10%" >Type</th>
+	                    <th style="width: 5%" >&nbsp;</th>
+	                </tr>
+                
+    <%
+            
+        for(int j = 0 ; j < vMarcheFqrValide.size(); j++)
+        {   
+            MarcheFqr marcheFqr = vMarcheFqrValide.get(j);
+                
+            PersonnePhysique pers = PersonnePhysique.getPersonnePhysique(marcheFqr.getIdPersonnePhysique());
+            Organisation org = Organisation.getOrganisation(pers.getIdOrganisation());
+            MarcheFqrType marcheFqrType = null;
+            try{
+                marcheFqrType = MarcheFqrType.getMarcheFqrTypeMemory(marcheFqr.getIdMarcheFqrType());
+            } catch (CoinDatabaseLoadException e){ 
+                marcheFqrType = new MarcheFqrType();
+                marcheFqrType.setLibelle("? = " + marcheFqr.getIdMarcheFqrType());
+            }
+            
+            MarcheFqrStatut marcheFqrStatut =  null;
+            try{
+                marcheFqrStatut = MarcheFqrStatut.getMarcheFqrStatutMemory(marcheFqr.getIdMarcheFqrStatut());
+            } catch (CoinDatabaseLoadException e){ 
+                marcheFqrStatut = new MarcheFqrStatut();
+                marcheFqrStatut.setLibelle("? = " + marcheFqr.getIdMarcheFqrStatut());
+            }
+            
+    %>
+	                <tr class="liste<%=j%2%>" 
+	                onmouseover="className='liste_over'" 
+	                onmouseout="className='liste<%=j%2%>'" 
+	                style="cursor: pointer;"
+	                onclick="Element.toggle('marcheFqr_valide_<%= marcheFqr.getId() %>')" >
+                        <td><%= marcheFqrStatut.getName() %></td>
+	                    <td>
+	                        <%= marcheFqr.getTitre() %> <br/>
+	                        <div id="marcheFqr_valide_<%= marcheFqr.getId() %>"
+	                              style="display: none;"  >
+	                            <u>Question</u> : <%=  marcheFqr.getQuestion() %><br/>
+	                            <u>Réponse</u> : <%=  marcheFqr.getReponse() %>
+	                        </div>
+	                    </td>
+	                    <td><%= marcheFqrType.getName() %>&nbsp;</td>
+	                    <td style="text-align:right">
+	                        <img src="<%=rootPath+ Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE
+	                        %>"  alt="Voir la question" title="Voir la question" />
+	                    </td>
+	                </tr>
+    <%
+        }
+    %>
+<%
+        if(vMarcheFqrValide.size() == 0){
+%>
+				    <tr><td colspan="4">&nbsp;</td></tr>
+				    <tr><td colspan="4">Pas de question</td></tr>
+				    <tr><td colspan="4">&nbsp;</td></tr>
+<%
+        }
+    
+%>
+	            </table>
+	        </td>
+	    </tr>
+	</table>	
+    </div>
+</div>
+	<%
+	} // End ELSE bWriteQuestion
+%>
+
+
+
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Liste des questions que vous avez posé</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+        <tr>
+            <td >
+
+		      <table class="liste" >
+		            <tr>
+                        <th style="width: 10%" >Etat</th>
+		                <th style="width: 50%" >Question / Réponse</th>
+		                <th style="width: 10%" >Type</th>
+		                <th style="width: 5%" >&nbsp;</th>
+		            </tr>
+ 
+    <%
+    
+		    for(int j = 0 ; j < vMarcheFqrCandidat.size(); j++)
+		    {   
+		        MarcheFqr marcheFqr = vMarcheFqrCandidat.get(j);
+		        MarcheFqrType marcheFqrType = null;
+		        try{
+	                marcheFqrType = MarcheFqrType.getMarcheFqrTypeMemory(marcheFqr.getIdMarcheFqrType());
+	            } catch (CoinDatabaseLoadException e){ 
+	                marcheFqrType = new MarcheFqrType();
+	                marcheFqrType.setLibelle("? = " + marcheFqr.getIdMarcheFqrType());
+	            }
+	            
+	            MarcheFqrStatut marcheFqrStatut =  null;
+	            try{
+	                marcheFqrStatut = MarcheFqrStatut.getMarcheFqrStatutMemory(marcheFqr.getIdMarcheFqrStatut());
+	            } catch (CoinDatabaseLoadException e){ 
+	                marcheFqrStatut = new MarcheFqrStatut();
+	                marcheFqrStatut.setLibelle("? = " + marcheFqr.getIdMarcheFqrStatut());
+	            }
+
+            %>
+			  <tr class="liste<%=j%2%>" 
+			        onmouseover="className='liste_over'" 
+	                onmouseout="className='liste<%=j%2%>'" 
+	                style="cursor: pointer;"
+	                onclick="Element.toggle('marcheFqr_<%= marcheFqr.getId() %>')" >
+                    <td><%= marcheFqrStatut.getName() %></td>
+                    <td>
+                        <%= marcheFqr.getTitre() %>  <br/>
+                        <div id="marcheFqr_<%= marcheFqr.getId() %>"
+                              style="display: none;"  >
+                            <u>Question</u> : <%=  marcheFqr.getQuestion() %><br/>
+                            <u>Réponse</u> : <%=  marcheFqr.getReponse() %>
+                        </div>
+                    </td>
+                    <td><%= marcheFqrType.getName() %>&nbsp;</td>
+                    <td style="text-align:right">
+                        <img src="<%=rootPath+ Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE
+                        %>"  alt="Voir la question" title="Voir la question" />
+                    </td>
+                </tr>
+    <%
+            }
+    %>
+                </table>
+            </td>
+        </tr>
+    </table>    
+    </div>
+</div>
+
+
+<div style="text-align:center">
+	<button type="button" onclick="Redirect('<%= response.encodeURL(
+			 rootPath + "publisher_portail/private/candidat/consulterDossier.jsp?iIdOnglet=3&bWriteQuestion=true&cand="
+			     +SecureString.getSessionSecureString(Long.toString(candidature.getIdCandidature()),session) ) 
+					%>')" >Poser une question</button>
+</div><br />

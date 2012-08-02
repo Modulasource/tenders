@@ -1,0 +1,7 @@
+<br />
+<div class="footer">
+	<a href="<%= 
+		response.encodeURL(rootPath + "publisher_portail/public/pagesStatics/infoslegales.jsp") 
+		%>" >Conditions générales d'utilisation</a> <font color="#ff8c00">|</font> 
+	<a href="http://www.modula-demat.com">Credits</a>
+</div>

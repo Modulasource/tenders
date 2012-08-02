@@ -1,0 +1,128 @@
+<%
+	Vector vTypeObjetModula = modula.TypeObjetModula.getAllTypeObjetModula();
+	Vector vPublicationType = PublicationType.getAllPublicationType();
+	Vector vPublicationEtat = org.coin.fr.bean.export.PublicationEtat.getAllPublicationEtat();
+	Vector vPublicationDestinationType = org.coin.fr.bean.export.PublicationDestinationType.getAllStaticMemory();
+
+%>		
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="org.coin.fr.bean.export.PublicationDestinationType"%><tr>
+			<td class="pave_cellule_gauche">Type d'objet :</td>
+			<td class="pave_cellule_droite">
+			<input type="hidden" name="iIdPublication" value="<%= publi.getIdPublication() %>" />
+			<input name="iIdReferenceObjet" type="hidden" value="<%= publi.getIdReferenceObjet() %>" />
+			<input name="iIdExport" type="hidden" value="<%= publi.getIdExport() %>" />
+			<select name="iIdTypeObjet" >
+				<%
+				for(int i = 0; i < vTypeObjetModula.size() ; i++)
+				{
+					String sSelected = "";
+					modula.TypeObjetModula oTypeObjet = (modula.TypeObjetModula)vTypeObjetModula.get(i);
+					if(publi.getIdTypeObjet() == oTypeObjet.getId())
+					{
+						sSelected = " selected ";
+					}
+
+				 %>
+				<option value="<%= oTypeObjet.getId() %>" <%=sSelected %> ><%= oTypeObjet.getName() %></option>
+				<%} %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Type :</td>
+			<td class="pave_cellule_droite">
+			<select name="iIdPublicationType" >
+				<%
+				
+				for(int i = 0; i < vPublicationType.size() ; i++)
+				{
+					String sSelected = "";
+					PublicationType publiType = (PublicationType)vPublicationType.get(i);
+					if(publi.getIdPublicationType() == publiType.getId())
+					{
+						sSelected = " selected ";
+					}
+
+				 %>
+				<option value="<%= publiType.getId() %>" <%=sSelected %> ><%= publiType.getName() %></option>
+				<%} %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Etat :</td>
+			<td class="pave_cellule_droite">
+			<select name="iIdPublicationEtat" >
+				<%
+				
+				for(int i = 0; i < vPublicationEtat.size() ; i++)
+				{
+					String sSelected = "";
+					PublicationEtat publiEtat = (PublicationEtat)vPublicationEtat.get(i);
+					if(publi.getIdPublicationEtat() == publiEtat.getId())
+					{
+						sSelected = " selected ";
+					}
+
+				 %>
+				<option value="<%= publiEtat.getId() %>" <%=sSelected %> ><%= publiEtat.getName() %></option>
+				<%} %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Type destination :</td>
+			<td class="pave_cellule_droite">
+			<select name="iIdPublicationDestinationType" >
+				<%
+				
+				for(int i = 0; i < vPublicationDestinationType.size() ; i++)
+				{
+					String sSelected = "";
+					PublicationDestinationType publiDestType = (PublicationDestinationType)vPublicationDestinationType.get(i);
+					if(publi.getIdPublicationDestinationType() == publiDestType.getId())
+					{
+						sSelected = " selected ";
+					}
+
+				 %>
+				<option value="<%= publiDestType.getId() %>" <%=sSelected %> ><%= publiDestType.getName() %></option>
+				<%} %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Référence externe :</td>
+			<td class="pave_cellule_droite"><input name="sReferenceExterne" type="text" value="<%= publi.getReferenceExterne() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Numéro de parution : </td>
+			<td class="pave_cellule_droite"><input name="sNumeroParution"  type="text" value="<%= publi.getNumeroParution() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Numéro d'annonce : </td>
+			<td class="pave_cellule_droite"><input name="sNumeroAnnonce"  type="text" value="<%= publi.getNumeroAnnonce() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date d'envoi : </td>
+			<td class="pave_cellule_droite"><input name="tsDateEnvoi" type="text" value="<%= publi.getDateEnvoi() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date d'envoi effective : </td>
+			<td class="pave_cellule_droite"><input name="tsDateEnvoi" type="text" value="<%= publi.getDateEnvoiEffective() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date de publication : </td>
+			<td class="pave_cellule_droite"><input name="tsDatePublication" type="text" value="<%= publi.getDatePublication() %>" /></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date de création : </td>
+			<td class="pave_cellule_droite"><%= publi.getDateCreation() %></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">Date de modification : </td>
+			<td class="pave_cellule_droite"><%= publi.getDateModification() %></td>
+		</tr>

@@ -1,0 +1,41 @@
+<script type="text/javascript">
+	function cacherToutesDivisions(){
+		var tab = new Array;
+<%Vector vCouples = FAQ.getAllCoupleQR(" WHERE id_statut="+FAQConstant.VALIDE+" ORDER BY id_type");
+	for (int j=0 ; j<vCouples.size() ; j++){
+		FAQ oCouple = (FAQ) vCouples.get(j) ;
+%>
+	tab[<%=j%>]=<%=oCouple.getIdCoupleQR()%>;
+<%
+	}
+%>
+	var nb;
+	for(var i=0;i<tab.length;i++){
+		nb=tab[i];
+		cacher('div'+nb);
+	}
+}
+function checkCategorie(){
+	if(document.enAttente.typeQR.value==0) {alert('Sélectionnez une catégorie');}
+	else {
+	document.enAttente.submit();
+	}
+}
+function checkQuestionReponse(){
+	if(document.formulaire2.type.value==0){
+		alert("Vous devez sélectionner une catégorie pour le couple Question-Réponse");
+		return false;
+	}
+	if(document.formulaire2.question.value==0){
+		alert("Vous devez remplir la question");
+		return false;
+	}
+	if(document.formulaire2.reponse.value==0){
+		alert("Vous devez remplir la question");
+		return false;
+	}
+	
+return true;
+}
+
+</script>

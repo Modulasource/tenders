@@ -1,0 +1,21 @@
+<%
+	
+	String sMessageErreur = "";
+	if(session.getAttribute("sMessageErreur") != null
+	&& !((String)session.getAttribute("sMessageErreur")).equalsIgnoreCase(""))
+	{
+		sMessageErreur = (String)session.getAttribute("sMessageErreur");
+        session.setAttribute("sMessageErreur", null);
+	}
+	
+	
+	if(sMessageErreur!=null && !sMessageErreur.equalsIgnoreCase(""))
+	{
+%>
+<div id="login_box" class="error-msg">
+<%= sMessageErreur %>
+</div>
+<%
+    } 
+%>
+

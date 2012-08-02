@@ -1,0 +1,43 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Coordonnées de l'organisme</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Email :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="sMailOrganisation" size="60" maxlength="255"  
+			value="<%= organisation.getMailOrganisation() %>"					
+			<%=bReadOnly?"readonly":"" %> >&nbsp;<input type="button" value="Générer un Email" onclick="javascript:buildEmail();" />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">T&eacute;l&eacute;phone :</td>
+		<td class="pave_cellule_droite"  >
+			<input type="text" name="sTelephone" size="20" maxlength="20" 
+			value="<%= organisation.getTelephone() %>"
+			<%=bReadOnly?"readonly":"" %> />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Fax :</td>
+		<td class="pave_cellule_droite"  >
+			<input type="text" name="sFax" size="20" maxlength="20" 
+			value="<%= organisation.getFax() %>"
+			<%=bReadOnly?"readonly":"" %> />
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche"  >Adresse Internet :</td>
+		<td class="pave_cellule_droite"  >
+			<input type="text" name="sSiteWeb" size="60" maxlength="100" 
+			value="<%= organisation.getSiteWeb() %>"
+			<%=bReadOnly?"readonly":"" %> />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

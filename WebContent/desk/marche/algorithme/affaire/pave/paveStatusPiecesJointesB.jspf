@@ -1,0 +1,142 @@
+<%@page import="org.coin.security.token.Crypto"%>
+<%@page import="modula.candidature.EnveloppeBPieceJointe"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="org.coin.security.CertificateUtil"%>
+<%
+	Vector vEnveloppeBPJ 
+	= EnveloppeBPieceJointe.getAllEnveloppeBPiecesJointesFromEnveloppe(oEnveloppeB.getIdEnveloppe());
+if(vEnveloppeBPJ != null)
+{
+	if(vEnveloppeBPJ.size() > 0)
+	{
+	%>
+<table class="pave" s>
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Liste des pièces jointes de l'enveloppe B<%=
+				oEnveloppeB.getIdEnveloppe() %></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<table class="liste" >
+				<tr>
+					<th>Nom</th>		
+					<th>Taille</th>
+					<th>Statut</th>
+					<th>Signature fichier chiffré</th>	
+					<th>Signature fichier clair</th>	
+					<th>Certificat</th>
+					<th>Action</th>
+				</tr>
+	<%
+	for(int iEnvBPJ=0;iEnvBPJ<vEnveloppeBPJ.size();iEnvBPJ++)
+	{
+		EnveloppeBPieceJointe envBPJ = (EnveloppeBPieceJointe)vEnveloppeBPJ.get(iEnvBPJ);
+		
+		String sNomCertificat = "";
+		
+		if(envBPJ.getCertificatPublic() != null)
+		{
+	        try{
+			    sNomCertificat = CertificateUtil.getCertificateFilename(envBPJ.getCertificatPublic());
+	        } catch(Exception e){
+	        	sNomCertificat = e.getMessage();
+	        }
+		}
+		String sStateEnvB = null;
+		try{
+			sStateEnvB = envBPJ.getFileStateName();
+		} catch(Exception e){
+			sStateEnvB = e.getMessage();
+			e.printStackTrace();
+		}
+		
+		%>
+		<tr>
+			<%
+			String sURLBPJ = "desk/DownloadFileDesk?" 
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request,
+							envBPJ.getIdEnveloppePieceJointe(), 
+							TypeObjetModula.ENVELOPPE_B);
+					
+			sURLBPJ = response.encodeURL(rootPath+ sURLBPJ);
+			%>
+			<td style="vertical-align: top;">
+				<a style="font-size: 9px" href="<%= sURLBPJ %> ">
+				<%= envBPJ.getNomPieceJointe() %>
+				</a>
+			</td>
+			<td><%= envBPJ.getFileSizeInMegaBytes() %></td>
+			<td style="vertical-align: top;"><%= sStateEnvB %></td>
+			<%
+			String sURLB = "desk/DownloadFileDesk?"
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request,
+							envBPJ.getIdEnveloppePieceJointe(), 
+							TypeObjetModula.ENVELOPPE_B_PJ)
+					+ "&amp;sTypeSignature=chiffre";
+					
+			sURLB = response.encodeURL(rootPath+ sURLB);
+			%>
+			<td style="vertical-align: top;">
+				<a style="font-size: 9px" href="<%= sURLB %>">
+				<%= envBPJ.getNomPieceJointe()+".sign" %>
+				</a>
+			</td>
+			<%
+			String sURLBBis = "desk/DownloadFileDesk?"
+					+ DownloadFile.getSecureTransactionStringFullJspPage(
+							request,
+							envBPJ.getIdEnveloppePieceJointe(), 
+							TypeObjetModula.ENVELOPPE_B_PJ)
+					+"&amp;sTypeSignature=clair";
+			sURLBBis = response.encodeURL(rootPath+ sURLBBis);
+			%>
+			<td style="vertical-align: top;">
+				<a style="font-size: 9px" href="<%= sURLBBis %>">
+				<%= envBPJ.getNomPieceJointe()+".sign" %>
+				</a>
+			</td>
+			<td style="vertical-align: top;">
+			<%
+			
+			String sURLCertificate = "";
+			if(sNomCertificat.compareTo("") != 0)
+			{
+				sURLCertificate = "desk/DownloadFileDesk?"
+						+ DownloadFile.getSecureTransactionStringFullJspPage(
+								request,
+								envBPJ.getIdEnveloppePieceJointe(), 
+								TypeObjetModula.ENVELOPPE_B_PJ_CERT);
+						
+				sURLCertificate = response.encodeURL(rootPath+ sURLCertificate);
+			%>
+				<a style="font-size: 9px" href="<%= sURLCertificate %>">
+				<%= sNomCertificat %>
+				</a>
+			<%
+			}
+			%>
+			</td>
+			<td style="vertical-align: top;">
+			<input type="button" value="tester le fichier" 
+			onclick="OuvrirPopup('<%= response.encodeURL("testerPieceJointe.jsp?iIdPieceJointe="
+					+envBPJ.getIdEnveloppePieceJointe()
+					+"&iIdTypeObjetModula="+ TypeObjetModula.ENVELOPPE_B )
+					%>',200,200,'menubar=no,scrollbars=yes,statusbar=no')" />
+			</td>
+		</tr>
+		<%
+		}
+		%>
+		</table>
+		</td>
+		</tr>
+	</table>
+	<br />
+	<%
+	}
+}
+%>

@@ -1,0 +1,49 @@
+<%@page import="org.coin.security.SecureString"%>
+<%@page import="org.coin.fr.bean.Pays"%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueCivilite"%>
+<input type="hidden" name="pp" value="<%= SecureString.getSessionSecureString(Long.toString(personne.getId()),session) %>" />
+<input type="hidden" name="sEmailAuth" id="sEmailAuth" value="" />
+<% 
+	PersonnePhysiqueCivilite ppCivilite = new PersonnePhysiqueCivilite(personne.getIdPersonnePhysiqueCivilite()); 
+%>
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Personne physique</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+	<%= hbFormulaire.getHtmlTrSelect("Civilité* :","iIdCivilite",ppCivilite) %>
+	<%= hbFormulaire.getHtmlTrInput("Nom* :","sNom",personne.getNom(), " size='55' ") %>
+	<%= hbFormulaire.getHtmlTrInput("Prénom* :","sPrenom",personne.getPrenom(), " size='55' ") %>
+	<%= hbFormulaire.getHtmlTrInput("Fonction :","sFonction",personne.getFonction(), " size='55' ") %>
+	<tr>
+		<td class="pave_cellule_gauche" >Nationalité :</td>
+		<td class="pave_cellule_droite" >
+		<%= Pays.getPaysHTMLComboList(personne.getIdNationalite(),"iIdNationalite") %>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Tél. :","sTel",personne.getTel(), " size='55' ") %>
+	<tr id="tr_infoEmail" style="display: none; visibility: hidden;">
+		<td class="pave_cellule_gauche" >&nbsp;</td>
+		<td class="pave_cellule_droite" >
+			<div class="rouge" style="text-align:left">
+			Attention, l'adresse Email saisie ci-dessous est déjà enregistrée dans la base de données.
+			</div>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Email* :","sEmail",personne.getEmail(),"onBlur=\"verifierMailPP();\" onKeyUp=\"verifierMailPP();\" size='55' ") %>
+	<%= hbFormulaire.getHtmlTrInput("Fax. :","sFax",personne.getFax()," size='55'") %>
+	<%= hbFormulaire.getHtmlTrInput("Tel. portable :","sTelPortable",personne.getTelPortable()," size='55' ") %>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+<%@page import="org.coin.util.treeview.TreeviewNode"%>
+					<%
+					//TreeviewNode node ;
+					
+					for(j=0; j < node.iDepth; j++)
+					{
+						String sTreeviewNodeImage = "blank.png";
+						if(j==0){
+							sTreeviewNodeImage = "I.png";
+						} 
+					    
+						if( j == (node.iDepth-1)  ){
+                            if(node.isHasBrother())
+                            {
+								sTreeviewNodeImage = "T.png";
+                            } else {
+                               sTreeviewNodeImage = "L.png";
+                            }
+						}
+						%>
+                        <td style='width: 19 px; text-align: center ; vertical-align:center'>
+                            <img style="vertical-align:bottom" src="<%= rootPath + "images/treeview/"+sTreeviewNodeImage %>" />
+                        </td><%
+					}
+					%>
+					<td style="width: 19 px; text-align: center ; vertical-align:center">
+                            <img style="vertical-align:bottom" src="<%= rootPath + "images/treeview/folder.png" %>" />
+                    </td>
+					<td style="width: 19 px; text-align: center ; vertical-align:center">&nbsp;<%=node.getName() %></td>
+					<%
+					for(; j < 8; j++)
+					{
+						%><td style='width:19 px; text-align: center; vertical-align:bottom'>&nbsp;</td>
+						<%
+					}
+					%>
+					<td >&nbsp;</td>
+					

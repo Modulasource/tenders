@@ -1,0 +1,113 @@
+
+var jourDebutDepotCandidature = form.elements['AAPC_tsDateValiditeDebut']
+var heureDebutDepotCandidature = form.elements['AAPC_tsHeureValiditeDebut'];
+var jourFinDepotCandidature = form.elements['enveloppe_a_tsDateValiditeFin'];
+var heureFinDepotCandidature = form.elements['enveloppe_a_tsHeureValiditeFin'];
+var ordre=Date.compareStringDate(jourDebutDepotCandidature.value,jourFinDepotCandidature.value);
+var sMsgError = "";
+
+if (ordre=="1")
+{
+	sMsgError = "La date de début de dépôt des candidatures est postérieure à la date de fin de dépôt des candidatures.";
+	mt.utils.displayFormFieldMsg(jourDebutDepotCandidature, sMsgError );
+	jourDebutDepotCandidature.focus();
+	alert(sMsgError );
+    return false;
+}
+if (ordre=="0")
+{
+	if(heureDebutDepotCandidature.value>=heureFinDepotCandidature.value)
+	{
+		sMsgError= "L'heure de début de dépôt des candidatures est postérieure ou égale à l'heure de fin de dépôt des candidatures.";
+		mt.utils.displayFormFieldMsg(heureFinDepotCandidature,sMsgError);
+		heureFinDepotCandidature.focus();
+		alert(sMsgError );
+   		return false;
+   	}
+}
+
+var anc_nb_rel=form.elements['iIndex'];
+if(anc_nb_rel){
+	var i=anc_nb_rel.value-1
+	prefix="enveloppe_b_"+i
+	var oldDateValiditeDebut=prefix+"_tsDateValiditeDebut";
+	var oDateValDebut=form.elements[oldDateValiditeDebut];
+	var	oldHeureValiditeDebut=prefix+"_tsHeureValiditeDebut";
+	var oHeureValDebut=form.elements[oldHeureValiditeDebut];
+	var oldDateValiditeFin=prefix+"_tsDateValiditeFin";
+	var oDateValFin=form.elements[oldDateValiditeFin];
+
+	//vérifier que les dates sont saisies dans le bonne ordre
+	if(oDateValDebut && oDateValFin){
+		ordre=Date.compareStringDate(oDateValDebut.value,oDateValFin.value);
+		if(ordre=="1")
+		{
+		    mt.utils.displayFormFieldMsg(oDateValFin,"La date de début de réception des offres est postérieure à La date de fin de réception des offres.");
+		    oDateValFin.focus();
+		    return false;
+		}
+		if(ordre=="0")
+		{
+		    if(oHeureValFin.value<=oHeureValDebut.value)
+			{
+			    mt.utils.displayFormFieldMsg(oHeureValFin,"L'heure de début de réception des offres est postérieure ou égale à L'heure de fin de réception des offres.");
+			    oHeureValFin.focus();
+		        return false;
+		    }
+		}
+	}
+
+	//comparaison entre les dates de dépôt d'offre et de candidature
+	ordre=Date.compareStringDate(jourFinDepotCandidature.value,oDateValDebut.value);
+	if(ordre=="1")
+	{
+		mt.utils.displayFormFieldMsg(oDateValDebut,"La date de fin de réception des candidatures est postérieure à La date de début de réception des offres.");
+		oDateValDebut.focus();
+		return false;
+	}
+	if(ordre=="0")
+	{
+	    if(heureFinDepotCandidature.value>=oHeureValDebut.value)
+		{
+		   mt.utils.displayFormFieldMsg(oHeureValDebut,"L'heure de fin de réception des candidatures est postérieure ou égale à L'heure de début de réception des offres.");
+		   oHeureValDebut.focus();
+		   return false;
+		}
+	}
+}
+//comparaison entre la dernière date de dépot des offres et la nouvelle
+//nouvelle date de relance
+var nDateValDebut=form.elements['enveloppe_b_supp_tsDateValiditeDebut'];
+var nHeureValDebut=form.elements['enveloppe_b_supp_tsHeureValiditeDebut'];
+var nDateValFin=form.elements['enveloppe_b_supp_tsDateValiditeFin'];
+var nHeureValFin=form.elements['enveloppe_b_supp_tsHeureValiditeFin'];
+
+
+//vérifier que la nouvelle date est saisie dans le bonne ordre
+if(nDateValDebut && nDateValFin){
+	ordre=Date.compareStringDate(nDateValDebut.value,nDateValFin.value);
+	if(ordre=="1")
+	{
+		mt.utils.displayFormFieldMsg(nDateValFin,"La date de début de réception des offres est postérieure à La date de fin de réception des offres.");
+		nDateValFin.focus();
+		return false;
+	}
+	if(ordre == "0"){
+		if (nHeureValDebut.value>=nHeureValFin.value){
+			mt.utils.displayFormFieldMsg(nHeureValFin,"L'heure de début de réception des offres est postérieure ou égale à L'heure de fin de réception des offres.");
+			nHeureValFin.focus();
+			return false;
+		}
+	}
+	//vérifier le non-chevauchement de la dernière période saisie et de la nouvelle
+	if((nDateValFin.value!="")&&(nDateValDebut.value!=""))
+	{
+	    ordre=Date.compareStringDate(oDateValFin.value,nDateValDebut.value);
+		if(ordre=="1")
+		{
+			mt.utils.displayFormFieldMsg(nDateValDebut,"La dernière date de fin de réception des offres est postérieure à la date nouvelle date de début de réception des offres.");
+			nDateValDebut.focus();
+			return false;
+		}
+	}
+}

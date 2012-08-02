@@ -1,0 +1,156 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		String sPaveRecompenseTitre;
+	*
+	*/
+	
+	MarcheAutreRenseignement mnc = null;
+	try {
+		mnc =  MarcheAutreRenseignement.getMarcheAutreRenseignementFromIdMarche(marche.getId());
+	}catch (Exception e ) {
+		mnc = new MarcheAutreRenseignement();
+	}	
+	
+	Currency currency = null;
+	try {
+		currency = Currency.getCurrency(mnc.getIdCurrencyDocumentPayant());
+	} catch (Exception e) {
+		currency = new Currency ("EUR");
+	}
+	
+%>
+<%@page import="modula.marche.MarcheAutreRenseignement"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="org.coin.bean.accountancy.Currency"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.util.Outils"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveRecompenseTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Définition des &étudesà effectuer par les candidats 
+			(concours, marché de conception réalisation ou dialogue compétitif) :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sDefEtudes" cols="100" rows="4"><%= marche.getDefEtudes() %></textarea>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr><td colspan="2" class="mention" >R&eacute;compenses et Jury</td></tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Nombre et valeur des primes qui seront attribu&eacute;es :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sPrimes" cols="100" rows="4"><%= marche.getPrimes() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		D&eacute;tails des paiements &agrave; verser &agrave; tous les participants:
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sDetailPaiement" cols="100" rows="4"><%= marche.getDetailPaiement() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Le march&eacute; qui fera suite &agrave; ce concours devra &ecirc;tre attribu&eacute; au 
+		laur&eacute;at ou &agrave; l'un des laur&eacute;ats d'un concours :
+		</td>
+		<td class="pave_cellule_droite">
+<%
+	
+	String sAttributionLaureatCheckedBlank = "";
+	String sAttributionLaureatCheckedYes = "";
+	String sAttributionLaureatCheckedNo = "";
+
+	switch (marche.getAttributionLaureat())
+	{
+		case 1:
+			sAttributionLaureatCheckedYes = "selected= 'selected' ";
+			break;
+		case 0:
+			sAttributionLaureatCheckedBlank = "selected= 'selected' ";
+			break;
+			
+		default:
+			sAttributionLaureatCheckedNo = "selected= 'selected' ";
+			break;
+	
+	}
+%>
+			<select name="<%= sFormPrefix %>iAttributionLaureat" >
+			<option value="0" <%= sAttributionLaureatCheckedBlank %> >&nbsp;</option>
+			<option value="1" <%= sAttributionLaureatCheckedYes %> >Oui</option>
+			<option value="2" <%= sAttributionLaureatCheckedNo %> >Non</option>
+			</select>
+		</td>
+	</tr>
+
+<%
+	if(bUseBoamp17){
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Conditions de remise des offres ou des candidatures :
+		</td>
+		<td class="pave_cellule_droite">
+		<textarea rows="3" cols="60" name="MarcheAutreRenseignement_sConditionRemiseEnveloppe"><%= 
+			mnc.getConditionRemiseEnveloppe() %></textarea>
+		</td>
+	</tr>
+
+	<tr>
+		<td class="pave_cellule_gauche">
+			Conditions et mode de paiement pour obtenir les documents contractuels et additionnels :
+		</td>
+		<td class="pave_cellule_droite">
+		<textarea rows="3" cols="60" name="MarcheAutreRenseignement_sConditionObtentionDocument"><%= 
+			mnc.getConditionObtentionDocument() %></textarea>
+		</td>
+	</tr>
+<%
+		if(bUseFormNS || bUseFormUE)
+		{
+%>	
+	<tr>
+		<td class="pave_cellule_gauche">
+			Date limite d'obtention : 
+		</td>
+		<td class="pave_cellule_droite">
+  		<input type="text" size="8" name="MarcheAutreRenseignement_tsConditionObtentionDocumentDateLimite_Date" 
+  			class="dataType-date" size="15" maxlength="10" value="<%=
+  				CalendarUtil.getDateCourte(mnc.getConditionObtentionDocumentDateLimite() )  %>" /> 
+  		à <input type="text" size="5" name="MarcheAutreRenseignement_tsConditionObtentionDocumentDateLimite_Heure" value="<%=
+  			CalendarUtil.getHeureMinuteSecDefaultOfficial(mnc.getConditionObtentionDocumentDateLimite() ) %>" />
+  			<i>(format jj/mm/aaaa à hh:mm)</i>
+		</td>
+	</tr>
+		<%= QuestionAnswer.getHTML(
+			"AutreRenseignementDocumentPayant", 
+			"MarcheAutreRenseignement_lIdQaDocumentPayant",
+			mnc.getIdQaDocumentPayant(),
+			false,
+			true,
+			QuestionAnswer.FORM_TYPE_CHECKBOX) %>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Prix : 
+		</td>
+		<td class="pave_cellule_droite">
+  		<input type="text" size="10" name="MarcheAutreRenseignement_fDocumentPayantPrix" value="<%= 
+  			Outils.getFormatedValueNeant( mnc.getDocumentPayantPrix()) %>" />
+		<%= currency.getAllInHtmlSelect("MarcheAutreRenseignement_sIdCurrencyDocumentPayant")  %>
+		</td>
+	</tr>
+<%	
+		}
+	} 
+%>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

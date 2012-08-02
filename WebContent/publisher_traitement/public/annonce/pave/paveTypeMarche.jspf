@@ -1,0 +1,59 @@
+<%@page import="modula.marche.MarcheType"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="mt.modula.affaire.type.MarcheTypeExtension"%>
+<div class="post-header post-block">
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="right" style="margin: 2px;width: 60px" ><strong>Type : </strong></td>
+            <td style="text-align:left;margin: 2px;padding-left: 5px">
+                <% 
+                String sTypeMarche = "";
+                try {
+                	MarcheType type = MarcheType.getMarcheTypeMemory(marche.getIdMarcheType());
+                	sTypeMarche = type.getLibelle();
+                	
+                	if(!Outils.isNullOrBlank(type.getLibelleDetail())) sTypeMarche += " - "+type.getLibelleDetail();
+                	
+                	ArrayList<HashMap<String, String>> arrExt 
+                	   = MarcheTypeExtension.getAllActiveExtentionFromMarche(marche.getId(), type);
+                	
+                    if(arrExt.size()>0){
+                        for(HashMap<String, String> mapExt : arrExt){
+                            if(Boolean.valueOf(mapExt.get("value"))){
+                                sTypeMarche += " - "+mapExt.get("name");
+                            }
+                        }
+                    }
+                	
+                	String sPassation = "";
+                    try
+                    {
+                        int iIdMarchePassation = -1;
+                        if(iTypeProcedure ==  AffaireProcedure.AFFAIRE_PROCEDURE_PETITE_ANNONCE)
+                            iIdMarchePassation = marche.getPetiteAnnoncePassation();
+                        else
+                            iIdMarchePassation 
+                                = AffaireProcedure.getAffaireProcedureMemory(
+                                        marche.getIdAlgoAffaireProcedure()).getIdMarchePassation();
+                        
+                        sPassation = MarchePassation.getMarchePassationGlobalNameMemory(iIdMarchePassation);
+                    }
+                    catch(Exception e){}
+                    if(!Outils.isNullOrBlank(sPassation)) sTypeMarche += " ("+sPassation+")";
+                %>
+                <%= sTypeMarche %>
+                <%}catch(Exception e){} %>
+            </td>
+        </tr>
+        <tr>
+            <td class="right" style="vertical-align:top;margin: 2px"  ><strong>Objet : </strong></td>
+            <td style="text-align:left;margin: 2px;padding-left: 5px"><%= 
+            	Outils.linkify( Outils.getTextToHtml( marche.getObjet()), " target='_blank'") 
+             %></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,43 @@
+<div class="tabs">
+	<%
+	boolean bCandidatsPrevenuModifDCE = false;
+	try{bCandidatsPrevenuModifDCE = marche.isCandidatsPrevenusModificationDCE();}		
+	catch(Exception e){}
+		
+	for (int i = 0; i < vOnglets.size(); i++) 
+	{
+		onglet = vOnglets.get(i);
+		
+		if(!onglet.bHidden)
+		try {
+			String sImageInCreation = "" ;
+			bIsOngletInstancie = marche.isOngletInstancie(onglet.iId);
+			if (bLectureSeule && !bCandidatsPrevenuModifDCE && i == Onglet.ONGLET_AFFAIRE_DCE) bIsOngletInstancie = false; 
+			String sOnClick = "";
+			
+			if(!bIsOngletInstancie)
+			{
+				sImageInCreation = "<span style='color:#F00;font-weight:bold;font-size:12px'> ! </span>";
+			}
+		    if(bDCECorrupted && i == Onglet.ONGLET_AFFAIRE_DCE)
+            {
+                sImageInCreation += "<span style='color:#F00;font-weight:bold;font-size:12px'> CORROMPU </span>";
+            }
+			if(i == Onglet.ONGLET_AFFAIRE_PLANNING) sOnClick = "isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")";
+			
+			String sHref = response.encodeURL(onglet.sTargetUrl
+					+"&amp;iIdAffaire="+marche.getIdMarche()
+					+"&amp;nonce=" + System.currentTimeMillis());
+			
+			String sLink = "javascript:"+(sOnClick.equalsIgnoreCase("")?"location.href='"+sHref+"'":"if("+sOnClick+"){location.href='"+sHref+"';}");
+			%>
+			<div <%= (onglet.bIsCurrent?"class=\"active\"":"") %>
+				onclick="<%= sLink %>"><%=onglet.sLibelle%><%=sImageInCreation%>
+			</div><%
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	%>
+</div>

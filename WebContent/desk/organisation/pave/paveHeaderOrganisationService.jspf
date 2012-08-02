@@ -1,0 +1,52 @@
+<%@page import="modula.graphic.BarBouton"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.localization.Language"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.bean.UserStatus"%>
+<div id="menuBorder" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+	<div class="fullWidth">
+	<%
+	String sExtraParam = " class='opacity75' ";
+	String sExtraParamOnMouseOver= " this.className='opacity100' ";
+	String sExtraParamOnMouseOut= " this.className='opacity75' ";
+	
+	
+	String sLocalizationNameDisplayOrganization = locAddressBookButton.getValue(12,"Afficher l'organisation");
+	String sLocalizationNameDeleteService = localizeButton.getValueDelete();
+
+	Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+	vBarBoutons.add( 
+			new BarBouton(1,
+				sLocalizationNameDisplayOrganization,
+				response.encodeURL(rootPath + "desk/organisation/afficherOrganisation.jsp?iIdOnglet=" + Onglet.ONGLET_ORGANISATION_SERVICE+"&iIdOrganisation=" + organisation.getId()),
+				rootPath+"images/icons/36x36/home.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				sExtraParam,
+				true) );
+	
+	vBarBoutons.add( 
+			new BarBouton(2,
+				sLocalizationNameDeleteService,
+				"",
+				rootPath+"images/icons/32x32/remove.png", 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"removeService()",
+				sExtraParam,
+				true) );
+	
+	out.write( BarBouton.getAllButtonHtmlDesk(vBarBoutons));
+
+%>
+	</div>
+</div>
+<script>
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+	menuBorder.render($('menuBorder'));
+});
+</script>
+	<br />

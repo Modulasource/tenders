@@ -1,0 +1,71 @@
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="org.coin.localization.Language"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<tr class="liste<%=j%>" style="font-size:8px"> 
+	<td style="width:10%">
+	<%= cron.getName() %></td>
+	<td style="width:10%"><%= jobDetail.getName() %></td>
+	<td style="width:20%"><%= HtmlBeanInput.getHtmlInput("sJobArg0",cron.getCronExpression(),hbFormulaire.bIsForm) %></td>
+	<td style="width:20%"><%= HtmlBeanInput.getHtmlInput("sJobArg1",jobDetail.getDescription(),50,hbFormulaire.bIsForm) %></td>
+	<td style="width:20%">
+	<%
+	for(int k=0;k<tabKey.length;k++)
+	{
+		%><strong><%= tabKey[k] %></strong> : <%
+		if(tabKey[k].equalsIgnoreCase("iIdExport"))
+		{
+			Vector vExports = Export.getAllExport();
+		%>
+		<%= CoinDatabaseAbstractBeanHtmlUtil.getHtmlSelect("sJobArg"+(k+2), 1, (Vector<CoinDatabaseAbstractBean>)vExports, Long.parseLong(map.get(tabKey[k]).toString()), "",false,false) %>
+		<%
+		}
+		else if(tabKey[k].equalsIgnoreCase("iIdLanguage"))
+        {
+            Vector vLang = Language.getAllStaticMemory();
+        %>
+        <%= CoinDatabaseAbstractBeanHtmlUtil.getHtmlSelect("sJobArg"+(k+2), 1, (Vector<CoinDatabaseAbstractBean>)vLang, Long.parseLong(map.get(tabKey[k]).toString()), "",false,false) %>
+        <%
+        }
+		else
+		{
+		%>
+		<%= HtmlBeanInput.getHtmlInput("sJobArg"+(k+2),map.get(tabKey[k]).toString(),40,hbFormulaire.bIsForm) %><br/>
+		<%	
+		}
+		%>
+		<br/>
+		<%
+	}
+	%>
+	</td>
+	<td style="text-align:right;width:5%">
+		<a class="image" href="<%= response.encodeURL("afficherToutesCron.jsp?sAction=launchManuallyJob&sJobName=" + cron.getJobName() + "&sJobGroup=" + cron.getJobGroup() ) %>">
+		<img src="<%=rootPath+"images/icones/cog.gif"%>" alt="executer manuellement" title="executer"/>
+		</a>
+	</td>
+	<td style="text-align:right;width:5%">
+		<%
+		if(!sAction.equalsIgnoreCase("storeForm"))
+		{
+		%>
+		<a class="image" href="<%= response.encodeURL("afficherToutesCron.jsp?sAction=storeForm&sJobName=" + cron.getJobName() + "&sJobGroup=" + cron.getJobGroup() ) %>">
+		<%
+		}
+		else if(sAction.equalsIgnoreCase("storeForm"))
+		{
+		%>
+		<input type="hidden" name="sJobClass" value="<%= jobDetail.getJobClass().getName() %>" />
+		<a class="image" href="javascript:document.formulaire<%= i %>.submit();">
+		<%
+		}
+		%>
+		<img src="<%=rootPath+"images/icones/application_edit.gif"%>" alt="Modifier" title="Modifier"/>
+		</a>
+	</td>
+	<td style="text-align:right;width:5%">
+		<a class="image" href="<%= response.encodeURL("afficherToutesCron.jsp?sAction=remove&sJobName=" + cron.getJobName() + "&sJobGroup=" + cron.getJobGroup()+"&sJobClass="+jobDetail.getJobClass().getName() ) %>">
+		<img src="<%=rootPath+"images/icones/flag_red.gif"%>" alt="desactiver" title="desactiver"/>
+		</a>
+	</td>
+</tr>

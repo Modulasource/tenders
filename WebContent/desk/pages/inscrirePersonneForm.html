@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+
+<head>
+<META HTTP-EQUIV="Expires" CONTENT="-1"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache, must-revalidate">
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<TITLE>Inscrire une personne</TITLE>
+<script src="/modula/desk/include/verification.js" type="text/javascript"></script>
+<script type="text/javascript">
+function ChangeUrl(formulaire, champFormulaire, message, redirection)
+{
+	var champ = formulaire.elements[champFormulaire];
+		
+	if (champ.selectedIndex != 0)
+	{
+	
+		var url =  redirection + champ.options[champ.selectedIndex].value;
+		
+		window.top.main.location.href = url ;
+ 	}
+	else 
+	{
+		if (message != null)
+			alert(message);
+	}
+}
+</SCRIPT>
+<style type="text/css">
+<!-- 
+@import url("../include/css/desk.css");
+-->
+</style>
+<script src="../include/inscrirePersonneForm.js" type="text/javascript"></script>
+<script src="../include/redirection.js" type="text/javascript"></script>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="20" topmargin="20" marginwidth="20" marginheight="20">
+<form action="inscrirePersonne.jsp" method="post" id="form1" name="form1" onsubmit="return validation();">
+<div style="text-align:center; width : 99%;">
+	<div class="titre_page">INSCRIRE UNE PERSONNE</div>
+	<p><img src="../../images/icones/warning.gif" width="21" height="19"  alt="" style="vertical-align:middle" /><span class="red"><strong> Attention : </strong></span><br />
+	<strong>
+	- Ce membre ne sera relié à aucune commission<br />
+	- Le mot de passe est généré automatiquement et envoyé au destinataire par Modula
+	</strong>
+	</p>
+	<i>* : Champs obligatoires </i>
+	<br />
+	<!-- Organisation du membre -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">Organisation associ&eacute;e &agrave; la personne</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Type :</strong>
+					</td>
+					<td style="text-align : left;">
+					<input type="hidden" name="idOrganisationType" value="0" />
+					P.R.M.
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Organisation :</strong>
+					</td>
+					<td style="text-align : left;">
+					<input type="hidden" name="idOrganisation" value="1">
+					 Communauté de Communes de Cattenom et Environs - 24570069500027
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Organisation du membre -->
+	<br />
+	<!-- Informations personnelles -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">Personne physique &agrave; inscrire</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Civilit&eacute;* :</strong>
+					</td>
+					<td style="text-align : left;">
+						<select name="idCivilite" size="1">
+
+							<option value="1"> Monsieur
+
+							<option value="2"> Madame
+
+							<option value="3"> Mademoiselle
+
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Nom* :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="nom" size="40" maxlength="40"></td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Pr&eacute;nom* :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="prenom" size="40" maxlength="40"></td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Fonction* :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="fonction" size="40" maxlength="40"></td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Nationalit&eacute;* :</strong></td>
+					<td style="text-align : left;">
+						<select name="idNationalite" size="1">
+	                        <option selected="selected" >Choisissez le pays</option>
+
+							<option value="1"> France
+
+							<option value="2"> Allemagne
+
+							<option value="3"> Royaume Uni
+
+						</select></td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Tel :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="tel" size="20" maxlength="20"></td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Email* :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="email" size="40" maxlength="40"></td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Tel domicile :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="telDomicile" size="20" maxlength="20"></td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Tel portable:</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="telPortable" size="20" maxlength="20"></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Informations personnelles -->
+	<br />
+	<!-- Adresse à inscrire: -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">Adresse &agrave; inscrire</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Ligne 1* :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="adresseLigne1" size="40" maxlength="40" value="13, rue des Châteaux">
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Ligne 2 :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="adresseLigne2" size="40" maxlength="40" value="">
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Ligne 3 :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="adresseLigne3" size="40" maxlength="40" value="">
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Code postal* :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="codePostal" size="6" maxlength="5" value="57570">
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Commune* :</strong></td>
+					<td style="text-align : left;">
+					<input type="text" name="commune" size="30" maxlength="30" value="CATTENOM">
+					</td>
+				</tr>
+				<tr>
+					<td style="width : 50% ; text-align : right;">
+					<strong>Pays* :</strong></td>
+					<td style="text-align : left;">
+						<select name="pays">
+                        	<option value="">Choisissez le pays</option>
+
+								<option value="1"
+								selected >
+								France
+	
+								<option value="2"
+								 >
+								Allemagne
+	
+								<option value="3"
+								 >
+								Royaume Uni
+	
+						</select>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Adresse à inscrire -->
+	<br />
+	<!-- Compte utilisateur -->
+	<div class="result">
+		<div>
+			<table summary="none">
+				<tr>
+					<td class="titre_gris">Compte utilisateur</td>
+					<td class="titre_gris" style="text-align:right;">&nbsp;</td>
+				</tr>
+			</table>
+		</div>
+		<div class="contenu">
+			<table summary="none">
+				<tr>
+					<td style="width : 100% ; text-align : center;">
+						<strong>
+						<input id="cbx" type="checkbox" name="activation" value="1" checked='checked' />
+						Si vous laissez la case coch&eacute;e, le compte utilisateur cr&eacute;&eacute; sera activ&eacute;
+						</strong>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- /Compte utilisateur -->
+	<br />
+	<input type="submit" name="submit" value="Inscrire" />&nbsp;
+	<input type="reset" name="RAZ" value="Annuler" 
+	onclick="Redirect('/modula/desk/organisation/afficherOrganisation.jsp?id=1')" />
+</div>
+
+</body>
+</html>

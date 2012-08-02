@@ -1,0 +1,15 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.bean.editorial.EditorialAssistanceType"%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Contenu</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :","",edit.getName(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Type :","",EditorialAssistanceType.getEditorialAssistanceTypeName(edit.getIdEditorialAssistanceType()),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Contenu :","",edit.getContenu(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Groupe :","","<a href=\""+response.encodeURL(rootPath+"desk/editorial/afficherEditorialAssistanceGroup.jsp?iIdEditorialAssistanceGroup="+group.getId()+"&amp;iIdOnglet="+Onglet.ONGLET_AR_GROUP_CONTENUS)+"\">"+ group.getName()+"</a>","") %>
+	<%= hbFormulaire.getHtmlTrInput("Date de création :","",CalendarUtil.getDateCourte(edit.getDateCreation()),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Date de modification :","",CalendarUtil.getDateCourte(edit.getDateModification()),"") %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

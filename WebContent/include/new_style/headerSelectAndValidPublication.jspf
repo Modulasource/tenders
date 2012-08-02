@@ -1,0 +1,67 @@
+<%@ page import="modula.graphic.*" %>
+<%@page import="modula.marche.AvisAttribution"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.util.treeview.TreeviewTest"%>
+<%@page import="modula.algorithme.PhaseEtapes"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="modula.algorithme.PhaseProcedure"%>
+<%@page import="modula.algorithme.Phase"%>
+<%@page import="modula.algorithme.Etape"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarcheSynchroMarco"%>
+<%@page import="modula.commission.Commission"%>
+
+<%
+{
+	Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+	String sExtraParamHeaderAffaire = " class='opacity75' ";
+	String sExtraParamOnMouseOver= " this.className='opacity100' ";
+	String sExtraParamOnMouseOut= " this.className='opacity75' ";
+
+	
+	if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-41") )
+	{
+		String sRedirectPage = "";
+		String sIconAffaireType = "";
+		if(marche.isAffaireAAPC(false))
+		{
+			sRedirectPage = "afficherAffaire.jsp";
+			sIconAffaireType = "affair_aapc.png";
+		}
+		else if(marche.isAffaireAATR(false))
+		{
+			sRedirectPage = "afficherAttribution.jsp";
+			sIconAffaireType = "affair_aatr.png";
+		}
+	
+		vBarBoutons.add( 
+			new BarBouton(1,
+				"Retour à l'affaire",
+				response.encodeURL(rootPath + "desk/marche/algorithme/affaire/"+sRedirectPage
+						+"?iIdAffaire=" + marche.getIdMarche()),
+				rootPath+"images/icons/36x36/" + sIconAffaireType, 
+				sExtraParamOnMouseOver,
+				sExtraParamOnMouseOut,
+				"",
+				true) );	
+	}
+%>
+<%@page import="modula.marche.MarcheSynchro"%>
+
+<%@page import="org.coin.util.HttpUtil"%><a name="ancreHP">&nbsp;</a>
+<div id="menuBorderAffaire" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+	<div class="fullWidth">
+		<%
+		out.write( BarBouton.getAllButtonHtmlDesk(vBarBoutons));
+		%>
+	</div>
+</div>
+<script>
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+	menuBorder.render($('menuBorderAffaire'));
+});
+</script>
+<%
+} 
+%>

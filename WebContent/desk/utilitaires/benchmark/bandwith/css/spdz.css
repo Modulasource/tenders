@@ -1,0 +1,129 @@
+body,html,#scale,.step {
+	margin:0;
+	padding:0
+}
+
+body,html {
+	height:100%
+}
+
+body {
+	font-family:lucida grande,arial,helvetica,sans-serif
+}
+
+div#center {
+	text-align:center;
+	margin-bottom:0
+}
+
+div#resw {
+	margin-left:auto;
+	margin-right:auto;
+	text-align:left;
+	padding:15px 10px;
+	height: 295px;
+}
+
+#connection {
+	font-size:14px
+}
+
+#connection,#status,.label,#console,#results,.stb a,button {
+	font-weight:bold
+}
+
+#connection,#bottomblock {
+	margin-bottom:5px
+}
+
+#status {
+	font-size:16px;
+	font-style:italic
+}
+
+.bargraph,#scale {
+	margin-top:10px
+}
+
+.barcontainer,#dwbar,#upbar,#uptext,#dwtext,.step,.stepn,.cal,#right {
+	float:left
+}
+
+.barcontainer {
+	width:100%;
+	white-space:nowrap
+}
+
+#dwbar,#upbar {
+	width:3px
+}
+
+#dwbar,#upbar,.cal {
+	height:9px;
+	font-size:0;
+	line-height:0
+}
+
+#uptext,#dwtext,.label,#results,.stb a,button {
+	font-size:12px
+}
+
+#scale,.step,.stepn {
+	height:32px
+}
+
+.step,.stepn {
+	text-align:right
+}
+
+.cal {
+	background:transparent;
+	width:2px
+}
+
+.clr {
+	clear:both
+}
+
+.label,.stb a,button {
+	display:block
+}
+
+.label {
+	margin-top:9px
+}
+
+#console {
+	padding:4px;
+	overflow:auto;
+	height:7em
+}
+
+.ipi {
+	display:inline;
+	padding:0 5px;
+	color:black;
+	font-style:normal
+}
+
+#right {
+	margin-left:15px;
+	overflow:hidden
+}
+
+.stb a,button {
+	text-decoration:none
+}
+
+#scale {
+	border:2px solid;
+}
+
+.step {
+	border-right:1px dotted #003aba
+}
+
+#imgcopy {
+	background-repeat: no-repeat;
+	background-position: left;
+}

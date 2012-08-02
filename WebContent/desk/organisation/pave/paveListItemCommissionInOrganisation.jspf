@@ -1,0 +1,10 @@
+<tr class="line<%=j%>" >
+	<td class="cell" style="width:50%"><%= commission.getNom() %></td>
+	<td class="cell" style="width:50%"><%= commission.getCompetence() %></td>
+	<td class="cell" style="text-align:right;width:5%">
+		<a href="<%= response.encodeURL(rootPath + "desk/commission/afficherCommission.jsp?iIdCommission=" + commission.getIdCommission()) %>">
+			<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE %>" alt="Afficher" title="Afficher"/>
+		</a>
+	</td>
+</tr>
+		

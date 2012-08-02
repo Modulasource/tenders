@@ -1,0 +1,355 @@
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="modula.marche.VeilleMarcheAbonnes"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<%@page import="org.coin.db.CoinDatabaseUtil"%>
+<script type="text/javascript" >
+<% if(cpfSwitcher.isUseCPFGroup()){ %>
+function synchronizeCPF(){
+	var bRestrict = $('bSynchroCPF').checked;
+	if(bRestrict){
+		var listGroupCPF = $('iIdGroupCompetenceSelection');
+		mt.html.setSuperCombo(listGroupCPF);
+		var arrGroup = [];
+		for (var z=0; z<listGroupCPF.options.length; z++) {
+			arrGroup.push(listGroupCPF.options[z].value);
+		}
+
+		var listCPF = $('iIdCompetenceSelection');
+		mt.html.setSuperCombo(listCPF);
+		var arr = [];
+		for (var z=0; z<listCPF.options.length; z++) {
+			arr.push(listCPF.options[z].value);
+		}
+	
+		CodeCpfSwitcher.getJSONArrayCPFFromGroupList(
+						Object.toJSON(arrGroup),
+						Object.toJSON(arr),
+						function (s) {
+							$('iIdCompetence').populate(s.evalJSON());
+						});
+	}else{
+		var listCPF = $('iIdCompetenceSelection');
+		mt.html.setSuperCombo(listCPF);
+		var arr = [];
+		for (var z=0; z<listCPF.options.length; z++) {
+			arr.push(listCPF.options[z].value);
+		}
+	
+		CodeCpfSwitcher.getJSONArrayCPFFromCPFList(
+						Object.toJSON(arr),
+						function (s) {
+							$('iIdCompetence').populate(s.evalJSON());
+						});
+	}
+}
+<%} %>
+var countVeilleMail = <%= sMailList.size() %>;
+function applyVeilleAction(){
+	$("butVeilleMailAdd").onclick = function(){
+		if(countVeilleMail < <%= lNumberMailAuthorize %>){
+			countVeilleMail ++;
+			var div = document.createElement("div");
+			div.id = "divVeilleMail_"+(countVeilleMail);
+			div.innerHTML ="<input size=\"40\" class=\"dataType-email\" type=\"text\" name=\"veilleMail_"+(countVeilleMail)+"\" value=\"\" />&nbsp;"
+            +"<img name=\"butVeilleMail_"+(countVeilleMail)+"\" class=\"butVeilleMail\" src=\"<%=rootPath+Icone.ICONE_SUPPRIMER_NEW_STYLE %>\" alt=\"\" style=\"cursor:pointer;vertical-align:middle\" />";
+			$("veilleMailList").appendChild(div);
+		   	applyVeilleAction();
+		}else{
+			alert("Vous ne pouvez pas ajouter de mail suppplémentaire. Merci de contacter votre service commercial.");
+		}
+	}
+
+	$$(".butVeilleMail").each(function(but){
+		but.onclick = function(){
+			if(confirm("Etes-vous sûr de vouloir supprimer cette adresse ?")){
+				if(countVeilleMail > 1){
+					countVeilleMail --;
+					var count = but.name.substr(14,but.name.length);
+					Element.remove("divVeilleMail_"+count);
+					applyVeilleAction();
+				}else{
+					alert("Vous ne pouvez pas supprimer cette adresse. Par contre vous pouvez la modifier.");
+				}
+			}
+		}
+	});
+
+	if(countVeilleMail >= <%= lNumberMailAuthorize %>){
+		Element.hide($("butVeilleMailAdd"));
+	}else{
+		Element.show($("butVeilleMailAdd"));
+	}
+
+	if(countVeilleMail <= 1){
+		$$(".butVeilleMail").each(function(but){
+			Element.hide(but);
+		});
+	}else{
+		$$(".butVeilleMail").each(function(but){
+			Element.show(but);
+		});
+	}
+}
+var jsonDeptAll = <%= CoinDatabaseUtil.convertToJSONArray(vDept)%>;
+var jsonDeptSelected = <%= CoinDatabaseUtil.convertToJSONArray(vDeptSelected)%>;
+
+Event.observe(window, 'load', function(){
+	<% if(cpfSwitcher.isUseCPFGroup()){ %>
+	synchronizeCPF();
+	$('bSynchroCPF').onclick = function(){synchronizeCPF();}
+    <% } %>
+	applyVeilleAction();
+});
+</script>
+<form action="" method="post" name="formulaire">
+<div class="post">
+   <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Sélection des mots clés</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+   <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+		<tr>
+			<td style="width:30%;font-weight:bold">Mots clés : </td>
+			<td><input type="text" size="50" name="sKeyWord" value="<%= veilleMarcheAbonnes.getKeyWord() %>"/></td>
+		</tr>
+		<tr>
+			<td style="width:30%;font-style:italic">
+			les mots clés doivent être séparés par des espaces et contenir au moins 5 caractères
+			</td>
+			<td><input name="typeKeyWord" id="typeKeyWordAll" value="and" <%= sTypeKeyword.equalsIgnoreCase("and")?"checked=\"checked\"":"" %> type="radio"> Rechercher tous les termes
+			<br/><input name="typeKeyWord" id="typeKeyWordAny" value="or" <%= sTypeKeyword.equalsIgnoreCase("or")?"checked=\"checked\"":"" %> type="radio"> Rechercher n'importe lequel de ces termes</td>
+		</tr>
+    </table>
+  </div>
+  <br/>
+  <% if(cpfSwitcher.isUseCPFGroup()){ %>
+    <div class="post-title">
+      <table class="fullWidth" cellpadding="0" cellspacing="0">
+      <tr>
+          <td>
+              <strong class="post-title-alt">Sélection du ou des groupes de secteurs d'activité</strong>
+          </td>
+          <td class="right">
+              <strong style="color:#B00">&nbsp;</strong>
+          </td>
+      </tr>
+      </table>
+  </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+		<tr>
+			<td colspan="2">
+				<table style="text-align:left" summary="none">
+					<tr>
+						<td style="width:45%;text-align:right">
+							<select name="iIdGroupCompetence" id="iIdGroupCompetence" size="8" style="width:250px;font-size:9px" multiple="multiple">
+			                </select>
+			                <script>
+			                var select = $("iIdGroupCompetence");
+			                mt.html.setSuperCombo(select);
+			                select.populate(<%= cpfSwitcher.getGroupCPFList() %>);
+			                </script>
+						</td>
+						<td style="width:10%;text-align:center">
+							<a href="javascript:DeplacerTous(document.formulaire.iIdGroupCompetenceSelection,document.formulaire.iIdGroupCompetence);synchronizeCPF();" >
+								<img src="<%= rootPath + Icone.ICONE_GAUCHE%>"  
+								alt="Enlever" /></a>
+							<a href="javascript:DeplacerTous(document.formulaire.iIdGroupCompetence,document.formulaire.iIdGroupCompetenceSelection);synchronizeCPF();" >
+								<img src="<%= rootPath + Icone.ICONE_DROITE%>"  
+								alt="Ajouter" /></a> 
+						</td>
+						<td style="width:45%">
+							<select name="iIdGroupCompetenceSelection" id="iIdGroupCompetenceSelection" size="8" style="width:250px;font-size:9px" multiple="multiple" >
+		                    </select>
+		                    <script>
+                            var select = $("iIdGroupCompetenceSelection");
+                            mt.html.setSuperCombo(select);
+                            select.populate(<%= cpfSwitcher.getGroupCPFSelectedList() %>);
+                            </script>
+							<input type="hidden" name="iIdGroupCompetenceSelectionListe" />
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+    </table>
+    </div>
+  <br/>
+  <% } %>
+  
+  <div class="post-title">
+      <table class="fullWidth" cellpadding="0" cellspacing="0">
+      <tr>
+          <td>
+              <strong class="post-title-alt">Sélection du ou des secteurs d'activité</strong>
+          </td>
+          <td class="right">
+              <strong style="color:#B00">&nbsp;</strong>
+          </td>
+      </tr>
+      </table>
+  </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+		<tr>
+			<td colspan="2">
+				<table style="text-align:left" summary="none">
+					<% if(cpfSwitcher.isUseCPFGroup()){%>
+					<tr>
+						<td class="pave_cellule_gauche" colspan="3">
+						Restreindre la liste aux secteurs en relation avec les groupes séléctionnés ci-dessus
+						<input type="checkbox" checked="checked" name="bSynchroCPF" id="bSynchroCPF" />
+						</td>
+					</tr>
+					<tr><td class="pave_cellule_gauche" colspan="3">&nbsp;</td></tr>
+					<%} %>
+					<tr>
+						<td style="width:45%;text-align:right">
+							<select name="iIdCompetence" id="iIdCompetence" size="8" style="width:250px;font-size:9px" multiple="multiple">
+			                </select>
+			                <script>
+			                var select = $("iIdCompetence");
+			                mt.html.setSuperCombo(select);
+			                select.populate(<%= cpfSwitcher.getBoampCPFList() %>);
+			                </script>
+						</td>
+						<td style="width:10%;text-align:center">
+							<a href="javascript:DeplacerTous(document.formulaire.iIdCompetenceSelection,document.formulaire.iIdCompetence)" >
+								<img src="<%= rootPath + Icone.ICONE_GAUCHE%>"  
+								alt="Enlever" /></a>
+							<a href="javascript:DeplacerTous(document.formulaire.iIdCompetence,document.formulaire.iIdCompetenceSelection)" >
+								<img src="<%= rootPath + Icone.ICONE_DROITE%>"  
+								alt="Ajouter" /></a> 
+						</td>
+						<td style="width:45%">
+							<select name="iIdCompetenceSelection" id="iIdCompetenceSelection" size="8" style="width:250px;font-size:9px" multiple="multiple" >
+		                    </select>
+		                    <script>
+                            var select = $("iIdCompetenceSelection");
+                            mt.html.setSuperCombo(select);
+                            select.populate(<%= cpfSwitcher.getBoampCPFSelectedList() %>);
+                            </script>
+							<input type="hidden" name="iIdCompetenceSelectionListe" />
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+    </table>
+    </div>
+    <br />
+    
+   <div class="post-title">
+      <table class="fullWidth" cellpadding="0" cellspacing="0">
+      <tr>
+          <td>
+              <strong class="post-title-alt">Sélection du ou des départements</strong>
+          </td>
+          <td class="right">
+              <strong style="color:#B00">&nbsp;</strong>
+          </td>
+      </tr>
+      </table>
+  </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+        <tr>
+            <td colspan="2">
+                <table style="text-align:left" summary="none">
+                    <tr>
+                        <td style="width:45%;text-align:right">
+                            <select name="iIdDepartement" id="iIdDepartement" size="8" style="width:250px;font-size:9px" multiple="multiple">
+                            </select>
+                            <script>
+                            var select = $("iIdDepartement");
+                            mt.html.setSuperCombo(select);
+                            select.populate(jsonDeptAll,null,"sId","sName");
+                            </script>
+                        </td>
+                        <td style="width:10%;text-align:center">
+                            <a href="javascript:DeplacerTous(document.formulaire.iIdDepartementSelection,document.formulaire.iIdDepartement)" >
+                                <img src="<%= rootPath + Icone.ICONE_GAUCHE%>"  
+                                alt="Enlever" /></a>
+                            <a href="javascript:DeplacerTous(document.formulaire.iIdDepartement,document.formulaire.iIdDepartementSelection)" >
+                                <img src="<%= rootPath + Icone.ICONE_DROITE%>"  
+                                alt="Ajouter" /></a> 
+                        </td>
+                        <td style="width:45%">
+                            <select name="iIdDepartementSelection" id="iIdDepartementSelection" size="8" style="width:250px;font-size:9px" multiple="multiple" >
+                            </select>
+                            <script>
+                            var select = $("iIdDepartementSelection");
+                            mt.html.setSuperCombo(select);
+                            select.populate(jsonDeptSelected,null,"sId","sName");
+                            </script>
+                            <input type="hidden" name="iIdDepartementSelectionListe" />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    </div>
+    <br />
+    
+    <div class="post-title">
+      <table class="fullWidth" cellpadding="0" cellspacing="0">
+	      <tr>
+	          <td>
+	              <strong class="post-title-alt">Acceptation de l'alerte</strong>
+	          </td>
+	          <td class="right">
+	              <strong style="color:#B00">&nbsp;</strong>
+	          </td>
+	      </tr>
+      </table>
+  </div>
+  <br/>
+    <div class="post-footer post-block" style="margin-top:0">
+  	<div style="float:left;">
+  		<input type="checkbox" name="bVeilleMarche" value="true" <%=bVeilleMarche?"checked=\"checked\"":"" %> />
+	</div>
+	<div style="float:left;margin-left:32px;">
+	<div>Cocher la case puis "Valider" pour recevoir des alertes mails pour les marchés dématérialisés publiés sur la plate-forme.</div>
+	<div style="margin-top:3px">Décocher la case puis "Valider" pour ne plus recevoir d'alertes mails pour les marchés dématérialisés publiés sur la plate-forme.</div>
+	</div>
+	<div style="clear:both"></div>
+	<div style="float:left;margin-left:45px;margin-top:10px;">
+		<span style="text-decoration:underline">Adresses mails où sera envoyé la veille de marché</span> :&nbsp;
+		<img id="butVeilleMailAdd" src="<%=rootPath+Icone.ICONE_PLUS %>" alt="" style="cursor:pointer;vertical-align:middle" />
+	</div>
+   	<div id="veilleMailList" style="float:left;margin-top:10px;margin-left:10px;">
+   	       adresse principale : <%= candidat.getEmail() %> <br/>
+   	<% 
+   	for(int iMail=0;iMail<sMailList.size();iMail++){ 
+   		String sMail = sMailList.get(iMail);
+   	%>
+   	<div id="divVeilleMail_<%= iMail %>">
+   	<input size="40" type="text" class="dataType-email" name="veilleMail_<%= iMail %>" value="<%= sMail %>" />&nbsp;
+   	<img name="butVeilleMail_<%= iMail %>" class="butVeilleMail" src="<%=rootPath+Icone.ICONE_SUPPRIMER_NEW_STYLE %>" alt="" style="cursor:pointer;vertical-align:middle" />
+   	</div> 
+   	<%} %>
+	</div>
+	<div style="clear:both"></div>
+	</div>
+    
+</div>

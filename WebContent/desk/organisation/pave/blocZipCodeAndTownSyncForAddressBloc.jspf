@@ -1,0 +1,65 @@
+<script type="text/javascript">
+var g_sOldValueZipCode = null;
+function getTownList()
+{ 
+	var cb = $("checkboxTownAndZipCodeSync");
+	if(!cb.checked ) {
+		/** not activated */
+		return;
+	}
+	
+	var sZipCode = $("sCodePostal").value;
+	if( g_sOldValueZipCode == sZipCode) return ;
+	g_sOldValueZipCoded = sZipCode;
+	getTownListFromZipCode(
+			$("sIdPays").value,
+			sZipCode,
+			$("sIdTown"));
+}
+
+function doCheckboxTownAndZipCodeSync()
+{
+	var cb = $("checkboxTownAndZipCodeSync");
+	cb.checked = !cb.checked ;
+	cb.onclick();
+}
+
+Event.observe(window,"load",function(){
+    try{
+        $("spanTownAndZipCodeSync").innerHTML 
+        	= "<input type='checkbox' id='checkboxTownAndZipCodeSync' />\n"
+			+ "<img title='sync zip code and town' src='<%= rootPath + "images/icons/synchronize.png"
+			%>' onclick='doCheckboxTownAndZipCodeSync();' />"
+        	+ "<select name='sIdTown' id='sIdTown' style='display:none' class='obligatory' ></select>";
+
+        $("sCodePostal").onkeyup = function(){
+        	getTownList();
+        	//Element.show("sIdTown");
+        }
+
+        $("sIdTown").onchange = function(){
+        	$("sCommune").value =  $("sIdTown").value;
+        	$("checkboxTownAndZipCodeSync").checked = false;
+        	Element.hide("sIdTown");
+        }
+
+        $("checkboxTownAndZipCodeSync").onclick = function(){
+            if (this.checked)
+            {
+            	$("sCodePostal").style.backgroundColor = "#FDD";
+                if($("sIdTown").length > 0){
+	            	Element.show("sIdTown");
+                }
+            } else {
+            	Element.hide("sIdTown");
+	        	$("sCodePostal").style.backgroundColor = "#FFF";
+            }
+        }
+        
+        
+    } catch(e){
+        //alert(e);
+    }
+});
+</script>
+<%@ include file="/desk/organisation/pave/blocZipCodeAndTownSync.jspf" %>

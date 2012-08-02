@@ -1,0 +1,25 @@
+<%@page import="org.coin.localization.LocalizationConstant"%>
+<%@page import="org.coin.localization.Localize"%>
+<%
+	Localize locTitle = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_JOURNAL_PAGE_TITLE);
+
+	Localize locMessage = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_JOURNAL_PAGE_MESSAGE);
+
+	Localize locTab = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_JOURNAL_PAGE_TAB);
+	
+	Localize locBloc = new Localize(
+            sessionLanguage.getId(),
+            LocalizationConstant.CAPTION_CATEGORY_JOURNAL_PAGE_BLOC);
+
+	Localize locPlanificationButton = new Localize(
+			sessionLanguage.getId(),
+			LocalizationConstant.CAPTION_CATEGORY_JOURNAL_PAGE_BUTTON);
+
+
+%>

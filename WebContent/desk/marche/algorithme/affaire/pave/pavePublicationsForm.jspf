@@ -1,0 +1,178 @@
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		String sPavePublicationsTitre;
+	*
+	*/
+%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%
+if(bIsContainsCandidatureManagement || bIsContainsAAPCPublicity)
+{
+%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="org.coin.util.Outils"%>
+
+<%@page import="modula.graphic.CSS"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.Validite"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%><table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePublicationsTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%
+	if(bIsContainsAAPCPublicity)
+	{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" >
+		Date de mise en ligne sur le site Internet* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			Vector<Validite> vValiditeAAPC = Validite.getAllValiditeAAPCFromAffaire(iIdAffaire);
+			Validite oValiditePublication = null;
+			Timestamp tsDatePublicationDebut = null;
+			Timestamp tsDatePublicationFin = null;
+			sFormPrefix = "AAPC_";
+			if(vValiditeAAPC != null)
+			{
+				if(vValiditeAAPC.size() == 1) 
+				{
+					oValiditePublication = vValiditeAAPC.firstElement();
+					tsDatePublicationDebut = oValiditePublication.getDateDebut();
+					tsDatePublicationFin = oValiditePublication.getDateFin();
+				}
+			}
+		%>
+			<%= !bIsLinkedPublicityAndCandidature?"<strong>Du </strong>":"" %>
+			<input type="text" name="<%=sFormPrefix %>tsDateValiditeDebut" size="15" maxlength="10" 
+			class="dataType-date <%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull"
+			value="<%= CalendarUtil.getDateCourte(tsDatePublicationDebut) %>" />
+			<strong>Heure :</strong>&nbsp;
+			<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull dataType-hour-minute" type="text" name="<%=sFormPrefix %>tsHeureValiditeDebut" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDatePublicationDebut) %>" />&nbsp; 
+			
+			<% if(!bIsLinkedPublicityAndCandidature){ %>
+			<br/><strong>Au </strong>
+			<input type="text" name="<%=sFormPrefix %>tsDateValiditeFin" size="15" maxlength="10" 
+			class="dataType-date <%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull"
+			value="<%= CalendarUtil.getDateCourte(tsDatePublicationFin) %>" />
+			<strong>Heure :</strong>&nbsp;
+			<input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %> dataType-notNull dataType-hour-minute" type="text" name="<%=sFormPrefix %>tsHeureValiditeFin" size="5" maxlength="5" 
+			value="<%= CalendarUtil.getHeureMinuteSecDefaultOfficial(tsDatePublicationFin) %>" />&nbsp; 
+			<%} %>
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.DATE_MISE_EN_LIGNE) %>
+			<input  type="hidden" name="<%=sFormPrefix %>iIdReferenceObjet" value="<%= iIdAffaire %>" />
+			<input type="hidden" name="<%=sFormPrefix %>iIdTypeObjetModula" value="<%= TypeObjetModula.AAPC %>" />
+		</td>
+	</tr>
+	<%
+	}
+	else
+	{
+	%>
+	<tr><td class="mention" colspan="2">Ces informations ne seront accessibles seulement par les candidats séléctionnés pour repondre au marché.</td></tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%
+	}
+	sFormPrefix = "";
+	%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Edition de l'AAPC * :
+		</td>
+		<td class="pave_cellule_droite">
+			<%
+				String sCheckedAAPCFormatAuto = "checked='checked'";
+				String sCheckedAAPCFormatLibre = "";
+				boolean bAAPCAutomatique = bAAPCAutomatique = marche.isAAPCAutomatique(false);
+			
+				if(!bAAPCAutomatique)
+				{
+					sCheckedAAPCFormatLibre = "checked='checked'";
+					sCheckedAAPCFormatAuto = "";
+				}
+			%>
+			<input type="radio" name="<%=sFormPrefix %>sAAPCFormat" <%= sCheckedAAPCFormatAuto %>
+			  value="automatique" onclick="javascript:cacher('uploadAAPCLibre')" /> Format automatique généré en PDF &nbsp;&nbsp;
+			<input type="radio" name="<%=sFormPrefix %>sAAPCFormat" <%= sCheckedAAPCFormatLibre %>
+			  value="libre" onclick="javascript:montrer('uploadAAPCLibre')" /> Format libre
+		</td>
+	</tr>
+	<tr id="uploadAAPCLibre" style="display: none;visibility: hidden;">
+		<td class="pave_cellule_gauche">
+		AAPC au format libre :
+		</td>
+		<td class="pave_cellule_droite">
+			<button type="button" onclick="javascript:formulaire.submit();openModal('<%=
+				response.encodeURL(
+						rootPath +"desk/marche/algorithme/affaire/uploadAAPCForm.jsp"
+						+ "?iIdAffaire=" + marche.getIdMarche())
+				%>','Sélectionner le fichier à charger','400px','300px');" >Sélectionner le fichier à charger</button> &nbsp;&nbsp;
+			<% 	String sNomAAPCLibre = marche.getNomAAPC();
+				if (sNomAAPCLibre != null && !sNomAAPCLibre.equals("") )
+				{
+					String sURLAAPC = "desk/DownloadFileDesk?" 
+							+ DownloadFile.getSecureTransactionStringFullJspPage(
+									request,
+									marche.getIdMarche()  , 
+									TypeObjetModula.AAPC);
+					
+					sURLAAPC = response.encodeURL(rootPath+ sURLAAPC);
+					%>
+					<a href='<%= sURLAAPC %>'><%= sNomAAPCLibre %></a>
+					<%		
+				}
+				else
+				{
+					%><span class="rouge">pas de document associé</span><%
+				}
+			 %>
+			 <br/>
+			 <strong>Attention : c'est ce document qui sera mis à disposition des entreprises 
+			 sur le site Internet et envoyé aux publications papiers</strong>
+		</td>
+	</tr>
+	<!--<tr>
+		<td class="pave_cellule_gauche">
+			Temps accordé pour le double envoi* :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="text" name="<%=sFormPrefix %>iTimingDoubleEnvoi" size="15" maxlength="10" 
+			value="<%= ( marche.getTimingDoubleEnvoi() >= 0 ? ""+marche.getTimingDoubleEnvoi() : "24") %>" /> (en heures)&nbsp; 
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.DOUBLE_ENVOI) %>
+		</td>
+	</tr>-->
+	<tr>
+		<td class="pave_cellule_gauche">
+			<div style="display:none">
+				<a href="javascript:montrer_cacher('complement_annonce');">Ajouter un complément d'annonce </a><br /><br />
+				<div class="mention" style="font-size:9px;text-align:right">
+					(s'affiche dans l'annonce<br/> en cliquant sur "en savoir plus")
+				</div>
+			</div>
+		</td>
+		<td class="pave_cellule_droite">
+			<table style="width:100%;"  >
+				<tr id="complement_annonce" style='display: none;visibility: hidden;' >
+					<td><textarea name="<%=sFormPrefix %>sPetiteAnnonceTexteLibre" id="<%=sFormPrefix 
+					%>sPetiteAnnonceTexteLibre" style="width:100%;height:400px"><%= 
+						marche.getPetiteAnnonceTexteLibre()%></textarea></td>
+					<%= EditorialAssistance.getAideRedactionnelleDeskTdBouton("iIdPetiteAnnonceTexteLibre",rootPath,sessionUserHabilitation) %>
+ 				</tr>
+ 			</table>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br/>
+<%
+
+}
+%>

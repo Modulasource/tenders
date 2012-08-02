@@ -1,0 +1,24 @@
+<%@page import="org.coin.fr.bean.PersonnePhysiqueCivilite"%>
+<%@page import="org.coin.security.SecureString"%>
+
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<input type="hidden" name="pp" id="pp" value="<%= SecureString.getSessionSecureString(Long.toString(candidat.getId()),session) %>" />
+	<% PersonnePhysiqueCivilite ppCivilite = new PersonnePhysiqueCivilite(candidat.getIdPersonnePhysiqueCivilite()); %>
+	<%= hbFormulaire.getHtmlTrSelect("Civilité :","iIdCivilite",ppCivilite) %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :","sNom",candidat.getNom()," size='20' ") %>	
+	<%= hbFormulaire.getHtmlTrInput("Prénom :","sPrenom",candidat.getPrenom()," size='20' ") %>	
+	<%= hbFormulaire.getHtmlTrInput("Email :","sEmail",candidat.getEmail()," size='40' onBlur=\"verifierMailGerant();\" onKeyUp=\"verifierMailGerant();\"") %>
+    <%= hbFormulaire.getHtmlTrInput("Téléphone fixe :","sTel",candidat.getTel()," size='20' ") %>    
+    <%= hbFormulaire.getHtmlTrInput("Téléphone mobile :","sTelPortable",candidat.getTelPortable()," size='20' ") %>    
+    <%= hbFormulaire.getHtmlTrInput("Fax :","sFax",candidat.getFax()," size='20' ") %>    
+	<input type="hidden" name="sEmailAuth" id="sEmailAuth" value="" />
+	<tr id="tr_infoEmail" style="display: none; visibility: hidden;">
+		<td class="pave_cellule_gauche" >&nbsp;</td>
+		<td class="pave_cellule_droite" >
+			<div class="rouge" style="text-align:left">
+			Attention, l'adresse Email saisie ci-dessous est déjà enregistrée dans la base de données.
+			Il est possible que vous soyez déjà inscrit.
+			</div>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>

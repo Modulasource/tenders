@@ -1,0 +1,240 @@
+<%
+	AffaireProcedure affProc = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure());
+	String sProcedureName = MarchePassation.getMarchePassationNameMemory(affProc.getIdMarchePassation());
+	int iIdJustifSelected = 0;
+	sSelected = "checked=\"checked\"";
+    Vector<Integer> vIdJustifSelected = new Vector<Integer>();
+	try{
+		Vector<MarcheJustifNegocie> vMarcheJustif = MarcheJustifNegocie.getAllFromMarche(marche.getIdMarche());
+		for(MarcheJustifNegocie marcheJustif : vMarcheJustif) {
+			vIdJustifSelected.add(marcheJustif.getIdJustifNegocie());
+		}
+	}
+	catch(Exception e){}
+%>
+
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="modula.marche.MarcheJustifNegocie"%>
+<%@page import="java.util.Vector"%>
+<script type="text/javascript">
+function uncheck(item) {
+	if(document.getElementById) {
+		var radio = document.getElementById(item.id);
+		var temp = document.getElementById('temp_'+item.name);
+	} else if(document.all) {
+		var radio = document.all[item.id];
+		var temp = document.all['temp_'+item.name];
+	} else {
+		if((navigator.appname.indexOf("Netscape") != -1) && parseInt(navigator.appversion == 4)) {
+			var radio = document.layers[item.id];
+			var temp = document.layers['temp_'+item.name];
+	    }
+	}
+	
+	if(radio.value == temp.value) {
+		radio.checked = false;
+		temp.value = '';
+	} else {
+	    temp.value = radio.value;
+	}
+}
+</script>
+
+<table class="pave" summary="Justificatif du choix de la procédure négociée">
+	<tr>
+		<td colspan="2" class="pave_titre_gauche">Justificatif du choix de la procédure négociée (art.35 du code des marchés publics)</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+<%
+if(bErrorJustifNegoc) {
+%>
+        <tr>
+            <td colspan="2" class="rouge">
+                Vous ne pouvez pas sélectionner de justifications à la fois pour les pouvoirs adjudicateurs et les entités adjudicatrices.
+            </td>
+            <td colspan="2">&nbsp;</td>
+        </tr>
+<%
+}
+%>
+		<tr>
+			<td colspan="2" class="pave_cellule_droite"><strong><%=sProcedureName %></strong></td>
+		</tr>
+		<tr>
+	       <td colspan="2" class="pave_cellule_droite"><strong>Pour les pouvoirs adjudicateurs</strong></td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_droite" colspan="2">
+				    Aucune candidature, aucune offre ou aucune offre appropriée n'a été déposée en réponse à : (article 35-II-2°).<br/>
+                <input type="radio" value="18" id="choixJustif_18" name="choixJustif_18" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(18))?sSelected:"" %>/>
+                    une procédure ouverte<br/>
+                <input type="radio" value="19" id="choixJustif_19" name="choixJustif_18" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(19))?sSelected:"" %>/>
+                    une procédure ouverte<br/>
+                <input type="hidden" id="temp_choixJustif_18" value=""/>
+			</td>
+		</tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="20" name="choixJustif_20" <%=(vIdJustifSelected.contains(20))?sSelected:"" %>/>
+                    Marché ou accord-cadre de fournitures concernant des produits fabriqués uniquement à des fins de recherche, d'essai, d'expérimentation, d'étude ou de développement, sans objectif de rentabilité ou de récupération des coûts de recherche et de développement (article 35-II-2°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="21" name="choixJustif_21" <%=(vIdJustifSelected.contains(21))?sSelected:"" %>/>
+                    Marché ou accord-cadre qui ne peut être confié qu'à un opérateur économique déterminé pour des raisons techniques (article 35-II-8°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="22" name="choixJustif_22" <%=(vIdJustifSelected.contains(22))?sSelected:"" %>/>
+                    Marché ou accord-cadre qui ne peut être confié qu'à un opérateur économique déterminé pour des raisons artistiques (article 35-II-8°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="23" name="choixJustif_23" <%=(vIdJustifSelected.contains(23))?sSelected:"" %>/>
+                    Marché ou accord-cadre qui ne peut être confié qu'à un opérateur économique déterminé pour des raisons tenant à la protection de droits d'exclusivité (article 35-II-8°).<br/>
+            </td>
+        </tr>        
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="24" name="choixJustif_24" <%=(vIdJustifSelected.contains(24))?sSelected:"" %>/>
+                    Marché ou accord-cadre conclu pour faire face à une urgence impérieuse (article 35-II-1°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="25" name="choixJustif_25" <%=(vIdJustifSelected.contains(25))?sSelected:"" %>/>
+                    Marché complémentaire de fournitures, de services ou de travaux (article 35-II-4° et 5°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="26" name="choixJustif_26" <%=(vIdJustifSelected.contains(26))?sSelected:"" %>/>
+                    Marché de services ou de travaux ayant pour objet la réalisation de prestations similaires à celles qui ont été confiées au titulaire d'un marché précédent passé après mise en concurrence (article 35-II-6°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="27" name="choixJustif_27" <%=(vIdJustifSelected.contains(27))?sSelected:"" %>/>
+                    Marchés ou accords-cadres de services attribués à un ou plusieurs lauréats d'un concours (article 35-II-7°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="28" name="choixJustif_28" <%=(vIdJustifSelected.contains(28))?sSelected:"" %>/>
+                    Marché ou accord-cadre ayant pour objet l'achat de matières premières cotées et achetées en bourse (article 35-II-9°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                    Marché ou accord-cadre ayant pour objet l'achat de fournitures à des conditions particulièrement avantageuses : (article 35-II-10°).<br/>
+                <input type="radio" value="29" id="choixJustif_29" name="choixJustif_29" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(29))?sSelected:"" %>/>
+                   auprès d'un fournisseur en cessation définitive d'activité<br/>
+                <input type="radio" value="30" id="choixJustif_30" name="choixJustif_29" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(30))?sSelected:"" %>/>
+                   auprès des liquidateurs d'une faillite ou d'une procédure de même nature<br/>
+                <input type="hidden" id="temp_choixJustif_29" value='' />
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="31" name="choixJustif_31" <%=(vIdJustifSelected.contains(31))?sSelected:"" %>/>
+                   Marché ou accord-cadre pour lequel, après appel d'offres ou dialogue compétitif, il n'a été proposé que des offres irrégulières ou inacceptables. Seuls le ou les candidats qui, lors de la procédure antérieure, ont soumis des offres respectant les exigences relatives aux délais et modalités formelles de présentation des offres ont été invités à négocier (article 35-I-1°).<br/>
+            </td>
+        </tr>
+        <tr>
+           <td colspan="2" class="pave_cellule_droite"><strong>Pour les entités adjudicatitrices</strong></td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                    Aucune candidature, aucune offre ou aucune offre appropriée n'a été déposée en réponse à : (article 144-II-1°).<br/>
+                <input type="radio" value="32" id="choixJustif_32" name="choixJustif_32" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(32))?sSelected:"" %>/>
+                    une procédure ouverte<br/>
+                <input type="radio" value="33" id="choixJustif_33" name="choixJustif_32" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(33))?sSelected:"" %>/>
+                    une procédure restreinte<br/>
+                <input type="radio" value="34" id="choixJustif_34" name="choixJustif_32" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(34))?sSelected:"" %>/>
+                    une procédure négociée avec mise en concurrence préalable<br/>
+                <input type="hidden" id="temp_choixJustif_32" value='' />
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="35" name="choixJustif_35" <%=(vIdJustifSelected.contains(35))?sSelected:"" %>/>
+                   Marché ou accord-cadre conclu uniquement à des fins de recherche, d'essai, d'expérimentation, d'étude ou de développement, sans objectif de rentabilité ou de récupération des coûts de recherche et de développement (article 144-II-2°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="36" name="choixJustif_36" <%=(vIdJustifSelected.contains(36))?sSelected:"" %>/>
+                   Marché ou accord-cadre qui ne peut être confié qu'à un opérateur économique déterminé pour des raisons techniques (article 144-II-3°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="37" name="choixJustif_37" <%=(vIdJustifSelected.contains(37))?sSelected:"" %>/>
+                   Marché ou accord-cadre qui ne peut être confié qu'à un opérateur économique déterminé pour des raisons artistiques (article 144-II-3°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="38" name="choixJustif_38" <%=(vIdJustifSelected.contains(38))?sSelected:"" %>/>
+                   Marché ou accord-cadre qui ne peut être confié qu'à un opérateur économique déterminé pour des raisons tenant à la protection de droits d'exclusivité (article 144-II-3°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="39" name="choixJustif_39" <%=(vIdJustifSelected.contains(39))?sSelected:"" %>/>
+                   Marché ou accord-cadre conclu pour faire face à une urgence impérieuse (article 144-II-4°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="40" name="choixJustif_40" <%=(vIdJustifSelected.contains(40))?sSelected:"" %>/>
+                   Marché complémentaire de fournitures, de services ou de travaux (article 144-II-5° et 6°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="41" name="choixJustif_41" <%=(vIdJustifSelected.contains(41))?sSelected:"" %>/>
+                   Marché de travaux ayant pour objet la réalisation d'ouvrages similaires à ceux qui ont été confiés au.titulaire d'un marché précédent passé après mise en concurrence (article 144-II-7°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="42" name="choixJustif_42" <%=(vIdJustifSelected.contains(42))?sSelected:"" %>/>
+                   Marchés ou accords-cadres de services attribués à un ou plusieurs lauréats d'un concours (article 144-II-12°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="43" name="choixJustif_43" <%=(vIdJustifSelected.contains(43))?sSelected:"" %>/>
+                   Marché ou accord-cadre ayant pour objet l'achat de matières premières cotées et achetées en bourse (article 144-II-8°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                    Marché ou accord-cadre ayant pour objet l'achat de fournitures à des conditions particulièrement avantageuses : (article 144-II-11°).<br/>
+                <input type="radio" value="44" id="choixJustif_44" name="choixJustif_44" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(44))?sSelected:"" %>/>
+                    auprès d'un fournisseur en cessation définitive d'activité<br/>
+                <input type="radio" value="45" id="choixJustif_45" name="choixJustif_44" onclick="uncheck(this)" <%=(vIdJustifSelected.contains(45))?sSelected:"" %>/>
+                    avantageuses auprès des liquidateurs d'une faillite ou d'une procédure de même nature<br/>
+                <input type="hidden" id="temp_choixJustif_44" value='' />
+            
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="46" name="choixJustif_46" <%=(vIdJustifSelected.contains(46))?sSelected:"" %>/>
+                   Achat d'opportunité de fournitures (article 144-II-10°).<br/>
+            </td>
+        </tr>
+        <tr>
+            <td class="pave_cellule_droite" colspan="2">
+                <input type="checkbox" value="47" name="choixJustif_47" <%=(vIdJustifSelected.contains(47))?sSelected:"" %>/>
+                   Marchés passés sur la base d'un accord-cadre (article 144-II-9°).<br/>
+            </td>
+        </tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

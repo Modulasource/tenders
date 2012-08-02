@@ -1,0 +1,13 @@
+/*FORMULAIRES*/
+
+/*****************************************************************/
+.bandeau { 
+	background: transparent url(../../images/bandeaux/marchespublics_bando.gif) no-repeat top left;
+	margin: 0px; 
+	height: 95px; 
+	vertical-align:top;
+	text-align:right;
+	width: 100%;
+	border : 1px solid #369;
+}
+

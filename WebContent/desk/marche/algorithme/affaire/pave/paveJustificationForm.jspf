@@ -1,0 +1,299 @@
+<%@page import="modula.marche.justification.MarcheJustification"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanHtmlUtil"%>
+<%@page import="modula.marche.justification.MarcheJustificationType"%>
+<%@page import="org.coin.db.CoinDatabaseHtmlTraitment"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBean"%>
+<%@page import="modula.marche.justification.MarcheJustificationSelected"%>
+<%@page import="modula.marche.MarcheAutreRenseignement"%>
+<%@page import="modula.marche.justification.MarcheJustificationCommentaire"%>
+<%
+	/*
+	*	Nécessite les objets suivants :
+	*		String sPaveConditionsTitre;
+	*
+	*	Champs renvoyés :
+	*/
+
+
+	Vector vMJChoixObligatoire 
+		= MarcheJustification.getAllValideWithFromJustificationType(
+				MarcheJustificationType.TYPE_APPUI_CANDIDATURE_OBLIGATOIRE); 
+
+	Vector vMJChoixAP 
+		= MarcheJustification.getAllValideWithFromJustificationType(
+				MarcheJustificationType.TYPE_APPUI_CANDIDATURE_CHOIX_AP); 
+
+	Vector vMJChoixStadeAATR 
+		= MarcheJustification.getAllValideWithFromJustificationType(
+			MarcheJustificationType.TYPE_APPUI_STADE_AATR); 
+
+	Vector<MarcheJustificationSelected> vMarcheJustificationSelected =
+		MarcheJustificationSelected.getAllFromMarche(marche.getId());
+	
+	CoinDatabaseHtmlTraitment trt = new CoinDatabaseHtmlTraitment(){
+		public boolean isItemChecked(CoinDatabaseAbstractBean item)
+		{
+			Vector<MarcheJustificationSelected> 
+				vMarcheJustificationSelected = (Vector)context1;
+			
+			for (MarcheJustificationSelected 
+				selected : vMarcheJustificationSelected) 
+			{
+				if(selected.getIdMarcheJustification() == item.getId())
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public void onDisplayName(StringBuffer sbListe, CoinDatabaseAbstractBean item){
+			super.onDisplayName(sbListe, item);
+			MarcheJustification mj = (MarcheJustification)item;
+			if(mj.isUsePrecisions() )
+			{	
+				// Recherche en bdd si la donnée precision existe deja pour ce champ
+				Vector<MarcheJustificationSelected> 
+				vMarcheJustificationSelected = (Vector)context1;
+				String sValue= "";
+				
+				for (MarcheJustificationSelected 
+					selected : vMarcheJustificationSelected) 
+				{
+					if(selected.getIdMarcheJustification() == item.getId())
+					{
+						sValue = selected.getPrecisions();
+					}
+				}
+				
+				// if Formulaire
+				if(this.bIsForm)
+				{
+					sbListe.append("<br/>préciser <textarea rows='3' cols='60' ");
+					sbListe.append("name='MarcheJustificationSelected_precision_"+ item.getId() + "' >");
+					sbListe.append(sValue);
+					sbListe.append("</textarea>");
+				} else {
+					//if(this.bDisplayItemUnchecked)
+					{
+						if(sValue == null || sValue.equals("")) sValue = "<i>pas de précision apportée</i>";
+						sbListe.append("<br/><b>préciser : </b>");
+						sbListe.append(sValue);
+					}
+				}
+			}
+		}
+	};
+	
+	trt.context1 = vMarcheJustificationSelected;
+	trt.bIsForm = bIsFormPaveJustification;
+	trt.bDisplayItemUnchecked = false;
+	trt.sTdRightEndItem = "<br/>&nbsp;<br/>";
+	trt.bDisplayId = false;
+	trt.iColumn = 1;
+	
+	MarcheJustificationCommentaire marcheJustificationCommentaire = null;
+	try {
+		marcheJustificationCommentaire 
+			= MarcheJustificationCommentaire
+				.getMarcheJustificationCommentaireFromIdMarche(marche.getId()) ;
+	} catch (Exception e ){
+		marcheJustificationCommentaire 
+			= new MarcheJustificationCommentaire();
+	}
+	
+	
+	Vector<MarcheJustificationAutreRenseignement> vMJAR 
+		= MarcheJustificationAutreRenseignement.getAllFromIdMarche(marche.getId());
+	
+	if(vMJAR.size()==0)
+	{
+		MarcheJustificationAutreRenseignement itemMJAR = new MarcheJustificationAutreRenseignement();
+		itemMJAR.setNumero(1);
+		itemMJAR.setIdMarche(marche.getId());
+		vMJAR.add(itemMJAR);	
+	}
+	
+%>
+<%@page import="modula.marche.justification.MarcheJustificationAutreRenseignement"%>
+<script type="text/javascript">
+<!--
+
+	
+	function addRenseignementComplementaire()
+	{
+		
+		var iNbRenseignementComplementaire = $('iNbRenseignementComplementaire').value;
+		var rensCompl = []; 
+		for(i = 1; i <= iNbRenseignementComplementaire ; i++)
+		{
+		 	rensCompl[i] = $('sRenseignementComplementaire_' + i).value;
+		}
+	
+		iNbRenseignementComplementaire++;
+	
+		var sHtml = '<tr id="trRenseignementComplementaire_' + iNbRenseignementComplementaire + '">\n'
+					+ '<td class="pave_cellule_gauche">\n'
+					+ 'Renseignement ' + iNbRenseignementComplementaire+ ' :<br/>\n'
+					+ ' </td>\n'
+					+ '<td class="pave_cellule_droite">\n'
+					+ '	<textarea rows="3" cols="60"'
+					+ ' name="sRenseignementComplementaire_' + iNbRenseignementComplementaire + '"' 
+					+ ' id="sRenseignementComplementaire_' + iNbRenseignementComplementaire + '"'
+					+ ' ></textarea>\n'
+					+ '</td></tr>';
+
+		$("tableAutreRenseignementDemande").getElementsByTagName("tbody")[0].innerHTML += sHtml;
+		
+		for(i = 1; i < iNbRenseignementComplementaire ; i++)
+		{
+		 	$('sRenseignementComplementaire_' + i).value = rensCompl[i] ;
+		}
+
+		$("iNbRenseignementComplementaire").value= iNbRenseignementComplementaire;
+		
+	}
+
+	function removeLastRenseignementComplementaire()
+	{
+		var iNbRenseignementComplementaire = $('iNbRenseignementComplementaire').value;
+		
+		alert("Pour supprimer un renseigment il faut vider le contenu. La suppresion sera prise en compte lors de la validation de l'onglet");
+		if (true) return ;
+		
+		if(iNbRenseignementComplementaire < 2) return;
+	
+		var renseignement = "trRenseignementComplementaire_" + iNbRenseignementComplementaire;
+		iNbRenseignementComplementaire--;
+		$(renseignement).innerHTML = "";
+
+		$("iNbRenseignementComplementaire").value= iNbRenseignementComplementaire;
+
+	}
+
+//-->
+</script>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%=sPaveJustificationTitre%></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<tr>
+		<td colspan="2" style="text-align: left">Justifications à produire quant aux qualités et capacités du candidat :<br/>
+	Le texte proposé en regard de la case à cocher sera publié intégralement dans l'annonce et facturé en conséquence.<br/>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align: left" >
+		<b>Documents à produire obligatoirement à l'appui des candidatures :</b>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="vertical-align: top" >
+		<%=trt.getHtmlTableInput(vMJChoixObligatoire,
+							"cbMarcheJustificationSelected", "checkbox")%>	
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align: left" >
+		<b>Documents à produire à l'appui des candidatures au choix de l'acheteur public :</b>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="vertical-align: top">
+		<%=trt.getHtmlTableInput(vMJChoixAP,
+							"cbMarcheJustificationSelected", "checkbox")%>	
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align: left">
+		<b>Documents à produire dans tous les cas au stade de l'attribution du marché :</b>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="vertical-align: top">
+		<%=trt.getHtmlTableInput(vMJChoixStadeAATR,
+							"cbMarcheJustificationSelected", "checkbox")%>	
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="2" style="text-align: left">
+		<b>Autres renseignements demandés :</b>
+		</td>
+	</tr>	
+	<tr>
+		<td colspan="2" >
+		<div>
+			<table id="tableAutreRenseignementDemande">
+<%
+	
+	for(int i=0;i<vMJAR.size();i++)
+	{
+		MarcheJustificationAutreRenseignement itemMJAR 
+			= vMJAR.get(i);
+		
+%>				<tr id="trRenseignementComplementaire_<%= i+1 %>" >
+					<td class="pave_cellule_gauche">
+					Renseignement <%= i+1 %> :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+		if(bIsFormPaveJustification)
+		{
+%>
+						<textarea rows="3" cols="60" 
+							name="sRenseignementComplementaire_<%=i+1 %>" 
+							id="sRenseignementComplementaire_<%=i+1 %>" 
+						><%=
+							itemMJAR.getRenseignement()
+						%></textarea>
+<%
+		} else {
+%>
+<%= itemMJAR.getRenseignement() %>	
+<%			
+		}
+%>
+					</td>
+				</tr>
+<%
+	}
+%>			</table>
+		</div>
+	</tr>
+<%
+	if(bIsFormPaveJustification)
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+		</td>
+		<td class="pave_cellule_droite">
+		<button type="button" onclick="addRenseignementComplementaire()" />Ajouter un renseignement</button>
+	 	<button type="button" onclick="removeLastRenseignementComplementaire();" >Supprimer</button>
+		</td>
+	</tr>
+<%
+	}
+%>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<input type="hidden" value="<%= vMJAR.size() %>" id="iNbRenseignementComplementaire"  name="iNbRenseignementComplementaire" />
+		Commentaire :
+		</td>
+		<td class="pave_cellule_droite">
+<%
+		if(bIsFormPaveJustification)
+		{
+%>
+			<textarea rows="3" cols="60" name="MarcheJustificationCommentaire_sCommentaire"><%=marcheJustificationCommentaire.getCommentaire()%></textarea>
+<%
+		}else{
+%><%=marcheJustificationCommentaire.getCommentaire()%>
+<%
+	}
+%>		</td>
+	</tr>
+</table>

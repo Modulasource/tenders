@@ -1,0 +1,105 @@
+<%@page import="org.coin.fr.bean.Pays"%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueCivilite"%>
+<%@page import="org.coin.localization.Language"%>
+
+<%@page import="mt.common.addressbook.AddressBookOwner"%>
+<input type="hidden" name="<%=sFormPrefix %>iIdPersonnePhysique" value="<%= personne.getIdPersonnePhysique() %>" />
+<%
+	String sMessageEmailAllreadyUsed = locMessage.getValue(2,"Attention, l'adresse Email saisie ci-dessous est déjà enregistrée dans la base de données.");
+%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sBlocNamePersonnePhysique %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+<%
+	if(dih.bGroupPersoData){
+	%><%= hbFormulaire.getHtmlTr(sOrganisationTypeName
+			+" :","<a href='"+response.encodeURL(
+					rootPath+"desk/organisation/afficherOrganisation.jsp?iIdOrganisation="+organisation.getId())
+					+"'>"+organisation.getRaisonSociale()+"</a>") %>
+<% 
+	}
+	PersonnePhysiqueCivilite ppCivilite = new PersonnePhysiqueCivilite(personne.getIdPersonnePhysiqueCivilite());
+	ppCivilite.setAbstractBeanLocalization(personne);
+
+%>
+	<tr>
+		<td class="pave_cellule_gauche" ><%= personne.getIdPersonnePhysiqueCiviliteLabel() %> :</td>
+		<td class="pave_cellule_droite" >
+		<%= ppCivilite.getAllInHtmlSelect(sFormPrefix + "iIdCivilite") %>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput(personne.getPrenomLabel() + "* :",sFormPrefix + "sPrenom",personne.getPrenom(),"",true) %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getNomLabel() + "* :",sFormPrefix + "sNom",personne.getNom(),"",true) %>
+	<tr>
+		<td class="pave_cellule_gauche"><%=personne.getInitialsLabel() %> :</td>
+		<td class="pave_cellule_droite">
+			<input type="text" value="<%=(personne.getInitials()==null?"":personne.getInitials()) %>" name="sInitials" id="sInitials"/>
+			<button id="but_sInitials" type="button" onclick="generateInitials();return false;">&lt; <%= localizeButton.getValueGenerate("Generate") %></button>
+		</td>
+	</tr>
+	<%= hbFormulaire.getHtmlTrInput(personne.getFonctionLabel() + " :",sFormPrefix + "sFonction",personne.getFonction(),"") %>
+	<%if(bDisplayNationality){%>
+	<tr>
+		<td class="pave_cellule_gauche" ><%= personne.getIdNationaliteLabel() %> :</td>
+		<td class="pave_cellule_droite" >
+		<%= nationalite.getAllInHtmlSelect(sFormPrefix + "iIdNationalite") %>
+		</td>
+	</tr>
+	<%}%>
+	<%= hbFormulaire.getHtmlTrInput(personne.getTelLabel() + " :",sFormPrefix + "sTel",personne.getTel(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getPosteLabel() + " :",sFormPrefix + "sPoste",personne.getPoste(),"") %>
+	<tr id="tr_infoEmail" style="display: none; visibility: hidden;">
+		<td class="pave_cellule_gauche" >&nbsp;</td>
+		<td class="pave_cellule_droite" >
+			<div class="rouge" style="text-align:left">
+				<%= sMessageEmailAllreadyUsed %>
+			</div>
+		</td>
+	</tr>
+	<input type="hidden" name="<%= sFormPrefix %>sEmailAuth" id="<%= sFormPrefix %>sEmailAuth" value="" />
+	<%= hbFormulaire.getHtmlTrInput(personne.getEmailLabel() + "* :",sFormPrefix + "sEmail",personne.getEmail(),"onBlur=\"verifierMailPP();\" onKeyUp=\"verifierMailPP();\" size='60'",true) %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getFaxLabel() + " :",sFormPrefix + "sFax",personne.getFax(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getTelPortableLabel() + " :",sFormPrefix + "sTelPortable",personne.getTelPortable(),"") %>
+    <%= hbFormulaire.getHtmlTrInput(personne.getSiteWebLabel() + " :",sFormPrefix + "sSiteWeb",personne.getSiteWeb(),"") %>
+<%
+    if(dih.bDisplayExternalReference)
+    {
+%>
+    <%= hbFormulaire.getHtmlTrInput(personne.getLocalizedLabel("sReferenceExterne")+" :",sFormPrefix 
+    		+ "sReferenceExterne",personne.getReferenceExterne(),"") %>
+<%
+    }
+
+	if(dih.bDisplayOwner ){ 
+		AddressBookOwner addressBookOwner = new AddressBookOwner ();
+		addressBookOwner.setItemOwned(personne);
+		addressBookOwner.compute(conn);
+	
+		request.setAttribute("addressBookOwner", addressBookOwner);
+%>
+	<tr>
+		<td class="pave_cellule_gauche" ><%= locTitle.getValue(35,"Appartient à (owner)") %> : </td>
+		<td class="pave_cellule_droite" >
+<%
+	if(dih.bDisplayOwnerForm){
+%>
+		<jsp:include page="/desk/organisation/bloc/blocDisplayAddressBookOwner.jsp"></jsp:include>	
+<%		
+	} else {
+%>
+		<input type="hidden" name="<%= sFormPrefix %>lIdObjectTypeOwner" value="<%= personne.getIdObjectTypeOwner() %>" />
+		<input type="hidden" name="<%= sFormPrefix %>lIdObjectReferenceOwner" value="<%= personne.getIdObjectReferenceOwner() %>" />
+<%= addressBookOwner.ot.getName() + " : " + addressBookOwner.sObjectNameOwner  %>
+<%		
+	}
+%>
+		</td>
+	</tr>		
+<%
+	}
+%>
+
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

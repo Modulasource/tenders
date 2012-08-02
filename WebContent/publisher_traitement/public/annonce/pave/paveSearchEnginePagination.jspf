@@ -1,0 +1,146 @@
+<%
+	{
+	String sUrlRedirection = request.getRequestURI();
+	int iNbResults = recherche.getNbResultats();
+	int iStart = iNumPage;
+	int iNBR = iNbResults;
+	int iNBG = (int)(Math.ceil((float) iNBR/(float) iMAXP));
+	int iGROUPP = 10;
+%>
+
+<%@page import="org.coin.util.CalendarUtil"%><div style="color:#FF8C00;padding:5px;text-align:center">
+<%
+	if(iNbResults>1){
+		out.println(iNbResults+" résultats");
+	}else if(iNbResults==1){
+		out.println("Un résultat");
+	}else{
+		out.println("Pas de résultat");
+	}
+	out.println("<br />");
+
+if ((iNBR>iMAXP) && (iStart<iNBG))
+{
+	String sRedirectSearch 
+		= sUrlRedirection+"?filtreType=" + filtreType
+				+"&filtre=" + filtre
+				+"&type_avis=" + sType_avis
+				+"&tri=" + tri
+				+"&iIdDepartement=" + sIdDepartement
+				+"&type_annonce=" + sType_annonce
+                +"&iIdMarcheType=" + sIdMarcheType
+                +"&bDisplaySearchEngine=" + bDisplaySearchEngine
+                +"&bLaunchSearch=" + bLaunchSearch
+                +"&sIsAnnonceDemat=" + sIsAnnonceDemat
+                +"&sIsAnnonceDce=" + sIsAnnonceDce
+                +"&sIsOnlyUnreadedAnnonceChecked=" + sIsOnlyUnreadedAnnonceChecked
+			    +"&iIdGroupCompetence=" + sIdGroupCompetence
+                +"&se_tsStartDate=" + CalendarUtil.getDateCourte(tsStartDate)
+                +"&se_tsEndDate=" + CalendarUtil.getDateCourte(tsEndDate)
+                +"&se_iMaxElementPerPage=" + iMAXP
+                +"&se_bDisplayMapAnnounce=" + bDisplayMapAnnounce
+			    ;
+	
+    String sHTML = "";
+	int iP = 0;
+	// recherche du point de départ iNN ; exemple : 30 31 32 ... <= iNN = 30
+	int iNN = iStart;
+	while(iNN%iGROUPP!=0){
+		iNN--;
+	}
+				
+	int iMM = 0;
+	if (iNN>=iNBG-iGROUPP){
+		iMM = iNBG;
+	}else{
+		iMM = iNN+iGROUPP;
+	}
+
+	// [ |<< ] Aller au début
+	if (iStart>0){
+		iP = 0;
+		sHTML += "<a href=\""+response.encodeURL(sRedirectSearch 
+				+ "&amp;numPage="+iP+"#ancreHP")+"\" style=\"color:#ff8c00;\">";
+		sHTML += "<img src=\""+rootPath+"images/icones/back_start.gif\" " +
+				"alt=\"Aller à la première page\" " +
+				"title=\"Aller à la première page\" />";
+		sHTML += "</a>&nbsp;";
+	}
+	
+	//	[ << ] saut de iGroupPerPage pages précédentes
+	if (iStart>iGROUPP){
+		iP = iStart-iGROUPP;
+		sHTML += "<a href=\""+response.encodeURL(sRedirectSearch 
+				+ "&amp;numPage="+iP+"#ancreHP")+"\" style=\"color:#ff8c00;\">";
+		sHTML += "<img src=\""+rootPath+"images/icones/back_ten.gif\" " +
+				"alt=\"Aller à la page "+(iP+1)+"\" " +
+				"title=\"Aller à la page "+(iP+1)+"\" />";
+		sHTML += "</a>&nbsp;";
+	}
+	
+	// [ < ] saut d'une page précédente
+	if (iStart>0){
+		iP = iStart-1;
+		sHTML += "<a href=\""+response.encodeURL(sRedirectSearch 
+				+ "&amp;numPage="+iP+"#ancreHP")+"\" style=\"color:#ff8c00;\">";
+		sHTML += "<img src=\""+rootPath+"images/icones/back_one.gif\" " +
+				"alt=\"Aller à la page "+(iP+1)+"\" " +
+				"title=\"Aller à la page "+(iP+1)+"\" />";
+		sHTML += "</a>&nbsp;";
+	}
+	
+	// Pages : 12 | 13 | 14
+	int iNoToDisplay;
+	for (int i=iNN;i<iMM;i++){
+		iNoToDisplay = i+1;
+		if (iStart == i){
+			sHTML += "["+iNoToDisplay+"]";
+		}else{
+			sHTML += "<a href=\""+response.encodeURL(sRedirectSearch 
+					+ "&amp;numPage="+i+"#ancreHP")+"\" style=\"color:#ff8c00;\"> ";
+			sHTML += iNoToDisplay;
+			sHTML += " </a>";
+		}
+		if (i<iMM-1) sHTML += "&nbsp;|&nbsp;";
+	}
+	
+	
+	// [ > ] saut d'une page suivante
+	if (iStart+1<(int) Math.ceil((float) iNBR/(float) iMAXP)){
+		iP = iStart+1;
+		sHTML += "&nbsp;<a href=\""+response.encodeURL(sRedirectSearch 
+				+ "&amp;numPage="+iP+"#ancreHP")+"\" style=\"color:#ff8c00;\">";
+		sHTML += "<img src=\""+rootPath+"images/icones/fwd_one.gif\" " +
+					"alt=\"Aller à la page "+(iP+1)+"\" " +
+					"title=\"Aller à la page "+(iP+1)+"\" />";
+		sHTML += "</a>";
+	}
+	
+		
+	// [ >> ] saut de iGroupPerPage pages suivantes
+	if (iStart+iGROUPP<(int) Math.ceil((float) iNBR/(float) iMAXP)){
+		iP = iStart+iGROUPP;
+		sHTML += "&nbsp;<a href=\""+response.encodeURL(sRedirectSearch 
+				+ "&amp;numPage="+iP+"#ancreHP")+"\" style=\"color:#ff8c00;\">";
+		sHTML += "<img src=\""+rootPath+"images/icones/fwd_ten.gif\" " +
+					"alt=\"Aller à la page "+(iP+1)+"\" " +
+					"title=\"Aller à la page "+(iP+1)+"\" />";
+		sHTML += "</a>";
+	}
+	
+	
+	// [ >>| ] Aller à la fin
+	if (iStart<iNBG-1){
+		iP = iNBG-1;
+		sHTML += "&nbsp;<a href=\""+response.encodeURL(sRedirectSearch 
+				+ "&amp;numPage="+iP+"#ancreHP")+"\" style=\"color:#ff8c00;\">";
+		sHTML += "<img src=\""+rootPath+"images/icones/fwd_end.gif\" " +
+					"alt=\"Aller à la page "+(iP+1)+"\" " +
+					"title=\"Aller à la page "+(iP+1)+"\" />";
+		sHTML += "</a>";
+	}
+	out.println(sHTML);
+}
+}
+%>
+</div>

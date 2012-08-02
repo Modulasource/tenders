@@ -1,0 +1,384 @@
+<%
+
+
+{
+
+	if(marche.isAffaireAnnulee(false)) sStatut = "Marché déclaré sans suite";
+		
+	if (iTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE)
+	{
+		if ((!marche.getNomAAPC().equalsIgnoreCase(""))&&(!marche.getNomAAPC().equalsIgnoreCase(null)))  {
+			bConsultationAAPC = true;
+		}
+		else { 
+			bConsultationAAPC = false;
+			bImprimer = true;
+		}
+		bLirePetiteAnnonce = true;
+	}
+%>
+<%@page import="modula.servlet.DownloadPieceMarche"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.servlet.DownloadFile"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="org.coin.fr.bean.export.PublicationPdfGeneric"%>
+<%@page import="modula.commission.Commission"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.Multimedia"%>
+<%@page import="org.coin.fr.bean.MultimediaType"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="modula.marche.MarcheType"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="modula.marche.MarchePieceJointe"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="modula.graphic.Icone"%>
+
+<%@page import="org.coin.security.SecureString"%>
+
+<%@page import="org.coin.bean.conf.Configuration"%><div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+<%@ include file="paveAnnonceMarchePersonneItemCheckbox.jspf" %>
+              
+                <strong class="post-title-alt"><%=sAffaireAcheteurPublic%></strong> réf. <%=
+                    marche.getReference() %> - <span class="post-title-alt">(<%= sTypePetiteAnnonce%>)</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00"><%=sPrintMessAvisRectificatif%></strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+
+
+    <table class="fullWidth" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="top">
+            <%@ include file="paveTypeMarche.jspf" %>
+        </td>
+<%
+if(bShowButtonAnnonceDetail || 
+(bShowButtonStatut && !sStatut.equals("") ) ) {
+%>
+        <td class="top" style="width:140px">
+<%
+    if(bShowButtonAnnonceDetail ) {
+%>
+            <div class="post-header post-block center" style="margin-left:0;">
+                <img class="middle" src="<%=rootPath %>images/icons/zoom.gif" />&nbsp;&nbsp;<a id="marche_<%=
+                    marche.getId() %>" href="javascript:void(0)" class="middle">Détail de l'annonce</a>
+                <script type="text/javascript"> 
+                    
+                    Event.observe(window, "load", function() {
+                    
+                        $('marche_<%=marche.getId()%>').onclick = function() 
+                        {
+                    
+                           
+					       if(sUserAgent == "ie6" || <%= 
+					    	   Configuration.isTrueMemory("publisher.display.annonce.detail.force.popup", false) %>)
+                           {
+                               OuvrirPopup("<%= response.encodeURL(rootPath 
+                                    + "publisher_portail/public/annonce/afficherAnnonce.jsp?a="
+                                            + SecureString.getSessionSecureString(
+                                                    Long.toString(marche.getId()), session)) %>",800,650,"menubar=no,scrollbars=yes,statusbar=no");
+                              return ;
+                           }
+                           
+                            var doc;
+                            try{doc = parent.document;doc.appendChild(doc.createTextNode(""));}
+                            catch(e){doc = document;}
+                           
+                            
+                           
+                            var popupDiv = doc.createElement("div");
+                            popupDiv.style.position = "relative";
+                            popupDiv.style.backgroundColor = "#EFF5FF";
+                            popupDiv.style.padding = "0 7px 0 7px";
+
+                            var img = doc.createElement("img");
+                            img.style.position = "absolute";
+                            img.style.top = "3px";
+                            img.style.right = "3px";
+                            img.style.cursor = "pointer";
+                            img.src = "<%=rootPath%>images/icons/close.gif";
+                            img.onclick = function(){
+                                try {new parent.Control.Modal.close();}
+                                catch(e) { Control.Modal.close();}
+                            }
+
+                            popupDiv.appendChild(img);
+                            
+                            
+                            var divHeader = doc.createElement("div");
+                            divHeader.style.textAlign = "center";
+                            divHeader.style.lineHeight = "28px";
+                            divHeader.innerHTML = 'Petite annonce référence <%= 
+                                Outils.replaceAll( marche.getReference(), "'", "''") %>';
+                            divHeader.style.height = "28px";
+                            
+                            var divIframe = doc.createElement("div");
+                            divIframe.style.border = "1px solid #888";
+                            divIframe.style.backgroundColor = "#AAA";
+                            
+                            var iframe = doc.createElement("iframe");
+                            iframe.name = "offerPopup";
+                            iframe.id = "offerPopup";
+                            iframe.src = "<%= response.encodeURL(rootPath 
+                                    + "publisher_portail/public/annonce/afficherAnnonce.jsp?a="
+                                            + SecureString.getSessionSecureString(
+                                                    Long.toString(marche.getId()), session)) %>";
+                            iframe.style.width = "100%";
+                            iframe.style.height = "430px";
+                            iframe.style.border = 0;
+                            iframe.style.margin = 0;
+                            iframe.align = "top";
+                            iframe.frameBorder = "0";
+                            iframe.border = "1";
+                            divIframe.appendChild(iframe);
+                                                        
+                            var divFooter = doc.createElement("div");
+                            divFooter.style.textAlign = "center";
+                            divFooter.style.lineHeight = "6px";
+                            //divFooter.innerHTML = '<button>un bouton ici</button>';
+                            divFooter.style.height = "6px";
+                            
+                            popupDiv.appendChild(divHeader);
+                            popupDiv.appendChild(divIframe);
+                            popupDiv.appendChild(divFooter);
+
+                            var modal ;
+                           try{ 
+                               modal = new parent.Control.Modal(false,{width: 700, contents: popupDiv});
+                           } catch(e) {
+                               modal = new Control.Modal(false,{width: 700, contents: popupDiv});
+                           }
+                               
+                           modal.container.insert(popupDiv);
+                           modal.open();
+                        }
+                        
+                    });
+                    
+                </script>
+            </div>
+<%
+    }
+
+    if(bShowButtonStatut && !sStatut.equals("")) {
+%>
+            <div class="post-header post-block center" style="margin-left:0;">
+               <%= sStatut %>
+            </div>
+           
+<%
+    }
+%>
+            
+        </td>
+<%
+
+}
+%>
+    </tr>
+    </table>
+    
+    <%@ include file="paveAnnonceCPF.jspf" %>
+    
+    <% if(!sAffaireAcheteurPublic.equals("")&& vMultimedias.size()>0) { %>
+    <div class="post-picture">
+            <img src="<%= response.encodeURL(
+                    rootPath+ "publisher_portail/DownloadFilePublisher?" 
+                    + DownloadFile.getSecureTransactionStringFullJspPage(
+                            request, 
+                            vMultimedias.firstElement().getIdMultimedia() , 
+                            TypeObjetModula.MULTIMEDIA,
+                            false /* permet de ne pas recharger le logo à chaque fois */)
+                    +"&amp;sContentType="+vMultimedias.firstElement().getContentType()
+                    +"&amp;sAction=view") %>" alt="Acheteur Public" />
+    </div>
+    <% }  
+       if(vAvisRectificatif != null && vAvisRectificatif.size() > 0) { %>
+    <div class="post-avis post-block" style="margin-top:0">
+        <%@ include file="paveListeAvisRectificatifs.jspf" %>
+    </div>
+    <%  } %>
+    
+    <div class="post-footer post-block" style="margin-top:0">
+        <table class="fullWidth">
+            <%  
+                Timestamp tsDateLimite = null;
+                String sLibelleDate = "";
+                String sLibelleFin = "Dossier clos";    
+                Timestamp tsDatePublication = null; 
+                boolean bCandidaturesCloses = marche.isCandidaturesCloses(false);
+                boolean bOffresCloses = marche.isOffresCloses(false);
+                
+                
+                if (iTypeProcedure == AffaireProcedure.TYPE_PROCEDURE_PETITE_ANNONCE){
+                    /* PETITES ANNONCES */
+                    if (marche.isAffaireAAPC(false)) { sLibelleDate = "Date limite :"; }
+                    else if (marche.isAffaireAATR(false)){sLibelleDate = "" ; bAfficheDates = false; sLibelleFin = "";}
+                    Vector<Validite> vValiditesAnnonce 
+                       = Validite.getAllValiditeAffaireFromAffaire(marche.getIdMarche(), vValiditeTotal); 
+                    if(vValiditesAnnonce != null)
+                    {
+                        if(vValiditesAnnonce.size() == 1)
+                        {
+                            Validite oValiditeAnnonce = vValiditesAnnonce.firstElement();
+                            tsDatePublication = oValiditeAnnonce.getDateDebut();
+                            tsDateLimite = oValiditeAnnonce.getDateFin();
+                        }
+                    }
+                    /* PETITES ANNONCES */
+                }
+                else
+                {
+                    switch(iTypeProcedure)
+                    {
+                        case AffaireProcedure.TYPE_PROCEDURE_OUVERTE:
+                            sLibelleDate = "Date limite de reception des plis :";
+                            sLibelleFin = "Dossier clos";
+                            break;
+                    
+                        case AffaireProcedure.TYPE_PROCEDURE_RESTREINTE:
+                            if(bCandidaturesCloses) 
+                            {
+                                sLibelleDate = "Date limite de reception des offres :";
+                                sLibelleFin = "Offres closes";
+                            }
+                            else 
+                            {
+                                sLibelleDate = "Date limite de reception des candidatures :";
+                                sLibelleFin = "Candidatures closes";
+                            }
+                            break;
+                        
+                        case AffaireProcedure.TYPE_PROCEDURE_NEGOCIE:
+                            if(bCandidaturesCloses) 
+                            {
+                                sLibelleDate = "Date limite de reception des offres :";
+                                sLibelleFin = "Offres closes";
+                            }
+                            else 
+                            {
+                                sLibelleDate = "Date limite de reception des candidatures :";
+                                sLibelleFin = "Candidatures closes";
+                            }
+                            break;
+                    }
+                    
+                    Vector<Validite> vValiditesAAPC 
+                       = Validite.getAllValiditeAAPCFromAffaire(marche.getIdMarche(), vValiditeTotal);
+                    if(vValiditesAAPC != null)
+                    {
+                        if(vValiditesAAPC.size() == 1)
+                        {
+                            Validite oValiditeAAPC = vValiditesAAPC.firstElement();
+                            tsDatePublication = oValiditeAAPC.getDateDebut();
+                        }
+                    }
+                    
+                   
+
+                }
+            %>
+                <tr>
+                    <th>Date de publication :</th>
+                </tr>
+                <tr>
+                    <td style="text-align:left"><%= CalendarUtil.getDateFormattee(tsDatePublication) %></td>
+                </tr>
+            </table>
+        
+        
+    </div>
+<%
+    if(bShowButtonToDownloadFile)
+    {
+%>
+    
+    <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="top">
+                <div class="post-header post-block" style="text-align:center;padding:5px">          
+<%
+            
+		if(bSearchEngineHabilitation && !sessionUser.isLogged && marche.isDCEDisponible(false)){
+			/* CF #3408	*/			
+			out.println("Vous devez être inscrit et connecté pour télécharger le DCE");
+		}else if(bConsultationAAPC) {
+            if ( marche.isAAPCAutomatique(false)) 
+            {
+%><a href='javascript:OuvrirPopup("<%= response.encodeURL( 
+            rootPath 
+            + "publisher_portail/PublicationPdfGeneric?"
+            + PublicationPdfGeneric.getSecureTransactionStringFullJspPage(
+            request, marche.getIdMarche(),  PublicationType.TYPE_AAPC))
+                %>",800,650,"menubar=no,scrollbars=yes,statusbar=no")' 
+        style="color:#ff8c00;"><img src="<%=rootPath+ Icone.ICONE_FICHIER_PDF
+        %>" style="vertical-align:middle;" alt="Télécharger l'AAPC / DCE"/>&nbsp;Télécharger l'AAPC / DCE &nbsp;</a>
+<%
+        }
+        else
+        {
+%><a href='javascript:OuvrirPopup("<%= response.encodeURL(
+                rootPath+ "publisher_portail/DownloadFilePublisher?" 
+                        + DownloadFile.getSecureTransactionStringFullJspPage(
+                                request, 
+                                marche.getIdMarche()  , 
+                                TypeObjetModula.AAPC )) %>",800,650,"menubar=no,scrollbars=yes,statusbar=no")'
+        style="color:#ff8c00;"><img src="<%=rootPath+ Icone.getIconeFromFileName(marche.getNomAAPC())
+        %>" style="vertical-align:middle;"  />&nbsp;Consulter l'<%= sTypePetiteAnnonce %> &nbsp;</a>
+<%
+        }
+    
+        int iNbColspan = 2;
+        
+    
+        {
+            Vector<MarchePieceJointe> vRC = MarchePieceJointe.getReglementConsultation(
+                    marche.getIdMarche(),
+                    vMarchePieceJointeTotal);
+            if ( (vRC != null) && (vRC.size() > 0) )
+            {
+                  iNbColspan = 1;
+                // Récupération de la première pièce correspondante au Règlement de Consultation
+                MarchePieceJointe pj = vRC.firstElement();
+                String url = response.encodeURL( request.getContextPath()
+                            + "/publisher_portail/DownloadPieceMarchePublisher?"
+                            + DownloadPieceMarche.getSecureTransactionString(
+                                    marche.getIdMarche(), 
+                                    pj.getIdMarchePieceJointe(),
+                                    request) );
+%>  
+    <a href='javascript:OuvrirPopup("<%= url %>",800,650,"menubar=no,scrollbars=yes,statusbar=no")' style="color:#ff8c00">
+        <img src="<%=rootPath+ Icone.getIconeFromFileName(pj.getNomPieceJointe())
+                  %>" style="vertical-align:middle;"  />
+        Consulter le règlement de consultation
+    </a>
+<%
+            }
+        }
+    }
+    
+%>
+    
+            </td>
+        </tr>
+    </table>
+
+<%
+    }
+} // à cause des variables locales ...   
+
+%>
+</div>
+

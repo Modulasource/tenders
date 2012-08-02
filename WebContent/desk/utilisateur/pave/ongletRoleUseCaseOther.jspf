@@ -1,0 +1,41 @@
+	<%
+		// Le reste 
+		sUseCasePrefix = "_OTHER_" ;
+		sUseCase = "" ;
+		sUseCaseWhereClause 
+				= " WHERE id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseOrganisation) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCasePersonne) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseCommission) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCasePetiteAnnonce) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCasePublisher) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseParamHabilitation) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseParamOrganisation) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseParamAffaire) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseParamMail) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseParamTreeview) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseJournal)+ "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseFAQ) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseGED) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseAR) + "%' " 
+				+ " AND id_use_case NOT LIKE '" + org.coin.util.Outils.addLikeSlashes(sUseCaseAffaire) + "%' " ;
+				
+			
+		vUseCasesAll = UseCase.getAllUseCaseWithWhereAndOrderByClauses(sUseCaseWhereClause , "");
+			
+		if(sAction.equals("store") )
+ 		{
+ 		%>
+			<%@ include file="paveBalanceUseCase.jspf" %>
+			<input type="hidden" name="_OTHER_UNSELECTED_iIdUseCaseSelectionListe" />
+			<br />
+		<%
+		} else {
+		%>
+			<%@ include file="pavePrefixUseCase.jspf" %>
+			<br />
+		<%
+		}
+		
+	
+		
+	%>

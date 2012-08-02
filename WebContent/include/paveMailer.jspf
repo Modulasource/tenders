@@ -1,0 +1,255 @@
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.fr.bean.mail.MailType"%>
+<%@page import="org.coin.fr.bean.mail.MailConstant"%>
+<script type="text/javascript" src="<%=rootPath%>include/js/tinymce/jscripts/tiny_mce/tiny_mce_gzip.jsp"></script>
+
+<script type="text/javascript">
+
+tinyMCE_GZ.init({//extraction des plugins du fichier  tiny_mce_gzip
+	plugins : 'paste,preview',
+	themes : 'advanced',
+	languages : 'en',
+	disk_cache : true,
+	debug : false
+});
+
+
+tinyMCE.init({
+	theme : "advanced",
+	mode : "exact",
+	elements : "contenuMail",//contenu à traiter
+	skin : "o2k7",
+	plugins:"paste,preview,-balise",//plugins à utiliser
+	theme_advanced_toolbar_location : "top",
+	theme_advanced_toolbar_align : "left",
+	theme_advanced_path_location : "bottom",
+	theme_advanced_buttons1 : "bold,italic,underline,|,bullist,numlist,|,link,unlink,|,preview,mylistbox",//liste des commandes à intégrer
+	theme_advanced_buttons2 : "",
+	theme_advanced_buttons3 : "",
+	plugin_preview_pageurl:"<%=rootPath%>include/js/tinymce/jscripts/tiny_mce/plugins/preview/preview.jsp",//page qui sert à afficher la preview
+	content_css : "<%=rootPath%>include/css/tinymce.css",
+
+	theme_advanced_width : "600",
+	theme_advanced_height : "600",
+	
+	theme_advanced_resizing : true,
+	theme_advanced_resize_horizontal : true,
+	plugin_preview_width : "600",
+	plugin_preview_height : "600"
+});
+//Creates a new plugin class and a custom listbox
+tinymce.create('tinymce.plugins.BalisePlugin', 
+		{
+    		createControl: function(n, cm) 
+    		{
+        		switch (n) 
+        		{
+            		case 'mylistbox':
+               		 var mlb = cm.createListBox('mylistbox',
+						{
+                    		title : 'ajouter_balise',
+                     		onselect : function(v) 
+                     		{
+               			
+                				addBalise(v);
+                    		 }
+                		});
+
+				                // Add some values to the list box
+				                
+               		<%for (int cpt = 0; cpt < sBalisesActives.length; cpt++){%>
+               	 mlb.add("<%= sBalisesActives[cpt]%>","<%= sBalisesActives[cpt]%>");
+               		<%}%>
+				              
+				                // Return the new listbox instance
+				                return mlb;
+       			 }
+
+        return null;
+    }
+});
+
+// Register plugin with a short name
+tinymce.PluginManager.add('balise', tinymce.plugins.BalisePlugin);
+function setSubmitOnClickButton(){
+  
+  $('form').onsubmit = function() {
+	  $('store_btn').disabled = true;
+	  $('store_btn').innerHTML = "envoi en cours...";
+	  
+	  copyHtmlModal();
+	  
+      return true;
+ }
+ 
+} 
+ 
+
+function copyHtmlModal(){
+    var sHTML = $('patternHTML').value;
+    var sPlainText = $('contenuMail').value;
+    /**
+	* to make fusion between plain text and html
+	*/
+	var reg1=new RegExp("<div id=\"_repere_\"></div>", "g");
+    
+   sHTML = sHTML.replace(reg1,sPlainText);
+   $('contenuMail').value = sHTML;
+}
+
+function displayHtmlModalOld(){
+	openModal(null);
+}
+
+function openModal(obj){
+	var modal, div ;
+	
+	try{div = createModal(obj,parent.document);}
+	catch(e){div = createModal(obj,document);}
+	
+	try {modal = new parent.Control.Modal(false,{contents: div});}
+	catch(e) {modal = new Control.Modal(false,{contents: div});}
+	
+    modal.container.insert(div);
+	modal.open();
+}
+
+function createModal(obj, doc){
+	
+	var modal_princ = doc.createElement("div");
+	var divControls = doc.createElement("div");
+	divControls.className = "modal_controls";
+		
+	var divTitle = doc.createElement("div");
+	divTitle.className = "modal_title";
+	divTitle.innerHTML = "HTML Généré";
+	
+	var img = doc.createElement("img");
+	img.style.position = "absolute";
+	img.style.top = "3px";
+	img.style.right = "3px";
+	img.style.cursor = "pointer";
+	img.src = "/modula_test/images/icons/close.gif";
+	img.onclick = function(){
+		try {new parent.Control.Modal.close();}
+		catch(e) { Control.Modal.close();}
+	}
+	
+	divControls.appendChild(divTitle);
+	divControls.appendChild(img);
+	
+	var divFrame = doc.createElement("div");
+	divFrame.className = "modal_frame_principal";
+	
+	var divContent = doc.createElement("div");
+	divContent.className = "modal_frame_content";
+	
+    var sHTML = $('contenuMail').value;
+    var sPlainText = $('contenuMailPlainText').value;
+    var reg2=new RegExp("\n", "g");
+    sPlainText = sPlainText.replace(reg2,"<br/>\n");
+
+
+	
+	divContent.innerHTML = sHTML;
+	divFrame.appendChild(divContent);
+
+	divContent.onclick = function(){
+		try {new parent.Control.Modal.close();}
+		catch(e) { Control.Modal.close();}
+	}
+	
+	var divOptions = doc.createElement("div");
+	divOptions.className = "modal_options";
+		
+	modal_princ.appendChild(divFrame);
+	modal_princ.appendChild(divOptions);
+	
+	return modal_princ;
+}
+function addBalise(v){
+	tinyMCE.execCommand('mceInsertContent', false, v);
+}
+Event.observe(window, 'load', function(){
+	
+	
+
+	setSubmitOnClickButton();
+});
+//-->
+</script>
+<%
+	/*
+	 *	Nécessite les objets suivants :
+	 *		MailType mailType;
+	 *		String sTitrePave;
+	 *		String rootPath;
+	 *		String[] sBalisesActives;
+	 *		boolean bJoindreAAPC;
+	 *		boolean bJoindreAATR;
+	 *
+	 *	Nécessite les javascripts suivants :
+	 *		popup.js;
+	 *		
+	 */
+%>
+<input type="hidden" name="iIdAffaire" value="<%= iIdAffaire %>" />
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sTitrePave %></td>
+	</tr>
+	<tr>
+		<td>
+	
+
+		
+		
+		</td>
+	</tr>
+	<tr><td style="font-weight:bold">Objet :&nbsp;</td></tr>
+	<tr>
+		<td style="text-align:center">
+		<input type="text" size="100" name="objet" value="<%= mailType.getObjetType() %>" />
+		</td>
+	</tr>
+	<tr>
+		<td style="font-weight:bold">Contenu :&nbsp;<%= InfosBulles.getModal(InfosBullesConstant.BALISES,rootPath)%></td>&nbsp;
+
+	</tr>
+	
+
+<tr>
+		<td style="text-align:center">
+ 		<textarea cols="100" rows="10" id="contenuMail" name="contenuMail" ><%= mailType.getContenuTypeHTML() %></textarea>
+<%
+MailType mt =  MailType.getMailTypeMemory(MailConstant.MAIL_TEMPLATE,false);
+%>
+<textarea cols="100" rows="10" id="patternHTML" name="patternHTML" style="display:none" ><%= mt.getContenuTypeHTML() %></textarea>
+        </td>
+    </tr>
+<%
+if (bJoindreAAPC)
+{
+%>
+	<tr>
+		<td>
+			<input type="checkbox" name="bJoindreAAPC" value="true" checked='checked'/>&nbsp; Joindre l'AAPC au format PDF
+		</td>
+	</tr>			
+<%
+}
+if (bJoindreAATR)
+{
+%>
+	<tr>
+		<td>
+			<input type="checkbox" name="bJoindreAATR" value="true" />&nbsp; Joindre l'AATR au format PDF
+		</td>
+	</tr>
+<%
+}
+%>
+
+</table>
+

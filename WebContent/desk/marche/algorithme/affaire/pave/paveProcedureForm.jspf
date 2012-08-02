@@ -1,0 +1,6 @@
+<%= ((bUseBoamp17)?afBlockTypeAvis.getHTML():"") %>
+<%@page import="modula.marche.MarcheForme"%>
+<%@page import="java.util.Vector"%>
+<br />
+<%= afBlockProcedure.getHTML() %>
+<br />

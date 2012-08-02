@@ -1,0 +1,36 @@
+<%@page import="java.util.Vector"%>
+<%@page import="modula.graphic.BarBouton"%>
+<%
+	Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+	String sExtraParam = " class='opacity75' ";
+	String sExtraParamOnMouseOver= " this.className='opacity100' ";
+	String sExtraParamOnMouseOut= " this.className='opacity75' ";
+
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonSupprimerDocument))
+	{
+		vBarBoutons.add( 
+				new BarBouton(0,
+					"Supprimer le document",
+					response.encodeURL(rootPath + "desk/document/supprimerDocumentForm.jsp?iIdDocument=" + doc.getId()),
+					rootPath+modula.graphic.Icone.ICONE_SUPPRIMER, 
+					sExtraParamOnMouseOver,
+					sExtraParamOnMouseOut,
+					"",
+					true) );
+	}
+	
+%>
+<a name="ancreHP">&nbsp;</a>
+<div id="menuBorderAffaire" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+	<div class="fullWidth">
+		<%
+		out.write( BarBouton.getAllButtonHtmlDesk(vBarBoutons));
+		%>
+	</div>
+</div>
+<script>
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+	menuBorder.render($('menuBorderAffaire'));
+});
+</script>

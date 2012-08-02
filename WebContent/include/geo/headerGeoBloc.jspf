@@ -1,0 +1,125 @@
+<link rel="stylesheet" href="<%= rootPath %>include/js/openlayers/theme/default/style.css" type="text/css" />
+<script src="<%= rootPath %>include/js/openlayers/OpenLayers.js"></script>
+<%
+
+
+	if(geoMap.bUseOpenStreetMap)
+	{
+%>
+  
+<script src="http://www.openstreetmap.org/openlayers/OpenStreetMap.js"></script>
+<%
+	}
+	
+	if(geoMap.bUseGoogleMaps)
+	{
+%>  
+<!-- 
+ FOR GOOGLE MAPS
+ This gmaps key generated for http://openlayers.org/dev/ 
+  -->
+<link rel="stylesheet" href="<%= rootPath %>include/js/openlayers/theme/default/google.css" type="text/css" />
+<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAjpkAC9ePGem0lIq5XcMiuhR_wWLPFku8Ix9i2SXYRVK3e45q1BQUd_beF8dtzKET_EteAjPdGDwqpQ'></script>
+<%
+	}
+%>  
+  
+<script type="text/javascript">
+
+var g_lon = 5;
+var g_lat = 46;
+var g_zoom = 5;
+var g_map;
+
+function Map_initMaps()
+{
+    OpenLayers.ProxyHost="/proxy/?url=";
+
+<%
+	if(	geoMap.bUseProjection )
+	{
+%>
+    g_map = new OpenLayers.Map ("map", {
+        controls:[
+            new OpenLayers.Control.Navigation(),
+            new OpenLayers.Control.PanZoomBar(),
+            new OpenLayers.Control.Attribution()],
+        maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34),
+        maxResolution: 156543.0399,
+        numZoomLevels: 19,
+        units: 'm',
+        projection: new OpenLayers.Projection("EPSG:900913"),
+        displayProjection: new OpenLayers.Projection("EPSG:4326")
+    } );
+<%
+	} else {
+%>
+	g_map = new OpenLayers.Map('map');
+<%
+	}
+
+	if(geoMap.bUseOpenLayerMap)
+	{
+%>
+    var layerOpenLayesWMS = new OpenLayers.Layer.WMS( "OpenLayers WMS", 
+        "http://labs.metacarta.com/wms/vmap0", {layers: 'basic'} );
+    g_map.addLayer(layerOpenLayesWMS);
+<%
+	}
+    
+	if(geoMap.bUseOpenStreetMap)
+	{
+%>
+	var layerMapnik = new OpenLayers.Layer.OSM.Mapnik("Mapnik");
+	g_map.addLayer(layerMapnik);
+	
+	var layerTilesAtHome = new OpenLayers.Layer.OSM.Osmarender("Osmarender");
+    g_map.addLayer(layerTilesAtHome);
+
+    var jpl_wms = new OpenLayers.Layer.WMS( "NASA Global Mosaic",
+            "http://t1.hypercube.telascience.org/cgi-bin/landsat7", 
+            {layers: "landsat7"});
+    g_map.addLayer(jpl_wms);
+
+<%
+	}
+
+	if(geoMap.bUseGoogleMaps)
+	{
+%>  
+    /**
+     * google maps
+     */
+    var gphy = new OpenLayers.Layer.Google(
+        "Google Physical",
+        {type: G_PHYSICAL_MAP}
+    );
+    var gmap = new OpenLayers.Layer.Google(
+        "Google Streets", // the default
+        {numZoomLevels: 20}
+    );
+    var ghyb = new OpenLayers.Layer.Google(
+        "Google Hybrid",
+        {type: G_HYBRID_MAP, numZoomLevels: 20}
+    );
+    var gsat = new OpenLayers.Layer.Google(
+        "Google Satellite",
+        {type: G_SATELLITE_MAP, numZoomLevels: 20}
+    );
+    g_map.addLayers([gphy, gmap, ghyb, gsat]);
+<%
+	}
+%>
+}
+
+function Map_getLonLatProjected(lonLat)
+{
+	return lonLat.transform(new OpenLayers.Projection("EPSG:4326"), g_map.getProjectionObject());	
+}
+
+function Map_getLonLatUnprojected(lonLat)
+{
+	return lonLat.transform(g_map.getProjectionObject(), new OpenLayers.Projection("EPSG:4326"));	
+}
+
+</script>

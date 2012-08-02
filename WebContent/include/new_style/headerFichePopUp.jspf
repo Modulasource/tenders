@@ -1,0 +1,17 @@
+<% long lIdPersonnePhysique = sessionUser.getIdIndividual(); %>
+<div class="ficheTablePadding">
+<table id="ficheTable" cellspacing="0" cellpadding="0" class="fullWidth">
+	<tr>
+		<td></td>
+		<td class="imgTop"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="imgCenterLeft"></td>
+		<td>
+			<div class="ficheFrame">
+				<!-- 
+				<table cellspacing="0" cellpadding="0" id="pageTitleWrapper" style="margin:0 auto;padding: 0 15px 0 15px;"><tr><td>
+					<div id="pageTitleRound" class="roundCorners" style="padding:4px 10px 4px 10px"><span id="pageTitle"><%=sTitle%></span></div>
+				</td></tr></table>
+				 -->

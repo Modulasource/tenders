@@ -1,0 +1,60 @@
+<%
+	/* 
+	*	Nécessite les objets suivants :
+	*		String sPaveTypeAcheteurPublicTitre;
+	*		String sFormPrefix;
+	*		Organisation organisation;
+	*		String sRedirection;
+	*		Adresse adresse;
+	*		Pays pays;
+	*		String sPage;
+	*/
+%>
+<%
+	sPage = "afficherAffaire.jsp?iIdAffaire="+marche.getIdMarche()+"&amp;iIdOnglet="+Onglet.ONGLET_AFFAIRE_ORGANISME+"&amp;sAction=store&amp;bShowForm=true";
+	sRedirection = sPage;
+	if (iIdPersInfosAdm != -1)
+		sRedirection += "&amp;iIdPersInfosAdm=" + iIdPersInfosAdm;
+	if (iIdPersInfosTech != -1)
+		sRedirection += "&amp;iIdPersInfosTech=" + iIdPersInfosTech;
+	if (iIdDocumentaliste != -1)
+		sRedirection += "&amp;iIdDocumentaliste=" + iIdDocumentaliste;
+	if (iIdRecipiendaire != -1)
+		sRedirection += "&amp;iIdRecipiendaire=" + iIdRecipiendaire;
+	if (iIdPRM != -1)
+		sRedirection += "&amp;iIdPRM=" + iIdPRM;
+	sRedirection += "&amp;iTypeAcheteurPublic=";
+%>
+
+<%@page import="modula.marche.TypeAcheteurPublic"%>
+<%@page import="modula.graphic.Onglet"%><table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveTypeAcheteurPublicTitre %></td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'acheteur public :
+		</td>
+		<td class="pave_cellule_droite">
+			<select name="<%= sFormPrefix %>iTypeAcheteurPublic" onchange="ChangeUrl(this.form, 'iTypeAcheteurPublic',
+				 'Veuillez choisir un type d\'acheteur public', '<%= response.encodeURL(sRedirection) %>')">
+				 <option value="<%=iTypeAcheteurPublic%>" selected='selected' > 
+				<%= TypeAcheteurPublic.getTypeAcheteurPublicName(iTypeAcheteurPublic) %>
+				</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;
+		</td>
+	</tr>
+</table>

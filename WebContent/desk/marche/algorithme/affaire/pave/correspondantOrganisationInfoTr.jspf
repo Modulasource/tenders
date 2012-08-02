@@ -1,0 +1,34 @@
+	<tr>
+		<td class="pave_cellule_gauche">Nom de l'organisation : </td>
+		<td class="pave_cellule_droite">
+			<%=correspondantOrganisationInfo.getNom() %>
+		</td>
+	</tr>
+	<%@ include file="paveAdresseStatique.jspf" %>
+	<tr>
+		<td class="pave_cellule_gauche">T&eacute;l&eacute;phone :</td>
+		<td class="pave_cellule_droite">
+		
+			<%=correspondantOrganisationInfo.getTelephone() %>
+			&nbsp;&nbsp;&nbsp;<span style="font-weight:bold">Poste :</span>
+			<%=correspondantOrganisationInfo.getPoste()%>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Fax :</td>
+		<td class="pave_cellule_droite">
+			<%=correspondantOrganisationInfo.getFax()%>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Courrier électronique :</td>
+		<td class="pave_cellule_droite">
+			<%=correspondantOrganisationInfo.getEmail()%>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">Adresse Internet (URL) :</td>
+		<td class="pave_cellule_droite">
+			<%= correspondantOrganisationInfo.getSiteWeb()%>
+		</td>
+	</tr>

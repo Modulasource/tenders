@@ -1,0 +1,77 @@
+<%
+	/*
+	 *	Objets nécessaires :
+	 *		String sPaveLangueTitre;
+	 *		Marche marche;
+	 */ 
+%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.bean.question.QuestionAnswer"%>
+<%@page import="org.coin.fr.bean.Langue"%>
+<%@page import="java.util.Vector"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveLangue')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveLangueTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveLangue" summary="Langues">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Langues pouvant être utilisées dans l'offre ou la candidature autres que la langue française :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+Vector vLangues = Langue.getAllLangueFromMarche(marche.getIdMarche());
+if (vLangues.size() > 0)
+{
+	for (int i = 0; i < vLangues.size(); i++)
+	{
+		Langue langue = (Langue)vLangues.get(i);
+%>
+							<%= langue.getName() %><br />
+<%
+	}
+}
+else
+{
+%>
+							Aucune langue autre que le français
+<%
+}
+%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Langue(s) autre(s):
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(marche.getLangueAutre() ) %>
+					</td>
+				</tr>
+<%
+if(bUseFormMAPA)
+{
+%>	
+	<%= QuestionAnswer.getHTML(
+			"EnveloppeLangueFrancaise", 
+			"lIdQaEnveloppeLangueFrancaise",
+			mcr.getIdQaEnveloppeLangueFrancaise(),
+			false,
+			false,
+			QuestionAnswer.FORM_TYPE_CHECKBOX) %>
+			
+<%
+}
+%>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

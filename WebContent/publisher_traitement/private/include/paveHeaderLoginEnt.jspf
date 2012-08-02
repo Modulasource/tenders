@@ -1,0 +1,77 @@
+<%@page import="org.coin.bean.conf.Configuration"%>
+<form id="login_form_ent" action="<%= response.encodeURL(rootPath+"publisher_portail/logon.jsp")%>" 
+		    onsubmit="crypterPassword(document.forms['login_form_ent'],'<%= sMotCache %>');"
+		    method="post" 
+		    name="login_form_ent">
+		    <input type="hidden" name="cryptogramme" id="cryptogramme" value="" />
+            <input type="hidden" name="type" value="ent" />
+            
+            <table>
+                <tr>
+                    <td style="text-align:right;padding-bottom: 3px">Identifiant :&nbsp;</td>
+                    <td style="padding-bottom: 3px">
+                        <input type="text" name="login" class="clearFocus" size="17" 
+                            value="" alt="identifiant ou adresse email"  />
+                    </td>
+                    <td style="text-align:left;">
+                    <button type="submit" name="submit" class="butLogon">&nbsp;</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:right;padding-bottom: 3px;vertical-align: top;">Mot de passe :&nbsp;</td>
+                    <td style="padding-bottom: 3px;vertical-align: top;">
+                        <input type="password" class="clearFocus" name="pass" size="17" />
+                    </td>
+                    <td style="padding-left: 5px;vertical-align: top;">
+                    <div>
+                    <a class="middle headerLoginLink" 
+                        <%= Configuration.getConfigurationValueMemory(
+                                "publisher.portail.logon.bloc.label.button.subscription.url.target", 
+                                "")
+                        %>
+
+                        href="<%=
+                    	Configuration.getConfigurationValueMemory(
+                                "publisher.portail.logon.bloc.label.button.subscription.url", 
+                                response.encodeURL(rootPath + sPublisherPath
+                                        + "/public/organisation/ajouterEntrepriseForm.jsp")
+                    	) %>">
+                        <%=
+                        	Configuration.getConfigurationValueMemory(
+                        			"publisher.portail.logon.bloc.label.button.subscription", 
+                        			"Demande d'inscription") %>
+                      </a>
+                      </div>
+<%
+    if(Configuration.isEnabledMemory("publisher.portail.annonce.searchengine.habilitation", false))
+    {
+%>
+					<div style="margin-top: 5px;">
+                    <a class="middle" 
+                        href="<%= response.encodeURL(rootPath + sPublisherPath
+                                        + "/public/organisation/ajouterEntrepriseForm.jsp")
+                        %>" 
+                        title="Télécharger un DCE (RC, CCAP, CCTP, etc. )">
+                        Inscription pour<br/>télécharger un DCE 
+                      </a>
+                      </div>
+<%        
+    }
+%>                    
+
+
+<%
+	if(Configuration.isTrueMemory("publisher.portail.logon.bloc.display.button.forgot.pwd", true))
+	{
+%>                      <div style="margin-top: 5px;">
+                       <a class="headerLoginLink" style="margin-top:2px" href="<%= response.encodeURL(rootPath+ "publisher_portail/public/oublierMDPForm.jsp" )%> ">
+                      Mot de passe oublié ?</a>  
+                      </div>
+<%
+	}
+%>
+                    </td>
+                </tr>
+          </table>
+          
+          </form>

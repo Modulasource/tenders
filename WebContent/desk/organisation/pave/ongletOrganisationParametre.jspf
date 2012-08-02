@@ -1,0 +1,356 @@
+<%@page import="java.util.Collections"%>
+<%@page import="org.coin.db.CoinDatabaseAbstractBeanComparator"%>
+<%@page import="org.coin.fr.bean.OrganisationParametre"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="org.coin.bean.param.ObjectParameterTemplate"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="org.coin.bean.param.ObjectParameterTemplateType"%>
+<%@page import="java.util.Vector"%>
+
+<%@page import="org.coin.bean.param.ObjectParameterTemplateState"%>
+<%@page import="org.coin.util.Outils"%><div id="search">
+<script type="text/javascript">
+function editParam(sParamName)
+{
+    Element.toggle("span_form_" + sParamName);
+    Element.toggle("span_display_" + sParamName);
+}
+
+function addParam()
+{
+    doUrl("<%=
+    		response.encodeURL(
+                    rootPath + "desk/organisation/modifierOrganisationParametre.jsp?"
+                    + "iIdOrganisation=" + organisation.getIdOrganisation() 
+                    + "&iIdOnglet=" + iIdOnglet
+                    + "&sAction=create") 
+           %>");
+}
+
+function addParamFromTemplate(
+        sParamName,
+        sParamValue)
+{
+    doUrl("<%=
+    		response.encodeURL(
+                    rootPath + "desk/organisation/modifierOrganisationParametre.jsp?"
+                    + "iIdOrganisation=" + organisation.getIdOrganisation() 
+                    + "&iIdOnglet=" + iIdOnglet
+                    + "&sAction=create"  ) 
+        %>" + "&sName=" + sParamName 
+        + "&sValue=" + sParamValue);
+}
+
+
+function removeParam(sUrlRemove)
+{
+    if(confirm("Etes vous sûr ?")){
+        doUrl(sUrlRemove);
+    }
+}
+
+function toggleObjectParameterTemplateList()
+{
+    Element.toggle("divObjectParameterTemplateList");
+}
+
+
+</script>
+<div class="searchTitle">
+    <div id="infosSearchLeft" style="float:left"><%= sTabParameterNameParameterList %></div>
+    <div id="infosSearchRight" style="float:right;text-align:right;">
+        <button type="button" onclick="Redirect('<%= 
+    response.encodeURL(
+        rootPath + "desk/organisation/afficherOrganisation.jsp?"
+        + "iIdOrganisation=" + organisation.getIdOrganisation() 
+        + "&iIdOnglet=" + iIdOnglet
+        + "&sAction=store" 
+        + "&nonce=" + System.currentTimeMillis() ) 
+%>')" ><%= localizeButton.getValueModify() %></button>&nbsp;
+
+<!-- 
+		<button type="button" onclick="Redirect('<%= 
+		    response.encodeURL(
+		        rootPath + "desk/organisation/modifierOrganisationParametre.jsp?"
+		        + "iIdOrganisation=" + organisation.getIdOrganisation() 
+		        + "&iIdOnglet=" + iIdOnglet
+		        + "&sAction=create" 
+		        + "&nonce=" + System.currentTimeMillis() ) 
+		%>')" ><%= localizeButton.getValueAdd() %></button>
+ -->
+<button type="button" onclick="toggleObjectParameterTemplateList()" ><%= 
+    localizeButton.getValueAdd() %></button>
+
+
+    </div>
+
+
+    <div style="clear:both"></div>
+</div>
+
+
+
+<div id="divObjectParameterTemplateList" style="display: none;margin-bottom: 20px;">
+<table class="dataGrid fullWidth" cellspacing="1">
+     <tr class="header">
+         <td class="cell" style="width: 1%">&nbsp;</td>
+         <td class="cell" style="width: 40%"><%= sTabParameterNameParameterName %></td>
+         <td class="cell" style="width: 49%"><%= "Description" %></td>
+      </tr>      
+
+<%
+	     try{
+	        Vector<ObjectParameterTemplate> v = ObjectParameterTemplate.getAllObjectParameterTemplateMemory(ObjectType.ORGANISATION);
+
+	        /**
+	         * sort by param name
+	         */
+	        Vector<ObjectParameterTemplate> vv = (Vector<ObjectParameterTemplate>)v.clone();
+	        Collections.sort( vv, 
+	        		new CoinDatabaseAbstractBeanComparator(
+	        				CoinDatabaseAbstractBeanComparator.ORDERBY_LEXICOGRAPHIC_NAME_ASCENDING)
+	        			{
+				        	public int compare(Object o1, Object o2) {
+				        		ObjectParameterTemplate a1 = (ObjectParameterTemplate)o1;
+				        		ObjectParameterTemplate a2 = (ObjectParameterTemplate)o2;
+				        		
+				        		int ret = 0;
+				        		switch(this.iOrderBy){
+				        		case ORDERBY_LEXICOGRAPHIC_NAME_ASCENDING:
+				        		case ORDERBY_LEXICOGRAPHIC_NAME_DESCENDING:
+				        			ret =a1.getParamName().compareTo(a2.getParamName());
+				        			if(iOrderBy == ORDERBY_LEXICOGRAPHIC_NAME_DESCENDING)
+				        				ret = -ret;
+				        			break;
+				        		}
+			
+				        		return ret;
+				        	}
+	        			}
+	        );
+	        
+	        int ii = 0;
+	        for(ObjectParameterTemplate opt : vv)
+	        {
+	            int j = ii % 2;
+	            String sOPTClass = "opt_not_instanciate";
+	            String sOPTStyle = "";
+	            try {
+	            	OrganisationParametre c 
+	                    = OrganisationParametre.getOrganisationParametre(
+	                            organisation.getIdOrganisation(),
+	                            opt.getParamName());
+	                sOPTClass = "opt_instanciate";
+	                sOPTStyle = "style='display:none'";
+	
+	                /**
+	                 * to hide  params allready instanciates
+	                 */
+	                continue;
+	
+	            } catch (Exception e) {
+	            }
+	            
+	            ii++;
+	            ObjectParameterTemplateType optType = null;
+	            try {
+	                optType 
+	                   = ObjectParameterTemplateType.getObjectParameterTemplateTypeMemory(opt.getIdObjectParameterTemplateType()); 
+	            } catch (Exception e) {
+	                optType = new ObjectParameterTemplateType();
+	            }            
+	
+	            ObjectParameterTemplateState optState = null;
+	            try {
+	                optState
+	                   = ObjectParameterTemplateState.getObjectParameterTemplateStateMemory(opt.getIdObjectParameterTemplateType()); 
+	            } catch (Exception e) {
+	                optState = new ObjectParameterTemplateState();
+	            } 
+	        
+
+%>
+            <tr class="line<%=j%> <%= sOPTClass %>" <%= sOPTStyle %> >
+                <td class="cell" ><img src="<%= rootPath + "images/icons/plus.gif" %>" /></td>
+                <td class="cell" >
+                    <span style="cursor: pointer;"
+                        onclick="addParamFromTemplate('<%= opt.getParamName() 
+                                %>','<%= opt.getDefaultValue() %>');" ><%= opt.getParamName() %></span>
+                </td>
+                <td class="cell" ><%= Outils.getTextToHtml(opt.getName() ) %></td>
+            </tr>
+<%      
+    }
+	     }catch(Exception e){}
+%>        
+            <tr >
+                <td class="cell" style="border-top: #AAF 1px solid;"><img src="<%= rootPath + "images/icons/plus_purple.gif" %>" /></td>
+                <td class="cell" style="border-top: #AAF 1px solid;">
+                    <span style="cursor: pointer;"
+                        onclick="addParam();" >Autre</span>
+                </td>
+                <td class="cell" style="border-top: #AAF 1px solid  ;"><%= "Ajouter un paramètre qui n'est pas dans la liste" %></td>
+            </tr>
+
+
+</table>
+</div>
+
+
+
+
+<table class="dataGrid fullWidth" cellspacing="1">
+ <tbody>
+     <tr class="header">
+         <td class="cell">&nbsp;</td>
+         <td class="cell"><%= sTabParameterNameParameterName %></td>
+         <td class="cell"><%= sTabParameterNameParameterValue %></td>
+         <td class="cell">&nbsp;</td>
+     </tr>		
+<%
+for(int i = 0;i < vParams.size() ; i++)
+{
+	int j = i % 2;
+
+	OrganisationParametre param = vParams.get(i);
+	String sUrlSupprimer 
+		= rootPath + "desk/organisation/modifierOrganisationParametre.jsp?"
+		+ "sAction=remove"
+		+ "&iIdOrganisationParametre=" + param.getIdOrganisationParametre()
+		+ "&iIdOnglet=" + iIdOnglet;
+
+	String sParamTemplateInfo = null;
+    ObjectParameterTemplate otm = null;
+	try {
+		otm  = ObjectParameterTemplate.getObjectParameterTemplateMemory(ObjectType.ORGANISATION, param.getName());
+        ObjectParameterTemplateState otmState = null;
+		String sIconSrc = rootPath + "images/icons/link.gif";
+		String sDescription = otm.getName();
+
+        try {
+            otmState = ObjectParameterTemplateState 
+               .getObjectParameterTemplateStateMemory(
+                       otm.getIdObjectParameterTemplateState());
+            
+
+            switch ((int)otmState.getId())
+            {
+            case ObjectParameterTemplateState.STATE_ACTIVATED: 
+                sIconSrc = rootPath + "images/icons/link.gif";
+                break;
+            case ObjectParameterTemplateState.STATE_DEACTIVATED: 
+                sIconSrc = rootPath + "images/icons/icon_remove.png";
+                sDescription = otmState.getName() + ": " + sDescription;
+                break;
+            case ObjectParameterTemplateState.STATE_ARCHIVED: 
+                sIconSrc = rootPath + "images/icons/icon_remove.png";
+                sDescription = otmState.getName() + ": " + sDescription;
+                break;
+            case ObjectParameterTemplateState.STATE_DEPRECATED: 
+                sIconSrc = rootPath + "images/icons/warning.png";
+                sDescription = otmState.getName() + ": " + sDescription;
+                break;
+            }
+        } catch (Exception ee) {
+            ee.printStackTrace();
+        }
+		
+		
+		sParamTemplateInfo = "<img src=\"" + sIconSrc + "\" "
+		  + " title=\"" + sDescription + "\" "
+		  + " alt=\"" + sDescription + "\" "
+		  + "/>";
+	} catch (Exception e) {
+		sParamTemplateInfo = "";
+	}
+	
+%>
+	<tr class="line<%=j%>" > 
+        <td class="cell" style="width:2%">
+        <%= sParamTemplateInfo %>
+        </td>
+        <td class="cell" style="width:50%"><%= param.getName() %></td>
+		<td class="cell" style="width:40%">
+		  <span id="<%= "span_display_" + param.getName() %>" 
+		      style="cursor: pointer;" 
+		      onclick="editParam('<%= param.getName() %>');" >
+            <%= param.getValue() %>
+          </span>
+		  <span id="<%= "span_form_" + param.getName() %>" style="display: none;">
+		      <form action="<%= response.encodeURL(rootPath+ "desk/organisation/modifierOrganisationParametre.jsp") %>" >
+                  <input type="hidden" name="sAction" value="storeOneParam" />
+                  <input type="hidden" name="sParamName" value="<%= param.getName() %>" />
+		          <input type="hidden" name="iIdOrganisation" value="<%= organisation.getIdOrganisation()  %>" />
+                  <input type="hidden" name="iIdOnglet" value="<%= iIdOnglet  %>" />
+<%
+	    int iCurrentInputType = 2;
+		if(otm != null)
+		{	
+			iCurrentInputType 
+			 = ObjectParameterTemplateType.getHtmlInputType(
+					 otm.getIdObjectParameterTemplateType());
+		}
+
+        switch(iCurrentInputType )
+        {
+        case ObjectParameterTemplateType.HTML_INPUT_TYPE_INPUT:
+%>                
+            <input name="sParamValue" size="40" value="<%= param.getValue() %>" />
+<%
+            break;
+        case ObjectParameterTemplateType.HTML_INPUT_TYPE_TEXTAREA:
+            /**
+             * normal mode
+             */
+%>                
+                  <textarea rows="2" name="sParamValue" style="width:99%"><%= param.getValue() %></textarea>
+<%
+            break;
+        case ObjectParameterTemplateType.HTML_INPUT_TYPE_SELECT:
+            Vector<String> vValue 
+	            = ObjectParameterTemplateType.getAllHtmlSelectValue(
+	                    otm.getIdObjectParameterTemplateType());
+        	
+%>                
+                <select  name="sParamValue" >
+<%
+			for(String sVal : vValue)
+			{
+%>
+				    <option value="<%= sVal %>" <%= sVal.equals( param.getValue())?"selected='selected'":"" %> ><%= sVal %></option>
+<%				
+			}
+%>                    
+                </select>
+<%
+            break;
+        }
+	    
+%>                  
+
+
+                  <button type="submit">Valider</button>
+                  <button type="button" onclick="editParam('<%= param.getName() %>');" >Annuler</button>
+		      </form>
+		  </span>
+		</td>
+		<td class="cell" style="text-align:right;width:8%">
+            <img src="<%=rootPath + Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE %>" 
+                style="cursor: pointer;"
+                onclick="editParam('<%= param.getName() %>');"
+                alt="Modifer" 
+                title="Modifer" /> 
+			<img src="<%=rootPath + Icone.ICONE_SUPPRIMER_NEW_STYLE %>" 
+                style="cursor: pointer;"
+                onclick="removeParam('<%= response.encodeURL(sUrlSupprimer)  %>');"
+			    alt="Supprimer" 
+			    title="Supprimer" /> 
+		</td>		
+	</tr>
+<%
+}
+ %>	
+	</tbody>
+</table>
+</div>

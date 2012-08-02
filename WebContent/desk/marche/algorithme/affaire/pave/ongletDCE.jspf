@@ -1,0 +1,19 @@
+<%
+	boolean bSuppression = false;
+	boolean bAffichageLienActif = false;
+	boolean bisDCEModifieApresPublication = false;
+	try{bisDCEModifieApresPublication = marche.isDCEModifieApresPublication(); }
+	catch(Exception e){}
+	boolean bisCandidatsPrevenusModificationDCE = true;
+	try{bisCandidatsPrevenusModificationDCE = marche.isCandidatsPrevenusModificationDCE();}
+	catch(Exception e){}
+	if(!bisCandidatsPrevenusModificationDCE)
+	{
+%>
+<p class="mention" style="color:#F00">
+	ATTENTION! Vous n'avez pas communiqué la modification du DCE aux candidats.
+</p>
+<%
+	}
+%>
+<%@ include file="paveDCE.jspf" %>

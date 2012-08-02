@@ -1,0 +1,91 @@
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="mt.modula.affaire.fqr.*"%>
+<%@page import="org.coin.fr.bean.*"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="java.util.Vector"%>
+
+<table class="pave" >
+    <tr>
+        <td class="pave_titre_gauche">
+            Liste des questions traitées
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table class="liste" >
+                <tr>
+                    <th style="width: 10%" >Etat</th>
+                    <th style="width: 50%" >Question / Réponse</th>
+                    <th style="width: 10%" >Type</th>
+                    <th style="width: 15%" >Personne</th>
+                    <th style="width: 15%" >Organisme</th>
+                    <th style="width: 5%" >&nbsp;</th>
+                </tr>
+                
+    <%
+        Vector<MarcheFqr> vMarcheFqr = MarcheFqr.getAllMarcheFqrFromMarche(marche.getIdMarche());
+            
+        // TODO optimiser !
+        for(int j = 0 ; j < vMarcheFqr.size(); j++)
+        {   
+            MarcheFqr marcheFqr = vMarcheFqr.get(j);
+            if(marcheFqr.getIdMarcheFqrStatut() == MarcheFqrStatut.STATUT_A_VALIDER) continue;
+                
+                
+            PersonnePhysique pers = PersonnePhysique.getPersonnePhysique(marcheFqr.getIdPersonnePhysique());
+            Organisation org = Organisation.getOrganisation(pers.getIdOrganisation());
+            MarcheFqrType marcheFqrType = null;
+            try{
+                marcheFqrType = MarcheFqrType.getMarcheFqrTypeMemory(marcheFqr.getIdMarcheFqrType());
+            } catch (CoinDatabaseLoadException e){ 
+                marcheFqrType = new MarcheFqrType();
+                marcheFqrType.setLibelle("? = " + marcheFqr.getIdMarcheFqrType());
+            }
+            
+            MarcheFqrStatut marcheFqrStatut =  null;
+            try{
+            	marcheFqrStatut = MarcheFqrStatut.getMarcheFqrStatutMemory(marcheFqr.getIdMarcheFqrStatut());
+            } catch (CoinDatabaseLoadException e){ 
+            	marcheFqrStatut = new MarcheFqrStatut();
+            	marcheFqrStatut.setLibelle("? = " + marcheFqr.getIdMarcheFqrStatut());
+            }
+    %>
+                <tr class="liste<%=j%2%>" 
+                onmouseover="className='liste_over'" 
+                onmouseout="className='liste<%=j%2%>'" 
+                style="cursor: pointer;"
+                onclick="Element.toggle('marcheFqr_<%= marcheFqr.getId() %>')" >
+                    <td><%= marcheFqrStatut.getName() %></td>
+                    <td>
+                        <%= marcheFqr.getTitre() %><br/>
+                        <div id="marcheFqr_<%= marcheFqr.getId() %>"
+                              style="display: none;"  >
+	                        <u>Question</u> : <%=  marcheFqr.getQuestion() %><br/>
+	                        <u>Réponse</u> : <%=  marcheFqr.getReponse() %>
+                        </div>
+                    </td>
+                    <td><%= marcheFqrType.getName() %>&nbsp;</td>
+                    <td><%= pers.getPrenomNom() %>&nbsp;</td>
+                    <td><%= org.getRaisonSociale() %>&nbsp;</td>
+                    <td style="text-align:right">
+                        <img src="<%=rootPath+ Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE
+                        %>"  alt="Voir la question" title="Voir la question" />
+                    </td>
+                </tr>
+    <%
+        }
+    %>
+<%
+        if(vMarcheFqr.size() == 0){
+%>
+    <tr><td colspan="4">&nbsp;</td></tr>
+    <tr><td colspan="4">Pas de question à valider</td></tr>
+    <tr><td colspan="4">&nbsp;</td></tr>
+<%
+        }
+    
+%>
+            </table>
+        </td>
+    </tr>
+</table>

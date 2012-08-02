@@ -1,0 +1,28 @@
+<%@page import="modula.journal.Evenement"%>
+<%
+
+	// extra param
+	String sType = request.getParameter("sType") ;
+	String sIdObjet = request.getParameter("sIdObjet") ;
+	String sExtraParam = "";
+	 
+	if (sType != null){
+		sExtraParam += "sType=" + sType;
+	} 
+	
+	if ( sIdObjet != null){
+		sExtraParam += "&amp;sIdObjet=" + sIdObjet ;
+	} 
+
+	String sTitle = "Evénement";
+	int iIdEvenement = -1;
+	if (request.getParameter("iIdEvenement") != null) {
+		iIdEvenement = Integer.parseInt(request.getParameter("iIdEvenement"));
+	} else {
+		iIdEvenement = -1;
+	}
+	
+	Evenement oEvenement = Evenement.getEvenement(iIdEvenement);
+	//TypeEvenement oTypeEvenement = TypeEvenement.getTypeEvenement(oEvenement.getIdTypeEvenement());
+
+%>

@@ -1,0 +1,81 @@
+<%
+	Node nodeFacturation = BasicDom.getChildNodeByNodeName(nodeAnn, "facturation");
+	String sTypeFacturation = "?";
+	
+	try {
+		BasicDom.getChildNodeValueByNodeName(nodeFacturation, "codeClient") ;
+		sTypeFacturation = "Groupée";
+	} catch (Exception e ) {}
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc17')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 17 Facturation</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc17" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche"><span class="rouge">* Numéro de bon de commande d'insertion au Boamp : </span></td>
+				<td class="pave_cellule_droite"> 
+					<%= BasicDom.getChildNodeValueByNodeName(nodeFacturation, "numBonCommande") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><span class="rouge">* Facturation : </span></td>
+				<td class="pave_cellule_droite"><%= sTypeFacturation %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche" style="text-align : left;" ><u> Libellé de la facture </u></td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><span class="rouge">* Code client : </span></td>
+				<td class="pave_cellule_droite">
+					<%= BasicDom.getChildNodeValueByNodeNameOptional(nodeFacturation, "codeClient") %> <i>(code client si facturation trimestrielle)</i>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><span class="rouge">* Dénomination : </span></td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr><td colspan="2"><i>Ne remplir que si l'adresse diffère de celle du service qui passe le marché</i></td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Adresse : </td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Code Postal : Ville :</td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche" style="text-align : left;"><u> Adresse d'expédition de la facture </u></td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr><td colspan="2"><i>Ne remplir que si l'adresse diffère de la facturation</i></td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Dénomination : </td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Adresse : </td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Code Postal : Ville :</td>
+				<td class="pave_cellule_droite">
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

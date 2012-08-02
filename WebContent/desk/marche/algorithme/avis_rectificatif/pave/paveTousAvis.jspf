@@ -1,0 +1,59 @@
+<%
+	String sRedirect = "afficherAffaire";
+	if(marche.isAffaireAATR(false))
+		sRedirect = "afficherAttribution";
+
+%>
+<%@page import="modula.marche.AvisRectificatif"%>
+<%@page import="modula.Validite"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche">Liste des avis rectificatifs</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+
+			<table class="liste" summary="none">
+				<tr>
+					<th >Type</th>
+					<th >Date création</th>
+					<th >Date de mise en ligne de l'avis rectificatif</th>
+					<th >&nbsp;</th>
+				</tr>
+				<% 
+				for (int i=0; i < vAvisRectificatif.size(); i++)
+				{
+					AvisRectificatif avis = vAvisRectificatif.get(i);
+					int	j = i % 2;
+					Validite validite 
+						= Validite.getValidite(TypeObjetModula.AVIS_RECTIFICATIF, avis.getIdAvisRectificatif());
+					
+					%>
+				<tr class="liste<%=j%>" 
+					 onmouseover="className='liste_over'" 
+					 onmouseout="className='liste<%=j%>'"
+					 onclick="Redirect('<%= response.encodeURL(rootPath + "desk/marche/algorithme/affaire/"+sRedirect+".jsp?iIdAvisRectificatif="+avis.getIdAvisRectificatif()+"&amp;iIdOnglet="+iIdOnglet+"&amp;sActionRectificatif=show&amp;iIdAffaire=" + marche.getIdMarche()+"&#ancreHP") %>')" >
+					<td style="text-align:left;width:10%" ><%= AvisRectificatifType.getAvisRectificatifTypeName( avis.getIdAvisRectificatifType() ) %></td>
+					<td style="text-align:left;width:30%" >
+						<%= CalendarUtil.getDateFormattee(avis.getDateCreation())%>
+					</td>
+					<td style="text-align:left;width:55%" >
+						<%= CalendarUtil.getDateFormattee(validite.getDateDebut())%>
+					</td>
+					<td style="text-align:right;width:5%" >
+						<a href="<%= response.encodeURL(rootPath + "desk/marche/algorithme/affaire/"+sRedirect+".jsp?iIdAvisRectificatif="+avis.getIdAvisRectificatif()+"&amp;iIdOnglet="+iIdOnglet+"&amp;sActionRectificatif=show&amp;iIdAffaire=" + marche.getIdMarche()+"&#ancreHP") %>">
+							<img src="<%=rootPath+Icone.ICONE_FICHIER_DEFAULT %>"  />
+						</a>
+					</td>
+				</tr>
+				<%		
+				}
+				%>
+			</table>
+		</td>
+	</tr>
+</table>

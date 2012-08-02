@@ -1,0 +1,38 @@
+<div class="titre_page"><%=sTitle %></div>
+<div style="clear:both"></div>
+Conformément à nos obligations légales, nous vous donnons accès aux informations concernant 
+notre activité de marchés publics : <br />
+<br />
+<table class="pave" summary="Notre activité de marchés publics">
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td>
+			<ul>
+			<li>Récapitulatif des marchés passés par notre collectivité en 2005 :<br /><br />
+				<a href="../include/Marches2005_<%= sPath %>.pdf" target="_blank">
+				<img src="<%=rootPath%>publisher_traitement/public/pagesStatics/images/pdf.gif"  align="baseline" /></a>
+				<br />
+			</li>
+			<br />
+			<br />
+			<li>Récapitulatif des marchés passés par notre collectivité en 2004 :<br /><br />
+				<a href="../include/Marches2004_<%= sPath %>.pdf" target="_blank">
+				<img src="<%=rootPath%>publisher_traitement/public/pagesStatics/images/pdf.gif"  align="baseline" /></a>
+				<br />
+			</li>
+			<br />
+			<br />
+			<li>Cahier des Clauses Administratives Générales :<br /><br />
+				<a href="../include/CCAG_<%= sPath %>.pdf" target="_blank">
+				<img src="<%=rootPath%>publisher_traitement/public/pagesStatics/images/pdf.gif"  align="baseline" /></a>
+				<br />
+			</li>
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+	</tr>
+</table>

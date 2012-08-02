@@ -1,0 +1,77 @@
+
+<%@page import="org.apache.taglibs.bsf.scriptlet"%>
+<%@page import="org.coin.util.HTMLEntities"%>
+<%@page import="org.coin.util.Outils"%>
+<%@page import="org.coin.util.HttpUtil"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfGroup"%>
+<%@page import="modula.marche.Marche"%><%@page import="modula.marche.VeilleMarcheAbonnes"%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueParametre"%>
+<%@page import="org.coin.fr.bean.Departement"%>
+<%@page import="java.util.Vector"%>
+<%
+			String sContainer = "<h2>Toutes les annonces</h2>\n";
+			
+			String sDptCode = HttpUtil.parseString("sDptCode", request, "");
+			long lIdCpf = HttpUtil.parseInt("iIdGroupCompetence", request, 0);
+			
+			//sContainer += "[sDptCode="+sDptCode+"][iIdCpf="+iIdCpf+"]";
+			
+			String sKeywordDepartment = "";
+			String sKeywordCpf = "";
+			
+			String sClause = "AND ( (statut.aatr=1 AND statut.aatr_en_ligne=1) "
+			+"OR ((statut.aapc=1 AND statut.aapc_en_ligne=1)) ) "
+			+"AND (TO_DAYS(NOW())-TO_DAYS(marche.date_creation))>70";
+			
+			Vector<Departement> vDepartement = new Vector<Departement>();
+			if (sDptCode.equals("")) vDepartement = Marche.getAllConcernedDepartment(sClause);
+			else{
+				try{vDepartement.add(Departement.getDepartement(sDptCode));
+				}catch(Exception e){}
+			}
+			if (lIdCpf==0){
+				// Display departments and competences
+				for(int i=0;i<vDepartement.size();i++){
+					sKeywordDepartment = Outils.getKeywordsForURL(HTMLEntities.unhtmlentities(vDepartement.get(i).getName()), 300, 0)+"_d"+vDepartement.get(i).getIdString();
+					sContainer += "<h3 style=\"border-bottom:1px solid #EEEEEE;margin-top:5px;\">"
+								/*+"<a href=\""+response.encodeURL(rootPath+"designMainPublisher.jsp?bDisplayListOfAnnouncement=true&amp;sDptCode="+vDepartement.get(i).getIdString())+"\">"*/
+								+vDepartement.get(i).getName()
+								/*+"</a>"*/
+								+"<h3>\n";
+					
+					Vector<CodeCpfGroup> vCodeCpfGroup = Marche.getAllConcernedCpfGroup(vDepartement.get(i).getIdString(), sClause);
+					for (int iIndCpf=0;iIndCpf<vCodeCpfGroup.size();iIndCpf++){
+						sKeywordCpf = Outils.getKeywordsForURL(HTMLEntities.unhtmlentities(vCodeCpfGroup.get(iIndCpf).getName()), 200, 2)+"_c"+vCodeCpfGroup.get(iIndCpf).getId();
+						sContainer += "<h4 style=\"margin-left:10px;\">"
+						+"<a href=\""+response.encodeURL(rootPath+sKeywordDepartment+"/"+sKeywordCpf+"/")+"\">"
+						+vCodeCpfGroup.get(iIndCpf).getName()
+						+"</a><h4>\n";
+					}
+				}
+			}else{
+				sContainer = "<h2><a href=\""+response.encodeURL(rootPath+"toutes-les-annonces.html")+"\">Toutes les annonces</a></h2>\n";
+				// Display announcement for a department and a competence
+				if (vDepartement.size()>0){
+					sContainer += "<h3>D&eacute;partement "+vDepartement.firstElement().getName()+"</h3>\n";
+				}
+				try{CodeCpfGroup cpfGroup = CodeCpfGroup.getCodeCpfGroup(lIdCpf);
+					sContainer += "<h4>"+cpfGroup.getName()+"</h4>\n";
+				}catch(Exception e){}
+				Vector<Marche> vMarche = Marche.getAllMarcheFromDepartmentAndCompetence(sDptCode, lIdCpf, sClause);
+				String sKeywordMarche = "";
+				sContainer += "<ul>\n";
+				for(int i=0;i<vMarche.size();i++){
+					sKeywordMarche = Outils.getKeywordsForURL(Outils.stripHTMLTags(HTMLEntities.unhtmlentities(vMarche.get(i).getObjet())), 100, 2)+"_a"+vMarche.get(i).getId()+".html";
+					sContainer += "<li><a href=\""+response.encodeURL(rootPath+sKeywordMarche)+"\">"
+								//+vMarche.get(i).getTitle("")
+								+"R&eacute;f. "+HTMLEntities.htmlentities(vMarche.get(i).getReference())
+								+"</a>"
+								+"<br />"
+								+Outils.stripHTMLTags(vMarche.get(i).getObjet());
+					sContainer += "</li>";
+				}
+				sContainer += "</ul>\n";
+			}
+			
+			sIframe = sContainer;// + sIframe;
+%>

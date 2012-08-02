@@ -1,0 +1,309 @@
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.bean.UserStatus"%>
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+<%@page import="org.coin.localization.Language"%>
+<%@page import="org.coin.bean.conf.Treeview"%>
+<%@page import="modula.TreeviewNoeud"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.graphic.Theme"%>
+<%
+
+	
+	String sMessageChangePassword = locBloc.getValue(11,"Changer le mot de passe");
+	String sMessageOldPassword = locBloc.getValue(12,"Ancien mot de passe");
+	String sMessageNewPassword = locBloc.getValue(13,"Nouveau mot de passe");
+	String sMessageConfirmNewPassword = locBloc.getValue(14,"Confirmation du nouveau mot de passe");
+	String sMessageCreateAccount = locBloc.getValue(15,"Créer un compte utilisateur pour cette personne");
+	String sMessageActivated = locBloc.getValue(16,"Activé");
+	String sMessageDesactivated = locBloc.getValue(17,"Desactivé");
+	
+	String sMessageLoginAllreadyExist = locMessage.getValue(31,"Attention, l'identificant saisi ci-dessous est déjà enregistré dans la base de données.Veuillez en saisir au autre.");
+	String sMessageIncorrectPassword = locMessage.getValue(32,"Attention, le mot de passe saisi ci-dessous n'est pas correct.");
+	String sMessageMailSendAfterAccountCreated = locMessage.getValue(33,"Le mot de passe est généré automatiquement et envoyé au destinataire par le système si le compte est activé");
+%>
+
+<%@page import="org.coin.security.SecureString"%>
+<%@page import="java.sql.SQLException"%>
+<%@page import="org.coin.bean.User"%><div class="blockPaveBorder">
+	<span style="float: left;"><%= sBlocNameUserAccount %></span>
+	<span style="float: right;"></span>
+	<div style="clear: both;"></div>
+</div>
+
+<%
+	boolean bAdminFunctional = false;
+	Vector<Treeview> vTreeviewAll = TreeviewNoeud.getTreeviewFromHabilitation(sessionUserHabilitation);
+	for(Treeview t: vTreeviewAll)
+	{
+		if(t.getName().contains("Admin") && t.getName().contains("Parapheur"))
+		{
+			bAdminFunctional = true;
+			break;
+		}
+	}
+
+	if( (sessionUserHabilitation.isSuperUser() && userPersonne != null) || bAdminFunctional)
+	{
+%>
+<script type="text/javascript">
+<!--
+
+	<%
+	if(sessionUserHabilitation.isSuperUser() && userPersonne != null)
+	{
+	%>
+		var g_sUrlOpenSessionSuperUser = '<%= 
+				User.getLogonSecureDeskUrl(rootPath, userPersonne.getId(), true)
+			 %>';
+
+			function openSessionSuperUser()
+			{
+			 	window.open(g_sUrlOpenSessionSuperUser,'_blank');
+			}
+	<%
+	}
+
+	if(userPersonne != null)
+	{
+	%>
+		var g_sUrlOpenSessionNormal = '<%= 
+			User.getLogonSecureDeskUrl(rootPath, userPersonne.getId(), false)
+	 		%>';
+
+	 	function openSessionNormal()
+	 	{
+	  	 	window.open(g_sUrlOpenSessionNormal,'_blank');
+	 	}
+	<%
+	}
+	%>
+
+//-->
+</script>
+<%
+	}
+%>
+<table class="paveUnrounded">
+<%
+	/**
+	 * Business Rule (bug #4097):
+	 * 		Is the session user the showed person? In this case, don't show the access URLs.
+	 *		Show the URLs when the session user is super user or functional administrator.
+	 */
+	if(	sessionUser != null
+		&& userPersonne != null
+		&& sessionUser.getId () != userPersonne.getId ()
+		&& (sessionUserHabilitation.isSuperUser() || bAdminFunctional) )
+	{
+%>
+		<tr >
+			<td class="pave_cellule_gauche" >&nbsp;</td>
+			<td class="pave_cellule_droite" >
+				<div class="rouge" style="text-align:left">
+					<%=locTitle.getValue (42, "Ouvrir une session sur ce compte") %> : <br/>
+					<%if(sessionUserHabilitation.isSuperUser() && userPersonne != null)
+					{
+					%>
+						<a href="javascript:void(0)" onclick="openSessionSuperUser()">en tant que SU</a>
+						<a href="javascript:void(0)" onclick="alert('<%= request.getServerName() %>' + g_sUrlOpenSessionSuperUser);">URL</a>
+						<br/>
+					<%
+					}
+					if(userPersonne != null)
+					{
+					%>	
+					<a href="javascript:void(0)" onclick="openSessionNormal()"><%=locTitle.getValue (43, "en mode normal") %></a>
+					<a href="javascript:void(0)" onclick="alert('<%= request.getServerName() %>' + g_sUrlOpenSessionNormal);">URL</a>
+					<%
+					}%>
+				</div>
+			</td>
+		</tr>
+<%
+	}
+
+if(userPersonne != null)
+{
+		String sUserStatus = "";
+		try {
+			sUserStatus = UserStatus.getUserStatusName(userPersonne.getIdUserStatus(), true, conn, sessionLanguage);
+		}catch (Exception e)
+		{
+			sUserStatus = locTitle.getValue (44, "undefined") + " : " + userPersonne.getIdUserStatus();
+		}
+		
+		if(sessionUserHabilitation.isHabilitate(sModifyAccountUseCaseId))
+		{
+			UserStatus oUserStatus = new UserStatus(userPersonne.getIdUserStatus());
+			oUserStatus.setAbstractBeanLocalization(sessionLanguage);
+		%>
+		<%= hbFormulaire.getHtmlTrSelect(userPersonne.getIdUserStatusLabel() + " :","iIdUserStatus",oUserStatus) %>
+		<%
+		}
+		else
+		{
+		%>
+ 		<% hbFormulaire.bIsForm = false; %>
+ 		<%= hbFormulaire.getHtmlTrInput(userPersonne.getIdUserStatusLabel() + " :","",sUserStatus,"") %>
+		<% hbFormulaire.bIsForm = true; %>
+		<%
+		}
+		%>
+
+		<tr id="tr_infoLogin" style="display: none; visibility: hidden;">
+			<td class="pave_cellule_gauche" >&nbsp;</td>
+			<td class="pave_cellule_droite" >
+				<div class="rouge" style="text-align:left">
+					<%= sMessageLoginAllreadyExist %>
+				</div>
+			</td>
+		</tr>
+        <input type="hidden" name="sLoginAuth" id="sLoginAuth" value="" /> 
+        <input type="hidden" name="sLoginOld" id="sLoginOld" value="<%= userPersonne.getLogin() %>" /> 
+<%
+	if(dih.bDisplayFullTabUserAccount)
+	{
+
+%>
+
+		<%= hbFormulaire.getHtmlTrInput(
+				"Login :",
+				"sLogin",
+				userPersonne.getLogin(),
+				"onBlur=\"verifierLogin();\" onKeyUp=\"verifierLogin();\" size='60' ") 
+		%>
+		<%= hbFormulaire.getHtmlTrInput(userPersonne.getDateExpirationLabel() + " :",
+				"tsDateExpirationDate",
+				CalendarUtil.getDateCourte(userPersonne.getDateExpiration()),
+				" class='dataType-date' ") %>
+	<%
+	if(dih.bDisplayAccessModule){
+	try{
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" >
+			Access Module Type :
+		</td>
+		<td class="pave_cellule_droite" >
+			<%= accessType.getAllInHtmlSelect("lIdCoinUserAccessModuleType") %>
+		</td>
+	</tr>		
+	<%
+	}catch(Exception se){/** no user acces module in db */}
+	}%>
+		
+<%
+	} else {
+%>
+
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:top">
+			<%= userPersonne.getLoginLabel() %> :
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+			<%= userPersonne.getLogin() %>
+		</td>
+	</tr>		
+<%		
+	}
+
+	if(organisation.getIdOrganisationType() == OrganisationType.TYPE_ACHETEUR_PUBLIC
+	&& dih.bDisplayFullTabUserAccount
+	&& !Theme.getTheme ().equals ("paraph"))
+	{ 
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:top">
+		<input class="cbx" type="checkbox" name="alertMail" id="alertMail"
+			 value="1" <%=personne.getAlerteMail()?"checked=\"checked\"":""%> />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+			Cette personne recevra des mails d'alerte lorsqu'un candidat : 
+			<ul>
+				<li>retirera le DCE par voie électronique</li>
+				<li>déposera ses plis par voie électronique</li>
+				<li>posera une question à la rubrique FQR</li>
+			</ul>
+		</td>
+	</tr>
+<% } %>
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>
+
+<div id="divPasswordForm">
+	<%
+	//TODO: a verifier si seul le propriétaire peut le faire
+	if (true)//sessionUser.getIdIndividual() == iIdPersonne
+	{
+		if(userPersonne.getIdUserStatus() == UserStatus.VALIDE 
+		&& (
+			sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonModifierMotDePasse)
+			|| dih.bForceModifyPassword
+		))
+		{
+		%>
+		<br />
+		<div class="blockPaveBorder">
+			<span style="float: left;"><%= sMessageChangePassword %></span>
+			<span style="float: right;"></span>
+			<div style="clear: both;"></div>
+		</div>
+		<table class="paveUnrounded">
+			<tr id="tr_infoMDP" style="display: none; visibility: hidden;">
+				<td class="pave_cellule_gauche" >&nbsp;</td>
+				<td class="pave_cellule_droite" >
+					<div class="rouge" style="text-align:left">
+					<%= sMessageIncorrectPassword %>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche"><%= sMessageOldPassword %>* :</td>
+				<td class="pave_cellule_droite" >
+				<input type="password" name="ancien" id="ancien" size="20" 
+				onBlur="verifierMDP();" />
+				<input type="hidden" name="ancienAuth" id="ancienAuth" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche" ><%= sMessageNewPassword %>* :</td>
+				<td class="pave_cellule_droite" >
+				<input type="password" name="newMdp1" id="newMdp1" size="20" />
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche" ><%= sMessageConfirmNewPassword %>* :</td>
+				<td class="pave_cellule_droite" >
+				<input type="password" name="newMdp2" id="newMdp2" size="20" />
+				</td>
+			</tr>
+
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		<br />
+		<%
+		}
+	}
+}
+else
+{
+%>
+			<tr>
+				<td class="pave_cellule_gauche" style="vertical-align:middle" >
+				<input class="cbx" type="checkbox" name="createUser" id="createUser" value="1" checked="checked"/>
+				</td>
+				<td class="pave_cellule_droite" style="vertical-align:middle" />
+				<font style="font-weight:bold;"></font><%= sMessageCreateAccount %>
+				<br /><%= sMessageMailSendAfterAccountCreated %>
+				<br />
+				<input type="radio" name="activateUser" value="1" checked="checked" /><%=sMessageActivated %> 
+				<input type="radio" name="activateUser" value="0" /><%= sMessageDesactivated %> 
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		<br />
+<%
+}
+%>
+</div>

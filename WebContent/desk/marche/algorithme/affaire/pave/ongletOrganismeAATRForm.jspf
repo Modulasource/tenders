@@ -1,0 +1,25 @@
+<p class="mention">
+Les champs noms et adresses seront renseignés avec l'adresse fournie lors de votre inscription. Si des &eacute;l&eacute;ments, 
+notamment dans les adresses compl&eacute;mentaires, sont diff&eacute;rents de l'adresse officielle, il vous suffit de les modifier.
+</p>
+<%
+sPaveAcheteurPublicTitre = "Nom et Adresse officiels de l'acheteur public";
+sFormPrefix = "";
+PersonnePhysique ppPRM = null;
+adresse = null;
+if (iIdPRM > 0)
+{
+	ppPRM = PersonnePhysique.getPersonnePhysique(iIdPRM);
+	adresse = Adresse.getAdresse(ppPRM.getIdAdresse());
+	pays = Pays.getPays(adresse.getIdPays());
+}
+else 
+	adresse = new Adresse();
+%>
+<%@ include file="pavePRMAATRForm.jspf" %>
+<br />
+<%
+sPaveTypeAcheteurPublicTitre = "Type d'acheteur public";
+sFormPrefix = "";
+%>
+<%@ include file="paveTypeAcheteurPublicAATR.jspf" %>

@@ -1,0 +1,242 @@
+<% 
+	sFormPrefix = "BOAMP_"; 
+
+	Adresse adresseExpedition = null;
+	Pays paysExpedition = null;
+	Adresse adresseFacturation = null;
+	Pays paysFacturation = null;
+	boolean bIsClientBOAMP = false;
+	
+	
+	
+	BOAMPProperties boampProperties = new BOAMPProperties();
+	try	{
+	    boampProperties = BOAMPProperties.getBOAMPPropertiesFromOrganisation(organisation.getIdOrganisation());
+	    if(boampProperties != null) bIsClientBOAMP = true;
+	    else boampProperties = new BOAMPProperties();
+	} catch(Exception e){
+		boampProperties = new BOAMPProperties();
+	}
+	try	{
+		adresseExpedition = Adresse.getAdresse(boampProperties.getIdAdresseExpedition());
+		paysExpedition = Pays.getPays(adresseExpedition.getIdPays());
+	} catch(Exception e){
+		adresseExpedition = new Adresse();
+		paysExpedition = new Pays();
+	}
+	
+	try	{
+		adresseFacturation = Adresse.getAdresse(boampProperties.getIdAdresseFacturation());
+		paysFacturation = Pays.getPays(adresseFacturation.getIdPays());
+	} catch(Exception e){
+		adresseFacturation =  new Adresse();
+		paysFacturation = new Pays();
+	}
+
+
+%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+
+<%@page import="org.coin.fr.bean.Adresse"%>
+<%@page import="org.coin.fr.bean.BOAMPProperties"%>
+<%@page import="org.coin.fr.bean.Pays"%>
+
+<%@page import="org.coin.fr.bean.OrganisationClasseProfit"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.HashMap"%>
+
+<script type="text/javascript">
+
+document.observe("dom:loaded", function() {
+
+<%
+
+	if(!bIsClientBOAMP){
+	%>
+			cacher("infos_compte_boamp");
+	<%
+		}
+		else {
+			if(boampProperties.getIdTypeFacturation() == BOAMPProperties.FACTURATION_SEPAREE) {
+	%>
+				cacher("facturation_groupee");
+	<%
+			}
+			else{
+	%>
+				cacher("facturation_separee");
+	<%
+			}
+	}
+%>
+
+});
+
+</script>
+
+
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche">BOAMP</td>
+		<td class="pave_titre_droite">
+			<a class="orange" href='javascript:OuvrirPopup("<%=response.encodeURL("afficherTarifsBoamp.jsp")%>",450,400,"menubar=no,scrollbars=yes,statusbar=no")'>Tarifs du BOAMP</a>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2" style="text-align:right">
+		  &nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Bénéficiez vous d'un compte au BOAMP ?* :</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle">
+		Oui <input type="radio" value="1" name="<%=sFormPrefix %>bCompteBOAMP" style="vertical-align:middle" <%=bIsClientBOAMP?"checked=\"checked\"":"" %> onclick="montrer('infos_compte_boamp')" />&nbsp;
+		Non <input type="radio" value="0" name="<%=sFormPrefix %>bCompteBOAMP" style="vertical-align:middle" <%=bIsClientBOAMP?"":"checked=\"checked\"" %> onclick="cacher('infos_compte_boamp')"/>&nbsp;
+		<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.BOAMP_TYPE_FACTURATION) %>
+		</td>
+	</tr> 
+	<tr id="infos_compte_boamp">
+		<td colspan="2">
+			<table summary="infos_compte_boamp">
+				<tr> 
+					<td class="pave_cellule_gauche">Login :</td>
+					<td class="pave_cellule_droite"><input type="text" name="<%=sFormPrefix %>sLogin" value="<%= boampProperties.getLogin()!=null?boampProperties.getLogin():""%>" /></td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Mot de passe :</td>
+					<td class="pave_cellule_droite"><input type="password" name="<%=sFormPrefix %>sPassword" value="<%= boampProperties.getPassword()!=null?boampProperties.getPassword():""%>" /></td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">Email :</td>
+					<td class="pave_cellule_droite"><input type="text" name="<%=sFormPrefix %>sEmail" value="<%= boampProperties.getEmail()!=null?boampProperties.getEmail():""%>" /></td>
+				</tr>
+				<tr>
+			        <td class="pave_cellule_gauche" ><%= organisation.getSiretLabel() %> :</td>
+			        <td class="pave_cellule_droite" >
+			        <%
+			        ArrayList<HashMap<String, String>> listSiret = organisation.getSiretValueForm(adresse.getIdPays());
+			        for(HashMap<String, String> mapSiret : listSiret){
+			        %>
+			            <input type="text" name="<%= mapSiret.get("name") %>" 
+			            id="<%= mapSiret.get("id") %>" 
+			            size="<%= mapSiret.get("size") %>" 
+			            maxlength="<%= mapSiret.get("maxlength") %>" 
+			            value="<%= mapSiret.get("value") %>" />
+			        <%}%>
+			        </td>
+			    </tr>
+                <%= hbFormulaire.getHtmlTrInput(organisation.getTvaIntraLabel() + " :","sTvaIntra",organisation.getTvaIntra(),"") %>
+			    <% OrganisationClasseProfit ocp = new OrganisationClasseProfit(organisation.getIdOrganisationClasseProfit()); %>
+			    <%= hbFormulaire.getHtmlTrSelect("Classe profit :","iIdOrganisationClasseProfit",ocp) %>				
+				<tr>
+					<td class="pave_cellule_gauche" >Bénéficiez vous d'un système de facturation ?* :</td>
+					<td class="pave_cellule_droite" style="vertical-align:middle">
+					Facturation groupée <input type="radio" value="1" name="<%=sFormPrefix %>sTypeFacturation" 
+												style="vertical-align:middle"
+												<%= boampProperties.getIdTypeFacturation() == BOAMPProperties.FACTURATION_GROUPEE ?"checked=\"checked\"":"" %> 
+												onclick="cacher('facturation_separee');montrer('facturation_groupee');" />&nbsp;
+					Facturation séparée <input type="radio" value="2" name="<%=sFormPrefix %>sTypeFacturation" 
+												style="vertical-align:middle" 
+												<%= boampProperties.getIdTypeFacturation() == BOAMPProperties.FACTURATION_SEPAREE ?"checked=\"checked\"":"" %> 
+												onclick="montrer('facturation_separee');cacher('facturation_groupee');"/>
+					</td>
+				</tr>
+				<tr id="facturation_groupee">
+					<td class="pave_cellule_gauche" >Code client :</td>
+					<td class="pave_cellule_droite" style="vertical-align:middle">
+						<input type="text" value="<%= boampProperties.getCodeClient()%>" name="<%=sFormPrefix %>sCodeClient" style="vertical-align:middle" />&nbsp;
+					</td>
+				</tr>
+				<tr id="facturation_separee">
+					<td colspan="2">
+						<table summary="Infos Facturation séparée">
+							<tr>
+								<td class="pave_cellule_gauche" >Dénomination :</td>
+								<td class="pave_cellule_droite" style="vertical-align:middle">
+									<input type="text" value="<%= boampProperties.getDenomination()%>" name="<%=sFormPrefix %>sDenomination" style="vertical-align:middle" />&nbsp;
+								</td>
+							</tr>
+							<%= hbFormulaire.getHtmlTrInput("Complément de remise :",sFormPrefix+"adresse_facturation_sAdresseLigne1",adresseFacturation.getAdresseLigne1(),"") %>
+							<%= hbFormulaire.getHtmlTrInput("Complément de distribution :",sFormPrefix+"adresse_facturation_sAdresseLigne2",adresseFacturation.getAdresseLigne2(),"") %>
+							<tr>
+								<td class="pave_cellule_gauche" >Voie :</td>
+								<td class="pave_cellule_droite" >
+								N° <input type="text" name="<%=sFormPrefix %>adresse_facturation_sVoieNumero" size="5" maxlength="10" 
+								value="<%= adresseFacturation.getVoieNumero() %>" />
+								Type <input type="text" name="<%=sFormPrefix %>adresse_facturation_sVoieType" size="8" maxlength="40" 
+								value="<%= adresseFacturation.getVoieType() %>" />
+								Nom <input type="text" name="<%=sFormPrefix %>adresse_facturation_sVoieNom" size="23" maxlength="40" 
+								value="<%= adresseFacturation.getVoieNom() %>" />
+								</td>
+							</tr>
+							<%= hbFormulaire.getHtmlTrInput("Lieu-dit :",sFormPrefix+"adresse_facturation_sAdresseLigne3",adresseFacturation.getAdresseLigne3(),"") %>
+							<%= hbFormulaire.getHtmlTrInput("Boîte Postale :",sFormPrefix+"adresse_facturation_sBoitePostale",adresseFacturation.getBoitePostale(),"") %>
+							<tr>
+								<td class="pave_cellule_gauche" >Code Postal :</td>
+								<td class="pave_cellule_droite" >
+								<input type="text" name="<%=sFormPrefix %>adresse_facturation_sCodePostal" size="6" maxlength="5" 
+								value="<%= adresseFacturation.getCodePostal() %>" />
+								Localité :
+								<input type="text" name="<%=sFormPrefix %>adresse_facturation_sCommune" size="19" maxlength="30" 
+								value="<%= adresseFacturation.getCommune() %>" />
+								Cedex :
+								<input type="text" name="<%=sFormPrefix %>adresse_facturation_sCedex" size="6" maxlength="5" 
+								value="<%= adresseFacturation.getCedex() %>" />
+								</td>
+							</tr>
+							<tr>
+								<td class="pave_cellule_gauche" >Pays :</td>
+								<td class="pave_cellule_droite" >
+								<%= org.coin.fr.bean.Pays.getPaysHTMLComboList(paysFacturation.getIdString(),sFormPrefix+"adresse_facturation_sIdPays") %>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr><td colspan="2">&nbsp;</td></tr>
+				<tr>
+					<td class="pave_cellule_gauche">Adresse d'expédition de la facture<br />(pour toutes les facturations)</td>
+					<td class="pave_cellule_droite">
+					<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.BOAMP_ADRESSE_FACTURATION) %>
+					</td>
+				</tr>
+				<%= hbFormulaire.getHtmlTrInput("Complément de remise :",sFormPrefix+"adresse_expedition_sAdresseLigne1",adresseExpedition.getAdresseLigne1(),"") %>
+				<%= hbFormulaire.getHtmlTrInput("Complément de distribution :",sFormPrefix+"adresse_expedition_sAdresseLigne2",adresseExpedition.getAdresseLigne2(),"") %>
+				<tr>
+					<td class="pave_cellule_gauche" >Voie :</td>
+					<td class="pave_cellule_droite" >
+					N° <input type="text" name="<%=sFormPrefix %>adresse_expedition_sVoieNumero" size="5" maxlength="10" 
+					value="<%= adresseExpedition.getVoieNumero() %>" />
+					Type <input type="text" name="<%=sFormPrefix %>adresse_expedition_sVoieType" size="8" maxlength="40" 
+					value="<%= adresseExpedition.getVoieType() %>" />
+					Nom <input type="text" name="<%=sFormPrefix %>adresse_expedition_sVoieNom" size="23" maxlength="40" 
+					value="<%= adresseExpedition.getVoieNom() %>" />
+					</td>
+				</tr>
+				<%= hbFormulaire.getHtmlTrInput("Lieu-dit :",sFormPrefix+"adresse_expedition_sAdresseLigne3",adresseExpedition.getAdresseLigne3(),"") %>
+				<%= hbFormulaire.getHtmlTrInput("Boîte Postale :",sFormPrefix+"adresse_expedition_sBoitePostale",adresseExpedition.getBoitePostale(),"") %>
+				<tr>
+					<td class="pave_cellule_gauche" >Code Postal :</td>
+					<td class="pave_cellule_droite" >
+					<input type="text" name="<%=sFormPrefix %>adresse_expedition_sCodePostal" size="6" maxlength="5" 
+					value="<%= adresseExpedition.getCodePostal() %>" />
+					Localité :
+					<input type="text" name="<%=sFormPrefix %>adresse_expedition_sCommune" size="19" maxlength="30" 
+					value="<%= adresseExpedition.getCommune() %>" />
+					Cedex :
+					<input type="text" name="<%=sFormPrefix %>adresse_expedition_sCedex" size="6" maxlength="5" 
+					value="<%= adresseExpedition.getCedex() %>" />
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche" >Pays :</td>
+					<td class="pave_cellule_droite" >
+					<%= org.coin.fr.bean.Pays.getPaysHTMLComboList(paysExpedition.getIdString(),sFormPrefix+"adresse_expedition_sIdPays") %>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

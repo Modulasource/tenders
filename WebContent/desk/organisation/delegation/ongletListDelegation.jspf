@@ -1,0 +1,96 @@
+<%
+{
+%>
+<%@page import="org.coin.fr.bean.DelegationType"%>
+<%@page import="org.coin.fr.bean.Delegation"%>
+<%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.db.CoinDatabaseLoadException"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="org.coin.fr.bean.DelegationState"%><div id="delegation_dg" style="margin-top: 5px;">
+<script>
+function displayDelegation(sUrl){
+	parent.mt.utils.displayModal({
+		type:"iframe",
+		url:sUrl+"&bIsPopup=true",
+		title:"<%=locTabs.getValue (26, "Délégation")%>",
+		width:700,
+		height:400
+	});
+}
+</script>
+<%
+	/** Just for localization **/
+	Delegation delegationLoc = new Delegation ();
+	delegationLoc.setAbstractBeanLocalization (sessionLanguage);
+%>
+<table style="width: 100%;" class="dataGrid" cellspacing="1">
+	<tbody>
+	<tr class="header">
+		<td class="cell"><%=delegationLoc.getIdPersonnePhysiqueOwnerLabel ()%></td>
+		<td class="cell"><%=delegationLoc.getIdPersonnePhysiqueDelegateLabel ()%></td>
+		<td class="cell"><%=delegationLoc.getIdDelegationTypeLabel ()%></td>
+		<td class="cell"><%=delegationLoc.getIdDelegationStateLabel ()%></td>
+		<td class="cell"><%=delegationLoc.getStartLabel ()%></td>
+		<td class="cell"><%=delegationLoc.getEndLabel ()%></td>
+		<td class="cell"><%=delegationLoc.getSignTemplateLabel ()%></td>
+	</tr>
+	<% 
+	CoinDatabaseWhereClause cwPPDeleg = new CoinDatabaseWhereClause(CoinDatabaseWhereClause.ITEM_TYPE_INTEGER);
+	for(Delegation item : vDelegation) {
+		cwPPDeleg.add(item.getIdPersonnePhysiqueOwner());
+		cwPPDeleg.add(item.getIdPersonnePhysiqueDelegate());
+	}
+	Vector<PersonnePhysique> vPPDeleg = PersonnePhysique.getAllWithWhereAndOrderByClauseStatic(cwPPDeleg,"");
+	for(int iDeleg=0;iDeleg<vDelegation.size();iDeleg++) {
+	Delegation item = vDelegation.get(iDeleg);
+	item.setAbstractBeanLocalization (sessionLanguage);
+	DelegationType type = DelegationType.getDelegationTypeMemoryLocalized(item.getIdDelegationType(),sessionLanguage.getId());
+	DelegationState state = DelegationState.getDelegationStateMemoryLocalized(item.getIdDelegationState(),sessionLanguage.getId());
+	PersonnePhysique ppOwner = null;
+	try{
+		ppOwner = PersonnePhysique.getPersonnePhysique (item.getIdPersonnePhysiqueOwner());
+		ppOwner.setAbstractBeanLocalization (sessionLanguage);
+	} catch(CoinDatabaseLoadException e){}
+	PersonnePhysique ppDelegate = null;
+	try{
+		ppDelegate = PersonnePhysique.getPersonnePhysique (item.getIdPersonnePhysiqueDelegate());
+		ppDelegate.setAbstractBeanLocalization (sessionLanguage);
+	} catch(CoinDatabaseLoadException e){}
+	
+	boolean bAutorizeDisplay = false;
+	if(sessionUserHabilitation.isSuperUser() 
+	|| sessionUserHabilitation.isHabilitate("IHM-DESK-PARAM-HAB-DELEG-2")
+	|| (sessionUserHabilitation.isHabilitate("IHM-DESK-PARAM-HAB-DELEG-6") && sessionUser.getIdIndividual()==item.getIdPersonnePhysiqueDelegate())
+	|| (sessionUserHabilitation.isHabilitate("IHM-DESK-PARAM-HAB-DELEG-7") && sessionUser.getIdIndividual()==item.getIdPersonnePhysiqueOwner())){
+		bAutorizeDisplay = true;
+	}
+	%>
+	<tr
+	class="line<%= iDeleg%2 %>"
+	<% if(bAutorizeDisplay){ %>
+	style="cursor:pointer" 
+	onmouseover="className='liste_over'" 
+	onmouseout="className='line<%= iDeleg%2 %>'" 
+	onclick="javascript:displayDelegation('<%= response.encodeURL( rootPath+
+		"desk/organisation/delegation/modifyDelegationForm.jsp?sAction=store"
+		+ "&amp;lIdPersonnePhysiqueOwner=" + personne.getId()
+		+ "&amp;lId="+item.getId()) %>')"
+	<%} %>>
+		<td class="cell"><%= ppOwner.getName() %></td>
+		<td class="cell"><%= ppDelegate.getName() %></td>
+		<td class="cell"><%= type.getName() %></td>
+		<td class="cell"><%= state.getName() %></td>
+		<td class="cell"><%= CalendarUtil.getDateCourte(item.getDateStart(),"") %></td>
+		<td class="cell"><%= CalendarUtil.getDateCourte(item.getDateEnd(),"") %></td>
+		<td class="cell"><%= item.getSignTemplate() %></td>
+	</tr>
+	<%} %>
+	</tbody>
+</table>
+</div>
+<%
+}
+%>

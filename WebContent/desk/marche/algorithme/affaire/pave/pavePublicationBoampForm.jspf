@@ -1,0 +1,69 @@
+<%
+	Vector<PublicationBoamp> vPublicationsAAPCBoamp = 
+		PublicationBoamp.getAllPublicationBoampFromAffaire(
+			PublicationType.TYPE_AAPC,
+			marche.getIdMarche());
+
+	if(vPublicationsAAPCBoamp.size() == 0)
+	{
+		Vector<Export> vExport = Export.getAllExportFromSourceAndDestination(
+				marche.getIdOrganisationFromMarche(),
+				TypeObjetModula.ORGANISATION,
+				PublicationBoamp.getIdOrganisationBoampOptional(),
+				TypeObjetModula.ORGANISATION);
+%>	
+				
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.fr.bean.export.PublicationBoamp"%>
+<%@page import="modula.TypeObjetModula"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="org.coin.fr.bean.export.ExportMode"%>
+<%@page import="org.coin.fr.bean.export.Export"%>
+<%@page import="org.coin.bean.ObjectType"%><tr>
+					<td class="pave_cellule_gauche">Publication de l'AAPC au BOAMP :</td>
+					<td class="pave_cellule_droite">
+<%		
+		if(vExport.size() ==0)
+		{
+			%>Pas export défini vers le BOAMP.<%
+		}
+			
+		for (int i =0 ; i < vExport.size() ; i++)
+		{
+			Export export = vExport.get(i);
+			String sUrlCreate 
+				= rootPath + "desk/export/publication/modifierPublicationBoamp.jsp?"
+				+ "sAction=createIndentifiants"
+				+ "&amp;iIdTypeObjet=" + ObjectType.AFFAIRE
+				+ "&amp;iIdReferenceObjet=" + marche.getIdMarche()
+				+ "&amp;iIdExport=" + export.getIdExport()
+				+ "&amp;iIdPublicationType=" + PublicationType.TYPE_AAPC
+				+ "&amp;iIdPublicationEtat=" + PublicationEtat.ETAT_A_ENVOYER
+				+ "&amp;iIdExportMode=" + export.getIdExportMode()
+				+ "&amp;sUrlRedirect=" 
+				+ rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?"
+				+ "iIdAffaire="	+ marche.getIdMarche() 
+				+ "%26iIdOnglet=" + modula.graphic.Onglet.ONGLET_AFFAIRE_PLANNING;
+			
+			String sMode = ExportMode.getExportModeNameMemory(export.getIdExportMode());
+%>					<a href="<%= response.encodeURL( 
+								sUrlCreate 
+							)  %>" >
+							Ajouter une publication <%= sMode %>
+						</a><br /> 
+		
+<%		} %>						
+					</td>
+				</tr>
+<%
+	
+	}
+	else
+	{
+		// FLON : DK ici à priori on ne prend que la premiere occurence ... à voir avec le BOAMP
+		
+		PublicationBoamp publi = vPublicationsAAPCBoamp.get(0);
+%><%@ include file="/desk/export/publication/pave/pavePublicationBoampCelluleForm.jspf" %><%	
+	}
+%>

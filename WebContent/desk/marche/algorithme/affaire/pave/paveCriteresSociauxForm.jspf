@@ -1,0 +1,40 @@
+	<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="org.coin.bean.ObjectType"%>
+
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="modula.graphic.CSS"%><%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Critères sociaux ou environnementaux</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr><td colspan="2" class="mention">
+			Si vous désirez que votre avis apparaisse sur le site Internet des Journaux officiels comme comportant des critères sociaux ou environnementaux, il vous suffit de cocher les cases ci-dessous.
+			<br/>
+			Désirez-vous faire apparaître que votre avis comporte des critères :
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				Sociaux :
+			</td>
+			<td class="pave_cellule_droite">
+				<input class="criteresSociauxSelectedClass" type="radio" name="bCriteresSociaux" <%= joueInfo.isCriteresSociaux()?"checked=\"checked\"":"" %> value="true" />Oui&nbsp;
+				<input class="criteresSociauxSelectedClass" type="radio" name="bCriteresSociaux" <%= joueInfo.isCriteresSociaux()?"":"checked=\"checked\"" %> value="false" />Non
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				Environnementaux :
+			</td>
+			<td class="pave_cellule_droite">
+				<input class="criteresSociauxSelectedClass" type="radio" name="bCriteresEnvironnementaux" <%= joueInfo.isCriteresEnvironnementaux()?"checked=\"checked\"":"" %> value="true" />Oui&nbsp;
+				<input class="criteresSociauxSelectedClass" type="radio" name="bCriteresEnvironnementaux" <%= joueInfo.isCriteresEnvironnementaux()?"":"checked=\"checked\"" %> value="false" />Non
+			</td>
+		</tr>			
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>

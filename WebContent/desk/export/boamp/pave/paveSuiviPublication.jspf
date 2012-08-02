@@ -1,0 +1,121 @@
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="org.coin.fr.bean.*"%>
+<%@page import="org.coin.bean.ObjectType"%>
+<%@page import="modula.ws.boamp.ServeurFichiersXMLBoamp"%>
+<%
+	if(bIsErreurEmetteur) {
+%>
+<script type="text/javascript">
+<!--
+	openModal('<%= response.encodeURL(rootPath +"desk/export/boamp/pave/popupErreurEmetteur.jsp") %>',
+				'Envoi de l\'avis impossible','400px','250px');
+//-->
+</script>
+<%
+	}
+
+	Organisation organisationPRM = null;
+	PersonnePhysique oPersonnePhysiquePRM = null;
+	try{
+		Correspondant oCorrespondantPRM = null;
+		oCorrespondantPRM 
+		= Correspondant.getAllCorrespondantFromTypeAndReferenceObjetAndFonction(
+				ObjectType.AFFAIRE,
+				marche.getIdMarche(),
+				PersonnePhysiqueFonction.PRM).firstElement();
+		oPersonnePhysiquePRM = PersonnePhysique.getPersonnePhysique(oCorrespondantPRM.getIdPersonnePhysique());
+		
+	}
+	catch(Exception e ){
+	//	throw new Exception("Vous devez définir une pouvoir adjudicateur");
+	}
+	
+	BOAMPProperties boampProperties = null;
+	try{
+		organisationPRM = Organisation.getOrganisation(commission.getIdOrganisation());
+	    boampProperties = BOAMPProperties.getBOAMPPropertiesFromOrganisation(organisationPRM.getIdOrganisation());
+	}catch(Exception e){}
+	if(boampProperties == null){
+%>
+
+
+<%@page import="modula.ws.boamp.suivi.ListSuivi"%>
+<%@page import="org.coin.fr.bean.export.PublicationBoamp"%>
+
+<%@page import="java.sql.Connection"%>
+<%@page import="org.coin.db.ConnectionManager"%>
+<%@page import="org.w3c.dom.Node"%>
+<%@page import="org.coin.util.BasicDom"%><div class="mention">
+		<img src="<%=rootPath + modula.graphic.Icone.ICONE_WARNING %>" style="vertical-align:middle" alt ="Pas de compte au boamp" />
+		Vous n'avez pas encore défini de <a href="<%= 
+			response.encodeURL(rootPath+"desk/organisation/afficherOrganisation.jsp?iIdOrganisation="
+					+commission.getIdOrganisation()
+					+"&iIdOnglet="+Onglet.ONGLET_ORGANISATION_INFORMATION_PUBLICATION) 
+					%>">compte de publication</a> au B.O.A.M.P pour votre organisme !
+	</div>
+	<br />
+<%
+	}
+	
+	Node nodeSuivi = null;
+	try{
+		ListSuivi liste 
+			= ServeurFichiersXMLBoamp.recupererSuiviPublicationBoamp(
+					Integer.parseInt(sIdAffaire),exportAff);
+		
+		Connection conn = ConnectionManager.getConnection();
+		
+		
+		Organisation boamp 
+    	= Organisation
+    		.getOrganisation(
+    			PublicationBoamp.getIdOrganisationBoamp(conn),
+    			false, conn);
+    
+	    String sURLSuiviBoamp 
+	    	= OrganisationParametre
+	    		.getOrganisationParametreValue
+	    			(boamp.getIdOrganisation(),"boamp.followup.url", conn)
+	    	+ "?type=GLOBAL";
+		
+		nodeSuivi = ServeurFichiersXMLBoamp.getXmlSuiviPublicationBoamp(boampProperties, sURLSuiviBoamp);
+		
+		ConnectionManager.closeConnection(conn);
+	}catch(Exception e){
+		e.printStackTrace();
+	}
+	Vector<PublicationBoamp> vPublications 
+		= PublicationBoamp.getAllPublicationBoampFromObjetDestinationAndExport( 
+			ObjectType.AFFAIRE,
+			marche.getIdMarche(), 
+			exportAff.getIdExport());
+
+	if(boampProperties != null)
+	{
+		%>
+		<%@include file="paveActions.jspf" %>
+		<br />
+		<%@include file="paveElementsEnvoyes.jspf" %>
+		<br />
+<%
+		if(sessionUserHabilitation.isSuperUser())
+		{
+%>
+XML retour du BOAMP (super admin) : <br/>
+<div style="border: 1px solid;background-color: #fff;color: #00f;padding: 15px">
+<%
+	String sXmlSuivi = "";
+	try{
+		if(BasicDom.getXML(nodeSuivi) != null){
+			sXmlSuivi = Outils.getTextToHtml(BasicDom.getXML(nodeSuivi));
+		}
+	} catch (Exception e) {
+		sXmlSuivi = "Pas encore de retour";
+	}
+%>
+<%= sXmlSuivi %>
+</div>
+<%			
+		}
+	} 
+%>

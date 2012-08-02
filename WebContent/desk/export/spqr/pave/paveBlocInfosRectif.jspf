@@ -1,0 +1,69 @@
+<%
+	// on récupère le premier noeud
+	Node nodeInfosRectif = BasicDom.getChildNodeByNodeName(nodeAnn, "infosRectif" ) ;
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveInfosRectif')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc Rectifications apportées</td>
+	</tr>
+	<tr>
+		<td>
+		<table id="paveInfosRectif" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+<%
+	while(nodeInfosRectif != null)
+	{
+		if(!nodeInfosRectif.getNodeName().equals("infosRectif")) break;
+		
+		try {
+			// cas de la rubrique au format TEXTE
+			Node nodeInfosRectifRubrique = BasicDom.getChildNodeByNodeName(nodeInfosRectif , "rubrique");
+%>
+			<tr>
+				<td class="pave_cellule_gauche">Rubrique : </td>
+				<td class="pave_cellule_droite"><%= nodeInfosRectifRubrique.getTextContent() %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">au lieu de : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeInfosRectif, "auLieuDe") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">lire : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeInfosRectif, "lire")  %>
+				</td>
+			</tr>
+<%
+
+
+		}catch (Exception e) {
+			// cas de la rubrique au format DATE
+			Node nodeInfosRectifRubrique = BasicDom.getChildNodeByNodeName(nodeInfosRectif , "rubDelais");
+%>
+			<tr>
+				<td class="pave_cellule_gauche">Rubrique : </td>
+				<td class="pave_cellule_droite"><%= nodeInfosRectifRubrique.getTextContent() %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">au lieu de : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeInfosRectif, "auLieuDeDate") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">lire: </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeInfosRectif, "lireDate")  %>
+				</td>
+			</tr>
+<%
+		}
+ %>
+			<tr><td colspan="2">&nbsp;</td></tr>
+<%
+		nodeInfosRectif = BasicDom.getNextSiblingElementNode(nodeInfosRectif ) ;
+	}
+ %>		</table>
+		</td>
+	</tr>
+</table>

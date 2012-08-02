@@ -1,0 +1,20 @@
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.util.SearchEngine"%>
+<tr class="line<%=j%>" 
+onmouseover="className='liste_over'" 
+            onmouseout="className='line<%=j%>'"
+            style="cursor:pointer;"
+            onclick="Redirect('<%= response.encodeURL(
+            		"afficherPersonnePhysique.jsp?iIdPersonnePhysique="+ personne.getIdPersonnePhysique())%>')">
+	<td class="cell" style="width:20%"><%= personne.getPrenomNom() %></td>
+	<td class="cell" style="width:35%"><%= organisation.getRaisonSociale() %></td>
+	<td class="cell" style="width:20%"><%= personne.getEmail() %></td>
+	<td class="cell" style="width:10%"><%= personne.getTel() %></td>
+    <td class="cell" style="width:10%"><%= adresse.getCommune() %></td>
+    <td class="cell" style="width:10%"><%= personne.getReferenceExterne() %></td>
+	<td class="cell" style="text-align:right;width:5%">
+			<img src="<%=rootPath+Icone.ICONE_FICHIER_DEFAULT_NEW_STYLE %>" alt="<%=
+				SearchEngine.getLocalizedLabel(SearchEngine.LABEL_DISPLAY,sessionLanguage.getId()) 
+				%>" title="<%= SearchEngine.getLocalizedLabel(SearchEngine.LABEL_DISPLAY,sessionLanguage.getId()) %>"/> 
+	</td>
+</tr>

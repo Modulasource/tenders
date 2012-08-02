@@ -1,0 +1,67 @@
+<%@page import="org.coin.servlet.CheckAjaxVerifField"%>
+<script type="text/javascript">
+
+
+//mail gerant
+var champMailGerantAuth = "sEmailAuth";
+var champMailGerant = "sEmail";
+var divMailGerant = "tr_infoEmail";
+function verifierMailGerant() 
+{
+	verifierChamp(
+			champMailGerant,
+			champMailGerantAuth,
+			divMailGerant,
+			<%= CheckAjaxVerifField.COIN_USER_LOGIN %>,
+			"",
+			"desk");
+}
+
+//verification du formulaire
+function checkForm()
+{
+	var form = document.formulaire;
+	var sError = "";
+	var bResult = true;
+	
+	if (isNull($("iIdCivilite").value)
+	|| $("iIdCivilite").value <= 0)
+	{
+		sError += "Vous devez saisir la civilit&eacute;.<br />";
+		bResult = false;
+	}
+	if (isNull($("sNom").value))
+	{
+		sError += "Vous devez saisir le nom.<br />";
+		bResult = false;
+	}
+	if (isNull($("sPrenom").value))
+	{
+		sError += "Vous devez saisir le prenom.<br />";
+		bResult = false;
+	}
+	if($("createUser").checked || $("sEmail").value != "")
+	{
+		if($("bCheckEmail").value == "true"){
+			if (!isMail($("sEmail").value))
+			{
+				sError += "La syntaxe de l'email n'est pas correcte.<br />";
+				bResult = false;
+			}
+			else if($("sEmailAuth").value == 0)
+			{
+				sError += "L'adresse email que vous avez saisie est déjà inscrite dans la base de données.\n"
+					+ "Vous ne pouvez pas poursuivre cette opération.<br />";
+				bResult = false;
+			}
+		}
+	}
+	
+	$("divError").innerHTML = sError+"<br/>" ;
+	if(!bResult)
+	{
+		document.location.href = "#ancreError";
+	}
+	return bResult;
+}
+</script>

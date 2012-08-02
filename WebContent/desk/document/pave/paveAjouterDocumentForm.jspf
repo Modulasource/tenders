@@ -1,0 +1,44 @@
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Document</td>
+	</tr>
+	<% hbFormulaire.bIsForm = false; %>
+	<%= hbFormulaire.getHtmlTrInput("Auteur :","",auteur.getName(),"") %>
+	<% hbFormulaire.bIsForm = true; %>
+	<%= hbFormulaire.getHtmlTrInput("Nom :",sFormPrefix+"sNom",doc.getName(),"size='50'") %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Type de document :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= org.coin.db.CoinDatabaseAbstractBeanHtmlUtil.getHtmlSelect(sFormPrefix+"iIdDocumentType",1,DocumentType.getAllDocumentTypeForm(),doc.getIdDocumentType()) %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Description :
+		</td>
+		<td class="pave_cellule_droite">
+			<textarea name="<%=sFormPrefix %>sDescription" cols="100" rows="4"><%= doc.getDescription() %></textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Fichier :
+		</td>
+		<td class="pave_cellule_droite">
+			<input size="70" type="file" name="<%=sFormPrefix %>sFilePath" id="<%=sFormPrefix %>sFilePath" value="" />
+		</td>
+	</tr>
+	<% String sChecked = "checked='checked'"; %>
+	<tr>
+		<td class="pave_cellule_gauche">
+		Visibilité :
+		</td>
+		<td class="pave_cellule_droite">
+			<input type="radio" name="<%=sFormPrefix %>sVisibilite" id="<%=sFormPrefix %>sVisibilite" value="public" <%= (sVisibilite.equalsIgnoreCase("public")?sChecked:"") %> />Public&nbsp;
+			<input type="radio" name="<%=sFormPrefix %>sVisibilite" id="<%=sFormPrefix %>sVisibilite"  value="private" <%= (sVisibilite.equalsIgnoreCase("private")?sChecked:"") %> />Priv&eacute;&nbsp;
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

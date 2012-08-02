@@ -1,0 +1,72 @@
+<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche">Signataires du document</td>
+		</tr>
+		<tr>
+			<td>
+				<table class="liste" summary="none">
+					<tr>
+						<th>Ordre</th>
+						<th>Personne</th>
+						<th>Signature</th>
+						<th>Certificat public</th>
+						<th>&nbsp;</th>
+					</tr>
+					<%
+					for (int i = 0; i < vDocumentSignataires.size(); i++)
+					{
+						int j = i % 2;
+						DocumentSignatory oDocumentSignatory = vDocumentSignataires.get(i);
+						PersonnePhysique signataire = PersonnePhysique.getPersonnePhysique(oDocumentSignatory.getIdPersonnePhysiqueSignataire());
+						
+						/*
+						byte[] bytesSignature = null ;
+						X509Certificate oX509Certificate = null;
+						String sNomCertificat = "";
+						
+						if(oDocumentSignatory.getCertificatPublic() != null)
+						{
+							ByteArrayInputStream bis = new ByteArrayInputStream(oDocumentSignatory.getCertificatPublic());
+						    String sCertificateName = null;
+						    CertificateFactory cf;
+						    try 
+						    {
+								cf = CertificateFactory.getInstance("X.509");
+								oX509Certificate = (X509Certificate) cf.generateCertificate(bis);
+							    sCertificateName = CertificateFile.getNomDestinataireCertificat(oX509Certificate);
+							    sNomCertificat = sCertificateName.toLowerCase();
+							    sNomCertificat = sNomCertificat.replaceFirst(" ",".");
+							    sNomCertificat = sNomCertificat.trim()+".crt";
+							} 
+						    catch (CertificateException e) {}		
+						}
+						
+						if(oDocumentSignatory.getSignature() != null)
+						{
+							try 
+							{
+							   	bytesSignature = Crypto.asymRecoverSignNoPaddingWithBCProvider(oX509Certificate.getPublicKey(), oDocumentSignatory.getSignature());
+							}
+							catch (Exception e) {}
+						}
+						*/
+					%>
+					<tr class="liste<%=j%>" onmouseover="className='liste_over'" onmouseout="className='liste<%=j%>'" onclick="Redirect('<%= response.encodeURL("afficherPersonnePhysique.jsp?iIdPersonnePhysique="+ signataire.getIdPersonnePhysique())%>')">
+						<td style="width:5%"><%= oDocumentSignatory.getOrdre() %></td>
+						<td style="width:30%"><%= signataire.getName() %></td>
+						<td style="width:30%"></td>
+						<td style="width:30%"></td>
+						<td  style="text-align:right;width:5%">
+							<a href="<%= response.encodeURL("afficherPersonnePhysique.jsp?iIdPersonnePhysique="+ signataire.getIdPersonnePhysique())%>">
+								<img src="<%=rootPath+modula.graphic.Icone.ICONE_FICHIER_DEFAULT %>" width="21" height="21"  alt="Afficher" title="Afficher"/> 
+							</a>
+							&nbsp;
+						</td>
+					</tr>
+					<%
+					}
+					%>
+			</table> 
+		</td>
+	</tr>
+</table>

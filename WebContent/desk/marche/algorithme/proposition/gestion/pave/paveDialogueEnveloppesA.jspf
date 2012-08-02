@@ -1,0 +1,313 @@
+<%
+	String sLibelleLot = "";
+	if(vLots.size()==1) sLibelleLot = "marché";
+	else sLibelleLot = "Lot " + lot.getNumero();
+%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.candidature.EnveloppeALot"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.marche.MarcheLot"%>
+<script type="text/javascript">
+function selectAction(hidden,action)
+{
+	return hidden.value = action;
+}
+function enregistrerListes()
+{
+	Visualise(document.formulaire.listeDialogues,document.formulaire.idDialogues);
+	Visualise(document.formulaire.listeNonDialogues,document.formulaire.idNonDialogues);
+
+	document.formulaire.submit();
+}
+function cloturerDialogue()
+{
+	if(confirm("Etes vous sûr de vouloir clôturer les dialogues du <%= sLibelleLot %> définitivement ?"))
+	{
+		selectAction(document.formulaire.sAction,'cloturer');
+		Visualise(document.formulaire.listeDialogues,document.formulaire.idDialogues);
+		Visualise(document.formulaire.listeNonDialogues,document.formulaire.idNonDialogues);
+		
+		return true;
+	}
+	return false;
+}
+</script>
+<%
+	Vector<EnveloppeALot> vDialogues = EnveloppeALot.getAllEnveloppeALotAdmisForDialogueFromLot(lot.getIdMarcheLot());
+	Vector<EnveloppeALot> vNonDialogues = EnveloppeALot.getAllEnveloppeALotNonAdmisNonNotifiesForDialogueFromLot(lot.getIdMarcheLot());
+	
+	/* Récupération de la localisation des icônes des flèches */
+	String sFlecheGauche = rootPath + Icone.ICONE_GAUCHE;
+	String sFlecheDroite = rootPath +Icone.ICONE_DROITE;
+	String sFlecheHaut = rootPath + Icone.ICONE_HAUT;
+	String sFlecheBas = rootPath + Icone.ICONE_BAS;
+	
+%>
+<form action="<%= response.encodeURL("validerDialogueEnveloppesAClassement.jsp?nonce="+System.currentTimeMillis()+"&iIdAffaire="+iIdAffaire) %>" method="post" name="formulaire">
+<table class="pave" id="tabClassement">
+	<tr>
+		<td colspan="3" style="width:100%">
+			<table summary="none">
+				<tr>
+					<td class="pave_titre_gauche">Classement des candidatures</td>
+					<td class="pave_titre_droite" >
+					<%
+					boolean bIsDialogueFige = lot.isDialogueFige(false);
+					boolean bIsDialogueEnCours = lot.isEnCoursDeDialogue(false);
+					
+					if(bIsDialogueFige)
+					{
+					%>
+					Dialogue clot
+					<%
+					}
+					%>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="text-align:left;">
+		<%
+		if(!bIsDialogueFige && !bIsDialogueEnCours)
+		{
+		%>
+			<a href='javascript:OuvrirPopup("<%= rootPath%>include/avertissementUtilisateur.jsp?id=<%=InfosBullesConstant.FLECHES %>",400,250,"menubar=no,scrollbars=yes,statusbar=no")'>
+			<img src="<%=rootPath+modula.graphic.Icone.ICONE_AU%>" alt="Avertissement utilisateur" title="Avertissement utilisateur" width="21" height="21"  style="vertical-align:middle" />
+			</a>
+		<%
+		}
+		else
+		{
+		%>
+		&nbsp;
+		<%
+		}
+		%>
+		</td>
+	</tr>
+	<%
+	if(!bIsDialogueFige && !bIsDialogueEnCours)
+	{
+	%>
+	<tr>
+		<td class="mention" colspan="3">
+			<br />
+			Attention!<br />
+			Cliquer sur le bouton "Enregistrer le classement" revient &agrave; enregistrer le classement des candidatures et &agrave; le conserver.<br />
+			<br />
+		</td>
+	</tr>
+	<%
+	}
+	%>
+	<!-- candidatures admises -->
+	<tr>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+		<td style="font-weight:bold;text-align:left;width:80%">
+		Candidatures admises &agrave; dialoguer (avec rang de classement)
+		</td>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td style="width:10%">
+			<img src="<%=rootPath+"images/icones/liste-candidats-dialogue.gif"%>" alt="liste des candidats admis à dialoguer" title="liste des candidats admis à dialoguer" width="69" height="86"  style="vertical-align:middle" />
+		</td>
+		<td style="text-align:left;width:80%">
+			<select name="listeDialogues" size="10" style="width:100%">
+			<%
+				for (int i = 0; i < vDialogues.size(); i++)
+				{
+					/* Récupération de l'enveloppe B */
+					EnveloppeALot oEnveloppeALot = vDialogues.get(i);
+					Candidature oCandidature = Candidature.getCandidatureFromEnveloppeA(oEnveloppeALot.getIdEnveloppeA());
+					PersonnePhysique candidat = PersonnePhysique.getPersonnePhysique(oCandidature.getIdPersonnePhysique());
+					Organisation org = Organisation.getOrganisation(oCandidature.getIdOrganisation());
+					String sCandidature = (i+1)+". "+candidat.getCivilitePrenomNom()+" - "+org.getRaisonSociale();
+					if(bIsAnonyme)
+						sCandidature = (i+1)+". Candidature ORG"+org.getId();
+			%>
+					<option value="<%= oEnveloppeALot.getIdEnveloppeALot() %>">
+					<%= sCandidature %>
+					</option>
+			<%
+				}
+			%>
+			</select>
+		</td>
+		<td style="width:10%">
+		<%
+		if(!bIsDialogueFige && !bIsDialogueEnCours)
+		{
+		%>
+			<table summary="none">
+				<tr>
+					<td style="text-align:center">
+					<a href="javascript:monter(document.formulaire.listeDialogues)">
+						<img src="<%= sFlecheHaut %>" />
+					</a>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:center">
+						<a href="javascript:descendre(document.formulaire.listeDialogues)">
+						<img src="<%= sFlecheBas %>" />
+						</a>
+					</td>
+				</tr>
+			</table>
+		<%
+		}
+		%>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="width:100%">
+		&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="text-align:center;width:100%">
+			<input type="hidden" name="sAction" value="" />
+			<input type="hidden" name="idDialogues" value="" />
+			<input type="hidden" name="idNonDialogues" value="" />
+			<input type="hidden" name="iIdLot" value="<%= lot.getIdMarcheLot() %>" />
+			<input type="hidden" name="iIdNextPhaseEtapes" value="<%= iIdNextPhaseEtapes %>" />
+		<%
+		if(!bIsDialogueFige && !bIsDialogueEnCours)
+		{
+		%>
+			<input type="submit" name="classement" value="Enregistrer le classement" onclick="selectAction(document.formulaire.sAction,'enregistrer');enregistrerListes();" />&nbsp;&nbsp;
+			<input type="submit" name="lancer" value="Lancer le dialogue" onclick="selectAction(document.formulaire.sAction,'lancer');"/>
+		<%
+		}
+		if(!bIsDialogueFige && bIsDialogueEnCours)
+		{
+		%>
+			<input type="submit" name="fermer" value="Relancer une phase de dialogue" onclick="selectAction(document.formulaire.sAction,'fermer');"/>
+			<%
+			if(vDialogues.size()>0)
+			{
+				String sURLNotification = response.encodeURL("envoyerMailForm.jsp?iMailType=" + ((vLots.size() > 1)?MailConstant.MAIL_CDT_ADMIS_DIALOGUE_SEPARE:MailConstant.MAIL_CDT_ADMIS_DIALOGUE_UNIQUE) +"&amp;iIdLot="+ lot.getIdMarcheLot() + "&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes+"&amp;iIdAffaire="+iIdAffaire+"&amp;sRedirectURL="+sURL);
+			%>
+			<input style="width:210px;" type="button" value="Informer les candidats 'admis'"
+			onclick="OuvrirPopup('<%=sURLNotification%>',700,580,'menubar=no,scrollbars=yes,statusbar=no');" />
+			<%
+			}
+		}
+		if(!bIsDialogueFige)
+		{
+		%>
+			<input type="submit" name="cloturer" value="Clôturer les dialogues" onclick="return cloturerDialogue()" />
+		<%
+		}
+		%>
+		</td>
+	</tr>
+		<tr>
+		<td colspan="3" style="width:100%">
+		&nbsp;
+		</td>
+	</tr>
+	<!-- /candidatures admises -->
+	<!-- candidatures non admises -->
+	<tr>
+		<td colspan="3" style="font-weight:bold;text-align:center;width:100%">
+		<%
+		if(!bIsDialogueFige && !bIsDialogueEnCours)
+		{
+		%>
+			<table summary="none">
+				<tr>
+					<td style="text-align:center">
+					<a href="javascript:Deplacer(document.formulaire.listeNonDialogues,document.formulaire.listeDialogues);enregistrerListes();">
+					<img src="<%= sFlecheHaut %>" />
+					</a>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:center">
+					<a href="javascript:Deplacer(document.formulaire.listeDialogues,document.formulaire.listeNonDialogues);enregistrerListes();">
+					<img src="<%= sFlecheBas %>" />
+					</a>
+					</td>
+				</tr>
+			</table>
+		<%
+		}
+		%>
+		</td>
+	</tr>
+	<tr>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+		<td style="text-align:left;width:80%">
+		<font style="font-weight:bold;">Candidatures non admises à dialoguer</font> (les candidats déjà notifiés et précédemment non admis n'apparaissent pas )
+		</td>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+	</tr>
+	<tr>
+		<td style="width:10%">
+			<img src="<%=rootPath+"images/icones/liste-candidats-non-dialogue.gif"%>" alt="liste des candidats non admis à dialoguer" title="liste des candidats non admis à dialoguer" width="59" height="86"  style="vertical-align:middle" />
+		</td>
+		<td style="text-align:left;width:80%">
+			<select name="listeNonDialogues" size="10" style="width:100%">
+			<%
+				for (int i = 0; i < vNonDialogues.size(); i++)
+				{
+					EnveloppeALot oEnveloppeALot = vNonDialogues.get(i);
+					Candidature oCandidature = Candidature.getCandidatureFromEnveloppeA(oEnveloppeALot.getIdEnveloppeA());
+					
+					PersonnePhysique candidat = PersonnePhysique.getPersonnePhysique(oCandidature.getIdPersonnePhysique());
+					Organisation org = Organisation.getOrganisation(oCandidature.getIdOrganisation());
+					
+					String sCandidature = candidat.getCivilitePrenomNom()+" - "+org.getRaisonSociale();
+					if(bIsAnonyme)
+						sCandidature = "Candidature ORG"+org.getId();
+					%>
+					<option value="<%= oEnveloppeALot.getIdEnveloppeALot() %>">
+					<%= sCandidature %>
+					</option>
+					<%
+				}
+			%>
+			</select>
+		</td>
+		<td style="width:10%">
+		&nbsp;
+		</td>
+	</tr>
+	<%
+	if(vNonDialogues.size()>0 && !bIsDialogueFige && bIsDialogueEnCours)
+	{
+		String sURLNotification = response.encodeURL("envoyerMailForm.jsp?iMailType=" + ((vLots.size() > 1)?MailConstant.MAIL_CDT_REJET_CANDIDATURE_MARCHE_SEPARE:MailConstant.MAIL_CDT_REJET_CANDIDATURE_MARCHE_UNIQUE) +"&amp;iIdLot="+ lot.getIdMarcheLot() + "&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes+"&amp;sRedirectURL="+sURL);
+	%>
+	<tr>
+		<td colspan="3" style="width:100%">
+			<input style="width:210px;" type="button" value="Informer les candidats 'non admis'"
+			onclick="OuvrirPopup('<%=sURLNotification%>',700,580,'menubar=no,scrollbars=yes,statusbar=no');" />
+		</td>
+	</tr>
+	<%
+	}
+	%>
+	<!-- /candidatures non admises -->
+	<tr>
+		<td colspan="3" style="width:100%">
+		&nbsp;
+		</td>
+	</tr>
+</table>
+</form>
+

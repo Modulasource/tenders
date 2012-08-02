@@ -1,0 +1,89 @@
+<%
+	Vector vEnveloppesB = null;
+	Vector<Candidature> vOffres = null;
+	int iStatut = -1;
+%>
+<%@page import="org.coin.fr.bean.mail.MailConstant"%>
+<%@page import="modula.candidature.EnveloppeB"%>
+<%@page import="modula.candidature.Candidature"%>
+<%@page import="java.util.Vector"%>
+<script type="text/javascript">
+function checkValidation()
+{
+	return confirm('Avez-vous bien notifié les candidats non retenus et les titulaires<%= 
+		(vLots.size() > 1)?" de tous les lots ":" " %>?');
+}
+</script>
+<br />
+<%	
+	vOffres = new Vector<Candidature>();
+	vEnveloppesB = EnveloppeB.getAllEnveloppesBRetenuesAndNonAttribueesFromLotAndValidite(
+			lot.getIdMarcheLot(), lot.getIdValiditeEnveloppeBCourante() );
+	
+	if(vEnveloppesB != null && vEnveloppesB.size() > 0)
+	{
+		for(int i=0;i<vEnveloppesB.size();i++)
+		{
+			EnveloppeB envB = (EnveloppeB)vEnveloppesB.get(i);
+			vOffres.add(Candidature.getCandidature(envB.getIdCandidature()));
+		}
+		sTitre = "Liste des Offres non retenues";
+		iStatut = EnveloppeB.ID_STATUS_ATTRIBUEE;
+%>
+<%@ include file="paveOffre.jspf" %>
+<%
+		String sURLRejetOffre = response.encodeURL(
+				rootPath + "desk/marche/algorithme/proposition/gestion/envoyerMailForm.jsp?iMailType=" 
+				+ ((vLots.size() > 1)
+					?MailConstant.MAIL_CDT_REJET_OFFRE_SEPARE
+					:MailConstant.MAIL_CDT_REJET_OFFRE_UNIQUE) 
+				+"&amp;iIdLot="+ lot.getIdMarcheLot() 
+				+ "&amp;iIdNextPhaseEtapes="+ iIdNextPhaseEtapes
+				+"&amp;sRedirectURL="+sURL
+				+"&amp;iIdAffaire="+iIdAffaire);
+%>
+<div style="text-align:center">
+	<button type="button" style="width:200px" 
+		onclick="openModal('<%=sURLRejetOffre
+		%>','Notifier les candidats non retenus');" >Notifier les candidats non retenus</button>
+</div>
+<br />
+<%
+}
+%>
+<%
+	vOffres = new Vector<Candidature>();
+	vEnveloppesB = EnveloppeB.getAllEnveloppesBAttribueesDefinitifFromLotAndValidite( 
+			lot.getIdMarcheLot(), lot.getIdValiditeEnveloppeBCourante() );
+	
+	if(vEnveloppesB != null && vEnveloppesB.size() > 0)
+	{	
+		for(int i=0;i<vEnveloppesB.size();i++)
+		{
+			EnveloppeB envB = (EnveloppeB)vEnveloppesB.get(i);
+			vOffres.add(Candidature.getCandidature(envB.getIdCandidature()));
+		}
+		sTitre = "Liste des Offres retenues définitivement";
+		iStatut = EnveloppeB.ID_STATUS_ATTRIBUEE_DEFINITIF;
+%>
+<%@ include file="paveOffre.jspf" %>
+<%
+	String sURLAttribution = response.encodeURL(
+			rootPath + "desk/marche/algorithme/proposition/gestion/envoyerMailForm.jsp"
+			    +"?iMailType="
+				+ ((vLots.size() > 1)
+					?MailConstant.MAIL_CDT_ATTRIBUTION_MARCHE_SEPARE
+					:MailConstant.MAIL_CDT_ATTRIBUTION_MARCHE_UNIQUE)
+                + "&iIdAffaire="+ marche.getId() 
+                + "&iIdLot="+ lot.getIdMarcheLot() 
+				+ "&iIdNextPhaseEtapes="+ iIdNextPhaseEtapes
+				+ "&sRedirectURL="+sURL);
+%> 
+<div style="text-align:center">
+	<button type="button" 
+		onclick="openModal('<%=sURLAttribution
+		%>','Informer le titulaire');" >Informer le titulaire</button>
+</div>
+<%
+}
+%>

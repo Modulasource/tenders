@@ -1,0 +1,431 @@
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="modula.graphic.Icone"%>
+<%@page import="org.coin.ui.Border"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%
+{
+			String sMessageMyProfile = localizeButton
+			.getValue(30, "Mon profil");
+	String sMessageLogout = localizeButton.getValue(31, "Déconnexion");
+	String sMessageLog = "";
+	
+	   PersonnePhysique __personneLogueePP = PersonnePhysique
+       .getPersonnePhysique(sessionUser.getIdIndividual());
+
+	   __personneLogueePP.setAbstractBeanIdLanguage(sessionLanguage.getId());
+	   __personneLogueePP.bUseLocalization = true;
+
+
+	    String sPersonnePhysique = __personneLogueePP.getPrenomNom() ;
+
+	String __sOrgUserLog = "";
+	try {
+		Organisation __o = sessionUser.getOrganisation();
+		__sOrgUserLog = "- " + __o.getRaisonSociale();
+	} catch (Exception e) {
+		__sOrgUserLog = "";
+	}
+	
+	//Border.setContextPath(rootPath);
+	
+	Border bTop = new Border("C5BDC9",5,100,"tlr",request);
+	bTop.setColorBorder("8A6D7C");
+	
+    Border bBottom = new Border("F3F3F3",5,100,"blr",request);
+    bBottom.setColorBorder("CCCCCC");
+    
+    Border bMiddleItemActive = new Border("8A6D7C",7,100,"tlr",request);
+    bMiddleItemActive.setColorBorder("FFFFFF");
+    
+    Border bMiddleItem = new Border("AEA8B3",7,100,"tlr",request);
+	
+    Border bButtonActive = new Border("FFE697",5,100,"tblr",request);
+    bButtonActive.setColorBorder("CCCCCC");
+    bButtonActive.setStyle("width:auto;");
+    
+    Border bButton = new Border("C5BDC9",5,100,"tblr",request);
+    bButton.setColorBorder("CCCCCC");
+    bButton.setStyle("width:auto;");
+    
+    Border bMenuMiddleBloc = new Border("8F7181",5,100,"tblr",request);
+    bMenuMiddleBloc.setColorBorder("C5BDC9");
+    bMenuMiddleBloc.setStyle("width:auto;");
+%>
+<div id="headerMenu">
+	<%= bTop.getHTMLTop() %>
+	<div id="blockMenuBarTop">
+        <div id="blockMenuBarInfo">
+            <div id="blockMenuBarInfoLeft">Connecté(e) : <%= sPersonnePhysique %></div>
+            <div id="blockMenuBarInfoRight"></div>
+            <div style="clear:both"></div>
+        </div>
+	</div>
+	<div id="menuTabs"></div>
+    <div class="blockMenuBarChangeFont">
+      <%= bMiddleItem.getHTMLTop() %>
+        <div>
+        <span id="blockMenuBarChangeFontBig" class="blockMenuBarChangeFontBig"
+        onclick="javascript:updateBigFontSize()">A</span>
+        &nbsp;
+        <span id="blockMenuBarChangeFontNormal" class="blockMenuBarChangeFontNormal blockMenuBarChangeFontSelect"
+        onclick="javascript:updateNormalFontSize()">A</span>
+        </div>
+         <%= bMiddleItem.getHTMLBottom() %>
+    </div>
+    <div style="clear:both"></div>
+	<%= bTop.getHTMLBottom() %>
+	<div id="blockMenuBarMiddle" class="blockMenuBarMiddle">
+       <div class="menuMiddle" style="display:none"><div></div></div>
+       <div class="menuMiddle" style="display:none">
+           <div class="menuMiddleBloc">
+               <%= bMenuMiddleBloc.getHTMLTop() %>
+               <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/amsn.png" /><br />
+                Délégation User1</span></div>
+                <div style="clear:both"></div>
+                <%= bMenuMiddleBloc.getHTMLBottom() %>
+           </div>
+           <div style="clear: both"></div>
+       </div>
+       <div class="menuMiddle" style="display:none"><div></div></div>
+       <div class="menuMiddle" style="display:none">
+           <div class="menuMiddleBloc">
+                <%= bMenuMiddleBloc.getHTMLTop() %>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-blue.png" /><br />
+                Circuit de notes</span></div>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-red.png" /><br />
+                Circuit de notes avec Visas préalables</span></div>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-green.png" /><br />
+                Circuit de Courriers Sortants</span></div>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-white.png" /><br />
+                Circuit de Courriers Entrants</span></div>
+                <div style="clear:both"></div>
+                <%= bMenuMiddleBloc.getHTMLBottom() %>
+           </div>
+           <div style="clear: both"></div>
+       </div>
+        <div class="menuMiddle" style="display:none">
+            <div class="menuMiddleBloc">
+                <%= bMenuMiddleBloc.getHTMLTop() %>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/folder-blue.png" /><br />
+                Relance des Courriers Entrants</span></div>
+                <div style="clear: both"></div>
+                <%= bMenuMiddleBloc.getHTMLBottom() %>
+            </div>
+            <div class="menuMiddleBloc">
+                <%= bMenuMiddleBloc.getHTMLTop() %>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/amsn.png" /><br />
+                Gestion des délégations</span></div>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/gdm.png" /><br />
+                Gestion des contacts</span></div>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/gnome-other.png" /><br />
+                Gestion des classeurs</span></div>
+                <div style="clear: both"></div>
+                <%= bMenuMiddleBloc.getHTMLBottom() %>
+            </div>
+            <div class="menuMiddleBloc">
+                <%= bMenuMiddleBloc.getHTMLTop() %>
+                <div class="menuMiddleItem"><span><img src="<%= rootPath %>/images/icons/24x24/administration.png" /><br />
+                Changer mon mot de passe</span></div>
+                <div style="clear: both"></div>
+                <%= bMenuMiddleBloc.getHTMLBottom() %>
+            </div>
+            <div style="clear: both"></div>
+        </div>
+	</div>
+	<%= bBottom.getHTMLTop() %>
+    <div class="blockMenuBarBottom">
+        <div class="fullWidth">
+            <div class="leftBottomBar" id="leftBottomPath">
+            </div>
+            <div class="rightBottomBar">
+            <%=sMessageLog + sessionUser.getLogin()%> <%=__sOrgUserLog%> (<%=sessionUserHabilitation.getGroupName()%>)
+            </div>
+           <div style="clear:both"></div>
+        </div>
+    </div>
+    <%= bBottom.getHTMLBottom() %>
+</div>
+
+<style>
+.leftBottomBar{
+    float:left;
+    font-size:10px;
+    color: #8A6D7C;
+}
+.rightBottomBar{
+    float:right;
+    font-size:10px;
+    color: #8A6D7C;
+}
+#blockMenuBarTop{
+    padding:9px 10px 0px 10px;
+}
+
+.blockMenuBarBottom{
+    padding:3px 10px 0px 10px;
+}
+.blockMenuBarBottom a{
+    font-weight:normal;
+    color: #333;
+}
+.blockMenuBarBottom a:hover{
+    font-weight:normal;
+    text-decoration:underline;
+}
+
+.blockMenuBarMiddle{
+    padding:3px 10px 3px 10px;
+    background-color : #8A6D7C;
+    color:#FFF;
+    border-top:1px solid #FFF;
+}
+
+.menuMiddleBloc{
+    padding:3px 3px 3px 3px;
+    float:left;
+    margin-left:5px;
+    /*height:90px;*/
+    vertical-align:middle;
+}
+
+.menuMiddleItem .sb-inner {background-color:#8F7181}
+.menuMiddleItem .sb-border {background-color:#8F7181}
+.menuMiddleItemActive .sb-inner {background-color:#FFE697}
+.menuMiddleItemActive .sb-border {background-color:#C5BDC9}
+.menuMiddleItem{
+    font-weight:normal;
+    color:#FFF;
+    text-align:center;
+    width:60px;
+    float:left;
+    cursor:pointer;
+    padding:3px 7px 3px 7px;
+    height:85px;
+    vertical-align:middle;
+}
+.menuMiddleItemActive{
+    font-weight:normal;
+    color:#8A6D7C;
+    text-align:center;
+    width:60px;
+    float:left;
+    cursor:pointer;
+    padding:3px 7px 3px 7px;
+    height:85px;
+    vertical-align:middle;
+}
+.blockMenuBarMiddleItemActive {
+    /*padding:7px 5px 3px 5px;*/
+    width:120px;
+    text-align:center;
+    color:#FFF;
+    /*font-weight:bold;*/
+    cursor:pointer;
+    float:left;
+    margin-left:3px;
+    
+    position:relative;
+    top:1px;
+}
+.blockMenuBarMiddleItemActive div{
+    font-size:14px;
+    padding-bottom:2px;
+}
+
+.blockMenuBarMiddleItem {
+    /*padding:7px 5px 3px 5px;*/
+    width:120px;
+    text-align:center;
+    cursor:pointer;
+    float:left;
+    margin-left:3px;
+    /*font-weight:bold;*/
+    color:#FFF/*#8A6D7C*/;
+}
+.blockMenuBarMiddleItem div{
+    font-size:14px;
+    padding-bottom:2px;
+}
+
+.blockMenuBarChangeFont {
+    width:40px;
+    float:right;
+    cursor:pointer;
+    font-size:11px;
+}
+.blockMenuBarChangeFont div{
+    padding-bottom:2px;
+    text-align:center;
+}
+.blockMenuBarChangeFontBig {
+    font-size:14px;
+    font-weight:bold;
+    color:#8A6D7C;
+}
+.blockMenuBarChangeFontNormal {
+    font-size:11px;
+    font-weight:bold;
+    color:#8A6D7C;
+}
+.blockMenuBarChangeFontSelect{
+    color:#FFF;
+}
+
+
+#blockMenuBarInfo{
+    color:#FFF;
+    margin-bottom: 5px;
+    font-size:12px;
+}
+#blockMenuBarInfo img{
+    vertical-align:middle;  
+}
+#blockMenuBarInfoLeft{
+    float:left;
+    text-align:center;
+    width:70%;
+    font-size: 18px;
+    font-weight: bold;
+}
+#blockMenuBarInfoRight{
+    float:right;
+}
+#blockMenuBarInfoRight div{
+    float:left;
+}
+
+.blockMenuBarInfoButton {
+    padding:7px 5px 7px 5px;
+    /*width:100px;*/
+    cursor:pointer;
+    color:#FFF;
+}
+.blockMenuBarInfoButtonActive {
+    padding:7px 5px 7px 5px;
+    width:100px;
+    cursor:pointer;
+    color:#8F7181;
+}
+</style>
+<script>
+function confirmLogout(){
+   if(enableDeskTabsSave){
+       var b = mt.html.updateUserConfig(logout);
+   }else{
+       logout();
+   }
+}
+function logout(){
+    location.href = "<%= response.encodeURL(rootPath+"desk/logout.jsp") %>";
+}
+function hideMenusMiddle(){
+    $$('.menuMiddle').each(function(item){
+        Element.hide(item);
+    });
+}
+function toggleMenusMiddle(indexMenuToggle){
+    $$('.menuMiddle').each(function(item,index){
+        if(index==indexMenuToggle) Element.toggle(item);
+        else Element.hide(item);
+    });
+}
+function updateNormalFontSize(){
+    Element.addClassName($("blockMenuBarChangeFontNormal"),"blockMenuBarChangeFontSelect");
+    Element.removeClassName($("blockMenuBarChangeFontBig"),"blockMenuBarChangeFontSelect");
+    mt.css.changeDocumentSize(documentFontSizeNormal);
+}
+function updateBigFontSize(){
+    Element.addClassName($("blockMenuBarChangeFontBig"),"blockMenuBarChangeFontSelect");
+    Element.removeClassName($("blockMenuBarChangeFontNormal"),"blockMenuBarChangeFontSelect");
+    mt.css.changeDocumentSize(documentFontSizeBig);
+}
+Event.observe(window, 'load', function(){
+    var pathArray = [{name:"Tableau de bord",url:"#"},{name:"Notes de service",url:"#"}];
+    updateNavPath(pathArray);
+    
+    hideMenusMiddle();
+
+    var helpButton = document.createElement("div");
+    Element.addClassName(helpButton,"blockMenuBarInfoButton");
+    helpButton.inactiveHTML = "<img src='<%= rootPath %>images/icons/24x24/help.png' /> Aide";
+    helpButton.activeHTML = "<%= bButtonActive.getHTMLTop()%><img src='<%= rootPath %>images/icons/24x24/help.png' /> Aide<%= bButtonActive.getHTMLBottom()%>";
+    helpButton.innerHTML = helpButton.inactiveHTML;
+    $("blockMenuBarInfoRight").appendChild(helpButton);
+    
+    var profilButton = document.createElement("div");
+    Element.addClassName(profilButton,"blockMenuBarInfoButton");
+    profilButton.inactiveHTML = "<img src='<%= rootPath %>images/icons/24x24/gdm.png' /> <%= sMessageMyProfile %>";
+    profilButton.activeHTML = "<%= bButtonActive.getHTMLTop()%>"+profilButton.inactiveHTML+"<%= bButtonActive.getHTMLBottom()%>";
+    profilButton.innerHTML = profilButton.inactiveHTML;
+    profilButton.onclick = function(){
+        mt.html.addTab('Mon profil','<%=
+                        response.encodeURL(rootPath+"desk/organisation/afficherPersonnePhysique.jsp?iIdPersonnePhysique="
+                                +iIdPersonnePhysique)%>');
+    }
+    $("blockMenuBarInfoRight").appendChild(profilButton);
+    
+    var logoutButton = document.createElement("div");
+    Element.addClassName(logoutButton,"blockMenuBarInfoButton");
+    logoutButton.inactiveHTML = "<img src='<%= rootPath %>images/icons/24x24/logout.png' /> <%= sMessageLogout %>";
+    logoutButton.activeHTML = "<%= bButtonActive.getHTMLTop()%>"+logoutButton.inactiveHTML+"<%= bButtonActive.getHTMLBottom()%>";
+    logoutButton.innerHTML = logoutButton.inactiveHTML;
+    logoutButton.onclick = function(){
+        confirmLogout();
+    }
+    $("blockMenuBarInfoRight").appendChild(logoutButton);
+        
+    //logoutButton.onmouseover = helpButton.onmouseover = function(){this.innerHTML = this.activeHTML;}
+    //logoutButton.onmouseout = helpButton.onmouseout = function(){this.innerHTML = this.inactiveHTML;}
+    
+    var tabArray = new Array();
+    
+    var tab1 = document.createElement("div")
+    tab1.isActive = true;
+    tab1.title = "Tableau de Bord";
+    tabArray.push(tab1);
+    
+    var tab2 = document.createElement("div")
+    tab2.title = "Délégations";
+    tabArray.push(tab2);
+    
+    var tab3 = document.createElement("div")
+    tab3.title = "Rechercher";
+    tabArray.push(tab3);
+    
+    var tab4 = document.createElement("div")
+    tab4.title = "Circuit Perso";
+    tabArray.push(tab4);
+    
+    var tab5 = document.createElement("div")
+    tab5.title = "Administration";
+    tabArray.push(tab5);
+    
+    $A(tabArray).each(function(item,index){
+        item.inactiveHTML = "<%= bMiddleItem.getHTMLTop() %><div>"+item.title+"</div><%= bMiddleItem.getHTMLBottom() %>";
+        item.activeHTML = "<%= bMiddleItemActive.getHTMLTop() %><div>"+item.title+"</div><%= bMiddleItemActive.getHTMLBottom() %>";
+        Element.addClassName(item,"menuTab");
+        if(item.isActive){
+            Element.addClassName(item,"blockMenuBarMiddleItemActive");
+            item.innerHTML = item.activeHTML;
+        }else{
+            Element.addClassName(item,"blockMenuBarMiddleItem");
+            item.innerHTML = item.inactiveHTML;
+        }
+        item.onclick = function(){
+            $$('.blockMenuBarMiddleItemActive').each(function(itemActive){
+                Element.removeClassName(itemActive,"blockMenuBarMiddleItemActive");
+                Element.addClassName(itemActive,"blockMenuBarMiddleItem");
+                itemActive.innerHTML = itemActive.inactiveHTML;
+            });
+            Element.removeClassName(item,"blockMenuBarMiddleItem");
+            Element.addClassName(item,"blockMenuBarMiddleItemActive");
+            item.innerHTML = item.activeHTML;
+            
+            toggleMenusMiddle(index);
+            mt.html.resizeLayout();
+        }
+        $("menuTabs").appendChild(item);
+    });
+});
+</script>
+<%}%>

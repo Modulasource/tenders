@@ -1,0 +1,19 @@
+<% String sUrlAfficherCommissionMembre 
+	= rootPath 
+		+ "desk/commission/afficherCommissionMembre.jsp?iIdCommissionMembre=" 
+		+ membre.getIdCommissionMembre() ;%>
+
+<%@page import="modula.commission.MembreRole"%>
+<tr class="liste<%=j%>" 
+	onmouseover="className='liste_over'" 
+	onmouseout="className='liste<%=j%>'" 
+	onclick="Redirect('<%= response.encodeURL(sUrlAfficherCommissionMembre ) %>')">
+	<td width="45%"><%= MembreRole.getMembreRoleName(membre.getIdMembreRole()) %></td>
+	<td width="50%"><%= commission.getNom() %></td>
+	<td width="5%" align="right">
+		<a href="<%= response.encodeURL(sUrlAfficherCommissionMembre ) %>">
+		<img src="<%= rootPath + modula.graphic.Icone.ICONE_FICHIER_DEFAULT
+		%>" width="21" height="21"  alt="Afficher" /></a>
+	</td>
+</tr>
+		

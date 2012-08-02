@@ -1,0 +1,8 @@
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveAdresseTitre %></td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+	<%= hbFormulaire.getHtmlTrInput(sPaveAdresseTitre +" :","",((adresse != null)?adresse.getAllAdresseString("<br />"):""),"") %>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

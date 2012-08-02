@@ -1,0 +1,425 @@
+<%@ page import="modula.graphic.*" %>
+<%@page import="modula.marche.AvisAttribution"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.util.treeview.TreeviewTest"%>
+<%@page import="modula.algorithme.PhaseEtapes"%>
+<%@page import="modula.marche.MarchePassation"%>
+<%@page import="modula.algorithme.PhaseProcedure"%>
+<%@page import="modula.algorithme.Phase"%>
+<%@page import="modula.algorithme.Etape"%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.marche.MarcheSynchroMarco"%>
+<%@page import="modula.commission.Commission"%>
+<%@page import="modula.marche.MarcheSynchro"%>
+<%@page import="modula.marche.AvisRectificatifType"%>
+<script type="text/javascript" >
+function confirmRectification()
+{
+	return confirm("Les modifications ne doivent pas atteindre l'objet même du marché "
+			+ "et ne doivent pas être discriminatoires.\nEtes-vous sûr de vouloir rectifier votre affaire?");
+}
+</script>
+<%
+{
+	//Declaration des variables daffichage
+	String sPhase = "";
+	String sEtape = "";
+	String sProcedure = "";
+
+	boolean bIsMarco = false;
+	if(marche.getIdMarcheSynchro()==MarcheSynchro.MARCO)
+		bIsMarco = true;
+	
+	boolean bAffaireValidee = false;
+	try{bAffaireValidee = marche.isAffaireValidee();}
+	catch(Exception e){}
+	
+	boolean bIsAAPC = marche.isAffaireAAPC(false);
+	
+	boolean bIsAATR = marche.isAffaireAATR(false);
+
+	boolean bAffairePublieePublisher = false;
+	try{bAffairePublieePublisher = marche.isAffairePublieeSurPublisher();}
+	catch(Exception e){}
+	
+	boolean bIsCandidatureCloses = false;
+	try{bIsCandidatureCloses = marche.isCandidaturesCloses();}
+	catch(Exception e){}
+
+	boolean bDCEModifieApresPublication = false;
+	try{bDCEModifieApresPublication = marche.isDCEModifieApresPublication();}
+	catch(Exception e){}
+
+	boolean bCandidatsPrevenusModificationDCE = true;
+	try{bCandidatsPrevenusModificationDCE = marche.isCandidatsPrevenusModificationDCE();}
+	catch(Exception e){}
+	
+	boolean bIsDCEDisponible = false;
+	try{bIsDCEDisponible = marche.isDCEDisponible();}
+	catch(Exception e){}
+	
+	boolean bIsArchivee = false;
+	try{bIsArchivee = marche.isAffaireArchivee();}
+	catch(Exception e){}
+	
+	boolean bAffaireEnCoursDeRectification = false;
+	try	{bAffaireEnCoursDeRectification = marche.isAffaireEnCoursDeRectification();}
+	catch(Exception e){}
+	
+	boolean bAffaireAnnulee = marche.isAffaireAnnulee(false);
+	
+	boolean bIsAvisAttributionPubliePublisher = false;
+	if(bIsAATR)
+	{
+		try
+		{
+			modula.marche.AvisAttribution attrib = modula.marche.AvisAttribution.getAvisAttributionFromMarche(marche.getIdMarche());
+			bIsAvisAttributionPubliePublisher = attrib.isAATRPublieSurPublisher();
+			bAffaireEnCoursDeRectification = attrib.isAATREnCoursDeRectification();
+		}
+		catch(Exception e){}
+	}
+	
+	if(marche.getIdAlgoAffaireProcedure() > 0)
+	{
+		try
+		{
+			AffaireProcedure affProc = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure());
+			if(affProc.getId() == AffaireProcedure.AFFAIRE_PROCEDURE_INDEFINI_AAPC || affProc.getId() == AffaireProcedure.AFFAIRE_PROCEDURE_INDEFINI_AATR)
+				throw new Exception("pas de procédure définie");
+			sProcedure = MarchePassation.getMarchePassationTitreFlashMemory(affProc.getIdMarchePassation(),false);
+			PhaseEtapes oPhaseEtapes = PhaseEtapes.getPhaseEtapesMemory(marche.getIdAlgoPhaseEtapes());
+			PhaseProcedure oPhaseProcedure = PhaseProcedure.getPhaseProcedureMemory(oPhaseEtapes.getIdAlgoPhaseProcedure());
+			sPhase = Phase.getPhaseNameMemory(oPhaseProcedure.getIdAlgoPhase());
+			sEtape = Etape.getEtapeNameMemory(oPhaseEtapes.getIdAlgoEtape());
+		}
+		catch(Exception e)
+		{
+			sPhase = "En instance de création";
+			sProcedure = "Création";
+		}
+	}
+	else
+	{
+		sPhase = "En instance de création";
+		sProcedure = "Création";
+	}
+	if(sHeadTitre.compareTo("") != 0) sPhase = sHeadTitre; 
+%>
+<a name="ancreHP">&nbsp;</a>
+<div class="titre_page">Affaire Référence : <%= marche.getReference() %></div>
+<table class="menu" cellspacing="2" summary="Menu">
+	<tr>
+	<%
+		Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-48") && (marche.getIdMarche()>0) )
+		{
+			vBarBoutons.add( 
+				new BarBouton(1,
+					"Générer l'AAPC au format PDF",
+					"",
+					rootPath+"images/icones/AAPC.gif", 
+					"this.src='"+rootPath+"images/icones/AAPC_over.gif'",
+					"this.src='"+rootPath+"images/icones/AAPC.gif'",
+					"OuvrirPopup('"+response.encodeURL(rootPath 
+							+ "desk/createpdfResumeAAPCDesk?iIdMarche=" + marche.getIdMarche())+"',850,650,'menubar=no,scrollbars=yes,statusbar=no')",
+					true) );
+		}
+		
+		try
+		{
+			AvisAttribution.getAvisAttributionFromMarche(iIdAffaire);
+		
+			if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-50") )
+			{
+				vBarBoutons.add( 
+					new BarBouton(3,
+							"Générer l'AATR au format PDF",
+							"",
+							rootPath+"images/icones/AATR.gif", 
+							"this.src='"+rootPath+"images/icones/AATR_over.gif'",
+							"this.src='"+rootPath+"images/icones/AATR.gif'",
+							"OuvrirPopup('"+response.encodeURL(rootPath 
+								+ "desk/createpdfResumeAATRDesk?iIdMarche=" + marche.getIdMarche())+"',850,650,'menubar=no,scrollbars=yes,statusbar=no')",
+							true) );
+			}
+		}
+		catch(Exception e){}	
+
+			String sTitreAnnulationAffaire = "";
+			if(bAffaireValidee)
+			{
+				sTitreAnnulationAffaire = "Déclarer l'affaire sans suite";
+			}
+			else
+			{
+				sTitreAnnulationAffaire = "Supprimer l'affaire";
+			}
+			if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-32")
+			|| sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-36"))
+			{
+				vBarBoutons.add( 
+					new BarBouton(5,sTitreAnnulationAffaire,response.encodeURL(
+							rootPath + "desk/marche/algorithme/annulation/annulerAffaireForm.jsp?iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/annuler_marche.gif", 
+					"this.src='"+rootPath+"images/icones/annuler_marche_over.gif'",
+					"this.src='"+rootPath+"images/icones/annuler_marche.gif'",
+					"",
+					true) );
+			}
+		
+
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-45") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(11,
+					"Afficher les événements",
+					response.encodeURL(rootPath + "desk/journal/afficherTousEvenements.jsp?sType=1&amp;sIdObjet=" + marche.getIdMarche() 
+						+ "&amp;sReference=" + marche.getReference()),
+					rootPath+"images/icones/journal-d-evenements.gif", 
+					"this.src='"+rootPath+"images/icones/journal-d-evenements-on.gif'",
+					"this.src='"+rootPath+"images/icones/journal-d-evenements.gif'","",true) );
+		}
+	
+		
+		if(marche.isAffairePublieeSurPublisher(false) 
+		|| (marche.isAffaireAATR(false))
+		|| (!AffaireProcedure.isContainsAAPCPublicity(marche.getIdAlgoAffaireProcedure()) 
+			&& bAffaireValidee))
+		{
+			if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-44") )
+			{
+				vBarBoutons.add( 
+					new BarBouton(13,
+						"Registre",
+						response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherRegistre.jsp"
+								+ "?sAction=create"
+								+ "&iIdAffaire=" + marche.getIdMarche()),
+						rootPath+"images/icones/coffret_fort.gif", 
+						"this.src='"+rootPath+"images/icones/coffret_fort_over.gif'",
+						"this.src='"+rootPath+"images/icones/coffret_fort.gif'",
+						"",
+						true) );
+			}
+		}
+		
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-54") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(16,
+					"Suivi de l'affaire",
+					response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherProcedureAffaire.jsp?iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/affaire_en_cours.gif", 
+					"this.src='"+rootPath+"images/icones/affaire_en_cours_over.gif'",
+					"this.src='"+rootPath+"images/icones/affaire_en_cours.gif'",
+					"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+					true) );
+		}
+
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-xxx") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(16,	
+					"Suivi des mailings",
+					response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherTousMailing.jsp?iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/mailer_suivi.gif", 
+					"this.src='"+rootPath+"images/icones/mailer_suivi_over.gif'",
+					"this.src='"+rootPath+"images/icones/mailer_suivi.gif'",
+					"",
+					true) );
+		}
+
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-78") )
+		{
+			if(bAffaireValidee || sessionUserHabilitation.isSuperUser() )
+			{
+				vBarBoutons.add( 
+					new BarBouton(16,	
+						"Suivi des publications",
+						response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherToutesPublications.jsp?iIdAffaire=" + marche.getIdMarche()+"&amp;sIsProcedureLineaire=false"),
+						rootPath+"images/icones/publication_suivi.gif", 
+						"this.src='"+rootPath+"images/icones/publication_suivi_over.gif'",
+						"this.src='"+rootPath+"images/icones/publication_suivi.gif'",
+						"",
+						true) );
+			}
+		}
+	
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-FQR-001") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(16,	
+					"FQR",
+					response.encodeURL(rootPath + "desk/FQR/afficherFQR.jsp?iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/FQR.gif", 
+					"this.src='"+rootPath+"images/icones/FQR_over.gif'",
+					"this.src='"+rootPath+"images/icones/FQR.gif'",
+					"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+					true) );
+		}
+		
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-40") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(17,
+					"Statut de l'affaire",
+					response.encodeURL(rootPath + "desk/marche/algorithme/affaire/afficherStatus.jsp"
+							+ "?iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/statut_affaire.gif", 
+					"this.src='"+rootPath+"images/icones/statut_affaire_over.gif'",
+					"this.src='"+rootPath+"images/icones/statut_affaire.gif'",
+					"",
+					true) );
+		}
+		
+		if(bIsDCEDisponible && !bIsAATR 
+		&& bCandidatsPrevenusModificationDCE && !bDCEModifieApresPublication 
+		&& sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-23") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(25,
+					"Modifier le DCE",
+					response.encodeURL(rootPath + "desk/marche/algorithme/affaire/modifierDCE.jsp"
+							  + "?sAction=debuter"
+							  + "&iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/modifier_DCE.gif", 
+					"this.src='"+rootPath+"images/icones/modifier_DCE_over.gif'",
+					"this.src='"+rootPath+"images/icones/modifier_DCE.gif'",
+					"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+					true) );
+
+		}
+		if(!bAffaireEnCoursDeRectification 
+		&& ( (bIsAAPC && bAffairePublieePublisher && !bIsCandidatureCloses) 
+		|| ( bIsAATR && bIsAvisAttributionPubliePublisher && !bIsArchivee) ) 
+		&& sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-RECT-2") )
+		{
+			vBarBoutons.add( 
+				new BarBouton(25,
+					"Rectifier l'affaire",
+					response.encodeURL(rootPath + "desk/marche/algorithme/avis_rectificatif/modifierAvisRectificatif.jsp"
+							+ "?sActionRectificatif=create&"
+							+"iTypeAvisRectificatif="+(bIsAAPC?AvisRectificatifType.TYPE_AAPC:AvisRectificatifType.TYPE_AATR)+"&amp;iIdOnglet="+(bIsAAPC?Onglet.ONGLET_AFFAIRE_RECTIFICATIF:Onglet.ONGLET_ATTRIBUTION_RECTIFICATIF)+"&amp;iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/modifier_marche.gif", 
+					"this.src='"+rootPath+"images/icones/modifier_marche_over.gif'",
+					"this.src='"+rootPath+"images/icones/modifier_marche.gif'",
+					"return confirmRectification()",
+					true) );
+
+		}
+
+		
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-GED-004") )
+		{
+			vBarBoutons.add( 
+					new BarBouton(25,
+						"Générateur de documents officiels",
+						response.encodeURL(rootPath + "desk/document/afficherTousDocumentsGeneres.jsp?iIdAffaire=" + marche.getIdMarche()),
+						rootPath+"images/icones/rtf.gif", 
+						"this.src='"+rootPath+"images/icones/rtf_over.gif'",
+						"this.src='"+rootPath+"images/icones/rtf.gif'",
+						"",
+						true) );
+		}
+		
+		if( bIsMarco )
+		{
+			int iIdExportMarco = 0;
+			try{
+				iIdExportMarco = MarcheSynchroMarco.getIdExportWithIdMarche((int)marche.getId());
+			}catch(Exception e){}
+			vBarBoutons.add( 
+					new BarBouton(27,
+						"Visualiser les données importées depuis Marco",
+						response.encodeURL(rootPath 
+								+ "desk/marche/marco/afficherExportPostAnalyse.jsp?iIdExportMarco=" 
+								+ iIdExportMarco+"&iIdMarche="+marche.getId()) ,
+						rootPath+"images/icones/envoyer-marche-modifie.gif", 
+						"this.src='"+rootPath+"images/icones/envoyer-marche-modifie_over.gif'",
+						"this.src='"+rootPath+"images/icones/envoyer-marche-modifie.gif'",
+						"",
+						true) );
+		}
+
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-CDT-PAPIER-1") )
+		{
+			vBarBoutons.add( 
+					new BarBouton(25,
+						"Ajouter une candidature papier",
+						response.encodeURL(rootPath 
+								+ "desk/marche/algorithme/proposition/candidature/modifyCandidatureForm.jsp?iIdAffaire=" 
+								+ marche.getId()) ,
+						rootPath+"images/icones/add_marche.gif", 
+						"this.src='"+rootPath+"images/icones/add_marche_over.gif'",
+						"this.src='"+rootPath+"images/icones/add_marche.gif'",
+						"",
+						true) );
+		}
+
+		Commission commissionHeaderAffaire = Commission.getCommission(marche.getIdCommission());
+		vBarBoutons.add( 
+				new BarBouton(25,
+					"Ajouter une candidature papier",
+					response.encodeURL(rootPath 
+							+ "desk/organisation/afficherOrganisation.jsp?iIdOrganisation=" 
+							+ commissionHeaderAffaire.getIdOrganisation()) ,
+					rootPath+"images/icones/organisation_orange.gif", 
+					"this.src='"+rootPath+"images/icones/organisation_orange.gif'",
+					"this.src='"+rootPath+"images/icones/organisation_orange.gif'",
+					"",
+					true) );
+	
+%><%@ include file="/include/new_style/headerAffaireButtonDisplayAffaire.jspf" %><%
+		
+		// FLON : il faut voir pour toujours rendre visible l'AAPC => PB et LR
+		if(bAfficherPoursuivreProcedure)
+		{
+			if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-39") )
+			{
+				vBarBoutons.add( 
+					new BarBouton(
+						14,
+						"Continuer la procédure",
+						response.encodeURL(rootPath + "desk/marche/algorithme/affaire/poursuivreProcedure.jsp"
+								+ "?sAction=next"
+								+ "&amp;iIdAffaire=" + marche.getIdMarche()),
+						rootPath+Icone.ICONE_CONTINUER_PROCEDURE, 
+						"this.src='"+rootPath+Icone.ICONE_CONTINUER_PROCEDURE_OVER+"'",
+						"this.src='"+rootPath+Icone.ICONE_CONTINUER_PROCEDURE+"'",
+						"return isProcedureSelect("+ marche.getIdAlgoAffaireProcedure()+")",
+						true) );
+			}
+		}
+
+	
+		for(int i=0;i<vBarBoutons.size();i++)
+		{
+			BarBouton bouton = vBarBoutons.get(i);
+			if(bouton.bVisible)
+			{
+			%>
+			<%= bouton.getHtmlDesk() %>
+			<%
+			}
+		}
+	%>
+	<td>&nbsp;</td>
+	</tr>
+</table>
+<br />	
+<div style="text-align:center">
+	<object type="application/x-shockwave-flash" data="<%= rootPath + "include/swf/progression.swf"
+		%> " style="text-align:center;width:750px;height:40px" >
+ 		<param NAME="movie" VALUE="<%= rootPath + "include/swf/progression.swf" %> "> 
+ 		<param NAME="quality" VALUE="high">
+ 		<param NAME="bgcolor" VALUE="#FFFFFF"> 
+		<param NAME="flashvars" VALUE="nom_etape=<%= sProcedure 
+			+ " - " + sPhase %>&amp;num_etape=<%= 
+				TreeviewTest.convertToUTF8(""+marche.getIdAlgoPhaseEtapes()) %>">
+		<!-- java.net.URLEncoder.encode(sProcedure + " - " + sPhase,"UTF-8") -->
+ 	</object>
+</div>
+<%
+} 
+%>

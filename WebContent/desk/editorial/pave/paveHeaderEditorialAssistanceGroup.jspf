@@ -1,0 +1,32 @@
+	<table class="menu" cellspacing="2" summary="menu">
+		<tr>
+<%
+	Vector<BarBouton> vBarBoutons = new Vector<BarBouton>();
+
+	if( sessionUserHabilitation.isHabilitate(sUseCaseIdBoutonSupprimerGroupe))
+	{
+		vBarBoutons.add( 
+				new BarBouton(0,
+					"Supprimer le groupe",
+					response.encodeURL(rootPath + "desk/editorial/supprimerEditorialAssistanceGroupForm.jsp?iIdEditorialAssistanceGroup=" + group.getId()),
+					rootPath+modula.graphic.Icone.ICONE_SUPPRIMER, 
+					"this.src='"+rootPath+modula.graphic.Icone.ICONE_SUPPRIMER+"'",
+					"this.src='"+rootPath+modula.graphic.Icone.ICONE_SUPPRIMER+"'",
+					"",
+					true) );
+	}
+	
+	for(int i=0;i<vBarBoutons.size();i++)
+	{
+		BarBouton bouton = vBarBoutons.get(i);
+		if(bouton.bVisible)
+		{
+		%>
+		<%= bouton.getHtmlDesk() %>
+		<%
+		}
+	}
+%>
+			<td>&nbsp;</td>
+		</tr>
+	</table>

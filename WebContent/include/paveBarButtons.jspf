@@ -1,0 +1,12 @@
+<%@page import="modula.graphic.BarBouton"%>
+<div id="menuBorder" class="sb" style="padding:3px 10px 3px 10px;margin:0 20px 0 20px;">
+    <div class="fullWidth">
+    <%= BarBouton.getAllButtonHtmlDesk(vBarBoutons) %>
+    </div>
+</div>
+<script>
+var menuBorder = RUZEE.ShadedBorder.create({corner:4, border:1});
+Event.observe(window, 'load', function(){
+    menuBorder.render($('menuBorder'));
+});
+</script>

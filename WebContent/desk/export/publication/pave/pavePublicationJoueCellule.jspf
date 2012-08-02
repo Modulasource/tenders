@@ -1,0 +1,60 @@
+<%
+	String sPublicationTypeName = "inconnu !";
+	String sPublicationEtatName = "inconnu !";
+	String sPublicationFormat = "inconnu !";
+	try {
+		sPublicationTypeName = PublicationType.getPublicationTypeName(publi.getIdPublicationType());
+	}catch (Exception e){}
+	try {
+		sPublicationEtatName = PublicationEtat.getPublicationEtatName(publi.getIdPublicationEtat());
+	}catch (Exception e){}
+
+	
+	try {
+		if(publi.isFormatPapier()) sPublicationFormat = "Papier";
+	}catch (Exception e){}
+
+%>	
+
+<%@page import="org.coin.fr.bean.export.PublicationEtat"%>
+<%@page import="org.coin.fr.bean.export.PublicationType"%>
+<%@page import="org.coin.util.CalendarUtil"%><tr>
+	<td class="pave_cellule_gauche" style="vertical-align:middle">Publication de l'AAPC au JOUE :</td>
+	<td class="pave_cellule_droite" style="vertical-align:middle">
+		<%= sPublicationTypeName %>
+		<b>Etat :</b> <%= sPublicationEtatName %>
+		<a href="<%= response.encodeURL( 
+			rootPath + "desk/export/publication/modifierPublicationJoue.jsp?"
+			+"sAction=remove&amp;iIdPublicationJoue=" + publi.getIdPublicationJoue()
+			+"&amp;sUrlRedirect=" 
+			+ rootPath + "desk/marche/algorithme/affaire/afficherAffaire.jsp?"
+			+ "iIdAffaire="	+ marche.getIdMarche() 
+			+ "%26iIdOnglet=" + modula.graphic.Onglet.ONGLET_AFFAIRE_PLANNING)  %>" >
+		  <img src="<%=rootPath + modula.graphic.Icone.ICONE_SUPPRIMER %>"  style="vertical-align:middle"/> 
+		</a>
+
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Type de journal : </td>
+	<td class="pave_cellule_droite">
+		<b>Parution : </b><%= publi.getNumeroParution() %>
+		<b>Annonce : </b><%= publi.getNumeroAnnonce() %>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date d'envoi : </td>
+	<td class="pave_cellule_droite">
+		<%= CalendarUtil.getDateFormattee(publi.getDateEnvoi()) %>
+		<i>(Date d'envoi effective : <%= CalendarUtil.getDateFormattee(publi.getDateEnvoiEffective()) %>)</i>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date de publication : </td>
+	<td class="pave_cellule_droite"><%= CalendarUtil.getDateFormattee(publi.getDatePublication()) %> <b>Format :</b> <%= sPublicationFormat %></td>
+</tr>
+<tr>
+	<td colspan="2">&nbsp;</td>
+</tr>
+		
+		

@@ -1,0 +1,62 @@
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt"><%=sTitle %></strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth" style="width:99%">
+		<tr>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td>
+				<ul>
+					<li>
+						Lettre de candidature - Habilitation du mandataire par ses cotraitants - DC1 (ancien DC4) <br /><br />
+						<a href="http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc1.rtf" target="_blank">http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc1.rtf</a><br />
+					<br />
+					<br />
+					</li>
+					<li>
+						Déclaration du candidat individuel ou du membre du groupement - DC2 (ancien DC5) <br /><br />
+						<a href="http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc2.rtf" target="_blank">http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc2.rtf</a><br />
+					<br />
+					<br />
+					</li>
+					<li>
+						Etat annuel des certificats reçus - NOTI2 (ancien DC7) <br /><br />
+						<a href="http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/NOTI/imprimes_noti/noti2.rtf" target="_blank">http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/NOTI/imprimes_noti/noti2.rtf</a><br />
+					<br />
+					<br />
+					</li>
+					<li>
+						Acte d'engagement - DC3 (ancien DC8) <br /><br />
+						<a href="http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc3.rtf" target="_blank">http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc3.rtf</a><br />
+					<br />
+					<br />
+					</li>
+                    <li>
+                        Déclaration de sous-traitance - DC4 (ancien DC13) <br /><br />
+                        <a href="http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc4.rtf" target="_blank">http://www.economie.gouv.fr/directions_services/daj/marches_publics/formulaires/DC/imprimes_dc/dc4.rtf</a><br />
+                    <br />
+                    <br />
+                    </li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;
+			</td>
+		</tr>
+	</table>
+</div>
+</div>

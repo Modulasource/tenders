@@ -1,0 +1,8 @@
+<%
+
+	if( !sessionUserHabilitation.isHabilitate(sPageUseCaseId))
+	{
+		// response.sendRedirect(response.encodeRedirectURL(rootPath+"publisher_traitement/include/errorAdmin.jsp?idError=100&sUseCase=" + sPageUseCaseId ));
+		//return;
+	}
+%>

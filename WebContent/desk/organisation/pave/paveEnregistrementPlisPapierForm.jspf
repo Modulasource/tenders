@@ -1,0 +1,33 @@
+<%
+	String sTitreRetraitDCE = "Date de retrait du DCE* :";
+	String sTitreFormatDCE = "DCE Retiré au format : ";
+	String sTitreFormatCandidature = "Format du dossier de candidature : ";
+	if(!bIsContainsEnveloppeAManagement)
+	{
+		sTitreFormatCandidature = "Format de l'offre : ";
+	}
+
+	int iNbCols = 4;
+	Double dNbElts = new Double((vLotsTotal.size()/iNbCols) + 0.5 );
+	int iNbElts = dNbElts.intValue();
+	if (iNbElts==0) iNbElts=1;
+	
+	sFormPrefix = "";
+%>
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveEnregistrementPlisTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<%@ include file="paveEnregistrementPlisPapierDCEForm.jspf" %>
+			<%@ include file="paveEnregistrementPlisPapierCandidatureForm.jspf" %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" colspan="2">
+		* Champs obligatoires
+		</td>
+	</tr>
+	<tr><td colspan="2">&nbsp;</td></tr>
+</table>

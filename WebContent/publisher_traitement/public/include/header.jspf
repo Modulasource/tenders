@@ -1,0 +1,237 @@
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%if(Configuration.isTrueMemory("publisher.portail.removescrollbars", false)){ %>
+<style>body {overflow:hidden;}</style>
+<script>try {document.body.scroll = "no";} catch(e){}</script>
+<%} %>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.Organisation"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="java.sql.Timestamp"%>
+<%@page import="java.util.Calendar"%>
+
+<%
+	try{
+		candidat = (PersonnePhysique)session.getAttribute("candidat");
+		organisation = (Organisation)session.getAttribute("organisation");
+	}
+	catch(Exception e){}
+	
+	if (sessionUser.isLogged)
+	{
+		candidat = PersonnePhysique.getPersonnePhysique(sessionUser.getIdIndividual());
+		session.setAttribute("candidat", candidat);
+
+		organisation = Organisation.getOrganisation(candidat.getIdOrganisation());
+		session.setAttribute("organisation", organisation);
+	}	
+	
+	String sPublisherServerDatetimeName = "";
+	String sPublisherServerDatetimeOptionalName = "";
+	int iPublisherServerDatetimeOptionalOffset = 0;
+	String sPublisherServerDatetimeOptional = "";
+	String sServerOptionalDate = "";
+	Calendar calPublisherServerDatetimeOptional = null;
+	
+	try{
+		sPublisherServerDatetimeOptionalName 
+			= Configuration.getConfigurationValueMemory("publisher.server.datetime.optional.name");
+	
+		iPublisherServerDatetimeOptionalOffset 
+			= Integer.parseInt( Configuration.getConfigurationValueMemory("publisher.server.datetime.optional.offset"));
+		
+		TimeZone tzOptional = TimeZone.getDefault() ;
+		tzOptional.setRawOffset(iPublisherServerDatetimeOptionalOffset * 1000 * 3600);
+		
+		Timestamp tsCurrent = new Timestamp( System.currentTimeMillis());
+		calPublisherServerDatetimeOptional = Calendar.getInstance();
+		calPublisherServerDatetimeOptional.setTimeInMillis(tsCurrent.getTime());
+		calPublisherServerDatetimeOptional.setTimeZone(tzOptional);
+		//calPublisherServerDatetimeOptional.add(Calendar.HOUR_OF_DAY, iPublisherServerDatetimeOptionalOffset);
+		String siPublisherServerDatetimeOptionalOffset = "";
+		if(iPublisherServerDatetimeOptionalOffset >= 0)
+		{
+			siPublisherServerDatetimeOptionalOffset = "+"+iPublisherServerDatetimeOptionalOffset;
+		} else {
+			siPublisherServerDatetimeOptionalOffset = ""+iPublisherServerDatetimeOptionalOffset;
+		}
+	
+		sPublisherServerDatetimeOptional 
+			= sPublisherServerDatetimeOptionalName
+			+ " " +CalendarUtil.getDateWithFormat(calPublisherServerDatetimeOptional,"dd/MM/yyyy") 
+			+ " <span id='publisherClockTimeOptional'></span>"
+			+ " (GMT" 
+			+ siPublisherServerDatetimeOptionalOffset
+			+")";
+		
+		sServerOptionalDate = ""+ (calPublisherServerDatetimeOptional.get(Calendar.YEAR) - 1900) + "," 
+			+ calPublisherServerDatetimeOptional.get(Calendar.MONTH) + "," 
+			+ calPublisherServerDatetimeOptional.get(Calendar.DAY_OF_MONTH) + "," 
+			+ calPublisherServerDatetimeOptional.get(Calendar.HOUR_OF_DAY) + "," 
+			+ calPublisherServerDatetimeOptional.get(Calendar.SECOND) ;
+			
+	} catch(Exception e){}
+
+	
+	try{
+		sPublisherServerDatetimeName = Configuration.getConfigurationValueMemory("publisher.server.datetime.name");
+	} catch(Exception e){}
+
+	String sPublisherPortailBandeauExtra = "";
+	try {
+		Configuration confPublisherPortailBandeauExtra 
+			= Configuration.getConfigurationMemory("publisher.portail.bandeau.extra", false);
+		if("true".equals(confPublisherPortailBandeauExtra.getName()))
+		{
+			sPublisherPortailBandeauExtra = confPublisherPortailBandeauExtra.getDescription();
+			sPublisherPortailBandeauExtra = HTMLEntities.unhtmlentitiesComplete(sPublisherPortailBandeauExtra);
+		}
+	} catch(Exception e){}
+	
+	TimeZone tz = TimeZone.getDefault() ;
+
+/*
+	System.out.println("timezone " + tz.getDisplayName());
+	System.out.println("timezone id : " + tz.getID());
+	System.out.println("timezone raw offset : " + tz.getRawOffset());
+	System.out.println("AA time " + System.currentTimeMillis());
+	System.out.println("BB time " + new Timestamp(System.currentTimeMillis()));
+	System.out.println("CC time " + CalendarUtil.getDateWithFormat(new Timestamp(System.currentTimeMillis()),"dd/MM/yyyy"));
+*/
+	Timestamp tsServer = new Timestamp(System.currentTimeMillis());
+	Calendar calServer = CalendarUtil.getCalendar(tsServer);
+/*	String sServerDate = ""+ (calServer.get(Calendar.YEAR) - 1900) + "," 
+			+ calServer.get(Calendar.MONTH) + "," 
+			+ calServer.get(Calendar.DAY_OF_MONTH) + "," 
+			+ calServer.get(Calendar.HOUR_OF_DAY) + "," 
+			+ calServer.get(Calendar.MINUTE) + "," 
+			+ calServer.get(Calendar.SECOND) 
+			;
+*/
+    String sServerDate = CalendarUtil.getDateStringForJavascript(calServer);
+
+	long lOffsetBeetwenServerAndOptionalDate = 0;
+	if(calPublisherServerDatetimeOptional != null)
+	{
+		lOffsetBeetwenServerAndOptionalDate 
+			= tz.getRawOffset() - (iPublisherServerDatetimeOptionalOffset * 3600 * 1000) ;
+	}
+
+%>
+<%@page import="java.util.TimeZone"%>
+<script type="text/javascript">
+<!--
+
+var timerLocal;
+var timerServer;
+var lTimeLocalSynchro;
+var lTimeServerSynchro ;
+var lTimeOffset;
+var bUseTimeOffsetOptional = true;
+var lTimeOffsetOptional ;
+var g_dtServerTime;
+
+function updateFromLocalClock()
+{
+    var dt=new Date();
+    var dtOpt=new Date();
+    
+    dt.setTime(dt.getTime() + lTimeOffset);
+    $("publisherClockTime").innerHTML=dt.dateFormat("H:i");
+
+
+    /**
+     * test dk
+     */
+    if(bUseTimeOffsetOptional)
+    {
+   	    dtOpt.setTime( dtOpt.getTime() + lTimeOffsetOptional);
+        try{
+        	var divOpt2 = $("publisherClockTimeOptional");
+        	if(divOpt2 != null)
+        	{
+        		divOpt2.innerHTML = dtOpt.dateFormat("H:i");
+            }
+        } catch (e ) {}
+    }
+}
+
+function computeTimeOffset()
+{
+	lTimeLocalSynchro = new Date().getTime();
+	lTimeServerSynchro = <%= System.currentTimeMillis() %>;
+	
+	g_dtServerTime = new Date(<%= sServerDate %>);
+	
+	lTimeOffset = g_dtServerTime.getTime() - lTimeLocalSynchro;
+	lTimeOffsetOptional = lTimeOffset - <%= lOffsetBeetwenServerAndOptionalDate %>;	
+}
+
+Event.observe(window, 'load', function(){
+	
+	computeTimeOffset();
+	updateFromLocalClock();
+	
+	/* toutes les 30 min */
+    //timerServer=setInterval("computeTimeOffset()", 60000 * 30);
+
+	/* toutes les 10 secs */
+    timerLocal=setInterval("updateFromLocalClock()", 10000);
+
+    try {
+        var iframeHeight = Element.getHeight(document.body);
+        top.resizeIframe(iframeHeight);
+    } catch(e){}    
+
+});
+
+
+//-->
+</script>
+<%@page import="org.coin.util.HTMLEntities"%>
+<div class="wrapper">  <!-- begin wrapper -->
+<div class="bandeau"></div>
+<%= sPublisherPortailBandeauExtra %>
+
+<div class="timeOffset" style="float:left;text-align:left;padding-left:35px">
+	<%= sPublisherServerDatetimeName %>
+	<%= CalendarUtil.getDateWithFormat(new Timestamp(System.currentTimeMillis()),"dd/MM/yyyy") %>&nbsp;
+	<span id="publisherClockTime"></span>
+	<%= sPublisherServerDatetimeOptional %>
+	<% if(candidat!=null && sessionUser.isLogged){ %>
+	<br/>
+	<%= candidat.getCivilitePrenomNom() + " (" + organisation.getRaisonSociale()+")" %>, <%= candidat.getEmail() %>
+	<%} %>
+</div>
+<div class="timeOffset" style="float:right;text-align:right;padding-right:10px;">
+    <% if(candidat!=null && sessionUser.isLogged){ %>
+    <img src="<%=rootPath+"images/icons/application_home.gif" %>" class="middle"/>
+    <a href="<%= response.encodeURL(rootPath + sPublisherPath + "/private/candidat/indexCandidat.jsp") %>">Mon espace candidat</a>
+    <br/>
+    <img src="<%=rootPath+"images/delete.gif" %>" class="middle" />
+    <a href="<%= response.encodeURL(rootPath + sPublisherPath + "/logout.jsp")%>" style="color:red">déconnexion</a>
+    <%} %>     
+</div>
+<div style="clear:both"></div>
+
+
+<% /* CF #3408	*/
+	if(Configuration.isEnabledMemory("publisher.portail.annonce.searchengine.habilitation",false)){
+		out.println("<div style=\"text-align: center;font-size: 15px;font-weight: bold;margin:0 auto 8px auto;\">Espace de connexion</div>");		
+		if(!sessionUser.isLogged){ %>
+<div style="font-weight:bold;text-align:center;">Accès au DCE : identifiez-vous ou cliquez sur "Inscription pour télécharger un DCE"</div>
+<%		}
+	}%>
+<%
+if(Configuration.isTrueMemory("publisher.portail.main.menu.show",true))
+{
+%>
+<%@ include file="/publisher_traitement/public/include/menu_horizontal_v2.jsp" %>
+<%
+}
+%>
+<%@ include file="/publisher_traitement/private/include/paveHeaderLogin.jspf" %>
+<% 
+	boolean bShowLogin = true;
+	boolean bShowHotline = false;
+%>
+<%@ include file="/publisher_traitement/public/include/menuRight.jspf" %>

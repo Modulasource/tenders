@@ -1,0 +1,183 @@
+<%@ include file="../../../../include/new_style/headerPublisher.jspf" %>
+<%@ include file="../../../../publisher_traitement/public/include/beanCandidat.jspf" %> 
+<%
+//voir paveListeCandidatures.jspf
+	String sTitle = "Mes dossiers en cours";
+
+%>
+<script type="text/javascript" src="<%=rootPath %>dwr/interface/AutoFormSearchEngine.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/mt.component.js?v=<%= JavascriptVersion.MT_COMPONENT_JS %>"></script>
+<script>
+var mySearch = new mt.component.SearchEngine("search","search_dg","search_dg_pagination","infosSearchLeft","infosSearchRight","searchAdvancedFunction");
+
+mySearch.lineBackgroundBis = "#DFEBFF";
+mySearch.sIdInTable = "id_candidature";
+mySearch.sMainTable = "candidature";
+mySearch.sMainAliasTable = "cand";
+mySearch.sLabelElement = "candidature(s)";
+mySearch.bKindFemaleElement = true;
+mySearch.uniqueSort = true;
+mySearch.sSelectPart = "<%=SecureString.getSessionSecureString(
+    "mar.reference as ref,"+
+    "mar.objet as obj,"+
+    "(SELECT val.date_fin FROM validite val"+
+    " WHERE val.id_reference_objet = mar.id_marche AND val.id_type_objet_modula="+ObjectType.ENVELOPPE_B+
+    " ORDER BY val.date_fin desc LIMIT 1) as date_cloture,"+
+    "IF(proc.id_algo_affaire_procedure_type "+
+    		"IN ("+AffaireProcedureType.PROCEDURE_COMPLETE+","+AffaireProcedureType.UNE_ENV_NEGO+","+AffaireProcedureType.DEUX_ENV_NEGO+"),"+
+    		"true, false) as bIsContainsCandidatureManagement,"+
+    "IF("+BitField.getSQLQueryRequestBit("cand.candidature_status",Candidature.ID_STATUS_RETRAIT_DCE_EFFECTUE,BitField.VALUE_FALSE)+","+
+    		"true,false) as bIsDCERetire,"+
+    "IF("+BitField.getSQLQueryRequestBit("mar.affaire_status",Marche.ID_STATUS_AFFAIRE_CANDIDATURES_CLOSES, BitField.VALUE_FALSE)+","+
+            "true,false) as bIsCandidaturesCloses,"+
+    "IF("+BitField.getSQLQueryRequestBit("mar.affaire_status",Marche.ID_STATUS_AFFAIRE_OFFRES_CLOSES,BitField.VALUE_FALSE)+","+
+            "true,false) as bIsOffreCloses,"+
+    "etape.libelle as etapeName",
+    session)%>";
+
+mySearch.addOtherTable("algo_phase_etapes pe", "cand.id_algo_phase_etapes = pe.id_algo_phase_etapes",true);
+mySearch.addOtherTable("algo_etape etape", "pe.id_algo_etape = etape.id_algo_etape",true);
+mySearch.addOtherTable("marche mar", "cand.id_marche = mar.id_marche");
+mySearch.addOtherTable("algo_affaire_procedure proc", "mar.id_algo_affaire_procedure = proc.id_algo_affaire_procedure AND proc.id_algo_procedure<><%= Procedure.PROCEDURE_PETITE_ANNONCE %>");
+
+
+mySearch.addHeader("Référence",["ref"],"mar.reference");
+mySearch.addHeader("Désignation",["obj"],"mar.objet");
+mySearch.addHeader("Date de clôture",["date_cloture"],"date_cloture","desc").onPopulate = function(values, id){
+    var date = Date.parseIsoDate(values[0]);
+    return date.dateFormat("d/m/Y à H:i");
+}
+/*
+mySearch.addHeader("Statut",["bIsDCERetire","bIsCandidaturesCloses","bIsOffreCloses","etapeName"]).onPopulate = function(values, id){
+	var bIsDCERetire = values[0];
+	var bIsCandidaturesCloses = values[1];
+	var bIsOffreCloses = values[2];
+	var sEtape = values[3];
+	if(bIsDCERetire==0)
+	{
+	    sEtape = "Dossier en cours";
+	}
+	if(bIsOffreCloses==1 || bIsCandidaturesCloses==1)
+	{
+	    sEtape = "En attente de delibération";
+	}
+    
+    return sEtape;
+}
+*/
+
+mySearch.addHeader('',["<%= AutoFormSearchEngine.PARAM_NAME_ID_SECURE %>","bIsContainsCandidatureManagement"]).onPopulate = function(values, mainId) {
+  var iIdOngletRedirect = <%= Onglet.ONGLET_PETITE_ANNONCE %>;
+  if(values[1] == 0)
+      iIdOngletRedirect = <%= Onglet.ONGLET_DCE %>;
+      
+    var link = document.createElement("a");
+    link.href = "<%= response.encodeURL(rootPath + sPublisherPath+"/private/candidat/consulterDossier.jsp?")%>iIdOnglet="+iIdOngletRedirect+"&cand="+values[0];
+    link.innerHTML = "<img src=\"<%=rootPath + "images/icons/application_edit.gif"%>\" " +
+                " alt=\"Afficher\" title=\"Afficher\" />";
+
+    return link;
+}
+
+mySearch.onLoad = function(){
+    Element.hide('searchLoader');
+    if (mySearch.iTotalCountCriterias>0) Element.show('search_dg');
+}
+
+mySearch.onBeforeSearch = function(){
+    Element.hide('search_dg');
+    Element.show('searchLoader');
+    
+    mySearch.addFilter(["cand.id_personne_physique"],["<%= candidat.getIdPersonnePhysique() %>"],false);
+
+    /*
+    var statut = $('statut').value;
+    if (statut!=0) {
+        switch(statut) {
+            case "1"://Dossier en cours
+            mySearch.addFilter([""],["IF(<%= BitField.getSQLQueryRequestBit("cand.candidature_status",Candidature.ID_STATUS_RETRAIT_DCE_EFFECTUE,BitField.VALUE_FALSE) %>,true,false) = 0"],false,"FREE_UNPREVENT");
+            mySearch.addFilter([""],["IF(<%= BitField.getSQLQueryRequestBit("mar.affaire_status",Marche.ID_STATUS_AFFAIRE_CANDIDATURES_CLOSES,BitField.VALUE_FALSE) %>,true,false) != 1"],false,"FREE_UNPREVENT");
+            mySearch.addFilter([""],["IF(<%= BitField.getSQLQueryRequestBit("mar.affaire_status",Marche.ID_STATUS_AFFAIRE_OFFRES_CLOSES,BitField.VALUE_FALSE) %>,true,false) != 1"],false,"FREE_UNPREVENT");
+            break;
+            
+            case "2"://En attente de delib
+            mySearch.addFilter([""],["IF(<%= BitField.getSQLQueryRequestBit("mar.affaire_status",Marche.ID_STATUS_AFFAIRE_CANDIDATURES_CLOSES,BitField.VALUE_FALSE) %>,true,false) = 1",
+                                     "IF(<%= BitField.getSQLQueryRequestBit("mar.affaire_status",Marche.ID_STATUS_AFFAIRE_OFFRES_CLOSES,BitField.VALUE_FALSE) %>,true,false) = 1"],
+                                     false,"FREE_UNPREVENT");
+            break;
+        }
+    }
+    */
+    
+    var input = $('keyword').value;
+    if (isNotNull(input)) {
+        switch($('keywordSelect').value) {
+            case "0"://Ref
+            mySearch.addFilter(["mar.reference"],[input],true);
+            break;
+            
+            case "1"://Objet
+            mySearch.addFilter(["mar.objet"],[input],true);
+            break;
+        }
+    }
+    
+}
+
+onPageLoad = function() {
+    
+    $('keywordSelect').populate([{value:"Référence", data:0},{value:"Désignation", data:1}]);
+    //$('statut').populate([{value:"Toutes", data:0},{value:"Dossier en cours", data:1},{value:"En attente de delibération", data:2}]);
+    
+    $('keyword').focus();
+    $('searchButton').onclick = function() {mySearch.search();}
+    mySearch.search();
+}
+</script>
+</head>
+<body>
+<%@ include file="../../../../publisher_traitement/public/include/header.jspf" %>
+
+<div class="content">
+    
+	<div id="search" style="padding:15px">
+	    <div style="position:relative">
+	        <div class="searchBlock">
+	            <div style="padding:2px">
+	                <table class="formLayout">
+	                    <tr>
+	                        <td class="label"><select id="keywordSelect"></select></td>
+	                        <td class="value"><input id="keyword" type="text" /></td>
+<!-- 	                        <td class="label">Statut :</td>
+	                        <td class="value"><select id="statut"></select></td>
+ -->
+	                        <td> <button style="right:4px;bottom:4px" id="searchButton">Rechercher</button></td>
+	                    </tr>
+	                </table>
+	            </div>
+	        </div>
+	    </div>
+	    <br/>
+	    <div class="searchTitle">
+	        <div id="infosSearchLeft" style="float:left"></div>
+	        <div id="infosSearchRight" style="float:right;text-align:right;"></div>
+	        <div style="clear:both"></div>
+	    </div>
+	    <div id="searchLoader" style="text-align:center;"><img src="<%= rootPath %>images/loader_modula.gif" alt="chargement..." title="chargement..."/></div>
+	    <div id="search_dg" style="margin-top:5px;padding:2px;border:1px solid #90B8E7"></div>
+	    <div id="search_dg_pagination" style="margin-top:10px" class="center"></div>
+	    <div id="searchAdvancedFunction" style="display:none;margin-top:5px"></div>
+	</div>
+    
+</div>
+
+<%@ include file="../../../../publisher_traitement/public/include/footer.jspf"%>
+
+</body>
+<%@page import="org.coin.autoform.AutoFormSearchEngine"%>
+<%@page import="modula.graphic.Onglet"%>
+<%@page import="modula.algorithme.AffaireProcedureType"%>
+<%@page import="modula.algorithme.Procedure"%>
+<%@page import="org.coin.util.*"%>
+</html>
+

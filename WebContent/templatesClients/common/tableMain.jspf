@@ -1,0 +1,49 @@
+<%@page import="java.net.URL"%>
+<%
+    String sUrl = request.getRequestURL().toString();
+    String sRedirect = "templatesClients/antillesLegales/index.jsp?filtreType=tout&filtre=";
+    if(sUrl.contains("normandie")) {
+    	sRedirect = "templatesClients/normandieLegales/index.jsp?filtreType=tout&filtre=";
+    }
+%>
+
+<table style="width:900px;height:900px;border:0px;vertical-align:top" 
+    align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td style="width:152px;vertical-align:top" >
+        <a href="<%=rootPath + sRedirect %>">
+        <img src="images/les-annonces_01.jpg"  
+        border="0"/>
+        </a>
+    </td>
+    <td  style="width:698px;vertical-align:top" >
+        <img src="images/les-annonces_02.jpg"  border="0" />
+    </td>
+    <td style="width:200px"  rowspan="4" style="vertical-align:middle;text-align:center">
+        &nbsp;  
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style=";vertical-align:top" >
+        <img src="images/les-annonces_03.jpg" border="0" />
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="background-image:url('images/fond_header.jsp')">
+        <h1>Portail des march&eacute;s publics</h1>
+    </td>
+  </tr>
+  <tr>
+    <td style="vertical-align:top;height:1900px;">
+    <%@include file="/templatesClients/common/menu.jspf" %>
+    </td>
+    <td valign="top" colspan="2" >
+    <iframe
+        name="main" id="main" frameborder="0"
+        style="width:100%;height:3500px;text-align:left"
+        src="<%= rootPath 
+    %>publisher_portail/public/annonce/afficherAnnonces.jsp?filtreType=marche.reference&filtre=<%=sFiltre
+    %>" ></iframe>
+    </td>
+  </tr>
+</table>

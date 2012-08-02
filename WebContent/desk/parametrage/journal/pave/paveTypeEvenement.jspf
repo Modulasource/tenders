@@ -1,0 +1,66 @@
+<%
+	/*
+	* 	Nécessite les objets suivants :
+	* 	
+	*/
+	
+%>
+
+<%@page import="org.coin.bean.ObjectType"%><input type="hidden" name="iIdTypeEvenement" value="<%= oTypeEvenement.getIdTypeEvenement() %>" />
+<input type="hidden" name="sAction" value="<%= sAction %>" />
+<table class="pave" summary="none">		
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"> 
+			Type d'événement
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Libelle* :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= oTypeEvenement.getLibelle() %>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Type d'objet* :
+		</td>
+		<td class="pave_cellule_droite">
+			<%=
+				ObjectType.getLocalizedLabel(oTypeEvenement.getIdTypeObjet(),sessionLanguage.getId())
+			%>
+		</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Horodatage* :
+		</td>
+		<td class="pave_cellule_droite">
+		<%
+			String sHorodatage = "Non";
+			
+			if (oTypeEvenement.isHorodatage()){
+				sHorodatage = "Oui";
+			} 
+			%><%= sHorodatage %>
+			</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			Cas d'utilisation* :
+		</td>
+		<td class="pave_cellule_droite">
+			<%= "[" + oTypeEvenement.getIdUseCase() + "] - "
+				+ org.coin.bean.UseCase.getUseCaseNameMemory( oTypeEvenement.getIdUseCase() )
+			%>
+		
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

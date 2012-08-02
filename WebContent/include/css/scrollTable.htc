@@ -1,0 +1,72 @@
+<PUBLIC:ATTACH event="ondocumentready" handler="onDocumentReady" />
+<SCRIPT language="JScript">
+function onDocumentReady()
+{
+   // Create elements
+   var tblHeader = this.cloneNode(false);
+   var tblBody   = this.cloneNode(false);
+   var divCntr   = document.createElement('<DIV id="' + this.bs_dg_objectId + '">');
+alert(this.bs_dg_objectId);
+   // Get column widths
+   var rgWidths = new Array();
+   for (var i = 0; i < this.rows[0].cells.length; i++)
+   {
+      rgWidths[i] = this.rows[0].cells[i].offsetWidth;
+   }
+
+   // Add header row
+   var tbdyHeader = document.createElement("TBODY");
+   tblHeader.appendChild(tbdyHeader);
+   tbdyHeader.appendChild(this.rows[0].cloneNode(true));
+
+   // Add body rows
+   var tbdyBody = document.createElement("TBODY");
+   tblBody.appendChild(tbdyBody);
+   
+   for (var i = 1; i < this.rows.length; i++)
+   {
+      var oRow = this.rows[i].cloneNode(true);
+      tbdyBody.appendChild(oRow);
+   }
+
+   // Set up body container
+   divCntr.style.overflow = "auto";
+   if (this.bodyHeight) divCntr.style.height = this.bodyHeight;
+   divCntr.appendChild(tblBody);
+
+   // Change existing table
+   for (var i = this.rows.length; i > 0; i--)
+   {
+      this.rows[i-1].removeNode(true);
+   }
+   var tr1 = this.insertRow();
+   var td1 = tr1.insertCell();
+   var tr2 = this.insertRow();
+   var td2 = tr2.insertCell();
+   
+   td1.appendChild(tblHeader);
+   td2.appendChild(divCntr);
+
+   // Set column widths of all but the last column
+   for (var i = 0; i < rgWidths.length - 1; i++)
+   {
+      tblHeader.rows[0].cells[i].width = rgWidths[i];   
+      tblBody.rows[0].cells[i].width   = rgWidths[i];
+   }
+
+   tblHeader.style.fontSize    = "100%";
+   tblHeader.width             = "100%";
+   tblHeader.style.tableLayout = "fixed";
+   tblHeader.className         = this.headerCSS ? this.headerCSS : "";
+   tblHeader.border = 0;
+
+   tblBody.style.fontSize      = "100%";
+   tblBody.width               = "100%";
+   tblBody.style.tableLayout   = "fixed";
+   tblBody.className           = this.bodyCSS ? this.bodyCSS : "";
+   tblBody.border = 0;
+
+   this.cellSpacing = 0;
+   this.cellPadding = 0;
+}
+</SCRIPT>

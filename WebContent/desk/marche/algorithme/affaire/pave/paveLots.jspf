@@ -1,0 +1,49 @@
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveCreationLot<%= lot.getNumero() %>')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveDefinitionLotsTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveCreationLot<%= lot.getNumero() %>" summary="Lots">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Description succincte :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(lot.getDesignationReduite())%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Nature ou &eacute;tendue ou quantit&eacute; :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= Outils.getStringNotNullNeant(lot.getQuantite())%>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Date d'ex&eacute;cution du lot :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= CalendarUtil.getDateCourteNeant(lot.getDateExecution() ) %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Date de livraison du lot :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= CalendarUtil.getDateCourteNeant(lot.getDateLivraison() )%>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

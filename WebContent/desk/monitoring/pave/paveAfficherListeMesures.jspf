@@ -1,0 +1,74 @@
+<%@page import="org.coin.bean.perf.Mesure"%>
+<table class="pave" summary="none">
+	<tr>
+		<td>
+<table  class="liste">
+	<tr>
+		<th>date creation</th>
+		<th>utilisateur</th>
+		<th>url</th>
+		<th>adresse IP</th>
+		<th>durée (en ms)</th>
+		<th>Exception</th>
+	</tr>
+<%
+	for(int i = 0; i < vMesures.size(); i++)
+	{
+		Mesure mesure = vMesures.get(i);
+		int j = i % 2;
+		String sUrlDisplay 
+			= response.encodeURL(rootPath + "desk/monitoring/afficherMesure.jsp?iIdMesure=" + mesure.getIdMesure());
+		
+		String sException = mesure.getException();
+		if(sException == null) 
+			sException = "<img height='16' src='" + rootPath + modula.graphic.Icone.ICONE_SUCCES + "' />" ;
+		
+		sException = sException.split("\n")[0] ;
+		String sPersonneNomPrenom = "";
+		try {
+			org.coin.bean.User user = org.coin.bean.User.getUser(mesure.getIdUser() );
+			org.coin.fr.bean.PersonnePhysique personne  
+				= org.coin.fr.bean.PersonnePhysique.getPersonnePhysique(user.getIdIndividual());
+			sPersonneNomPrenom 
+				= "<a href='" 
+				+ response.encodeURL(
+					rootPath + "desk/organisation/afficherPersonnePhysique.jsp?" 
+					+ "iIdPersonnePhysique="+ personne.getIdPersonnePhysique() )
+				+ "' >" + personne.getCivilitePrenomNom() + "</a>"; 
+		}catch(Exception e) {
+			sPersonneNomPrenom = "non connecté";
+		}
+	
+ %>
+		<tr class="liste<%=j%>"
+		 	onmouseover="className='liste_over'" 
+		 	onmouseout="className='liste<%=j%>'"
+		 	onclick="Redirect('<%= sUrlDisplay %>')" >
+			<td><%= org.coin.util.CalendarUtil.getDateFormattee(mesure.getDateCreation()) %> </td>
+			<td><%= sPersonneNomPrenom %> </td>
+			<td><font style="font-size : 10px" ><%= mesure.getUrlRequested() %></font></td>
+			<td><%= mesure.getUserIp() %> </td>
+			<td><%= mesure.getDurationMillisecond() %> </td>
+			<td><%= sException.replaceAll("\n", "<br>\n") %> </td>
+		
+		<% 
+			String iIdMesurePoints = "";
+			/*Vector<MesurePoint> vMesurePoints = mesure.getMesurePoints();
+			for(int k = 0; k < vMesurePoints.size(); k++)
+			{
+				String sDelimiter = "";
+				if (vMesurePoints.size()-1 != k) sDelimiter = ", ";
+				MesurePoint mp = vMesurePoints.get(k);
+				iIdMesurePoints += 
+					"" + (int)mesure.getDeltaMillisWithInitialMesurePoint(mp) 
+					+ sDelimiter ;
+			}
+			*/
+		%>
+		</tr>
+	
+<%	} %>
+</table>
+</td>
+</tr>
+</table>

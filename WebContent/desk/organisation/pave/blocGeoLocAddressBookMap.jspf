@@ -1,0 +1,24 @@
+<%
+
+	if(bUseGeoloc  )
+	{
+		if(sessionUserHabilitation.isSuperUser() )
+		{			
+
+%>
+<table width="100%">
+<tr>
+<td >&nbsp;</td>
+<td style="text-align: center;border: 1px solid #AAA;width: 600px;height: 400px">
+<div id="map" style="width: 600px;height: 400px" class="smallmap"></div>
+<div id="mapMessage"></div>
+</td>
+<td >&nbsp;</td>
+</tr>
+</table>
+
+</div>
+<%		}
+	}
+
+%>

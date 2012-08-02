@@ -1,0 +1,98 @@
+<%
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_OBJET )
+{
+	if(sAction.equals("store") )
+	{ %><%@ include file="ongletObjetForm.jsp" %><% }
+	else 
+	{%><%@ include file="ongletObjet.jsp" %><%}
+}
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_CARACTERISTIQUES )
+{
+	if(sAction.equals("store") )
+	{ %><%@ include file="ongletCaracteristiquesPrincipalesForm.jspf" %><% }
+	else 
+	{ %><%@ include file="ongletCaracteristiquesPrincipales.jspf" %><%}
+}
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_CONDITIONS )
+{
+	if(sAction.equals("store") )
+	{ %><%@ include file="ongletConditionsForm.jspf" %><% }
+	else 
+	{ %><%@ include file="ongletConditions.jspf" %><%}
+}
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_CRITERES )
+{
+	String sPaveCritereTitre = "Critères d'attribution";
+	if(sAction.equals("store") )
+	{
+	sPageUseCaseId = "IHM-DESK-AFF-CRE-3"; 
+	%>
+	<%@ include file="../../../../include/checkHabilitationPage.jspf" %>
+	<%@ include file="ongletCriteresForm.jspf" %><% }
+	else 
+	{ %><%@ include file="ongletCriteres.jspf" %><%}
+}
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_AUTRES )
+{
+
+	if(sAction.equals("store") )
+	{ %><%@ include file="ongletAutresRenseignementsForm.jspf" %><% } 
+	else 
+	{ %><%@ include file="ongletAutresRenseignements.jspf" %><%}
+
+}
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_PLANNING)
+{
+	if(sAction.equals("store") )
+	{
+	%>
+	<jsp:include page="ongletPlaningForm.jsp" >
+			<jsp:param name="sFormPrefix" value="<%= sFormPrefix %>" />
+			<jsp:param name="sPageUseCaseId" value="<%= sPageUseCaseId %>" />
+	</jsp:include>
+	<%  }
+	else 
+	{ %>
+	<jsp:include page="ongletPlaning.jsp">
+		<jsp:param name="sFormPrefix" value="<%= sFormPrefix %>" />
+		<jsp:param name="sPageUseCaseId" value="<%= sPageUseCaseId %>" />
+	</jsp:include>
+	<%}
+}
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_LOTS )
+{
+	if(sAction.equals("store") )
+	{
+	sPageUseCaseId = "IHM-DESK-AFF-CRE-4"; 
+	%>
+	<%@ include file="../../../../include/checkHabilitationPage.jspf" %>
+	<%@ include file="ongletLotsForm.jspf" %><% }
+	else 
+	{ %><%@ include file="ongletLots.jspf" %><%}
+}
+
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_ORGANISME )
+{
+	if(sAction.equals("store") )
+	{ %><%@ include file="ongletOrganismeForm.jspf" %><% }
+	else 
+	{ %><%@ include file="ongletOrganisme.jspf" %><%}
+}
+
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_DCE )
+{
+	if(sAction.equals("store") )
+	{ %><%@ include file="ongletDCEForm.jspf" %><% }
+	else 
+	{ %><%@ include file="ongletDCE.jspf" %><%}
+}
+
+
+if( iIdOnglet == Onglet.ONGLET_AFFAIRE_EXPORT)
+{
+	if(sAction.equals("store") )
+	{ %><%@ include file="ongletExport.jspf" %><%  }
+	else 
+	{ %><%@ include file="ongletExport.jspf" %><%}  
+}
+%>

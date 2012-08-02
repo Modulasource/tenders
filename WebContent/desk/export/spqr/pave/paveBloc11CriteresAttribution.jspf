@@ -1,0 +1,106 @@
+<%
+	Node nodeCriteres = BasicDom.getChildNodeByNodeName(nodeAnn, "criteres" );
+	String sNodeCriteres = "";
+	
+	try{
+		BasicDom.getChildNodeByNodeName(nodeCriteres, "critereCDC" );
+		sNodeCriteres = "Offre économiquement la pus avantageuse appréciée en fonction des critères énoncés dans le règlement de la consultation (lettre d'invitation, cahier des charges...).";
+	} catch (Exception e) {}
+	
+	try{
+		Node nodeCritreLibre = BasicDom.getChildNodeByNodeName(nodeCriteres, "critereLibre" );
+		sNodeCriteres = "<b>pas dans le bon ordre ... à corriger</b><br/>Offre économiquement la pus avantageuse appréciée en fonction des critères énoncés par ordre de priorité décroissante ( prorite = 1 à la priorité la plus grande)<br />\n";
+
+		// Il en faut deux minimum !
+		// le premier 
+		sNodeCriteres 
+			+= nodeCritreLibre.getTextContent()
+			+ "<br />\n";
+		
+		try{
+			// le second
+			nodeCritreLibre = BasicDom.getNextSiblingElementNode(nodeCritreLibre);
+			sNodeCriteres 
+				+= nodeCritreLibre.getTextContent()
+				+ "<br />\n";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
+		while(true)
+		{
+			// les autres
+			nodeCritreLibre = BasicDom.getNextSiblingElementNode(nodeCritreLibre);
+			sNodeCriteres 
+				+= nodeCritreLibre.getTextContent()
+				+ "<br />\n";
+			
+		}
+		
+
+
+	} catch (Exception e) {}
+
+	try{
+		// Il en faut deux minimum !
+		// le premier 
+		Node nodeCritrePondere = BasicDom.getChildNodeByNodeName(nodeCriteres, "criterePondere" );
+		sNodeCriteres = "Offre économiquement la pus avantageuse appréciée en fonction des critères énoncés avec leur ponderation.<br />\n";
+		
+		sNodeCriteres 
+			+= BasicDom.getChildNodeValueByNodeName(nodeCritrePondere,"criterePCT")
+			+ " % " + BasicDom.getChildNodeValueByNodeName(nodeCritrePondere,"critere")
+			+ "<br />\n";
+		
+		try{
+			// le second
+			nodeCritrePondere = BasicDom.getNextSiblingElementNode(nodeCritrePondere);
+			sNodeCriteres 
+				+= BasicDom.getChildNodeValueByNodeName(nodeCritrePondere,"criterePCT")
+				+ " % " + BasicDom.getChildNodeValueByNodeName(nodeCritrePondere,"critere")
+				+ "<br />\n";
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+		
+		while(true)
+		{
+			// les autres
+			nodeCritrePondere = BasicDom.getNextSiblingElementNode(nodeCritrePondere);
+			sNodeCriteres 
+				+= BasicDom.getChildNodeValueByNodeName(nodeCritrePondere,"criterePCT")
+				+ " % " + BasicDom.getChildNodeValueByNodeName(nodeCritrePondere,"critere")
+				+ "<br />\n";
+			
+		}
+		
+	} catch (Exception e) {}
+
+	try{
+		BasicDom.getChildNodeByNodeName(nodeCriteres, "criterePrix" );
+		sNodeCriteres = "Offre économiquement la pus avantageuse appréciée en fonction du critère unique du prix le plus bas.";
+	} catch (Exception e) {}
+
+
+ %><table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc11')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 11 Critères d'attribution</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc11" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Offres économiquement la plus avantageuse appréciée en fonction : </td>
+				<td class="pave_cellule_droite"><%= sNodeCriteres %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>
+

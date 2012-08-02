@@ -1,0 +1,78 @@
+var searchEngineW = null;
+function getTextBetweenOptional(sText, sStart, sEnd)
+{
+   	if(sText == null ) return ""; 
+   	
+   	var iStart =  sText.indexOf(sStart);
+   	var iEnd =  sText.indexOf(sEnd, iStart);
+   	
+   	try {
+   		return sText.substring(iStart+ sStart.length, iEnd);
+   	} catch (e) {
+   		return "";
+	}
+}
+
+function openSearchEngine(){
+	// recherche dans le texte de la PA
+	var sRaisonSociale = "";
+	try {
+		var form = document.formulaire;
+		var sTexte 
+			= document.getElementById('texteLibreHtmlEditorApplet').getSource();
+
+		// TODO : à mettre dans les paramétres de l'organisme de presse.
+		sRaisonSociale = getTextBetweenOptional(sTexte,"organisme acheteur : ", "<br>");
+		
+	} catch(e){	}
+	
+	try {
+		searchEngineW = window.open('<%=response.encodeURL("rechercherAPForm.jsp?") %>sRaisonSociale=' + sRaisonSociale , 'searchEngineW', 'width=760,height=600,"menubar=no,scrollbars=no,statusbar=no"');
+		
+	} catch(e){
+	}
+	
+	searchEngineW.opener = window;
+	searchEngineW.focus();
+}
+
+var tListe1 = Array(
+<%
+	for (int i = 0; i < vOrganisations.size(); i++)
+	{
+		Organisation org = vOrganisations.get(i);
+		out.write("\t\t\t Array(" + org.getIdOrganisation() + ",\"" 
+			+ org.getRaisonSociale() + "\")");
+		
+		if (i != (vOrganisations.size() -1 ))
+			out.write(",");
+		
+		out.write("\n");
+	}
+%>
+);
+
+function remplirCommission(liste, tab){
+	var l1 = eval("document.formulaire."+liste);
+	
+	if(l1 == null) return;
+	viderTotal(l1); 
+	
+	if(tab == null) return;
+	var longueur = tab.length ;
+	for (var i=0;i < longueur ;i++)  {
+		l1.options[l1.options.length] = new Option(tab[i][1],tab[i][0],0,0);
+	}
+}
+function actualiseCommission (liste, listeValeurSelectionnee, listeSuivante, listeValeurSuivanteSelectionnee)
+{
+	var l1 = eval("document.formulaire." + liste);
+	var l2 = eval("document.formulaire." + listeSuivante);
+	
+	remplirCommission(listeSuivante, niveau2(l1.value));
+ 	selectOptionByName(listeSuivante, listeValeurSuivanteSelectionnee);
+}
+
+function changeCommission(iIdOrganisation){
+	remplirCommission("iIdCommission", niveau2(iIdOrganisation)); 
+}

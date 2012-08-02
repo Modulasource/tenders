@@ -1,0 +1,161 @@
+<%@page import="org.coin.fr.bean.OrganisationType"%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueCivilite"%>
+<%@page import="org.coin.fr.bean.PersonnePhysique"%>
+<%@page import="org.coin.fr.bean.OrganisationParametre"%>
+<script type="text/javascript">
+<!--
+function checkCreateAccount(checkBox)
+{
+
+	if(checkBox.checked){
+    	$('activation_compte').style.display = '';
+	}else{
+		$('activation_compte').style.display = 'none';
+	}
+
+}
+	
+
+<%
+	PersonnePhysiqueCivilite oPersonnePhysiqueCivilite =
+		new PersonnePhysiqueCivilite(personne.getIdPersonnePhysiqueCivilite());
+
+	oPersonnePhysiqueCivilite.setAbstractBeanLocalization(personne);
+%>
+
+//-->
+</script>
+<input type="hidden" name="sEmailAuth" id="sEmailAuth" value="" />
+<input type="hidden" name="bCheckEmail" id="bCheckEmail" value="<%= bIsEnabledLdapSync?"false":"true" %>" />
+
+<table class="pave" >
+	<tr>
+		<td class="pave_titre_gauche" colspan="2"><%= sPavePersonnePhysiqueTitre %></td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	
+	<%  %>
+	<%= hbFormulaire.getHtmlTrSelect(true,personne.getIdPersonnePhysiqueCiviliteLabel() + "* :","iIdCivilite",oPersonnePhysiqueCivilite) %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getPrenomLabel() + "* :","sPrenom",personne.getPrenom(),"",true) %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getNomLabel() + "* :","sNom",personne.getNom(),"",true) %>
+
+	<tr id="tr_infoEmail" style="display: none; visibility: hidden;">
+		<td class="pave_cellule_gauche" >&nbsp;</td>
+		<td class="pave_cellule_droite" >
+			<div class="rouge" style="text-align:left">
+			<%= sLocalizedMessageEmailAllreadyUsed %>
+			</div>
+		</td>
+	</tr>
+<%
+	if(bAuthorizeCreateUserAccount && !bIsEnabledLdapSync)
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche" >&nbsp;</td>
+		<td class="pave_cellule_droite" >
+		<%= sLocalizedMessageEmailIsMandatory %>
+		</td>
+	</tr>
+<%
+	}
+%>	
+	<%= hbFormulaire.getHtmlTrInput(
+			"Email :",
+			"sEmail",
+			personne.getEmail(),
+			"size='50' "
+			+ (bIsEnabledLdapSync?"":" onKeyUp='verifierMailGerant();' ")) %>
+
+<%
+	if(bIsEnabledLdapSync)
+	{
+		/**
+		 * add more informations
+		 */
+%>
+	<%= hbFormulaire.getHtmlTrInput(personne.getFonctionLabel() + " :",sFormPrefix + "sFonction",personne.getFonction(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getTelLabel() + " :",sFormPrefix + "sTel",personne.getTel(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getPosteLabel() + " :",sFormPrefix + "sPoste",personne.getPoste(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getFaxLabel() + " :",sFormPrefix + "sFax",personne.getFax(),"") %>
+	<%= hbFormulaire.getHtmlTrInput(personne.getTelPortableLabel() + " :",sFormPrefix + "sTelPortable",personne.getTelPortable(),"") %>
+
+<%
+		if(sSamAccountName != null)
+		{
+%>
+	<tr>
+		<td class="pave_cellule_gauche" >Sam Account Name : </td>
+		<td class="pave_cellule_droite" >
+		<input type="hidden" name="sSamAccountName" value="<%= sSamAccountName  %>" />
+		<%= sSamAccountName %>
+		</td>
+	</tr>
+
+
+
+<%
+		}
+	}
+
+	if(bAuthorizeCreateUserAccount)
+	{
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle" >
+		<input class="cbx" type="checkbox" name="createUser" id="createUser" value="1" <%= 
+			sCreateUserAccount %> onclick="javascript:checkCreateAccount(this);" />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" />
+		<span style="font-weight:bold;"><%= sLocalizedMessageCreateAccount %></span>
+		</td>
+	</tr>
+	<tr id="activation_compte" style="display: none;">
+		<td>&nbsp;</td>
+		<td class="pave_cellule_droite">
+		<%= sLocalizedMessagePasswordAutomaticalyGenerated %><br />
+			<input type="radio" name="activateUser" value="1" checked="checked" /> <%= localizeButton.getValueActivated() %>
+			<input type="radio" name="activateUser" value="0" /> <%= localizeButton.getValueDisabled() %>
+		</td>
+	</tr>
+<%
+	}
+	if(bAuthorizeCreateUserCertificate){
+	%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:middle" >
+		<input class="cbx" type="checkbox" name="createUserCertificate" id="createUserCertificate" value="1" <%= 
+			sCreateUserCertificate %> />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" />
+		<span style="font-weight:bold;"><%= sLocalizedMessageCreateCertificate %></span>
+		</td>
+	</tr>
+	<%}
+	if(bIsThemeModula
+	&& organisation.getIdOrganisationType() == OrganisationType.TYPE_ACHETEUR_PUBLIC
+	&& bIsEnabledAlertEmail)
+	{ 
+%>
+	<tr>
+		<td class="pave_cellule_gauche" style="vertical-align:top">
+		<input class="cbx" type="checkbox" name="alertMail" id="alertMail" value="1" />
+		</td>
+		<td class="pave_cellule_droite" style="vertical-align:middle" >
+			Cette personne recevra des mails d'alerte lorsqu'un candidat : 
+			<ul>
+				<li>retirera le DCE par voie électronique</li>
+				<li>déposera ses plis par voie électronique</li>
+				<li>posera une question à la rubrique FQR</li>
+			</ul>
+		</td>
+	</tr>
+<% 
+	} 
+%>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</table>

@@ -1,0 +1,23 @@
+<%
+    if(sessionUser.isLogged )
+    {
+%>
+
+              <img alt="favori" title="favori" 
+                    src="<%= rootPath + "images/icons/favorites.png" %>"
+                    id="imgSelectIdMarcheInteresting_<%= marche.getId()  %>" 
+                    style="display: none" />
+              <img alt="poubelle" title="poubelle" 
+                    src="<%= rootPath + "images/icons/trash.png" %>"  
+                    id="imgSelectIdMarcheNotInteresting_<%= marche.getId()  %>" 
+                    style="display: none"  />
+              <img alt="lu" title="lu" 
+                    src="<%= rootPath + "images/icons/eye.gif" %>"  
+                    id="imgSelectIdMarcheReaded_<%= marche.getId()  %>" 
+                    style="display: none"  />
+              <input type="checkbox" name="checkBoxSelectIdMarche" value="<%= marche.getId() 
+                 %>" class="classCheckBoxSelectIdMarche"  /> LU 
+
+<%
+    }
+%>

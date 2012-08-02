@@ -1,0 +1,143 @@
+<%
+	/*
+	 *	Objets nécessaires :
+	 *		String sPaveNomenclatureTitre;
+	 *		Marche marche;
+	 */
+
+Vector vMarcheCPVObjet = MarcheCPVObjet.getAllMarcheCPVObjetFromMarche(marche.getIdMarche());
+%>
+<%@page import="modula.marche.geo.MarcheCodeNuts"%>
+<%@page import="org.coin.bean.geo.CodeNuts"%>
+<%@page import="java.util.Vector"%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveNomenclature')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveNomenclatureTitre %></td>
+	</tr>
+	<tr>
+		<td>
+			<table id="paveNomenclature" summary="Nomenclature">
+<%
+	if(bUseBoamp17)
+	{
+		MarcheCodeNuts marcheCodeNuts = null;
+		String sCodeNuts = "Indéfini";
+
+		try {
+			marcheCodeNuts = MarcheCodeNuts.getMarcheCodeNutsFromIdMarche(marche.getId());
+			try {
+				CodeNuts codeNuts = CodeNuts.getCodeNuts(marcheCodeNuts.getIdCodeNuts());
+				sCodeNuts = codeNuts.getName() + " - " +  codeNuts.getFullname() ;
+			} catch (Exception e) {
+				// ici le code n'est pas reconnu 
+				sCodeNuts = "<span style='color:red'> code '" 
+					+ marcheCodeNuts.getIdCodeNuts() 
+					+ "' non reconnu </span>";
+			}
+		} catch (Exception e) {
+			
+		}
+		
+		
+	
+%>	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche" >Code Nuts : </td>
+		<td class="pave_cellule_droite" > 
+			<%= sCodeNuts  %>
+		<tr>
+	</tr>
+<%
+	} 
+%>	<tr><td colspan="2">&nbsp;</td></tr>
+<%
+for (int k = 0; k < vMarcheCPVObjet.size(); k++)
+{
+	MarcheCPVObjet cpv = (MarcheCPVObjet)vMarcheCPVObjet.get(k);
+	
+	/* Récupération du CPVDescripteur associé à l'objet CPV */
+	Vector vCpvDescripteurs = CPVDescripteur.getAllCPVDescripteur(cpv.getIdMarcheCpvObjet());
+	CPVDescripteur cpvDescripteur = null;
+	Vector vCpvDescripteurSupplementaires = null;
+%>
+<%
+	for (int l = 0; l < vCpvDescripteurs.size(); l++)
+	{
+		cpvDescripteur = (CPVDescripteur)vCpvDescripteurs.get(l);
+
+		/* Récupération des CPV descripteurs supplémentaires */
+		vCpvDescripteurSupplementaires = 
+			CPVDescripteurSupplementaire.getAllCPVDescripteurSupplementaireFromDescripteur(
+					cpvDescripteur.getIdCpvDescripteur());
+%>
+				<tr>
+					<td class="pave_cellule_gauche" style="font-weight:bold;text-decoration:underline;">
+					Objet <%= (cpv.getCpvType() == MarcheCPVObjet.PRINCIPAL ? "principal" : "supplémentaire") %>
+					</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Descripteur principal :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+		CPVPrincipal cpvPrinc = null;
+		try	{
+			cpvPrinc = CPVPrincipal.getCPVPrincipal(cpvDescripteur.getIdCpvPrincipal());
+	%><%= cpvPrinc.getIdString() + " - " + cpvPrinc.getName() %><%
+		} catch (Exception e) {
+			%><%= cpvDescripteur.getIdCpvPrincipal() %> - non trouvé !<%
+		}
+		
+%>
+            		
+					</td>
+				</tr>
+<%
+		if ( vCpvDescripteurSupplementaires.size() > 0)
+		{
+			for(int i = 0; i < vCpvDescripteurSupplementaires.size(); i++)
+			{
+				CPVDescripteurSupplementaire cpvDescSupp = (CPVDescripteurSupplementaire)vCpvDescripteurSupplementaires.get(i);
+				String sCPVSuppName = "";
+				try {
+					CPVSupplementaire cpvSupp = CPVSupplementaire.getCPVSupplementaire(cpvDescSupp.getName());
+					sCPVSuppName = "" + cpvSupp.getIdString() + " - " + cpvSupp.getName();
+				} catch (Exception e)
+				{
+					sCPVSuppName = "élément non trouvé '" + cpvDescSupp.getName() + "'";
+				}
+%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Descripteur suppl&eacute;mentaire :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= sCPVSuppName %>
+					</td>
+				</tr>
+<%
+			}
+		}
+%>
+<%
+	}
+%>
+<%
+}
+if(vMarcheCPVObjet.size() == 0){
+%>
+				<tr><td class="pave_cellule_gauche">Descripteurs CPV :</td><td class="pave_cellule_droite">Pas de descripteurs CPV</td></tr>
+<%
+}
+%>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>

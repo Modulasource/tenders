@@ -1,0 +1,170 @@
+<%
+	String sPublicationTypeName = "inconnu !";
+	String sPublicationEtatName = "inconnu !";
+	String sPublicationFormat = "inconnu !";
+	String sFieldPublicationType = "";
+	String sFieldPublicationEtat = "";
+	String sFieldPrefix = "id" + publi.getIdPublicationBoamp() + "_"; 
+	try {
+		sPublicationTypeName = PublicationType.getPublicationTypeName(publi.getIdPublicationType());
+	}catch (Exception e){}
+	try {
+		sPublicationEtatName = PublicationEtat.getPublicationEtatName(publi.getIdPublicationEtat());
+	}catch (Exception e){}
+
+	boolean bEnableChoicePublicationType = false;
+	boolean bEnableChoicePublicationEtat = false;
+	
+	try {
+		if(publi.isFormatPapier()) sPublicationFormat = "Papier";
+	}catch (Exception e){}
+	try {
+		if(publi.isFormatWebService()) 	sPublicationFormat = "Web Service";
+	}catch (Exception e){}
+	
+	if(!bEnableChoicePublicationType )
+	{
+		sFieldPublicationType 
+			= "<input type='hidden' name='" + sFieldPrefix + "iIdPublicationType' value='" 
+			+ publi.getIdPublicationType()  + "' />" + sPublicationTypeName;
+	}
+	else
+	{
+		sFieldPublicationType = "<select name='" + sFieldPrefix + "iIdPublicationType' >\n";
+		Vector vPublicationType = PublicationType.getAllPublicationType();
+
+		for(int i = 0; i < vPublicationType.size() ; i++)
+		{
+			String sSelected = "";
+			PublicationType publiType = (PublicationType)vPublicationType.get(i);
+			if(publi.getIdPublicationType() == publiType.getId())
+			{
+				sSelected = " selected ";
+			}
+			sFieldPublicationType +=
+				"<option value='" + publiType.getId() + "' " + sSelected + " >" 
+				+ publiType.getName() + "</option>\n";
+		}
+		
+		sFieldPublicationType += "</select>\n";
+	}
+
+	if(!bEnableChoicePublicationEtat)
+	{
+		sFieldPublicationEtat
+			= "<input type='hidden' name='" + sFieldPrefix + "iIdPublicationEtat' value='" 
+			+ publi.getIdPublicationEtat()  + "' />" + sPublicationEtatName;
+	}
+	else
+	{
+		sFieldPublicationEtat = "<select name='" + sFieldPrefix + "iIdPublicationEtat' >\n";
+		Vector vPublicationEtat = PublicationEtat.getAllPublicationEtat();
+
+		for(int i = 0; i < vPublicationEtat.size() ; i++)
+		{
+			String sSelected = "";
+			PublicationEtat publiEtat = (PublicationEtat)vPublicationEtat.get(i);
+			if(publi.getIdPublicationEtat() == publiEtat.getId())
+			{
+				sSelected = " selected ";
+			}
+			sFieldPublicationEtat +=
+				"<option value='" + publiEtat.getId() + "' " + sSelected + " >" 
+				+ publiEtat.getName() + "</option>\n";
+		}
+		
+		sFieldPublicationEtat += "</select>\n";
+	}
+
+%>	
+<tr>
+	<td class="pave_cellule_gauche">Publication de l'AAPC au BOAMP :</td>
+	<td class="pave_cellule_droite">
+		<input type="hidden" name="<%= sFieldPrefix  %>iIdTypeObjet" value="<%= publi.getIdTypeObjet() %>" />
+		<input type="hidden" name="<%= sFieldPrefix  %>iIdReferenceObjet" value="<%= publi.getIdReferenceObjet() %>" />
+		<input type="hidden" name="<%= sFieldPrefix  %>iIdExport" value="<%= publi.getIdExport() %>" />
+		<input type="hidden" name="id2_iIdExportMode" value="<%= publi.getIdExportMode() %>" />
+		<table summary="none">
+		  <tr>
+		    <td width="40%"  ><%= sFieldPublicationType  %></td>
+		    <td width="20%" class="pave_cellule_gauche">Etat : </td>
+		    <td width="40%" ><%= sFieldPublicationEtat %></td>
+		  </tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Référence : </td>
+	<td class="pave_cellule_droite">
+		<table summary="none">
+		  <tr>
+		    <td width="40%"  >
+		    	<input type="text" name="<%= sFieldPrefix %>sReferenceExterne" value="<%= publi.getReferenceExterne() %>" />
+			</td>
+		    <td width="20%" class="pave_cellule_gauche">Type de journal : </td>
+		    <td width="40%" >
+			    <input type="text" name="<%= sFieldPrefix %>sTypeJournal" value="<%= publi.getTypeJournal() %>" />
+		    </td>
+		  </tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Parution : </td>
+	<td class="pave_cellule_droite">
+		<table summary="none">
+		  <tr>
+		    <td width="40%"  >
+		    	<input type="text" name="<%= sFieldPrefix %>sNumeroParution" value="<%= publi.getNumeroParution() %>" />
+			</td>
+		    <td width="20%" class="pave_cellule_gauche">Annonce : </td>
+		    <td width="40%" >
+			    <input type="text" name="<%= sFieldPrefix %>sNumeroAnnonce" value="<%= publi.getNumeroAnnonce() %>" />
+		    </td>
+		  </tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date d'envoi : </td>
+	<td class="pave_cellule_droite">
+		<table summary="none">
+		  <tr>
+		    <td width="40%"  >
+				<input 
+					type="text" 
+					name="<%= sFieldPrefix %>tsDateEnvoi" 
+					value="<%= CalendarUtil.getDateFormattee(publi.getDateEnvoi()) %>" />
+			</td>
+		    <td width="20%" class="pave_cellule_gauche"><i>(Date d'envoi effective : </i></td>
+		    <td width="40%" >
+			    <i><%= CalendarUtil.getDateFormattee(publi.getDateEnvoiEffective()) %>)</i>
+		    </td>
+		  </tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td class="pave_cellule_gauche">Date de publication : </td>
+	<td class="pave_cellule_droite">
+		<table summary="none">
+		  <tr>
+		    <td width="40%"  >
+				<input 
+					type="text" 
+					name="<%= sFieldPrefix %>tsDatePublication" 
+					value="<%= CalendarUtil.getDateFormattee(publi.getDatePublication()) %>" /> 
+			</td>
+		    <td width="20%" class="pave_cellule_gauche">Format : </td>
+		    <td width="40%" >
+			    <%= sPublicationFormat %>
+		    </td>
+		  </tr>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td colspan="2">&nbsp;</td>
+</tr>
+		
+		

@@ -1,0 +1,58 @@
+<%@page import="modula.graphic.Icone"%>
+<%@page import="modula.algorithme.AffaireProcedure"%>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<form name="formulaire" id="formulaire" method="post" action="<%= 
+	sActionForm %>" >
+<br />
+<input type="hidden" name="iIdNextPhaseEtapes" value="<%= iIdNextPhaseEtapes %>" />
+<table class="pave" >
+<tr><td class="pave_titre_gauche" colspan="2">Validation de l'avis</td></tr>
+<tr><td colspan="2">&nbsp;</td></tr>
+<tr>
+	<td class="pave_cellule_gauche">
+		<img src="<%=rootPath + Icone.ICONE_WARNING %>" style="vertical-align:middle" alt="Warning"/>
+	</td>
+	<td class="pave_cellule_droite" style="vertical-align:middle">
+		<input id="checkbox" type="checkbox" name="valider" style="vertical-align:middle" />
+Avez-vous bien pris connaissance des informations de cet avis ?
+	</td>
+<tr><td colspan="2">&nbsp;</td></tr>
+</table>
+<br /><br />
+<%
+
+	if(iTypeProcedure == AffaireProcedure.AFFAIRE_PROCEDURE_PETITE_ANNONCE) 
+		sURLRedirect = "desk/marche/petitesAnnonces/afficherPetiteAnnonce.jsp";
+	
+	String sDisableValidationButton = "";
+	if(export != null)
+	{
+		try {
+			String bUseHiddenAccount= Configuration.getConfigurationValueMemory(
+					"boamp.test.validity.with.hidden.account.before.send.publication");
+			if(bUseHiddenAccount != null && bUseHiddenAccount.equals("true"))
+			{
+				if(!bAllowValidateAvis) sDisableValidationButton = "disabled='disabled'";
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+	
+	if(Configuration.isTrue("boamp.test.validation.unblock", false)) {
+		sDisableValidationButton = "";
+	}
+%>
+
+<div style="text-align:center">
+	<button type="button"
+		onclick="javascript:Redirect('<%=
+			response.encodeURL(rootPath 
+					+ sURLRedirect // iIdAffaire is in the url
+					) %>')" >Retour à l'avis</button>
+							&nbsp;&nbsp;
+	<button type="submit" onclick="return checkForm()" <%= sDisableValidationButton
+	   %> >Valider l'avis</button>
+</div>
+</form>

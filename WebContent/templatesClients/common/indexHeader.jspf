@@ -1,0 +1,86 @@
+
+<%@ page import="java.sql.*,modula.algorithme.*,org.coin.util.*,java.util.*,org.coin.fr.bean.*,modula.configuration.*,org.coin.bean.*" %>
+<%@page import="org.coin.bean.conf.Configuration"%>
+<%@ page import="modula.marche.*" %> 
+<%@ include file="/publisher_traitement/public/include/beanSessionUser.jspf" %>
+<%
+    boolean bSearchEngineHabilitation = Configuration.isEnabledMemory("publisher.portail.annonce.searchengine.habilitation",false); 
+	boolean bDisplaySearchEngine = HttpUtil.parseBoolean("bDisplaySearchEngine", request ,true);
+	
+	String sHeaderEncoding = "ISO-8859-1";
+	String sMetaDataDescription = "solution globale, logiciel de dématérialisation de marchés et des achats publics. Service de dématérialisation des marchés publics fourni aux acheteurs publics, collectivités teriitoriales et entreprises publiques, conformément à l'article 56 du code des marchés publics. Progiciel interfaçable avec les logiciels de gestion de marchés publics et fourni à la presse quotidienne régionale.";
+    sMetaDataDescription = Configuration.getConfigurationDescriptionMemory("design.publisher.html.metadata.description",sMetaDataDescription, false);
+    sMetaDataDescription = new String ( sMetaDataDescription.getBytes(), sHeaderEncoding );
+
+    String sFormPrefix = "";
+    boolean bLaunchSearch = HttpUtil.parseBoolean("bLaunchSearch", request,false);
+
+    String sFiltreType = "";
+    String sFiltre = "";
+    try{
+        sFiltre = request.getParameter("filtre");
+    }catch(Exception e){}
+
+    String rootPath = request.getContextPath()+"/";     
+    PersonnePhysique candidat = new PersonnePhysique();
+    
+%>
+<%@ include file="/publisher_traitement/public/annonce/pave/paveSearchEngineAnnonces.jspf"%>  
+<html>
+<head>
+<title><%=sTitle %></title>
+<META name="keywords" content="modula, dématérialisation, logiciel, progiciel, marchés publics, appels d'offre, avis d'appel public à concurrence, AAPC, avis d?attribution, AATR, annonces légales, journal annonces légales, démat, acheteur public, infrastructure à clé publique, interfaçage marco agysoft, logiciels de gestion des marchés publics, portail de dématérialisation, plate-forme de dématérialisation, procédures formalisées, mapa, procédures adaptées, e-administration, publication marché" />
+<META name="description" content="<%= sMetaDataDescription %>"/>
+<META http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<META name="robots" content="index, follow" />
+<META name="rating" content="General" />
+<META name="distribution" content="Global" />
+<META name="revisit-after" content="5 days" />
+<META name="author" content="Studio Matamore" />
+<META name="copyright" content="Studio Matamore" />
+
+<script type="text/javascript" src="<%= rootPath %>include/js/prototype.js?v=<%= JavascriptVersion.PROTOTYPE_JS %>"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/dragdrop.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/livepipe.js"></script>
+<script type="text/javascript" src="<%=rootPath %>include/js/livepipe/window.js"></script>
+<style type="text/css">
+<!--
+ 
+a{ 
+    text-decoration: none; 
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12;
+    color: #000;
+}
+
+a:hover, a:active { 
+    text-decoration: underline; 
+}
+
+h1{
+    text-transform: uppercase;
+    color:#FFF;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    padding-left: 10px;
+    vertical-align: middle;
+    padding-top:5px;
+    padding-bottom:3px;
+    margin:0;
+}
+
+#modal_container {
+ background-color:#fff;
+ border:2px solid #666;
+}
+#modal_overlay {
+ background-color:#000;
+}
+
+-->
+</style>
+
+
+
+</head>

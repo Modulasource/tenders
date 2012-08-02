@@ -1,0 +1,80 @@
+<%
+	String sAdressesCompltAdmEtTech = "";
+	String sAdressesCompltAdmOuTech = "";
+	String sAdressesCompltDocument = "";
+	String sAdressesCompltEnvoi = "";
+	Node nodeAdressesCompltTemp;
+	Node nodeAdressesComplt =  null;
+	try{
+		nodeAdressesComplt = BasicDom.getChildNodeByNodeName(nodeAnn, "adressesComplt");
+		nodeAdressesCompltTemp = BasicDom.getChildNodeByNodeName(nodeAdressesComplt, "AdmEtTech");
+		sAdressesCompltAdmEtTech = ExportXmlOrganisation.getNodeJOTypeAdresseCompleteToString(nodeAdressesCompltTemp);
+	} catch (Exception e) {	}
+
+	try{
+		nodeAdressesCompltTemp = BasicDom.getChildNodeByNodeName(nodeAdressesComplt, "AdmOuTech");
+		sAdressesCompltAdmOuTech 
+			= "Administrative : " 
+			+ ExportXmlOrganisation.
+				getNodeJOTypeAdresseCompleteToString(
+					BasicDom.getChildNodeByNodeName(nodeAdressesCompltTemp, "adm")) + "<br /><br />";
+			
+		sAdressesCompltAdmOuTech 
+			+= "Technique : " 
+			+ ExportXmlOrganisation.
+				getNodeJOTypeAdresseCompleteToString(
+					BasicDom.getChildNodeByNodeName(nodeAdressesCompltTemp, "tech"));
+	} catch (Exception e) {}
+
+	try{
+		nodeAdressesCompltTemp = BasicDom.getChildNodeByNodeName(nodeAdressesComplt, "document");
+		sAdressesCompltDocument = ExportXmlOrganisation.getNodeJOTypeAdresseCompleteToString(nodeAdressesCompltTemp);
+	} catch (Exception e) {}
+
+	try{
+		nodeAdressesCompltTemp = BasicDom.getChildNodeByNodeName(nodeAdressesComplt, "envoi");
+		sAdressesCompltEnvoi = ExportXmlOrganisation.getNodeJOTypeAdresseCompleteToString(nodeAdressesCompltTemp);
+	} catch (Exception e) {}
+
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc15')">
+		<td class="pave_titre_gauche" colspan="2">Bloc 15 Adresses complémentaires</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc15" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+<%
+	if(!sAdressesCompltAdmEtTech.equals(""))
+	{
+ %>			<tr>
+				<td class="pave_cellule_gauche">Adresse auprès de laquelle des renseignements d'ordre administratifs et techniques peuvent être obtenus :  </td>
+				<td class="pave_cellule_droite"><%= sAdressesCompltAdmEtTech %>
+				</td>
+			</tr>
+<%	} 
+	else
+	{
+%>
+			<tr>
+				<td class="pave_cellule_gauche">Adresse auprès de laquelle des renseignements d'ordre administratifs ou techniques peuvent être obtenus :  </td>
+				<td class="pave_cellule_droite"><%= sAdressesCompltAdmOuTech %>
+				</td>
+			</tr>
+<%	} %>
+			<tr>
+				<td class="pave_cellule_gauche">Adresse auprès de laquelle les documents peuvent être obtenus : </td>
+				<td class="pave_cellule_droite"><%= sAdressesCompltDocument %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Adresse à laquelle les offres/candidatures/demandes de participation doivent être envoyées : </td>
+				<td class="pave_cellule_droite"><%= sAdressesCompltEnvoi %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

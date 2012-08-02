@@ -1,0 +1,76 @@
+<%
+	/*
+	 *	Objets nécessaires :
+	 *		String sPaveGestionLotsTitre;
+	 *		Marche marche;
+	 */
+%>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveGestionLots')">
+		<td class="pave_titre_gauche" colspan="2"><%= sPaveGestionLotsTitre %></td>
+	</tr>
+	<tr>
+		<td>
+		<%
+		String sNbLots = "";
+		switch(vLots.size())
+		{
+			case 0:
+				sNbLots = "Aucun lot";
+				break;
+				
+			case 1:
+				sNbLots = "Non Alloti";
+				break;
+				
+			default:
+				sNbLots = vLots.size() + " lots";
+				break;
+		}
+		%>
+			<table id="paveGestionLots" summary="Lots">
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Division en lots :
+					</td>
+					<td class="pave_cellule_droite">
+					<%= sNbLots %>
+					</td>
+				</tr>
+<%
+	if (vLots.size() > 1){
+%>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Possibilit&eacute; de pr&eacute;senter une offre pour :
+					</td>
+					<td class="pave_cellule_droite">
+<%
+	MarchePresentationOffre presentation = 
+				MarchePresentationOffre.getMarchePresentationOffre(marche.getPresentationOffre());
+%>
+						<%= presentation.getName() %>
+					</td>
+				</tr>
+				<tr>
+					<td class="pave_cellule_gauche">
+					Nombre de lots* :
+					</td>
+					<td class="pave_cellule_droite">
+						<%= vLots.size() %>
+					</td>
+				</tr>
+<%
+	}
+%>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+<br />

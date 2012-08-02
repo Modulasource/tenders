@@ -1,0 +1,69 @@
+<%
+
+	MarcheIndexation marcheIndexation = null;
+	try {
+		marcheIndexation  =  MarcheIndexation.getMarcheIndexationFromIdMarche(marche.getId());
+	}catch (Exception e ) {
+		marcheIndexation  = new MarcheIndexation();
+	}	
+
+	Departement departement = null;
+	try {
+		departement  =  Departement.getDepartement(marcheIndexation.getCodeDepartement());
+	}catch (Exception e ) {
+		departement  = new Departement();
+	}	
+	
+	
+%>
+<%@page import="modula.editorial.EditorialAssistance"%>
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.marche.MarcheIndexation"%>
+<%@page import="org.coin.fr.bean.Departement"%>
+<%@page import="java.util.Vector"%>
+<%@page import="org.coin.util.Outils"%>
+<table class="pave"  > 
+		<tr>
+			<td class="pave_titre_gauche" colspan="2">Indexation de l'annonce</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr><td colspan="2">Les informations suivantes servent à l'indexation de votre annonce sur le site Internet.<br/>
+			L'annonce sera publiée sous le département N° ??
+		</td></tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+			* Date jusqu'à laquelle cette annonce doit être disponible sur l'espace Internet de consultation
+			de la Direction des Journaux Officiels :
+			</td>
+			<td class="pave_cellule_droite">
+  				<%= CalendarUtil.getDateCourte(marcheIndexation.getEnLigneDjo() )  %>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				* Département des travaux ou des prestations :
+			</td>
+			<td class="pave_cellule_droite">
+				<%= departement.getName() %>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				* Résumé de l'objet et du lieu du marché :
+			</td>
+			<td class="pave_cellule_droite">
+				<%= Outils.getTextToHtml( marcheIndexation.getResumeObjetEtLieu() ) %>
+			</td>
+		</tr>
+		<tr>
+			<td class="pave_cellule_gauche">
+				* Identification du service public :
+			</td>
+			<td class="pave_cellule_droite">
+			 	<%= Outils.getTextToHtml(marcheIndexation.getIdentificationServicePublic()) %>
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>

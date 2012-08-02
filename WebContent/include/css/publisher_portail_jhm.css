@@ -1,0 +1,59 @@
+a.iconeMenuTop:link, a.iconeMenuTop:visited {
+    color:#A20307;
+    text-decoration:none;
+}
+
+a.iconeMenuTop:hover, a.iconeMenuTop:active {
+    text-decoration:none;
+    color: #F60;
+}
+
+a.footerLink:link, a.footerLink:visited {
+    color:#A20307;
+    text-decoration:none;
+}
+
+a.footerLink:hover, a.footerLink:active {
+    text-decoration:none;
+    color:#F60;
+}
+
+.headerLoginLink:link, .headerLoginLink:visited {
+    color:#A20307;
+    text-decoration:none;
+}
+
+.headerLoginLink:hover, .headerLoginLink:active {
+    text-decoration:none;
+    color:#F60;
+}
+
+.textHomePage:link, .textHomePage:visited {
+    color:#A20307;
+    text-decoration:none;
+}
+
+.textHomePage:hover, .textHomePage:active {
+    color:#F60;
+    text-decoration:none;
+}
+
+button.butLogon{
+    cursor:pointer;
+    background-image:url(/modula_outremer/images/but/but_login_red.gif);
+    width:106px;
+    height:26px;
+    padding:5px 10px 6px 7px; 
+    display:block;
+    text-decoration:none;
+
+    background-color:#EEE;;
+    border:none;
+    overflow:visible;
+}
+button.butLogon:hover{
+    background-image:url(/modula_outremer/images/but/but_login_hover_red.gif);
+}
+button.butLogon:active{
+    background-image:url(/modula_outremer/images/but/but_login_red.gif);
+}

@@ -1,0 +1,18 @@
+<%@page import="modula.marche.AvisRectificatifType"%>
+<%@page import="org.coin.db.CoinDatabaseWhereClause"%>
+<%@page import="modula.marche.Marche"%>
+<%
+	int iRecherche = vRecherche.size();
+	HtmlAnnonce htmlAnnonce = new HtmlAnnonce();
+	htmlAnnonce.sJavascriptFunctionRedirect = "Redirect"; 
+
+	for (int i = 0; i < iRecherche; i++)  
+	{
+		int numAnnonce = i;
+		int nbPieces = 0;
+		Marche marche = (Marche)vRecherche.get(i);
+%>		
+    <%@ include file="paveDisplayAnnonce.jspf" %>
+<% 		
+	} // END for vRecherche
+%>

@@ -1,0 +1,95 @@
+					<%
+					for(j=0; j < node.iDepth; j++){
+						%>
+					<td width='1%' style='vertical-align:middle'>
+						<div>
+							<%
+							if(j==node.iDepth-1){
+								if(node.isHasChild() && node.isHasBrother()){
+									%>
+									<img src="<%= response.encodeURL(sTIcon)%>" />
+									<%
+								}else if(node.isHasBrother()){
+									%>
+									<img src="<%= response.encodeURL(sTIcon)%>" />
+									<%
+								}else{
+									%>
+									<img src="<%= response.encodeURL(sLIcon)%>" />
+									<%									
+								}
+							}else{
+								%>
+								<img src="<%= response.encodeURL(sIIcon)%>" />
+								<%
+							}
+							%>
+						</div>
+					</td>
+						<%
+					}
+					%>
+					<td style="width:1%;vertical-align:middle;font-weight:bold">
+					<%
+					if (node.getId()==1){
+						%>
+						<img src="<%= response.encodeURL(sRootIcon)%>" />
+						<%
+					}else if(node.isHasChild()){
+						%>
+						<img src="<%= response.encodeURL(sOpenFolderIcon)%>" />
+						<%
+					}else{
+						%>
+						<img src="<%= response.encodeURL(sFileIcon)%>" />
+						<%
+					}
+					%>
+					</td>
+					
+					<td style="width:1%;vertical-align:middle;font-weight:bold">
+					&nbsp;<%= node.getId() %>&nbsp;</td>					
+					<%
+					for(; j < 6; j++)
+					{
+						out.write("<td style='width:1%;vertical-align:middle'>&nbsp;</td>");
+					}
+					%>
+					<td style="width:45%;vertical-align:middle;font-weight:bold">
+					<%= node.sNodeLabel %>&nbsp;</td>
+					
+					<%
+					if(bShowOptions)
+					{
+					%>
+					<td style="width:1%;vertical-align:middle">
+					  
+					<input type="button" name="but_<%= node.getId() %>" id="but_<%= node.getId() %>" 
+						value="Options" 
+						onclick="openTreeviewOption('<%= node.getId() %>')" />
+					
+					<!-- 
+					<input title='<%= node.iNextSiblingNode %>' 
+					  value="<%= node.iFirstChildNode  %>" onclick='checkChainedNode(<%= node.getId() %>)'    
+					<%
+						if(!bUseHabilitations)
+							if(TreeviewParsing.isHabilitate(vHabilitation, (int)node.getId()) )
+								out.write ("checked='checked'");
+							else
+								out.write("");
+					%> 
+					type="checkbox" id="<%= node.iParentNode %>" name="node_<%= node.getId() %>" />
+					-->
+					</td>
+					
+					<% } %>
+					 
+					<td style="width:25%;vertical-align:middle;font-weight:bold">
+					<%= node.sTooltip %>&nbsp;</td>
+					<td style="width:1%;vertical-align:middle;text-align:center">
+						<%= node.sIconName %>
+					</td>
+					<td style="width:5%;vertical-align:middle;font-weight:bold">
+					<%= "(" + node.iFirstChildNode + "," + node.iNextSiblingNode + ")" %>&nbsp;</td>
+					
+					

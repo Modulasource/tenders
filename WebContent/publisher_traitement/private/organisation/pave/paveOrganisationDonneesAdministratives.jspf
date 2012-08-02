@@ -1,0 +1,47 @@
+<%@page import="org.coin.fr.bean.CodeNaf"%>
+<%@page import="org.coin.fr.bean.CategorieJuridique"%>
+<div class="post">
+    <div class="post-title">
+        <table class="fullWidth" cellpadding="0" cellspacing="0">
+        <tr>
+            <td>
+                <strong class="post-title-alt">Données administratives</strong>
+            </td>
+            <td class="right">
+                <strong style="color:#B00">&nbsp;</strong>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <br/>
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+		<%= hbFormulaire.getHtmlTrInput("Raison sociale* :","",organisation.getRaisonSociale(),"") %>
+		<% String sarrSiretDecomposition[] = organisation.getSiretDecomposition(); %>
+		<%= hbFormulaire.getHtmlTrInput("Numéro SIRET :","",sarrSiretDecomposition[0]+" "+sarrSiretDecomposition[1]+" "+sarrSiretDecomposition[2]+" "+sarrSiretDecomposition[3],"") %>
+		<%= hbFormulaire.getHtmlTrInput("Numéro Tva IntraCommunautaire :","",organisation.getTvaIntra(),"") %>
+		<%= hbFormulaire.getHtmlTrInput("Catégorie juridique :","" , CategorieJuridique.getCategorieJuridiqueNameOptional(organisation.getIdCategorieJuridique() ),"") %>
+		<%= hbFormulaire.getHtmlTrInput("Code NAF (ou APE) :","", CodeNaf.getCodeNafEtLibelleOptional(organisation.getIdCodeNaf() ),"") %>
+<%
+	if (vCompetencesOrganisation.size()>0)
+	{
+%>
+		<tr>
+			<td class="pave_cellule_gauche" style="vertical-align:top">Compétences :</td>
+			<td class="pave_cellule_droite">
+			<%
+			for (int i=0; i < vCompetencesOrganisation.size(); i++)
+			{
+			%>
+				<%=vCompetencesOrganisation.get(i).getName()%><br />
+			<%
+			}
+			%>		
+			</td>
+		</tr>
+<%
+	}
+%>
+    </table>
+    </div>
+</div>

@@ -1,0 +1,30 @@
+<%
+		if( sessionUserHabilitation.isHabilitate("IHM-DESK-AFF-41") )
+		{
+			String sRedirectPage = "";
+			try
+			{
+				// FLON : Est-ce toujours d'actualité ce flag ??
+				if(marche.isAffaireAAPC())
+				{
+					sRedirectPage = "afficherAffaire.jsp";
+				}
+				else if(marche.isAffaireAATR())
+				{
+					sRedirectPage = "afficherAttribution.jsp";
+				}
+			}
+			catch(Exception e){}
+			
+			vBarBoutons.add( 
+				new BarBouton(18,
+					"Retour à l'affaire",
+					response.encodeURL(rootPath + "desk/marche/algorithme/affaire/"+sRedirectPage
+							+"?iIdAffaire=" + marche.getIdMarche()),
+					rootPath+"images/icones/affaire.gif", 
+					"this.src='"+rootPath+"images/icones/affaire_over.gif'",
+					"this.src='"+rootPath+"images/icones/affaire.gif'",
+					"",
+					true) );
+		}
+%>

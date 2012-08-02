@@ -1,0 +1,26 @@
+<%
+	String sPersonneCivilite = "";
+	try{sPersonneCivilite = PersonnePhysiqueCivilite.getPersonnePhysiqueCiviliteName(personne.getIdPersonnePhysiqueCivilite());}
+	catch(Exception e){}
+%>
+<%@page import="org.coin.fr.bean.PersonnePhysiqueCivilite"%>
+<div class="post">
+    <div class="post-title">
+    <strong class="post-title-alt">Personne physique</strong>
+    </div>
+   <br/>
+    
+  <div class="post-footer post-block" style="margin-top:0">
+    <table class="fullWidth">
+    <%= hbFormulaire.getHtmlTrInput("Civilité* :","",sPersonneCivilite,"") %>
+	<%= hbFormulaire.getHtmlTrInput("Nom* :","",personne.getNom(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Prénom* :","",personne.getPrenom(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Fonction :","",personne.getFonction(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Nationalité :","",nationalite.getName(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Email* :","",personne.getEmail(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Tél. :","",personne.getTel(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Fax. :","",personne.getFax(),"") %>
+	<%= hbFormulaire.getHtmlTrInput("Tel. portable :","",personne.getTelPortable(),"") %>
+    </table>
+    </div>
+</div>

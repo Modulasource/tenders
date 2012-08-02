@@ -1,0 +1,14 @@
+<table summary="none">
+	<tr>
+		<td colspan="2" class="mention">Gestion du DCE</td>
+	</tr>
+	<tr>
+		<td class="pave_cellule_gauche">
+			<%= sTitreFormatDCE %>
+		</td>
+		<td class="pave_cellule_droite">
+		<%= sFormatDCE %>
+		</td> 
+	</tr>
+</table>
+<%@ include file="paveEnregistrementPlisPapierDCEDates.jspf" %>

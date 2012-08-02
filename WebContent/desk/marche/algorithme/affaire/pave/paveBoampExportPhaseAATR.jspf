@@ -1,0 +1,25 @@
+
+<%@page import="org.coin.util.CalendarUtil"%>
+<%@page import="modula.graphic.CSS"%>
+
+<table class="pave">
+    <tr>
+        <td class="pave_titre_gauche" colspan="2">Publication relative envoyée au BOAMP : AAPC </td>
+    </tr>
+    <tr><td colspan="2">
+        <input type="hidden" name="bExportBoampDefined" value="true"/> 
+        <input type="hidden" name="iIdPublication" value="<%= avisInitial.getId() %>" />
+        <input type="hidden" name="iIdPublicationEtat" value="<%= avisInitial.getIdPublicationEtat() %>" />
+        <input type="hidden" name="iIdPublicationDestinationType" value="<%= avisInitial.getIdPublicationDestinationType() %>" />
+        <input type="hidden" name="iIdTypeObjet" value="<%= avisInitial.getIdTypeObjet() %>" />
+        <input type="hidden" name="iIdReferenceObjet" value="<%= avisInitial.getIdReferenceObjet() %>" />
+        <input type="hidden" name="iIdExport" value="<%= avisInitial.getIdExport() %>" />
+        <input type="hidden" name="iIdPublicationType" value="<%= avisInitial.getIdPublicationType() %>" />
+    </td></tr>
+    <tr>
+        <td class="pave_cellule_gauche" >Identifiant de l'annonce IdWeb * :<br/>
+        </td>
+        <td class="pave_cellule_droite" ><input class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" type="text" name="sReferenceExterne" value="<%= 
+            avisInitial.getReferenceExterne() %>" /></td>
+    </tr>
+    </table>

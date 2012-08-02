@@ -1,0 +1,72 @@
+	<%@page import="java.util.Vector"%>
+<%@page import="org.coin.bean.boamp.BoampCPF"%>
+<%@page import="org.coin.bean.boamp.BoampCPFItem"%>
+<%@page import="org.coin.bean.ObjectType"%>
+
+<%@page import="org.coin.util.InfosBulles"%>
+<%@page import="modula.marche.InfosBullesConstant"%>
+<%@page import="modula.graphic.CSS"%><%@page import="org.coin.bean.conf.Configuration"%>
+<%@page import="mt.modula.affaire.cpf.CodeCpfSwitcher"%>
+<table class="pave" summary="none">
+		<tr>
+			<td class="pave_titre_gauche" colspan="2"><%= sPaveClassificationProduitsTitre %></td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr><td colspan="2" class="mention">
+			L'indication d'une classification est impérative; elle correspond à la nature de la prestation ou de la facturation recherchée.
+			<br />
+			<%= InfosBulles.getHtmlAvertissementJuridique(response, rootPath, InfosBullesConstant.CLASSIFICATION_PRODUITS) %>
+			</td>
+		</tr>
+		<% if(cpfSwitcher.isUseCPFGroup()){%>
+		<tr>
+			<td class="pave_cellule_gauche">Restreindre la liste aux classifications en relation avec les groupes de classifications de produits séléctionnées</td>
+			<td class="pave_cellule_droite"><input type="checkbox" checked="checked" name="bSynchroCPF" id="bSynchroCPF" /></td>
+		</tr>
+		<%} %>
+		<tr>
+			<td class="pave_cellule_gauche" style="font-weight:normal" colspan="2">
+				<table style="text-align:left" >
+					<tr>
+						<td style="width:45%;text-align:right">
+							<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="iIdCompetence" id="iIdCompetence" size="10" style="width:350px;" multiple="multiple">
+			                </select>
+			                <script>
+			                var select = $("iIdCompetence");
+			                mt.html.setSuperCombo(select);
+			                select.populate(<%= cpfSwitcher.getBoampCPFList() %>);
+			                </script>
+						</td>
+
+	<%
+		String sActionUpdateMotCleListFromCPF = "";
+		if(bUseFormMAPA)
+		{
+			sActionUpdateMotCleListFromCPF = "updateMotCleListFromCPF();";
+		}
+	%>						
+						
+						<td style="width:10%;text-align:center">
+							<a id="remove_CPF" href="javascript:DeplacerTous(document.formulaire.iIdCompetenceSelection,document.formulaire.iIdCompetence);<%= sActionUpdateMotCleListFromCPF %>" >
+								<img src="<%= rootPath + modula.graphic.Icone.ICONE_GAUCHE%>"  
+								alt="Enlever" /></a>
+							<a id="add_CPF" href="javascript:DeplacerTous(document.formulaire.iIdCompetence,document.formulaire.iIdCompetenceSelection);<%= sActionUpdateMotCleListFromCPF %>" >
+								<img src="<%= rootPath + modula.graphic.Icone.ICONE_DROITE%>"  
+								alt="Ajouter" /></a> 
+						</td>
+						<td style="width:45%">
+							<select class="<%= CSS.DESIGN_CSS_MANDATORY_CLASS %>" name="iIdCompetenceSelection" id="iIdCompetenceSelection" size="10" style="width:350px;" multiple="multiple" >
+		                    </select>
+		                    <script>
+                            var select = $("iIdCompetenceSelection");
+                            mt.html.setSuperCombo(select);
+                            select.populate(<%= cpfSwitcher.getBoampCPFSelectedList() %>);
+                            </script>
+							<input type="hidden" name="iIdCompetenceSelectionListe" />
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>			
+		<tr><td colspan="2">&nbsp;</td></tr>
+	</table>

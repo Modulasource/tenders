@@ -1,0 +1,95 @@
+<TABLE class="pave">
+  <TR>
+    <TD class="pave_titre_gauche" colspan="2">Dossier : <%= dossier.sNumeroDossier %> Code origine : <%= dossier.sCodeOrigine %>
+    Numéro de l'affaire : <%= dossier.sNumeroAffaire %>
+    </TD>
+  </TR>
+  <tr>
+    <td colspan="2">&nbsp;</td>
+  </tr>
+  <TR>
+	  <TD class="pave_cellule_gauche">Libellé : </TD>
+	  <TD class="pave_cellule_droite"><%= dossier.sLibelle %></TD>
+  </TR>
+<%
+	//:BUG MARCO
+%>
+  <TR>
+     <TD class="pave_cellule_gauche">Mode de passation : </TD>
+     <TD class="pave_cellule_droite"><%= dossier.sIdModePassation %></TD>
+  </TR>
+  <TR>
+     <TD class="pave_cellule_gauche">Mode de passation détail : </TD>
+     <TD class="pave_cellule_droite"><%= dossier.sIdModePassationDetail  %></TD>
+  </TR>
+  <TR>
+     <TD class="pave_cellule_gauche">Nombre de Lots : </TD>
+     <TD class="pave_cellule_droite"><%= dossier.sNombreDeLots %></TD>
+  </TR>
+  <TR>
+     <TD class="pave_cellule_gauche">Date et heure de remise de l'affaire : </TD>
+     <% String sDateRemise = "";
+     	sDateRemise = dossier.sDateDeRemiseDeLAffaire;
+     	String sHeureRemise = "";
+     	sHeureRemise = dossier.sHeureDeRemiseDeLAffaire;
+     	int taille = dossier.sHeureDeRemiseDeLAffaire.length();
+     	String sheureFormatee ="";
+     	if (taille>3){sheureFormatee = (sHeureRemise).substring(0,2) + ":" +(sHeureRemise).substring(2,taille);}
+     	Timestamp tsAAfficher = null;
+     	if((!sheureFormatee.equalsIgnoreCase("")) && (!sDateRemise.equalsIgnoreCase(""))){
+		tsAAfficher = CalendarUtil.getTimestampMarco(sDateRemise+" "+sheureFormatee);
+		}
+     %>
+     <TD class="pave_cellule_droite"><%= ((tsAAfficher != null)?"le "+CalendarUtil.getDateCourte(tsAAfficher)+" à "+sheureFormatee :"") %>
+     </TD>
+  </TR>
+  <TR>
+     <TD class="pave_cellule_gauche">Marché alloti ? : </TD>
+     <TD class="pave_cellule_droite"> <%= dossier.sMarcheSepare %></TD>
+  </TR>
+  <TR>
+     <TD class="pave_cellule_gauche">Phase de candidature ? : </TD>
+     <TD class="pave_cellule_droite"><%= dossier.sPhaseCandidature %></TD>
+  </TR>
+  <TR>
+     <TD class="pave_cellule_gauche">Date et Heure de remise de la candidature : </TD>
+     <% sDateRemise = "";
+     	sDateRemise = dossier.sDateDeRemiseDeCandidature;
+     	sHeureRemise = "";
+     	sHeureRemise = dossier.sHeureDeRemiseDeCandidature;
+     	taille = dossier.sHeureDeRemiseDeCandidature.length();
+     	sheureFormatee = "";
+     	if (taille>3){sheureFormatee = (sHeureRemise).substring(0,2) + ":" +(sHeureRemise).substring(2,taille);}
+     	tsAAfficher = null;
+      	if((!sheureFormatee.equalsIgnoreCase("")) && (!sDateRemise.equalsIgnoreCase(""))){
+     	tsAAfficher = CalendarUtil.getTimestampMarco(sDateRemise+" "+sheureFormatee);}
+     %>
+     <TD class="pave_cellule_droite"><%= ((tsAAfficher != null )?"le "+CalendarUtil.getDateCourte(tsAAfficher)+" à "+sheureFormatee :"") %>
+      </TD>
+  </TR>
+  <tr>
+	 <td colspan="2">&nbsp;</td>
+  </tr>
+</TABLE>
+<% if (dossier.lots.length>0){ %>     
+<br />
+<table class="pave" summary="none">
+	<tr>
+		<td class="pave_titre_gauche" colspan="2">Liste des lots</td>
+	</tr>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+   		 <% for (int iLots=0; iLots < dossier.lots.length ; iLots++)
+        		{ 
+					MarcoLot lot = dossier.lots[iLots]; %>
+	    <TR><td class="pave_cellule_gauche">Lot <%= lot.sNumeroLot %> : </td><td class="pave_cellule_droite"><%= lot.sLibelle %></TD></TR>
+        <% }
+        %>
+	<tr>
+		<td colspan="2">&nbsp;</td>
+	</tr>
+</TABLE>
+<%
+	}
+%>

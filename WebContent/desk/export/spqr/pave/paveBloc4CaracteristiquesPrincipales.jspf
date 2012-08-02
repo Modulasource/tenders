@@ -1,0 +1,48 @@
+<%
+	Node nodeCaracteristiques = BasicDom.getChildNodeByNodeName(nodeAnn, "caracteristiques" );
+	boolean bVariantesInterdite = false;
+	try {
+		BasicDom.getChildNodeByNodeName(nodeCaracteristiques  , "pasDeVariantes" );
+		bVariantesInterdite = true;
+	} catch (Exception e) {}
+
+ %>
+<table class="pave" summary="none">
+	<tr onclick="montrer_cacher('paveBloc4')" >
+		<td class="pave_titre_gauche" colspan="2">Bloc 4 Caractéristiques principales</td>
+	</tr>
+	<tr>
+		<td>
+		<table summary="none" id="paveBloc4" >
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td class="pave_cellule_gauche">Marché divisé en lots (valeur dynamique ? A TESTER + DEV ... )</td>
+				<td class="pave_cellule_droite">
+					<img src="<%= bVariantesInterdite?sSrcImageChecked:sSrcImageNotChecked  %>" /> Refus des variantes
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Caractéristiques principales : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeCaracteristiques, "principales") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Quantités (fournitures et services), nature et étendue (travaux) : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeCaracteristiques, "quantites") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Options (descriptions concernant les achats complémentaires) : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeCaracteristiques, "options") %>
+				</td>
+			</tr>
+			<tr>
+				<td class="pave_cellule_gauche">Calendrier des marchés ultérieurs en cas de marchés reconductibles : </td>
+				<td class="pave_cellule_droite"><%= BasicDom.getChildNodeValueByNodeNameOptional(nodeCaracteristiques, "calendrier") %>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+		</table>
+		</td>
+	</tr>
+</table>

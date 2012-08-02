@@ -1,0 +1,63 @@
+<%@page import="org.coin.fr.bean.mail.MailConstant"%>
+<%@page import="modula.candidature.EnveloppeB"%>
+<%@page import="java.util.Vector"%>
+<script type="text/javascript">
+function checkMailOffres(iMailType,afficheAlert)
+	{
+		if(afficheAlert == null) afficheAlert = true;
+		var vEnveloppesSize = 0;
+		
+		if(iMailType == <%= MailConstant.MAIL_CDT_ATTRIBUTION_MARCHE_UNIQUE %> 
+		|| iMailType == <%= MailConstant.MAIL_CDT_ATTRIBUTION_MARCHE_SEPARE %>)
+		{
+			<% Vector vEnveloppesAttribueesDefinitif = EnveloppeB.getAllEnveloppesBAttribueesDefinitifFromLotAndValidite( lot.getIdMarcheLot(), lot.getIdValiditeEnveloppeBCourante() ); %>
+			vEnveloppesSize = <%= vEnveloppesAttribueesDefinitif.size() %>;
+		}
+		else if(iMailType == <%= MailConstant.MAIL_CDT_REJET_OFFRE_UNIQUE %> 
+		|| iMailType == <%= MailConstant.MAIL_CDT_REJET_OFFRE_SEPARE %>)
+		{
+			<% 
+			Vector vEnveloppesRejetees = new Vector();
+			boolean bIsEnNegociation = lot.isEnCoursDeNegociation(false);
+			
+			if(!bIsEnNegociation)
+				vEnveloppesRejetees = EnveloppeB.getAllEnveloppesBRetenuesAndNonAttribueesFromLotAndValidite(lot.getIdMarcheLot(),lot.getIdValiditeEnveloppeBCourante());
+			else
+				vEnveloppesRejetees = EnveloppeB.getAllEnveloppesBConformesAndNonRetenuesFromLotAndValidite(lot.getIdMarcheLot(),lot.getIdValiditeEnveloppeBCourante()); 
+			%>
+			vEnveloppesSize = <%= vEnveloppesRejetees.size() %>;
+		}
+		else if(iMailType == <%= MailConstant.MAIL_CDT_JUSTIFICATIF_UNIQUE %>
+		 || iMailType == <%= MailConstant.MAIL_CDT_JUSTIFICATIF_SEPARE %>)
+		{
+			<% Vector vEnveloppesAttribuees = EnveloppeB.getAllEnveloppesBAttribueesFromLotAndValidite(lot.getIdMarcheLot(),lot.getIdValiditeEnveloppeBCourante()); %>
+			vEnveloppesSize = <%= vEnveloppesAttribuees.size() %>;
+		}
+		else if(iMailType == <%= MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_UNIQUE %> 
+		|| iMailType == <%= MailConstant.MAIL_CDT_REJET_OFFRE_CONFORMITE_SEPARE %>)	
+		{
+			<% 
+			Vector vEnveloppesNonConformes = EnveloppeB.getAllEnveloppesBNonConformesFromLotAndValidite(lot.getIdMarcheLot(),lot.getIdValiditeEnveloppeBCourante());
+			Vector vEnveloppesNonConformesNonNotifiees = new Vector();
+			for(int i=0;i<vEnveloppesNonConformes.size();i++)
+			{
+				EnveloppeB oEnveloppeB = (EnveloppeB)vEnveloppesNonConformes.get(i);
+				boolean bNotifieNonConforme = oEnveloppeB.isNotifieNonConforme(false);
+				if(!bNotifieNonConforme) vEnveloppesNonConformesNonNotifiees.add(oEnveloppeB);
+			}
+			%>
+			vEnveloppesSize = <%= vEnveloppesNonConformesNonNotifiees.size() %>;
+		}
+	
+		if(vEnveloppesSize == 0)
+		{
+			if(afficheAlert) alert("Tous les candidats ont déja été notifiés");
+			return false;
+		}
+		else
+		{	
+			if(afficheAlert) alert("Seuls les candidats qui n'ont pas encore été notifiés seront avertis");
+			return true;
+		}	
+	}
+</script>

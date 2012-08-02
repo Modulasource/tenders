@@ -1,0 +1,346 @@
+function checkForm()
+{
+	var form = document.formulaire;
+
+	
+	var item = form.elements["" + "iIdOrganisation"];
+	if (item.value=="-1")
+	{
+		alert("Veuillez renseigner l'acheteur public");
+		item.focus();
+        return false;
+	}
+
+	item = form.elements["" + "iIdCommission"];
+	if (item.value=="")
+	{
+		alert("Veuillez renseigner la commission");
+		item.focus();
+        return false;
+	}
+
+	if (!checkObjet(form, ""))
+		return false;
+	
+	var typeAnnonce = form.elements[""+"sPetiteAnnonceType"];
+	if(!typeAnnonce[2].checked){
+		item = form.elements["" + "iIdMarcheType"];
+		if (item.value=="")
+		{
+			alert("Veuillez renseigner le type de marché");
+			item.focus();
+	        return false;
+		}
+	
+		item = form.elements["" + "idTypeDetaille"];
+		if (item.value=="")
+		{
+			alert("Veuillez renseigner le type prestations");
+			item.focus();
+	        return false;
+		}
+	
+		item = form.elements["" + "iIdMarchePassation"];
+		if (item.value=="")
+		{
+			alert("Veuillez renseigner le mode de passation");
+			item.focus();
+	        return false;
+		}
+	}
+
+    item = form.elements["" + "iIdSecteurActivite"];
+    if (item.value=="")
+    {
+        alert("Veuillez renseigner le secteur d'activité");
+        item.focus();
+        return false;
+    }
+
+	item = form.elements[""+"tsDateValiditeDebut"];
+	if (!isNull(item.value))
+	{
+		if (!checkDate(item.value))
+		{
+			alert("La date n'est pas au format jj/mm/aaaa .");
+			item.focus();
+	        return false;
+		}
+		item = form.elements['tsHeureValiditeDebut'];
+		if (!checkHourMinute(item))
+		{
+			alert("L'heure n'est pas au format hh:mm.");
+			item.focus();
+	        return false;
+		}
+	}
+	else{
+		alert("Veuillez renseigner la date de mise en ligne sur le site Internet.");
+		item.focus();
+        return false;
+	}
+	
+	item = form.elements[""+"tsDateValiditeFin"];
+	if (!isNull(item.value))
+	{
+		if (!checkDate(item.value))
+		{
+			alert("La date n'est pas au format jj/mm/aaaa .");
+			item.focus();
+	        return false;
+		}
+		item = form.elements['tsHeureValiditeFin'];
+		if (!checkHourMinute(item))
+		{
+			alert("L'heure n'est pas au format hh:mm.");
+			item.focus();
+	        return false;
+		}
+	}
+	else{
+		alert("Veuillez renseigner la date limite d'affichage.");
+		item.focus();
+        return false;
+	}
+	
+	var d1 = form.elements['tsDateValiditeDebut'].value;
+	var h1 = form.elements['tsHeureValiditeDebut'].value;
+	var d2 = form.elements['tsDateValiditeFin'].value;
+	var h2 = form.elements['tsHeureValiditeFin'].value;
+	if (!comparerDateComplete(d1,h1,d2,h2))
+	{
+		alert("La date limite d'affichage doit être postérieure à la date de mise en ligne");
+		item.focus();
+	    return false;					  
+	}
+	
+	return true;
+}
+
+function checkBeforeValidate () {
+	if(isNull(<%=marche.getIdCommission()%>)){
+		alert("Veuillez sélectionner la commission passant la petite annonce.");
+       return false;
+	}
+	
+	if(isNull("<%=marche.getReference() %>")){
+		alert("Veuillez renseigner la référence de la petite annonce.");
+       return false;
+	}
+
+	if(isNull("<%= org.coin.util.Outils.getStringForJavascriptFonction(marche.getObjet())%>")){
+		alert("Veuillez renseigner l'objet de la petite annonce.");
+       return false;
+	}
+	
+	if(isNull("<%=marche.getIdMarcheType()%>")){
+		alert("Veuillez renseigner le type de marché.");
+       return false;
+	}
+	
+	
+	<%
+	{
+		Vector<Validite> vValiditesAnnonce = Validite.getAllValiditeAffaireFromAffaire(marche.getIdMarche());
+		Validite oValiditeAnnonce = null;
+		Timestamp tsDateAnnonceDebut = null;
+		Timestamp tsDateAnnonceFin = null;
+		if(vValiditesAnnonce != null)
+		{
+			if(vValiditesAnnonce.size() == 1) 
+			{
+				oValiditeAnnonce = vValiditesAnnonce.firstElement();
+				tsDateAnnonceDebut = oValiditeAnnonce.getDateDebut();
+				tsDateAnnonceFin = oValiditeAnnonce.getDateFin();
+			}
+		}
+	%>
+	if(isNull("<%=tsDateAnnonceDebut%>")){
+	alert("Veuillez une date de mise en ligne sur le site Internet."); 
+    return false;
+	}
+	if(isNull("<%=tsDateAnnonceDebut%>")){
+	alert("Veuillez une date fin d'affichage sur le site Internet.");
+    return false;
+	}
+	<%
+	}
+	%>
+return true;
+}
+
+function onAfterPageLoading()
+{
+	MarcheType_init1();
+	MarcheType_selectionnerOption2NiveauxId('iIdMarcheType', "<%= oMarcheType.getIdCodeType() %>", 'idTypeDetaille', "<%= oMarcheType.getIdType() %>");
+}
+
+
+function updateBeforeOpenPJ()
+{
+	var form = document.formulaire;
+	form.submit();
+	
+	showModalFrame("Pièce jointe", '<%=response.encodeURL(
+			rootPath + "desk/marche/petitesAnnonces/uploadPieceJointeForm.jsp"
+			+ "?iIdAffaire=" + marche.getId()
+			)%>',500,400);
+ /*
+ 	OuvrirPopup('<%=response.encodeURL("uploadPieceJointeForm.jsp?iIdAffaire=" + marche.getId()
+			)%>',400,300,'menubar=no,scrollbars=yes,statusbar=no');
+ */
+}
+
+
+function isProcedureSelect(iIdProcedure){
+	if(iIdProcedure == 0)
+	{
+		alert("Vous devez sélectionner une procédure!");
+		return false ;
+	}
+	else
+		return true ;
+}
+function removeAffaire()
+{
+	return confirm("Vous allez supprimer définitivement la petite annonce. Etes vous sûr(e)?");
+}
+
+<% 
+if(sAction.equals("store") ) 
+{
+%>	
+/******** Fonctions de raffraichissement de la liste des commissions ***********/
+function chargerCommissionSelect(sReponse){
+	var aReponseLibelle = new Array();
+	var aReponseId = new Array();
+	var aReponseObj = new Array();
+	eval(sReponse);
+	var l1 = document.getElementById("iIdCommission");
+	for (var i=0;i<aReponseId.length;i++){
+		l1.options[i] = new Option(aReponseLibelle[i], aReponseId[i],0,0);
+	}
+}
+
+function viderCommissionSelect(){
+	var l1 = document.getElementById("iIdCommission");
+   	l1.options.length = 0;
+}
+
+function getCommission(iIdOrganisation){
+	// Ajax ///
+	var HttpObj = null;
+	if (window.XMLHttpRequest) {
+		HttpObj = new XMLHttpRequest();
+	}else if (window.ActiveXObject) {
+		HttpObj = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	viderCommissionSelect();
+	
+	var sURL = "desk/GetListeForAjaxComboList";	// URL par d?faut
+	var sRootPath = "<%= rootPath %>";
+	var sSessionId = ";jsessionid=<%= session.getId() %>";
+	try{
+		// on pr?pare l'envoi avec l'url donn?e
+		var sU = "sAction="+escape("getCommission");
+		sU += "&sChamp="+escape(iIdOrganisation);
+		HttpObj.open("POST", sRootPath+sURL+sSessionId);
+
+		// fonction ex?cut?e lorsque le traitement est termin?
+		HttpObj.onreadystatechange = function(){
+			if (HttpObj.readyState == 4) {
+				var sReponse = HttpObj.responseText;
+				if (sReponse.length>0){
+					viderCommissionSelect();
+					chargerCommissionSelect(sReponse);
+				}else{
+					viderCommissionSelect();
+				}
+			}else{
+			}
+		}
+		HttpObj.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		HttpObj.send(sU);
+	} catch (e){alert("Erreur > getCommission :\n\n"+e);}
+}
+function remplirCommission(){
+	var iIdOrganisation = parseInt(document.getElementById("iIdOrganisation").value,10);
+	if (iIdOrganisation>0){
+		getCommission(iIdOrganisation);
+	}
+}
+
+function initialiserCommissionSelect(iIdOrganisation, iIdCommission){
+ // Ajax ///
+ var HttpObj = null;
+ if (window.XMLHttpRequest) {
+  HttpObj = new XMLHttpRequest();
+ }else if (window.ActiveXObject) {
+  HttpObj = new ActiveXObject("Microsoft.XMLHTTP");
+ }
+ viderCommissionSelect();
+ 
+ var sURL = "desk/GetListeForAjaxComboList"; // URL par d?faut
+ var sRootPath = "<%= rootPath %>";
+ var sSessionId = ";jsessionid=<%= session.getId() %>";
+ try{
+  // on pr?pare l'envoi avec l'url donn?e
+  var sU = "sAction="+escape("getCommission");
+  sU += "&sChamp="+escape(iIdOrganisation);
+  HttpObj.open("POST", sRootPath+sURL+sSessionId);
+
+  // fonction ex?cut?e lorsque le traitement est termin?
+  HttpObj.onreadystatechange = function(){
+   if (HttpObj.readyState == 4) {
+    var sReponse = HttpObj.responseText;
+    if (sReponse.length>0){
+     viderCommissionSelect();
+     var aReponseLibelle = new Array();
+     var aReponseId = new Array();
+	 var aReponseObj = new Array();
+     eval(sReponse);
+     var l1 = document.getElementById("iIdCommission");
+     for (var i=0;i<aReponseId.length;i++){
+      if (iIdCommission==aReponseId[i]){
+        // le 1 en 3ème paramètre permet de sélectionner par défaut
+       l1.options[i] = new Option(aReponseLibelle[i], aReponseId[i],1,0);
+      }else{
+       l1.options[i] = new Option(aReponseLibelle[i], aReponseId[i],0,0);
+      }
+     }
+    }else{
+     viderCommissionSelect();
+    }
+   }else{
+   }
+  }
+  HttpObj.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+  HttpObj.send(sU);
+ } catch (e){alert("Erreur > initialiserCommissionSelect :\n\n"+e);}
+}
+/******** FIN Fonctions de raffraichissement de la liste des commissions ***********/
+
+window.onload = function(){
+	if (window.XMLHttpRequest || window.ActiveXObject){
+		var ac = new AjaxComboList("iIdOrganisation", "getRaisonSociale");
+		ac.addActionOnChange("remplirCommission()");
+<%
+	if(!"".equals(organisation.getRaisonSociale()))
+	{
+%>
+		ac.initialiserChamps("<%= organisation.getRaisonSociale() %>", <%= organisation.getIdOrganisation() %>);
+		initialiserCommissionSelect(<%= organisation.getIdOrganisation() %>, <%= commissionSelected.getIdCommission() %>)
+<%
+	}
+%>
+	}else{
+		alert("Attention, votre navigateur n'est pas compatible avec la technologie \"Ajax\".\nVeuillez installer un navigateur r?cent : www.GetFirefox.com");
+	}
+onAfterPageLoading();
+}
+<%
+}
+%>
+<%@page import="java.util.Vector"%>
+<%@page import="modula.Validite"%>
+<%@page import="java.sql.Timestamp"%>

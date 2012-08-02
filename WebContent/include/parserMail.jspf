@@ -1,0 +1,134 @@
+
+<%@page import="org.coin.mail.mailtype.MailUser"%><%@page import="modula.algorithme.AffaireProcedure"%>
+<%
+	/*
+	Objet necessaires
+		objet
+		contenuMail
+		Mail
+		candidat
+		user
+		marche
+		membre
+	*/
+	
+	String sPassation = "";
+	try
+	{
+		int iIdMarchePassation = AffaireProcedure.getAffaireProcedureMemory(marche.getIdAlgoAffaireProcedure()).getIdMarchePassation();
+		sPassation = MarchePassation.getMarchePassationGlobalNameMemory(iIdMarchePassation,false);
+	}
+	catch(Exception e){}
+	
+	objet = Outils.replaceAll(objet, "[reference]", marche.getReference());
+	objet = Outils.replaceAll(objet, "[mode_passation]", sPassation);
+	objet = Outils.replaceAll(objet, "[objet]", marche.getObjet());
+	
+	contenuMail = Outils.replaceAll(contenuMail, "[mode_passation]", sPassation);
+	contenuMail = Outils.replaceAll(contenuMail, "[nom_organisation]", Organisation.getOrganisation(user.getIdOrganisation()).getRaisonSociale());
+	contenuMail = Outils.replaceAll(contenuMail, "[nom_commission]",Commission.getNomCommission(marche.getIdCommission()));
+	contenuMail = Outils.replaceAll(contenuMail, "[site_web]", Organisation.getOrganisation(user.getIdOrganisation()).getSiteWeb());
+	
+	if(candidat != null)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[candidat]", candidat.getCivilitePrenomNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[civilite_candidat]", candidat.getCivilite());
+		contenuMail = Outils.replaceAll(contenuMail, "[nom_candidat]",candidat.getNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[prenom_candidat]", candidat.getPrenom());
+	}
+	
+	if(user != null)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[personne_loguee]", user.getCivilitePrenomNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[civilite_personne_loguee]", user.getCivilite());
+		contenuMail = Outils.replaceAll(contenuMail, "[nom_personne_loguee]",user.getNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[prenom_personne_loguee]", user.getPrenom());
+	}
+		
+	if(membre != null)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[membre]", membre.getCivilitePrenomNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[civilite_membre]", membre.getCivilite());
+		contenuMail = Outils.replaceAll(contenuMail, "[nom_membre]",membre.getNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[prenom_membre]", membre.getPrenom());
+	}
+	
+	if(gestionnaireCarnet != null)
+	{	
+		contenuMail = Outils.replaceAll(contenuMail, "[gestionnaire_carnet]", gestionnaireCarnet.getCivilitePrenomNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[civilite_gestionnaire_carnet]", gestionnaireCarnet.getCivilite());
+		contenuMail = Outils.replaceAll(contenuMail, "[nom_gestionnaire_carnet]",gestionnaireCarnet.getNom());
+		contenuMail = Outils.replaceAll(contenuMail, "[prenom_gestionnaire_carnet]", gestionnaireCarnet.getPrenom());
+	}	
+	
+	Vector<Validite> vValiditeAAPC = Validite.getAllValiditeAAPCFromAffaire(marche.getIdMarche());
+	Validite oValiditeAAPC = null;
+	String sDateDebutAAPC = "";
+	if(vValiditeAAPC != null)
+	{
+		if(vValiditeAAPC.size() == 1)
+		{
+			oValiditeAAPC = vValiditeAAPC.firstElement();
+			sDateDebutAAPC = CalendarUtil.getDateFormattee(oValiditeAAPC.getDateDebut());
+			contenuMail = Outils.replaceAll(contenuMail, "[date_mise_en_ligne]",sDateDebutAAPC);
+		}
+	}
+	
+	Vector<Validite> vValiditeAATR = Validite.getAllValiditeAATRFromAffaire(marche.getIdMarche());
+	Validite oValiditeAATR = null;
+	String sDateDebutAATR = "";
+	if(vValiditeAATR != null)
+	{
+		if(vValiditeAATR.size() == 1)
+		{
+			oValiditeAATR = vValiditeAATR.firstElement();
+			sDateDebutAATR = CalendarUtil.getDateFormattee(oValiditeAATR.getDateDebut());
+			contenuMail = Outils.replaceAll(contenuMail, "[date_publication_avis_attribution]",sDateDebutAATR);
+		}
+	}
+	
+	Vector<Validite> vLastValiditeB = Validite.getAllValiditeEnveloppeBFromAffaire(marche.getIdMarche());
+	Validite oLastValiditeB = null;
+	String sDateFinOffres = "";
+	if(vLastValiditeB != null)
+	{
+		if(vLastValiditeB.size() > 0)
+		{
+			oLastValiditeB = vLastValiditeB.lastElement();
+			sDateFinOffres = CalendarUtil.getDateFormattee(oLastValiditeB.getDateFin());
+			contenuMail = Outils.replaceAll(contenuMail, "[date_limite_offres]",sDateFinOffres);
+		}
+	}
+	
+	if(demandeInfoComplementaire != null)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[infos_complementaires]",demandeInfoComplementaire.getDemandeInfo());
+		contenuMail = Outils.replaceAll(contenuMail, "[delai_complementaire]",CalendarUtil.getDifferenceBetweenTimstampsWithFormatJJHHMM(demandeInfoComplementaire.getDateDebutRemise(),demandeInfoComplementaire.getDateFinRemise()));
+	}
+	
+	if(sUrlValidation.compareTo("") != 0)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, MailUser.TAG_URL_VALIDATION,sUrlValidation);
+	}
+	
+	if(sNouveauPassword.compareTo("") != 0)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[nouveau_password]",sNouveauPassword);
+	}
+	
+	if(sPassword.compareTo("") != 0)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[password]",sPassword);
+	}
+	
+	if(sMailNouveauMembre.compareTo("") != 0)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[mail_nouveau_membre]",sMailNouveauMembre);
+	}
+	
+	if(sStatut.compareTo("") != 0)
+	{
+		contenuMail = Outils.replaceAll(contenuMail, "[statut]",sStatut);
+	}
+	
+%>
