@@ -1,0 +1,31 @@
+<commissions>
+	<date_emission></date_emission>
+	<courtier>
+		<identite></identite>
+		<adresse>
+			<ligne1></ligne1>
+			<ligne2></ligne2>
+			<ligne3></ligne3>
+			<code_postal></code_postal>
+			<commune></commune>
+			<pays></pays>
+		</adresse>
+		<code_agent></code_agent>
+		<registre_commerce></registre_commerce>
+	</courtier>
+	<commandes>
+		<commande>
+			<ref_bdc_papier></ref_bdc_papier>
+			<prix_commande_ht></prix_commande_ht>
+			<commission_montant></commission_montant>
+			<client>
+				<ref_client></ref_client>
+				<nom_client></nom_client>
+			</client>
+			<echeance>
+				<echeance_libelle></echeance_libelle>
+				<echance_montant_ht></echance_montant_ht>
+			</echeance>
+		</commande>
+	</commandes>
+</commissions>
